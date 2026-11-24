@@ -3,6 +3,11 @@ title: Reading Telemetry
 description: Request telemetry from your phone, understand the permissions, and interpret what comes back
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/14_reading_telemetry.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The sensor is built and wired. Now let's ask it something from the other end of the mesh.

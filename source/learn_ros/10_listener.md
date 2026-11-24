@@ -3,6 +3,11 @@ layout: lesson
 title: Talker ROS2 Program
 type: page
 description: Let's create a talker program to publish messages
+cover: /learn/learn_ros/assets/banners/10_listener.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Talker Program

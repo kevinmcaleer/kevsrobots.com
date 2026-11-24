@@ -3,11 +3,11 @@ title: Obstacle Avoidance with Ultrasonic Sensors
 description: Use an ultrasonic sensor to detect obstacles and prevent your robot from crashing into things.
 layout: lesson
 type: page
-cover: assets/ultrasonic_sensor.jpg
+cover: /learn/micropython_robotics/assets/banners/05_ultrasonic_sensor.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/03.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

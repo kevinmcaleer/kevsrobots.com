@@ -3,11 +3,11 @@ title: Adding Nodes
 description: Join additional Raspberry Pi nodes to your K3s cluster using the shared token and master node address.
 layout: lesson
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/06_adding_nodes.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

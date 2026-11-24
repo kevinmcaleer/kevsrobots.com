@@ -3,7 +3,7 @@ layout: lesson
 title: "Course Summary and What\u2019s Next"
 author: Kevin McAleer
 type: page
-cover: assets/summary.jpg
+cover: /learn/micropython_robotics/assets/banners/12_summary.jpg
 date: 2025-05-20
 previous: 11_final_project.html
 description: "Reflect on what you\u2019ve accomplished and explore ideas for taking\
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

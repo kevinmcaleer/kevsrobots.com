@@ -4,6 +4,11 @@ description: >-
     Picture your Python classes - their attributes, methods and how they relate - with Mermaid class diagrams
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/07_class-diagrams.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Why draw your classes?

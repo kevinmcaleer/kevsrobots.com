@@ -3,11 +3,11 @@ title: Course Summary
 description: Review what you've learned, what you’ve built, and where to go next in your Kubernetes journey after completing the K3s on Raspberry Pi course.
 layout: lesson
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/18_summary.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

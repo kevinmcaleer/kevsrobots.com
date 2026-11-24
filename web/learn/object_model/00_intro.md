@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/object_model/assets/banners/00_intro.jpg
 date: 2025-12-04
 next: 01_setup.html
 description: Learn how to build custom object detection models using the Raspberry
@@ -44,7 +44,9 @@ navigation:
 ---
 
 
-![Raspberry Pi AI Camera](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

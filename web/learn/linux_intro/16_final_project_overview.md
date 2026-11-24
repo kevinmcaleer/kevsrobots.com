@@ -3,7 +3,7 @@ layout: lesson
 title: Final Project Overview
 author: Kevin McAleer
 type: page
-cover: /learn/linux_intro/assets/project.jpg
+cover: /learn/linux_intro/assets/banners/16_final_project_overview.jpg
 date: 2024-08-23
 previous: 15_basic_git_commands.html
 next: 17_final_project_steps.html
@@ -76,7 +76,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

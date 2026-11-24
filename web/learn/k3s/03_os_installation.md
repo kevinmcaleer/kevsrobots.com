@@ -3,7 +3,7 @@ layout: lesson
 title: Installing the Operating System
 author: Kevin McAleer
 type: page
-cover: assets/k3s02.jpg
+cover: /learn/k3s/assets/banners/03_os_installation.jpg
 date: 2025-06-01
 previous: 02_hardware_requirements.html
 next: 04_cluster_networking.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

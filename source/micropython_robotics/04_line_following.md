@@ -3,11 +3,11 @@ title: Line Following with IR Sensors
 description: Learn how to detect and follow a line using an IR sensor and MicroPython.
 layout: lesson
 type: page
-cover: assets/line_following.jpg
+cover: /learn/micropython_robotics/assets/banners/04_line_following.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

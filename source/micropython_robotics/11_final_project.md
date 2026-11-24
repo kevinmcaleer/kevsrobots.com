@@ -3,11 +3,11 @@ title: Final Project – Build Your Own Robot
 description: Apply what you’ve learned to design, build, and code your very own autonomous robot project.
 layout: lesson
 type: page
-cover: assets/final_project.jpg
+cover: /learn/micropython_robotics/assets/banners/11_final_project.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

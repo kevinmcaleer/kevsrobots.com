@@ -3,6 +3,11 @@ layout: lesson
 title: Analog Input (ADC)
 type: page
 description: Learn about analog input and the ADC on the Raspberry Pi Pico using MicroPython.
+cover: /learn/micropython_gpio/assets/banners/08_adc.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

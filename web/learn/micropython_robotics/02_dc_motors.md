@@ -3,7 +3,7 @@ layout: lesson
 title: Controlling DC Motors with the Raspberry Pi Pico
 author: Kevin McAleer
 type: page
-cover: assets/dc_motors.jpg
+cover: /learn/micropython_robotics/assets/banners/02_dc_motors.jpg
 date: 2025-05-20
 previous: 01_intro.html
 next: 03_hbridge_control.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

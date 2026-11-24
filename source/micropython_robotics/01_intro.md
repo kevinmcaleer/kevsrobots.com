@@ -3,11 +3,11 @@ title: Introduction to MicroPython Robotics Projects
 description: Get started with building robots using the Raspberry Pi Pico and MicroPython – learn about motors, sensors, and putting it all together.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/micropython_robotics/assets/banners/01_intro.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

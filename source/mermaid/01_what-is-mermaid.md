@@ -4,6 +4,11 @@ description: >-
     Learn what diagrams as code means, why it's so handy for makers, and where Mermaid diagrams are drawn for you
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/01_what-is-mermaid.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Diagrams as code

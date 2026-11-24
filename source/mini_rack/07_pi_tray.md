@@ -3,6 +3,11 @@ title: Create the Pi-Tray
 description: Raspberry Pi 5 Cluster Panel Tray
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/07_pi_tray.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 1. Create a new file named `pi_tray` in Fusion 360

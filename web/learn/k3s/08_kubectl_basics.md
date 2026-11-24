@@ -3,7 +3,7 @@ layout: lesson
 title: Kubectl Basics
 author: Kevin McAleer
 type: page
-cover: assets/k3s01.jpg
+cover: /learn/k3s/assets/banners/08_kubectl_basics.jpg
 date: 2025-06-01
 previous: 07_troubleshooting_install.html
 next: 09_dashboard_and_monitoring.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

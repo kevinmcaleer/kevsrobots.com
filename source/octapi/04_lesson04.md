@@ -2,6 +2,11 @@
 title: Bruteforce descryption
 description: Learn how to crack the Enigma machine using a brute force attack
 layout: lesson
+cover: /learn/octapi/assets/banners/04_lesson04.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What is a brute force attack?

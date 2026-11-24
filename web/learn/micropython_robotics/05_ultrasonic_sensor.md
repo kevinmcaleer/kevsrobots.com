@@ -3,7 +3,7 @@ layout: lesson
 title: Obstacle Avoidance with Ultrasonic Sensors
 author: Kevin McAleer
 type: page
-cover: assets/ultrasonic_sensor.jpg
+cover: /learn/micropython_robotics/assets/banners/05_ultrasonic_sensor.jpg
 date: 2025-05-20
 previous: 04_line_following.html
 next: 06_build_robot.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/03.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

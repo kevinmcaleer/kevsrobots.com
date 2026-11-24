@@ -2,6 +2,11 @@
 title: Summary and Review
 description: A summary of what you have learned so far
 layout: lesson
+cover: /learn/micropython/assets/banners/18_summary.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Picture of a group high-five](assets/summary.jpg){:.cover}

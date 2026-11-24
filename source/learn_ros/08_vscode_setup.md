@@ -3,6 +3,11 @@ layout: lesson
 title: VSCode setup
 type: page
 description: Install the VSCode extensions so we can remotely connect to the Raspberry Pi and Docker container instances
+cover: /learn/learn_ros/assets/banners/08_vscode_setup.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## VSCode Remote connection

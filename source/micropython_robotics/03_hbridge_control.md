@@ -3,11 +3,11 @@ title: Using H-Bridge Motor Drivers
 description: Understand how H-bridge motor drivers like the L298N control motor direction and speed for two-wheeled robots.
 layout: lesson
 type: page
-cover: assets/hbridge.jpg
+cover: /learn/micropython_robotics/assets/banners/03_hbridge_control.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

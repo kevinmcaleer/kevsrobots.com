@@ -2,6 +2,11 @@
 title: Example 01
 description: hello_world.py
 layout: lesson
+cover: /learn/micropython/assets/banners/07_hello_world.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Type of the program below into your MicroPython Editor.

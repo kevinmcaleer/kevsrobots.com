@@ -3,7 +3,7 @@ layout: lesson
 title: Building an Environment Sensor
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/11_environment_sensor.jpg
 date: 2026-08-05
 previous: 10_flashing_the_sensor.html
 next: 12_battery_telemetry.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Four wires and a £5 breakout, and your mesh can tell you whether the greenhouse went below freezing last night. This is the most satisfying build in the course.
 

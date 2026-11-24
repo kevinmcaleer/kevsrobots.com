@@ -3,6 +3,11 @@ title: Flashing the Firmware
 description: Use the MeshCore web flasher to load repeater firmware on one board and companion firmware on the other
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/05_flashing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 This is the moment the two identical boards become two different things. Node 1 gets **repeater** firmware; node 2 gets **companion** firmware. Everything else in the course follows from this choice.

@@ -3,7 +3,7 @@ layout: lesson
 title: Using Temperature Sensors
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/10_temperature_sensors.jpg
 date: 2023-04-14
 previous: 09_potentiometers.html
 next: 11_uart.html
@@ -68,6 +68,10 @@ navigation:
       link: 17_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

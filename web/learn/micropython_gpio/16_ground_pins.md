@@ -3,7 +3,7 @@ layout: lesson
 title: Ground Pins
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/16_ground_pins.jpg
 date: 2023-04-14
 previous: 15_ultrasonic_range_finders.html
 next: 17_summary.html
@@ -69,6 +69,10 @@ navigation:
       link: 17_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

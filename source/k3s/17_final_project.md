@@ -3,11 +3,11 @@ title: Final Project – Deploying a Multi-Service App
 description: Bring together everything you've learned to deploy a real, multi-service application on your K3s cluster with persistence, ingress, and CI/CD integration.
 layout: lesson
 type: page
-cover: assets/k3s04.jpg
+cover: /learn/k3s/assets/banners/17_final_project.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Hardware Requirements
 author: Kevin McAleer
 type: page
-cover: assets/k3s01.jpg
+cover: /learn/k3s/assets/banners/02_hardware_requirements.jpg
 date: 2025-06-01
 previous: 01_intro.html
 next: 03_os_installation.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

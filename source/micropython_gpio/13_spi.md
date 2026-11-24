@@ -3,6 +3,11 @@ layout: lesson
 title: Introduction to SPI
 type: page
 description: Learn about SPI communication protocol and how to use it with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/13_spi.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

@@ -2,6 +2,11 @@
 title: Functions
 description: Learn how to make reusable blocks of code
 layout: lesson
+cover: /learn/micropython/assets/banners/15_functions.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Photo of a laptop and notepad on a desk](assets//functions.jpg){:.cover}

@@ -3,11 +3,11 @@ title: Creating Simple Autonomous Behavior
 description: Combine motor control and sensors to give your robot autonomous movement and basic decision-making.
 layout: lesson
 type: page
-cover: assets/autonomous_robot.jpg
+cover: /learn/micropython_robotics/assets/banners/10_autonomous_robot.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/04.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

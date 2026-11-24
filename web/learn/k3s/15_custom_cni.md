@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Networking & Custom CNI
 author: Kevin McAleer
 type: page
-cover: assets/k3s02.jpg
+cover: /learn/k3s/assets/banners/15_custom_cni.jpg
 date: 2025-06-01
 previous: 14_ci_cd_on_k3s.html
 next: 16_securing_your_cluster.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

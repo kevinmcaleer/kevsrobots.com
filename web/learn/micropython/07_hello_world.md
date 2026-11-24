@@ -3,7 +3,7 @@ layout: lesson
 title: Example 01
 author: Kevin McAleer
 type: page
-cover: /learn/micropython/assets/micropython.jpg
+cover: /learn/micropython/assets/banners/07_hello_world.jpg
 date: 2022-12-04
 previous: 06_our_first_program.html
 next: 08_variables.html
@@ -67,6 +67,10 @@ navigation:
       link: 18_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Type of the program below into your MicroPython Editor.
 

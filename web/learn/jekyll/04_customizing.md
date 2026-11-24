@@ -3,7 +3,7 @@ layout: lesson
 title: Customizing Your Jekyll Site
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/04_customizing.jpg
 date: 2024-01-24
 previous: 03_content.html
 next: 05_advanced.html
@@ -38,6 +38,10 @@ navigation:
       link: 08_bonus.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

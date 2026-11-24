@@ -3,6 +3,11 @@ title: "Learn More: Markdown Course"
 description: Link to the full Markdown course for advanced Markdown skills.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/11_markdown_course_link.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Learn More: Markdown Course

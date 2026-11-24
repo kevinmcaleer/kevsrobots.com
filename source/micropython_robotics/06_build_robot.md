@@ -3,11 +3,11 @@ title: Building a Two-Wheel Drive Robot
 description: Assemble a simple two-wheeled robot chassis using motors, sensors, and the Raspberry Pi Pico.
 layout: lesson
 type: page
-cover: assets/robot_assembly.jpg
+cover: /learn/micropython_robotics/assets/banners/06_build_robot.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/04.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,6 +3,11 @@ title: Advanced Tips and Productivity Hacks for Jekyll
 description: Enhance your Jekyll skills with advanced tips, productivity hacks, and resources for further learning.
 layout: lesson
 type: page
+cover: /learn/jekyll/assets/banners/08_bonus.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

@@ -3,6 +3,11 @@ title: Create the Bottom Corner
 description: Learn how to create the bottom corner piece for the mini-rack
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/03_bottom.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Bottom Design](assets/bottom_design.png){:class="img-fluid w-100"}

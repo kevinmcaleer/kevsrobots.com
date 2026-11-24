@@ -3,6 +3,11 @@ title: Where to Put the Repeater
 description: Height, power, weatherproofing and solar - turning a dev board into infrastructure
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/08_repeater_placement.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 A repeater is only as good as its view of the world. This lesson is about the unglamorous physical stuff that decides whether your mesh covers a street or a county.

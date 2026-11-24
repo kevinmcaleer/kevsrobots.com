@@ -4,6 +4,11 @@ description: >-
     Learn how to deploy your trained object detection model to the Raspberry Pi AI Camera for edge inference
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/05_deployment.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

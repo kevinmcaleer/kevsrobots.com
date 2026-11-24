@@ -3,6 +3,11 @@ title: Remote Administration
 description: Log into your repeater over the air from your phone, change settings and read its stats
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/13_remote_admin.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Your repeater is in the loft, on a pole, or in a weatherproof box on a roof. Fetching a ladder and a laptop every time you want to change a setting would get old fast. It is a good job you do not have to.

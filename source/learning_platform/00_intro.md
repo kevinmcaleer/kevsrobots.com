@@ -3,6 +3,11 @@ layout: lesson
 title: Introduction
 type: page
 description: How to use the Learning Platform
+cover: /learn/learning_platform/assets/banners/00_intro.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Learning Platform Logo](assets/learning_platform.jpg){:class="img-fluid w-100"}

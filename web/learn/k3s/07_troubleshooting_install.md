@@ -3,7 +3,7 @@ layout: lesson
 title: Troubleshooting Installation
 author: Kevin McAleer
 type: page
-cover: assets/k3s06.jpg
+cover: /learn/k3s/assets/banners/07_troubleshooting_install.jpg
 date: 2025-06-01
 previous: 06_adding_nodes.html
 next: 08_kubectl_basics.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

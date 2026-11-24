@@ -3,6 +3,11 @@ layout: lesson
 title: First ROS2 Program
 type: page
 description: Let's create our first ROS2 program
+cover: /learn/learn_ros/assets/banners/09_first_ros_program.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the video

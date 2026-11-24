@@ -3,7 +3,7 @@ layout: lesson
 title: What is MeshCore?
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/01_what_is_meshcore.jpg
 date: 2026-08-05
 previous: 00_intro.html
 next: 02_how_lora_works.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 MeshCore is a lightweight, hybrid-routing mesh protocol for packet radios. In plain English: it is firmware that turns a cheap LoRa board into a node on a self-organising, encrypted text messaging network.
 

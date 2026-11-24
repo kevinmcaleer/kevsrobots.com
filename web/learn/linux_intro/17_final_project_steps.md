@@ -3,7 +3,7 @@ layout: lesson
 title: Final Project Steps
 author: Kevin McAleer
 type: page
-cover: /learn/linux_intro/assets/project.jpg
+cover: /learn/linux_intro/assets/banners/17_final_project_steps.jpg
 date: 2024-08-23
 previous: 16_final_project_overview.html
 next: 18_resources_next_steps.html
@@ -77,7 +77,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

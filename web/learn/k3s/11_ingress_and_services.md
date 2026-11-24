@@ -3,7 +3,7 @@ layout: lesson
 title: Ingress and Services
 author: Kevin McAleer
 type: page
-cover: assets/k3s04.jpg
+cover: /learn/k3s/assets/banners/11_ingress_and_services.jpg
 date: 2025-06-01
 previous: 10_storage_and_volumes.html
 next: 12_deploying_apps.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

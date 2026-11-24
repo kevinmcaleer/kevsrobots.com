@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/00_intro.jpg
 date: 2025-08-24
 next: 01_installing.html
 description: Learn about this introduction to Obsidian course.
@@ -50,6 +50,10 @@ navigation:
       link: 11_markdown_course_link.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 # Introduction to Obsidian
 

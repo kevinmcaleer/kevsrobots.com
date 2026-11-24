@@ -3,6 +3,11 @@ title: Graph View in Obsidian
 description: Discover how to visualize and explore your notes using Obsidian's powerful Graph View feature.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/12_graph_view.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Graph View in Obsidian

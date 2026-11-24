@@ -3,7 +3,7 @@ layout: lesson
 title: Raspberry Pi Setup
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/02_pi_setup.jpg
 date: 2023-01-07
 previous: 01_what_is_ros.html
 next: 03_install_updates.html
@@ -75,7 +75,9 @@ navigation:
 ---
 
 
-![Screenshot of the imager tool](assets/rpi_desktop.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

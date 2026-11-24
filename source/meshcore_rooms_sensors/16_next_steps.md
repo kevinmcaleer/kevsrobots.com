@@ -3,6 +3,11 @@ title: Where to Go Next
 description: Bridging to MQTT, Home Assistant and Grafana, and a capstone that ties the whole network together
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/16_next_steps.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 You now have all four MeshCore roles under your belt. Here is where a network like this goes once the basics are working.

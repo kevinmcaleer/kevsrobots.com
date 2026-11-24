@@ -3,7 +3,7 @@ layout: lesson
 title: Deploying and Managing Your Jekyll Site
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/06_deploy.jpg
 date: 2024-01-24
 previous: 05_advanced.html
 next: 07_realworld.html
@@ -38,6 +38,10 @@ navigation:
       link: 08_bonus.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

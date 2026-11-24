@@ -3,11 +3,11 @@ title: Course Summary and What’s Next
 description: Reflect on what you’ve accomplished and explore ideas for taking your MicroPython robotics skills even further.
 layout: lesson
 type: page
-cover: assets/summary.jpg
+cover: /learn/micropython_robotics/assets/banners/12_summary.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

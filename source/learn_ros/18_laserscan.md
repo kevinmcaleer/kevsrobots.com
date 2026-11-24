@@ -3,6 +3,11 @@ layout: lesson
 title: Laserscan data
 type: page
 description: Let's Visualise our Laser scan data
+cover: /learn/learn_ros/assets/banners/18_laserscan.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Visualise Laserscan

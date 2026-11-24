@@ -3,9 +3,12 @@ layout: lesson
 title: Raspberry Pi Setup
 type: page
 description: How to setup a Raspberry Pi 4
+cover: /learn/learn_ros/assets/banners/02_pi_setup.jpg
 ---
 
-![Screenshot of the imager tool](assets/rpi_desktop.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

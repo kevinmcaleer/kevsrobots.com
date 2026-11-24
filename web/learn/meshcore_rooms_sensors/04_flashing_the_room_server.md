@@ -3,7 +3,7 @@ layout: lesson
 title: Flashing the Room Server
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/04_flashing_the_room_server.jpg
 date: 2026-08-05
 previous: 03_what_is_a_room_server.html
 next: 05_room_server_config.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 This will feel familiar - it is the same flasher and the same process you used in part one, with a different firmware variant selected.
 

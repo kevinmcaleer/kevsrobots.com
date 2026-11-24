@@ -3,11 +3,11 @@ title: Troubleshooting Installation
 description: Solve common problems when installing or joining K3s on Raspberry Pi, including networking, tokens, and service errors.
 layout: lesson
 type: page
-cover: assets/k3s06.jpg
+cover: /learn/k3s/assets/banners/07_troubleshooting_install.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

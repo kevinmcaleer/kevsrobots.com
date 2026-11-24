@@ -3,7 +3,7 @@ layout: lesson
 title: Learn MicroPython Introduction Video
 author: Kevin McAleer
 type: page
-cover: /learn/micropython/assets/micropython.jpg
+cover: /learn/micropython/assets/banners/00_videos.jpg
 date: 2022-12-04
 previous: 00_intro.html
 next: 01_why_is_it_called_micropython.html
@@ -67,6 +67,10 @@ navigation:
       link: 18_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## YouTube Series
 

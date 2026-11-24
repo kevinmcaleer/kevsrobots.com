@@ -3,6 +3,11 @@ layout: lesson
 title: Create a ROS2 Python Package
 type: page
 description: Let's create a new Python Package
+cover: /learn/learn_ros/assets/banners/11_create_py_package.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Create a ROS2 Package

@@ -3,11 +3,11 @@ title: Hardware Requirements
 description: Choose the right Raspberry Pi hardware and accessories to build a reliable and scalable K3s Kubernetes cluster.
 layout: lesson
 type: page
-cover: assets/k3s01.jpg
+cover: /learn/k3s/assets/banners/02_hardware_requirements.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

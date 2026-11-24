@@ -3,6 +3,11 @@ title: What is a Sensor Node?
 description: Pull-based telemetry, leaf nodes, and why MeshCore sensors sip power
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/09_what_is_a_sensor_node.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Half way. The room server is built; now we turn to the role that lets your mesh measure things rather than just carry conversation.

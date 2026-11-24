@@ -3,11 +3,11 @@ title: Bluetooth Control with HC-05
 description: Learn how to control your robot remotely using Bluetooth and a smartphone or computer.
 layout: lesson
 type: page
-cover: assets/bluetooth_control.jpg
+cover: /learn/micropython_robotics/assets/banners/08_bluetooth_control.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

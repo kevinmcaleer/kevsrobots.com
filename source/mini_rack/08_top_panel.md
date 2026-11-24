@@ -3,6 +3,11 @@ title: Create the Top Panel
 description: Learn how to create the top panel for the mini-rack
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/08_top_panel.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## How to create the top Panel for the Mini-Rack

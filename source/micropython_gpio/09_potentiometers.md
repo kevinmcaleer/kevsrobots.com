@@ -3,6 +3,11 @@ layout: lesson
 title: Using Potentiometers
 type: page
 description: Learn how to use potentiometers with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/09_potentiometers.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

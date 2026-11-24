@@ -3,6 +3,11 @@ title: Configuring the Room Server
 description: Name, location, admin and guest passwords, read-only access and advert intervals
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/05_room_server_config.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The board is flashed and on the right frequency. Now we give it an identity and lock it down, because the passwords it shipped with are printed in the public documentation.

@@ -3,11 +3,11 @@ title: Using Helm
 description: Learn how to use Helm to deploy and manage applications on your K3s cluster with reusable charts and versioned releases.
 layout: lesson
 type: page
-cover: assets/k3s06.jpg
+cover: /learn/k3s/assets/banners/13_using_helm.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

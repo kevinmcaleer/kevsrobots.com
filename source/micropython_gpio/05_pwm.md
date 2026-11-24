@@ -3,6 +3,11 @@ layout: lesson
 title: Pulse Width Modulation (PWM)
 type: page
 description: Learn about Pulse Width Modulation (PWM) and controlling devices like LEDs and motors using the Raspberry Pi Pico with MicroPython.
+cover: /learn/micropython_gpio/assets/banners/05_pwm.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

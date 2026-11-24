@@ -3,11 +3,11 @@ title: Servo Scanning with Ultrasonic Sensors
 description: Use a servo motor to rotate your ultrasonic sensor and scan the environment with MicroPython.
 layout: lesson
 type: page
-cover: assets/servo_scanning.jpg
+cover: /learn/micropython_robotics/assets/banners/07_servo_scanning.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

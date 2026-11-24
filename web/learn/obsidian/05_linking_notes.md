@@ -3,7 +3,7 @@ layout: lesson
 title: Linking Notes
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/05_linking_notes.jpg
 date: 2025-08-24
 previous: 04_tagging_notes.html
 next: 06_canvas.html
@@ -52,6 +52,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Linking Notes
 

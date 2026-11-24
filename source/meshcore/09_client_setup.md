@@ -3,6 +3,11 @@ title: Setting Up the Client
 description: Pair node 2 with the MeshCore phone app over Bluetooth and match its radio settings
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/09_client_setup.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Node 2 has companion firmware on it. It has no keyboard and no way to type a message - that is your phone's job. Let's pair them up.
