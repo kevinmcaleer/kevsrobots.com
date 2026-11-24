@@ -4,27 +4,43 @@ title: Building a Robot Arm with Raspberry Pi and PCA9685
 author: Kevin McAleer
 cover: /learn/pca9685/assets/cover.png
 date: 2024-04-06
-description: Dive into the exciting world of robotics by learning how to control a
-  robot arm using a Raspberry Pi, Python, and the PCA9685 board. This course covers
-  everything from setting up your Raspberry Pi, understanding the PCA9685 board, programming
-  with Python, to constructing and controlling a 4-servo robot arm. Perfect for beginners
-  and enthusiasts alike, this course will guide you through each step with practical
-  examples and hands-on projects.
+description: Build Buddy Jr, a small 3D printed robot arm with four servos, and bring
+  it to life with a Raspberry Pi, Python and a PCA9685 servo driver. You'll set up
+  the Pi, wire the board safely with a separate servo supply, learn the maths from
+  angle to pulse, assemble the arm and program smooth, repeatable movements.
 level: beginner
-course_duration: 0h 34m
+course_duration: 1h 10m
 lesson_count: 12
-first_lesson: 01_course_introduction.html
+first_lesson: 00_intro.html
+quiz_total: 33
 video: _JJAV97Mm98
+outcomes:
+- Wire a PCA9685 to a Raspberry Pi and power the servos from their own supply
+- Turn an angle into a 12-bit PWM count and explain the maths
+- Control four servos by name from Python with the Adafruit PCA9685 library
+- Calibrate each joint and keep it inside safe limits
+- Make smooth movements between named poses and run an automated routine
+- Find faults in a servo arm by testing one link of the chain at a time
+prerequisites:
+- Some Python, such as Python for beginners
+- Comfort typing commands in a terminal, such as Introduction to the Linux Command
+  Line on Raspberry Pi OS
+you_need:
+- A Raspberry Pi with header pins, a power supply and a microSD card
+- A PCA9685 16-channel servo driver board
+- Four SG90 style servos and the 3D printed Buddy Jr parts
+- A separate 5 V supply for the servos, able to give at least 2 A
+- Jumper wires and a small cross-head screwdriver
 navigation:
 - name: Building a Robot Arm with Raspberry Pi and PCA9685
 - content:
   - section: Getting Started with Raspberry Pi and Python
     content:
     - name: Introduction
-      link: 01_course_introduction.html
+      link: 00_intro.html
     - name: Setting Up Your Raspberry Pi
       link: 02_raspberry_pi_setup.html
-    - name: Python Basics for Robotics
+    - name: 03_python_basics_for_robotics.md
       link: 03_python_basics_for_robotics.html
   - section: Understanding the PCA9685 Servo Driver
     content:
@@ -50,6 +66,6 @@ navigation:
     content:
     - name: Project Ideas
       link: 11_project_ideas.html
-    - name: Troubleshooting
+    - name: Troubleshooting and Next Steps
       link: 12_troubleshooting_common_issues.html
 ---
