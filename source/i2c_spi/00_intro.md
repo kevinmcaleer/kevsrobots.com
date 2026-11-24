@@ -6,6 +6,7 @@ type: page
 cover: /learn/i2c_spi/assets/banners/00_intro.jpg
 videos:
   - lthSloWM3Fk
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -13,6 +14,8 @@ videos:
 ---
 
 ![Course Cover](/learn/i2c_spi/assets/cover.jpg){:class="cover"}
+
+By the end of this lesson you will be able to say what the course covers, what kit you need, and how the lessons are laid out.
 
 ## Overview
 
@@ -53,17 +56,19 @@ After completing this course, you will be able to:
 ### Hardware
 
 - **Raspberry Pi Pico** (or Pico W) with MicroPython installed
-- **BME280 sensor module** - I2C version (commonly available on breakout boards)
+- **BME280 sensor module** - I2C version on a breakout board (3.3 V, or a 3.3 V/5 V board with a regulator)
 - **Breadboard** - For prototyping connections
 - **Jumper wires** - Male-to-male and male-to-female
 - **USB cable** - To connect Pico to your computer
-- **Optional**: SPI sensor or display module (for SPI section)
+- **Optional, for the SPI lessons**: a MAX31855 thermocouple breakout and a K-type thermocouple
+- **Optional, for the final project**: a 128x64 SSD1306 I2C OLED display
 
 ### Software
 
 - **Thonny IDE** - For writing and uploading MicroPython code
 - **MicroPython firmware** - Pre-installed on your Pico
 - **USB driver** - Usually installed automatically
+- **Two driver files** - `bme280.py` (we write it together in lesson 4) and `ssd1306.py` (only for the final project). Neither is built into the MicroPython firmware, so you save them onto the Pico yourself. Lesson 4 shows how.
 
 ### Knowledge Prerequisites
 
@@ -73,7 +78,7 @@ Before starting this course, you should:
 - Know how to connect to your Raspberry Pi Pico and run code
 - Have basic familiarity with GPIO pins
 
-If you need to brush up on these topics, check out the [Introduction to MicroPython](/learn/micropython/) course first.
+If you need to brush up on these topics, check out the [Introduction to MicroPython](/learn/micropython/) course first. If voltage, current and resistors are new to you, the [Electronics Basics](/learn/electronics_basics/) course covers what you need for the pull-up resistor lesson.
 
 ## How the Course Works
 
@@ -137,9 +142,12 @@ By the end, you'll have the confidence to pick up any I2C or SPI device datashee
 
 After completing this course, you'll be ready for:
 
+- **Driving many outputs from one bus** - The [PCA9685 course](/learn/pca9685/) uses the I2C skills from this course to control 16 servos with two wires
 - **Adding Displays** - Use I2C/SPI displays to visualize sensor data (Video 2 in the series)
 - **WiFi Communication** - Send sensor data over the internet (Video 3 in the series)
 - **Weather Station Project** - Build a complete IoT weather station (Video 6 capstone)
+
+> **Teachers**: This course suits ages 12 and up who already write simple MicroPython. Allow about 45 minutes per lesson, and 90 minutes for the final project. Plan on one Pico, one BME280 and a breadboard per pair of learners; the SPI lessons need a MAX31855 and a thermocouple, which is the dearest part of the kit, so one per group works well. With no hardware at all, learners can still read the lessons, work through the datasheet exercises in lessons 5 and 6, and do the bus-choice exercises in lesson 10 on paper. The driver files are copied to the Pico over USB, so a school network is not needed.
 
 ## Ready to Begin?
 

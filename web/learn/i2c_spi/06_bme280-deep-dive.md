@@ -10,7 +10,9 @@ next: 07_what-is-spi.html
 description: Explore advanced BME280 features including power modes, filtering, and
   optimization techniques
 percent: 56
-duration: 9
+duration: 12
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -59,6 +61,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to choose the BME280's power mode, oversampling, filter and standby time by writing its configuration registers.
+
 ## Mastering the BME280
 
 Now that you can read basic sensor data and understand datasheets, let's explore the BME280's advanced features. This lesson covers power modes, oversampling, filtering, and optimization techniques that make your projects more efficient and accurate.
@@ -73,12 +77,12 @@ The BME280 has three operating modes:
 - **Use case**: Battery-powered projects with infrequent readings
 
 ### Forced Mode
-- **Power consumption**: 340 μA (during measurement)
-- **When**: Take one measurement, then return to sleep
+- **Power consumption**: about 350 μA while measuring, then back to sleep
+- **When**: Take one measurement each time you ask, then return to sleep
 - **Use case**: Maximum battery life with periodic sampling
 
 ### Normal Mode
-- **Power consumption**: 3.6 μA @ 1Hz sampling
+- **Power consumption**: depends on oversampling and standby time (the datasheet quotes 3.6 μA at one reading per second with 1x oversampling)
 - **When**: Continuous automatic measurements
 - **Use case**: Real-time monitoring, always-on sensors
 
@@ -136,13 +140,16 @@ BME280_ADDR = 0x76
 def read_forced_mode():
     """Read sensor in forced mode (most power efficient)"""
 
+    # Humidity must be switched on too (it is skipped by default)
+    i2c.writeto_mem(BME280_ADDR, 0xF2, bytes([0b001]))  # humidity x1
+
     # Set forced mode
     # Configuration: temp_os=1x, press_os=1x, mode=forced
     ctrl_config = 0b00100101  # 0x25
     i2c.writeto_mem(BME280_ADDR, 0xF4, bytes([ctrl_config]))
 
-    # Wait for measurement to complete (max 10ms for 1x oversampling)
-    time.sleep_ms(10)
+    # Wait for measurement to complete (under 10ms at 1x oversampling)
+    time.sleep_ms(12)
 
     # Read data registers
     data = i2c.readfrom_mem(BME280_ADDR, 0xF7, 8)
@@ -152,7 +159,8 @@ def read_forced_mode():
     temp_raw = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
     hum_raw = (data[6] << 8) | data[7]
 
-    print(f"Temp: {temp_raw}, Press: {press_raw}, Hum: {hum_raw}")
+    print(f"Raw values - Temp: {temp_raw}, Press: {press_raw}, Hum: {hum_raw}")
+    # These are raw numbers; lesson 4's driver turns them into real units
 
     # Sensor automatically returns to sleep mode
 
@@ -163,9 +171,7 @@ for i in range(5):
     time.sleep(10)
 ```
 
-**Power savings**:
-- Normal mode @ 1Hz: ~3.6 μA continuous
-- Forced mode @ 0.1Hz: ~0.3 μA average (100x more efficient!)
+**Power savings**: the sensor only draws its roughly 350 μA for a few milliseconds per reading, then sleeps at about 0.1 μA. Reading once every 10 seconds therefore averages well under a microamp for the sensor, which is why forced mode wins for battery projects. (The Pico itself uses far more, so use its sleep modes too.)
 
 ## Oversampling
 
@@ -176,7 +182,7 @@ Oversampling reduces noise by taking multiple measurements and averaging:
 | Setting | Samples | Resolution | Measurement Time |
 |---------|---------|------------|------------------|
 | Skip | 0 | Output 0x80000 | 0ms |
-| x1 | 1 | Standard | 2.3ms |
+| x1 | 1 | Standard | 2.3ms (temperature or pressure) |
 | x2 | 2 | Better | 4.6ms |
 | x4 | 4 | Good | 9.2ms |
 | x8 | 8 | Very good | 18.4ms |
@@ -191,7 +197,7 @@ from machine import I2C, Pin
 i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 BME280_ADDR = 0x76
 
-# Oversampling values (bits in ctrl_meas register 0xF4)
+# Oversampling codes (written into the register bits; the code is NOT the multiplier)
 OVERSAMPLE_SKIP = 0b000
 OVERSAMPLE_1 = 0b001
 OVERSAMPLE_2 = 0b010
@@ -210,7 +216,8 @@ def configure_oversampling(temp_os, press_os, hum_os):
     ctrl_meas = (temp_os << 5) | (press_os << 2) | 0b11  # Normal mode
     i2c.writeto_mem(BME280_ADDR, 0xF4, bytes([ctrl_meas]))
 
-    print(f"Configured: Temp x{1<<temp_os}, Press x{1<<press_os}, Hum x{1<<hum_os}")
+    names = {0: "skipped", 1: "x1", 2: "x2", 3: "x4", 4: "x8", 5: "x16"}
+    print(f"Configured: Temp {names[temp_os]}, Press {names[press_os]}, Hum {names[hum_os]}")
 
 # High accuracy configuration
 configure_oversampling(
@@ -226,14 +233,14 @@ configure_oversampling(
 ```python
 # Fast readings, lower accuracy
 configure_oversampling(OVERSAMPLE_1, OVERSAMPLE_1, OVERSAMPLE_1)
-# Measurement time: ~7ms
+# Measurement time: under 10ms
 ```
 
 **High noise environment**:
 ```python
 # Slower readings, higher accuracy
 configure_oversampling(OVERSAMPLE_2, OVERSAMPLE_16, OVERSAMPLE_2)
-# Measurement time: ~50ms
+# Measurement time: roughly 50ms
 ```
 
 **Weather station (recommended)**:
@@ -249,13 +256,13 @@ The BME280 has a built-in Infinite Impulse Response (IIR) filter to reduce short
 
 ### Filter Coefficient
 
-| Coefficient | Filter Samples | Response Time |
-|-------------|----------------|---------------|
-| 0 | Off | Fastest |
-| 1 | 2 | Fast |
-| 2 | 5 | Medium |
-| 3 | 11 | Slow |
-| 4 | 22 | Slowest |
+| Register value | Filter | Samples to reach 75% of a step change |
+|----------------|--------|----------------------------------------|
+| 0 | Off | 1 |
+| 1 | x2 | 2 |
+| 2 | x4 | 5 |
+| 3 | x8 | 11 |
+| 4 | x16 | 22 |
 {:class="table table-single table-narrow"}
 
 ### Enabling the Filter
@@ -276,6 +283,7 @@ FILTER_16 = 0b100
 def set_filter(filter_coef):
     """Configure IIR filter"""
     # Config register (0xF5): [standby(3)][filter(3)][reserved(1)][spi3w_en(1)]
+    # This overwrites standby time too; it is set to 0.5ms here
     config = (filter_coef << 2)
     i2c.writeto_mem(BME280_ADDR, 0xF5, bytes([config]))
 
@@ -332,7 +340,7 @@ STANDBY_20 = 0b111    # 20ms (50 Hz)
 
 def set_standby_time(standby):
     """Set standby time between measurements"""
-    # Config register (0xF5)
+    # Config register (0xF5). This overwrites the filter setting too (set to off here)
     config = (standby << 5)  # Standby in bits 7:5
     i2c.writeto_mem(BME280_ADDR, 0xF5, bytes([config]))
 
@@ -361,7 +369,7 @@ class BME280_Optimized:
         if chip_id != 0x60:
             raise RuntimeError(f"BME280 not found. Chip ID: 0x{chip_id:02X}")
 
-        print("✓ BME280 detected")
+        print("[OK] BME280 detected")
 
         # Configure for weather monitoring
         self.configure_weather_station()
@@ -416,17 +424,19 @@ Understanding timing helps optimize your code:
 
 ### Measurement Duration
 
-Time = t_base + (temp_os + press_os + hum_os) × t_oversample
+The datasheet gives the maximum measurement time as:
 
-Where:
-- t_base = 1 ms (startup)
-- t_oversample = 2 ms per sample
+```text
+time = 1.25 ms + 2.3 ms x T + (2.3 ms x P + 0.575 ms) + (2.3 ms x H + 0.575 ms)
+```
+
+where T, P and H are the oversampling multipliers (1, 2, 4, 8 or 16; use 0 for a skipped channel and drop its extra 0.575 ms).
 
 **Examples**:
 
-```python
-# x1 all: 1 + (1 + 1 + 1) × 2 = 7 ms
-# x2 temp, x16 press, x1 hum: 1 + (2 + 16 + 1) × 2 = 39 ms
+```text
+x1 on all three:                   1.25 + 2.3 + 2.875 + 2.875 = about 9.3 ms
+x2 temp, x16 press, x1 hum:        1.25 + 4.6 + 37.375 + 2.875 = about 46 ms
 ```
 
 ### Waiting for Valid Data
@@ -467,9 +477,9 @@ Experiment with BME280 features:
 1. **Compare oversampling levels**:
 
 ```python
-# Test different oversampling
-for os_level in [1, 2, 4, 8, 16]:
-    configure_oversampling(os_level, os_level, os_level)
+# Test different oversampling (these are register codes: 1 means x1, 5 means x16)
+for os_code in [1, 2, 3, 4, 5]:
+    configure_oversampling(os_code, os_code, os_code)
     # Take readings and note noise levels
 ```
 
@@ -490,9 +500,10 @@ readings_filtered = [read_sensor() for _ in range(10)]
 3. **Measure power consumption**:
 
 ```python
-# Calculate average current
-# Normal mode @ 1Hz with moderate oversampling
-# Expected: ~3-5 μA
+# Work out the average current from the datasheet figures:
+# about 350 uA for a 10 ms measurement once a second is roughly 3.5 uA
+average_ua = 350 * 0.010 / 1.0
+print(f"Estimated average: {average_ua:.1f} uA")
 ```
 
 4. **Challenge**: Create an adaptive configuration that changes based on conditions:
@@ -511,6 +522,42 @@ def adaptive_config(rapid_changes_detected):
         configure_oversampling(OVERSAMPLE_2, OVERSAMPLE_16, OVERSAMPLE_1)
         set_standby_time(STANDBY_1000)  # 1 Hz
 ```
+
+## Common Issues
+
+- **Problem**: Humidity reads 32768 (0x8000) whatever the weather
+- **Solution**: Write a non-zero oversampling value to ctrl_hum (0xF2), then write ctrl_meas (0xF4)
+- **Why**: Humidity oversampling defaults to "skip", and the output for a skipped channel is a fixed placeholder value
+
+- **Problem**: The reading does not change after you set forced mode
+- **Solution**: Write the forced-mode bits to ctrl_meas before each reading, then wait for the measurement
+- **Why**: The sensor returns to sleep after one conversion, so the data registers only hold that one result
+
+- **Problem**: Changing the filter also changed the sample rate
+- **Solution**: Write both fields into one `config` byte (standby in bits 7:5, filter in bits 4:2)
+- **Why**: Both settings live in register 0xF5, so writing one value replaces the other
+
+## Check your understanding
+
+{% quiz %}
+? Which power mode gives the longest battery life for readings every few minutes?
+- [ ] Normal mode
+- [x] Forced mode
+- [ ] There is no difference
+> Forced mode measures once on request and goes back to sleep at about 0.1 μA.
+
+? What does the IIR filter do?
+- [ ] Speeds up the bus
+- [x] Smooths short-term noise in the readings, at the cost of a slower response
+- [ ] Changes the I2C address
+> Higher filter values give steadier numbers but react to real changes more slowly.
+
+? Which register holds the standby time and filter settings?
+- [ ] 0xF2 (ctrl_hum)
+- [ ] 0xF4 (ctrl_meas)
+- [x] 0xF5 (config)
+> ctrl_hum and ctrl_meas set oversampling and mode; config sets standby and filter.
+{% endquiz %}
 
 ## What You've Learned
 

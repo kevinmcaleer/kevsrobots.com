@@ -10,7 +10,9 @@ next: 11_common-issues.html
 description: Learn when to use I2C vs SPI for your projects with practical decision-making
   guidance
 percent: 84
-duration: 9
+duration: 12
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -59,6 +61,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to choose between I2C and SPI for a device by looking at its speed, pin count and distance needs, and work out how much bandwidth a display needs.
+
 ## Making the Right Choice
 
 You've mastered both I2C and SPI. Now comes the important question: which should you use for your next project? This lesson provides practical guidance for choosing between protocols based on your specific needs.
@@ -70,15 +74,15 @@ You've mastered both I2C and SPI. Now comes the important question: which should
 | **Wires** | 2 (SDA, SCL) | 4+ (SCLK, MOSI, MISO, CS per device) |
 | **Speed** | 100-400 kHz (standard/fast) | 1-60+ MHz |
 | **Device addressing** | Software (0x76, etc.) | Hardware (chip select pins) |
-| **Max devices** | 127 theoretical, ~20 practical | Limited by available CS pins (~10) |
+| **Max devices** | 112 usable addresses, fewer in practice (bus capacitance) | Limited by available CS pins |
 | **Communication** | Half-duplex (one direction at a time) | Full-duplex (simultaneous send/receive) |
 | **Protocol overhead** | More (addressing, ACK/NACK) | Less (just data transfer) |
 | **Wiring complexity** | Simple (2 wires total) | Complex (1 CS per device) |
 | **Pull-up resistors** | Required | Not required |
-| **Distance** | ~1 meter max | ~10 cm max (very short) |
+| **Distance** | Short runs (tens of cm); slower speeds go further | Very short at high speed |
 | **Error detection** | Built-in ACK/NACK | None (application level) |
 | **Multi-controller** | Supported (but complex) | Not supported |
-| **Power consumption** | Lower (slower switching) | Higher (fast switching) |
+| **Power consumption** | Set mostly by the chip's own sleep modes | Set mostly by the chip's own sleep modes; fast clocks add a little |
 {:class="table table-single table-narrow"}
 
 ## Decision Framework
@@ -96,7 +100,7 @@ sensors = [
     (0x68, "MPU6050"),
     (0x3C, "OLED"),
     (0x48, "ADS1115"),
-    # ... 6 more devices
+    # ... and as many more as you have different addresses
 ]
 
 for addr, name in sensors:
@@ -117,7 +121,7 @@ Robot example:
 - Display module
 ```
 
-**Why I2C wins**: Longer wire tolerance (~1m) vs SPI (~10cm). You can run I2C buses across your robot chassis.
+**Why I2C wins**: I2C runs at lower speeds, so it tolerates longer wires better than SPI at 10 MHz or more. Run a slow bus (100 kHz) across your chassis, and keep the total wire length short, because each extra centimetre adds capacitance the pull-ups must overcome.
 
 **3. Speed isn't critical**
 
@@ -151,31 +155,31 @@ cs3 = Pin(7, Pin.OUT)
 **5. Battery life is important**
 
 ```python
-# I2C runs slower, consumes less power
-# Good for battery projects
-i2c_device = BME280(i2c)
-i2c_device.set_mode(MODE_FORCED)  # Ultra-low power
+# What saves battery is the sensor's sleep mode, and I2C sensors
+# usually have one. Forced mode takes one reading, then sleeps.
+bme = bme280.BME280(i2c)
+bme.read()  # forced mode in our driver: wake, measure, sleep
 ```
 {: .no-snakie }
 
-**Why I2C wins**: Lower clock speeds = less current draw. Perfect for solar or battery-powered sensors.
+**Why I2C often wins here**: the chips you meet on I2C (like the BME280) tend to have good low-power modes, and you need fewer pins. The clock speed itself makes little difference to battery life.
 
 ### Use SPI When
 
 **1. You need high speed data transfer**
 
 ```python
-# Updating TFT display at 60 FPS
+# Updating a TFT display
 spi = SPI(0, baudrate=40000000)  # 40 MHz
 
 for frame in range(60):
     # Send 240x320 pixels x 16 bits = 153,600 bytes
-    display.write_frame(frame_buffer)  # ~4ms with SPI
-    # Would take ~150ms with I2C!
+    display.write_frame(frame_buffer)  # about 31ms at 40 MHz (roughly 30 frames a second at best)
+    # Would take over 3 seconds at 400 kHz I2C!
 ```
 {: .no-snakie }
 
-**Why SPI wins**: 100x faster transfer rates. Essential for displays and video.
+**Why SPI wins**: about 100 times the transfer rate. Essential for colour displays and video.
 
 **2. Full-duplex communication is needed**
 
@@ -199,10 +203,10 @@ spi.write_readinto(tx_data, rx_data)
 # SD card: transfer large files quickly
 spi = SPI(0, baudrate=25000000)  # 25 MHz
 
-# Read 512-byte block in ~200µs
+# Read a 512-byte block in about 0.2ms of clock time
 data = sd_card.read_block(block_num)
 
-# Would take ~10ms with I2C
+# About 11ms at 400 kHz I2C
 ```
 {: .no-snakie }
 
@@ -219,19 +223,9 @@ PCB design:
 
 **Why SPI wins**: When everything is close (PCB layout), SPI's short-distance limitation doesn't matter, and you get speed benefits.
 
-**5. You need guaranteed timing**
+**5. The device only speaks SPI**
 
-```python
-# Precise timing for WS2812 LEDs
-# SPI can generate exact timing signals
-spi = SPI(0, baudrate=2500000)  # Precise timing
-
-# Send WS2812 data via SPI (timing-critical)
-spi.write(led_data)
-```
-{: .no-snakie }
-
-**Why SPI wins**: SPI provides deterministic timing. I2C has variable timing due to ACK/NACK overhead.
+Many memory chips, radio modules and fast ADCs are only sold with an SPI interface, so the decision is made for you. Check the datasheet before you pick pins.
 
 ## Real-World Scenarios
 
@@ -277,7 +271,7 @@ i2c = I2C(0, scl=Pin(9), sda=Pin(8))
 # All on same bus
 sensors = {
     'front': VL53L0X(i2c, 0x29),
-    'back': VL53L0X(i2c, 0x30),
+    'back': VL53L0X(i2c, 0x30),  # a second VL53L0X needs its address changed at start-up
     # ... more sensors
     'imu1': MPU6050(i2c, 0x68),
     'imu2': MPU6050(i2c, 0x69),
@@ -299,16 +293,16 @@ sensors = {
 
 ```python
 spi = SPI(0, baudrate=20000000)  # 20 MHz
-adc = ADS7953(spi, cs=Pin(5))    # 12-bit, 8-channel ADC
+adc = FastADC(spi, cs=Pin(5))    # a fast SPI ADC chip (any model with 8+ channels)
 
 # Rapid sampling
 for channel in range(8):
-    value = adc.read_channel(channel)  # ~10µs with SPI
+    value = adc.read_channel(channel)  # a few microseconds each over SPI
     process_data(value)
 ```
 {: .no-snakie }
 
-**Why**: I2C @ 400 kHz couldn't keep up with 10 kHz sampling rate. SPI's speed is essential.
+**Why**: 8 channels x 10,000 samples a second is 80,000 samples a second. Each I2C transaction needs several bytes plus an address, so 400 kHz I2C cannot keep up, but SPI at 20 MHz can.
 
 ### Scenario 4: Portable Environmental Monitor
 
@@ -321,7 +315,7 @@ for channel in range(8):
 **Best choice**: I2C
 
 ```python
-i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=100000)  # Slow = low power
+i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=100000)  # 100 kHz is plenty for slow sensors
 
 # All I2C devices in low-power modes
 bme280 = BME280(i2c)
@@ -339,7 +333,7 @@ while True:
 ```
 {: .no-snakie }
 
-**Why**: I2C's lower power consumption extends battery life significantly.
+**Why**: Fewer wires, and sensors with sleep modes that you can put to sleep between readings, let the whole system run for weeks.
 
 ## Mixed I2C/SPI Systems
 
@@ -354,7 +348,7 @@ temp_sensor = BME280(i2c, 0x76)
 rtc = DS3231(i2c, 0x68)
 
 # SPI bus for display and storage (speed critical)
-spi = SPI(0, baudrate=40000000, sck=Pin(2), mosi=Pin(3), miso=Pin(4))
+spi = SPI(0, baudrate=20000000, sck=Pin(2), mosi=Pin(3), miso=Pin(4))  # SD cards top out around 25 MHz
 display = ILI9341(spi, cs=Pin(5), dc=Pin(6))
 sd_card = SDCard(spi, cs=Pin(7))
 
@@ -372,25 +366,15 @@ while True:
 
 ## Decision Flowchart
 
-```
-Start
-  │
-  ├─ Need >10 devices? ──Yes──> I2C
-  │                       No
-  │                        │
-  ├─ Need >10 MHz speed? ──Yes──> SPI
-  │                       No
-  │                        │
-  ├─ Devices >20cm apart? ──Yes──> I2C
-  │                        No
-  │                         │
-  ├─ Memory/Display device? ──Yes──> SPI
-  │                          No
-  │                           │
-  ├─ Battery powered? ──Yes──> I2C
-  │                     No
-  │                      │
-  └─ Either works! ──────────> I2C (simpler wiring)
+```mermaid
+flowchart TD
+    A[Start: which bus does the device offer?] --> B{Only one?}
+    B -->|Yes| C[Use that one]
+    B -->|Both| D{Need high speed, such as a colour display or SD card?}
+    D -->|Yes| E[Use SPI]
+    D -->|No| F{Many devices or few spare pins?}
+    F -->|Yes| G[Use I2C]
+    F -->|No| H[Use I2C: simpler wiring]
 ```
 
 ## Common Device Defaults
@@ -461,6 +445,41 @@ print(f"TFT needs: {bytes_per_sec} bytes/sec")
 # Result: 4,608,000 bytes/sec = 36,864,000 bits/sec
 # Need SPI @ 40+ MHz
 ```
+
+## Common Issues
+
+- **Problem**: A display redraws far too slowly over I2C
+- **Solution**: Work out the bytes per frame and compare with the bus speed (the bandwidth exercise below), then switch to an SPI version of the display or send only the parts that changed
+- **Why**: 400 kHz I2C moves roughly 40,000 bytes a second, while SPI at 40 MHz moves about 5 million
+
+- **Problem**: Two identical I2C modules clash on one bus
+- **Solution**: Change one address with its jumper, or put each on a separate bus (I2C0 and I2C1)
+- **Why**: I2C addresses must be unique on a bus, and a second hardware bus gives you a fresh address space
+
+- **Problem**: You run out of GPIO pins with several SPI devices
+- **Solution**: Swap some devices for I2C versions, or share a bus using only the chip select lines
+- **Why**: Each SPI device uses one extra pin for chip select
+
+## Check your understanding
+
+{% quiz %}
+? Which protocol suits a colour TFT display best?
+- [ ] I2C
+- [x] SPI
+> A 240x320 colour frame is over 150,000 bytes, which needs SPI's speed.
+
+? You have six sensors and only a couple of spare GPIO pins. Which bus is the better fit?
+- [x] I2C, because one pair of pins serves every device
+- [ ] SPI, because it is faster
+> SPI needs one chip select pin per device on top of the shared lines.
+
+? Can an I2C bus and an SPI bus be used in the same project?
+- [x] Yes, many projects use I2C for sensors and SPI for displays or storage
+- [ ] No, a board can only use one
+> The Pico has separate hardware I2C and SPI blocks, so you can mix them freely.
+{% endquiz %}
+
+> **Teachers**: This lesson works well as a paper design exercise with no hardware at all: give each group a shopping list of parts and ask them to choose a bus for each and draw the wiring. It is also a good moment to check pin budgets for shared Pico boards, since SPI uses up pins quickly.
 
 ## What You've Learned
 

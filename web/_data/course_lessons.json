@@ -1760,7 +1760,7 @@
     "groups": [
       "micropython",
       "electronics",
-      "raspberry pi"
+      "pico"
     ],
     "lessons": [
       {

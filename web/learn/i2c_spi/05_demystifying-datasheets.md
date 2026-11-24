@@ -9,7 +9,9 @@ previous: 04_reading-i2c-sensor.html
 next: 06_bme280-deep-dive.html
 description: Learn how to read and extract essential information from component datasheets
 percent: 49
-duration: 11
+duration: 13
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -57,6 +59,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find the supply voltage, I2C address, register map and data format in a datasheet, and turn them into working MicroPython code.
 
 ## Understanding Datasheets
 
@@ -135,14 +139,14 @@ Let's walk through the BME280 datasheet and extract useful information. You can 
 - Operating temperature range
 - Current consumption
 
-**BME280 example** (from page 4):
+**BME280 example** (from the general electrical specification tables near the start of the datasheet):
 
 ```
-Supply voltage (VDD): 1.71V to 3.6V ✓ (3.3V from Pico is fine)
-Interface: I2C and SPI ✓ (We can use I2C)
-I2C address: 0x76 or 0x77 ✓ (Noted for our code)
-Operating range: -40 to +85°C ✓ (Covers all normal use)
-Current consumption: 3.6 µA @ 1 Hz ✓ (Very low power)
+Supply voltage (VDD): 1.71V to 3.6V (3.3V from the Pico is fine)
+Interface: I2C and SPI (we can use I2C)
+I2C address: 0x76 or 0x77 (noted for our code)
+Operating range: -40 to +85°C (covers all normal use)
+Current consumption: 3.6 µA @ 1 Hz (humidity, pressure and temperature at 1x oversampling) (very low power)
 ```
 
 **Why this matters**: Confirms the sensor will work with your Raspberry Pi Pico (3.3V) and tells you the I2C address to use in code.
@@ -156,7 +160,7 @@ Current consumption: 3.6 µA @ 1 Hz ✓ (Very low power)
 - Which pins are I2C (SCL, SDA)
 - Any special pins (chip select, interrupt, etc.)
 
-**BME280 example** (from page 8):
+**BME280 example** (from the pin configuration section):
 
 ```
 Pin 1: GND - Ground
@@ -185,7 +189,7 @@ Pin 8: VDD - Power supply
 - Default I2C address
 - How to change address (if possible)
 
-**BME280 example** (from page 32):
+**BME280 example** (from the I2C interface section):
 
 ```
 The 7-bit device address is:
@@ -216,7 +220,7 @@ elif 0x77 in devices:
 - What each register does
 - Read/write permissions
 
-**BME280 example** (from page 26-27):
+**BME280 example** (from the memory map and register description sections):
 
 Key registers:
 
@@ -293,6 +297,7 @@ ctrl_meas = (TEMP_OVERSAMPLE_2 << 5) | (PRESS_OVERSAMPLE_16 << 2) | MODE_NORMAL
 ctrl_meas = 0x57
 
 # Both are equivalent!
+# (Remember: a change to ctrl_hum (0xF2) only takes effect after you next write ctrl_meas (0xF4).)
 i2c.writeto_mem(BME280_ADDR, 0xF4, bytes([ctrl_meas]))
 ```
 
@@ -305,7 +310,7 @@ i2c.writeto_mem(BME280_ADDR, 0xF4, bytes([ctrl_meas]))
 - Data format (8-bit, 16-bit, 20-bit)
 - How to combine multiple registers
 
-**BME280 example** (page 29):
+**BME280 example** (from the data readout description):
 
 Measurement data starts at address 0xF7:
 
@@ -381,7 +386,7 @@ print(f"Temp OS: {temp_os}, Press OS: {press_os}, Mode: {mode}")
 
 Datasheets often provide startup sequences:
 
-**BME280 example** (page 19):
+**BME280 example** (from the recommended start-up sequence in the datasheet):
 
 ```
 1. Wait for sensor startup (2ms)
@@ -422,11 +427,11 @@ print("BME280 initialized according to datasheet sequence")
 
 Let's find everything needed to read temperature from the BME280:
 
-1. **Find I2C address**: Page 32 → 0x76 or 0x77 ✓
-2. **Find control register**: Page 27 → 0xF4 (ctrl_meas) ✓
-3. **Configure for measurement**: Page 27 → Write 0x57 for temp x2, normal mode ✓
-4. **Find data registers**: Page 29 → Temperature at 0xFA-0xFC ✓
-5. **Read and combine**: Read 3 bytes, combine into 20-bit value ✓
+1. **Find I2C address**: the I2C interface section gives 0x76 or 0x77
+2. **Find control register**: the register description names 0xF4 (ctrl_meas)
+3. **Configure for measurement**: temperature x1, pressure x1, normal mode is binary 001 001 11, which is 0x27
+4. **Find data registers**: the data readout section puts temperature at 0xFA to 0xFC
+5. **Read and combine**: read 3 bytes and combine them into a 20-bit value
 
 **Complete example**:
 
@@ -437,22 +442,23 @@ import time
 i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 
 # Use datasheet info
-ADDR = 0x76           # From page 32
-CTRL_MEAS = 0xF4      # From page 27
-TEMP_MSB = 0xFA       # From page 29
+ADDR = 0x76           # I2C interface section (0x77 on some boards)
+CTRL_MEAS = 0xF4      # register description: ctrl_meas
+TEMP_MSB = 0xFA       # data readout: temp_msb
 
-# Configure (from page 27 - temp x2, normal mode)
+# Configure: 0x27 = temp x1 (001), pressure x1 (001), normal mode (11)
 i2c.writeto_mem(ADDR, CTRL_MEAS, bytes([0x27]))
 
-# Wait for measurement
+# Wait for the first measurement
 time.sleep_ms(10)
 
-# Read temperature (from page 29 - 3 bytes)
+# Read temperature (3 bytes: msb, lsb, xlsb)
 temp_data = i2c.readfrom_mem(ADDR, TEMP_MSB, 3)
 temp_raw = (temp_data[0] << 12) | (temp_data[1] << 4) | (temp_data[2] >> 4)
 
 print(f"Raw temperature: {temp_raw}")
-# Note: Real temperature requires calibration compensation (page 23-25)
+# Note: Real temperature needs the calibration maths from the datasheet's
+# compensation formulas section. The driver in lesson 4 does exactly that.
 ```
 
 ## Try It Yourself
@@ -482,19 +488,19 @@ assert chip_id == 0x60, "Not a BME280!"
 
 As a beginner, you can usually skip:
 
-- ❌ Detailed electrical characteristics (unless designing PCBs)
-- ❌ Mechanical drawings (unless 3D modeling)
-- ❌ Reliability/quality information
-- ❌ Ordering codes and packaging options
-- ❌ Complex timing diagrams (start with simple examples)
+- Detailed electrical characteristics (unless designing PCBs)
+- Mechanical drawings (unless 3D modeling)
+- Reliability/quality information
+- Ordering codes and packaging options
+- Complex timing diagrams (start with simple examples)
 
 Focus on:
 
-- ✓ Pin configuration
-- ✓ Register map
-- ✓ I2C/SPI interface description
-- ✓ Example initialization sequences
-- ✓ Data format and calculations
+- Pin configuration
+- Register map
+- I2C/SPI interface description
+- Example initialization sequences
+- Data format and calculations
 
 ## Datasheets vs Libraries
 
@@ -511,6 +517,44 @@ Focus on:
 - Understand what libraries do
 
 > **Best approach**: Use libraries for projects, but read datasheets to understand them. You'll write better code and debug faster.
+
+## Common Issues
+
+- **Problem**: The chip ID register returns 0x00 or 0xFF instead of 0x60
+- **Solution**: Run the scan again and use the address it reports, then check the wiring
+- **Why**: A device that does not acknowledge gives no valid data, so the address or wiring is wrong, not the datasheet
+
+- **Problem**: Raw temperature looks like a huge number such as 519888
+- **Solution**: That is expected: apply the calibration formulas, or use the driver from lesson 4
+- **Why**: The register holds an uncompensated 20-bit number, not degrees Celsius
+
+- **Problem**: A register write seems to have no effect
+- **Solution**: Read the register back and compare it with what you wrote, and check you wrote ctrl_meas after ctrl_hum
+- **Why**: Humidity settings are latched only when ctrl_meas is written
+
+## Check your understanding
+
+{% quiz %}
+? Which sections of a datasheet matter most for getting an I2C or SPI chip working?
+- [ ] Ordering codes and packaging
+- [x] Pin configuration, register map and the interface description
+- [ ] Mechanical drawings
+> Those three sections tell you how to wire it, which addresses to write to, and how to talk to it.
+
+? Which value do you write to ctrl_meas (0xF4) for temperature x2, pressure x16, normal mode?
+- [ ] 0x27
+- [x] 0x57
+- [ ] 0xB0
+> The bit fields are 010 (x2), 101 (x16) and 11 (normal): 0b01010111 is 0x57.
+
+? How is the BME280's 20-bit temperature reading assembled from three bytes?
+- [ ] `msb + lsb + xlsb`
+- [x] `(msb << 12) | (lsb << 4) | (xlsb >> 4)`
+- [ ] `msb << 8 | lsb`
+> The top four bits of xlsb hold the final bits, so the bytes are shifted into place.
+{% endquiz %}
+
+> **Teachers**: Datasheets are long PDFs, so print or share the three key pages (specifications, pin configuration, register map) for each learner, and set a time limit for the "find the value" exercise. A good no-hardware activity is a scavenger hunt: ask the class to find the chip ID, the reset value and the I2C addresses in the PDF.
 
 ## What You've Learned
 

@@ -4,11 +4,14 @@ description: Build a complete environmental monitoring station combining I2C sen
 layout: lesson
 type: page
 cover: /learn/i2c_spi/assets/banners/12_final-project.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build a complete monitoring station that reads a BME280, shows the values on an OLED, and logs them to a file, all on one I2C bus.
 
 ## Your Capstone Project
 
@@ -21,9 +24,9 @@ A complete environmental monitoring system that:
 
 - Reads temperature, humidity, and pressure from BME280 (I2C)
 - Displays current readings on OLED display (I2C)
-- Logs data to CSV file for analysis
-- Monitors trends and alerts on abnormal conditions
-- Runs continuously with error recovery
+- Logs data to a CSV file for analysis
+- Alerts when readings go outside safe ranges
+- Keeps running when a single reading fails
 
 **Skills demonstrated**:
 - I2C multi-device communication
@@ -75,32 +78,33 @@ Raspberry Pi Pico:
 
 ### Connection Summary
 
-```text
-# Pico to BME280
-GP8  → SDA
-GP9  → SCL
-3.3V → VCC
-GND  → GND
+| Pico pin | BME280 | OLED (SSD1306, I2C version) |
+|----------|--------|-----------------------------|
+| GP8 (pin 11) | SDA | SDA |
+| GP9 (pin 12) | SCL | SCL |
+| 3V3(OUT) (pin 36) | VCC | VCC |
+| GND (pin 38) | GND | GND |
+{:class="table table-single table-narrow"}
 
-# Pico to OLED (same bus)
-GP8  → SDA
-GP9  → SCL
-3.3V → VCC
-GND  → GND
+```mermaid
+flowchart LR
+    Pico["Pico GP8 / GP9"] --- Bus[(I2C bus)]
+    Bus --- BME["BME280 at 0x76"]
+    Bus --- OLED["SSD1306 OLED at 0x3C"]
 ```
+
+The two devices have different addresses (0x76 or 0x77, and 0x3C or 0x3D), so they share the bus without a clash. Run the scan from lesson 3 first and check that both show up.
 
 ## Software Architecture
 
 ### Project Structure
 
-```python
-"""
-Environmental Monitor System
-├── main.py           # Main program loop
-├── bme280.py         # BME280 driver (from earlier lessons)
-├── ssd1306.py        # OLED display library
-└── data_logger.py    # CSV logging utility
-"""
+These three files end up on the Pico:
+
+```text
+main.py       the monitoring program (below)
+bme280.py     the BME280 driver you saved in lesson 4
+ssd1306.py    the OLED display driver (Step 1)
 ```
 
 ### Core Components
@@ -113,62 +117,19 @@ Environmental Monitor System
 
 ## Complete Implementation
 
-### Step 1: Install Display Library
+### Step 1: Get the Display Driver
 
-```python
-# In Thonny: Tools → Manage packages
-# Search for: micropython-ssd1306
-# Or download from: https://github.com/stlehmann/micropython-ssd1306
-```
+The SSD1306 driver is not built into the MicroPython firmware either. It lives in the official `micropython-lib` collection (under `micropython/drivers/display/ssd1306`). To get it onto the Pico:
 
-### Step 2: BME280 Driver (Simplified)
+- **On a Pico W with Wi-Fi set up**: run `import mip` then `mip.install("ssd1306")` in the Thonny shell
+- **On any Pico**: download `ssd1306.py` from the `micropython-lib` repository on GitHub to your computer, open it in Thonny, and use File, Save as, Raspberry Pi Pico to save it as `ssd1306.py` in the top folder
+- **Thonny package manager**: Tools, Manage packages, search for `micropython-ssd1306`
 
-```python
-# bme280.py
-from micropython import const
-import time
+No display? Skip this step: the program below notices that the driver or the screen is missing and carries on without it.
 
-BME280_ADDR = const(0x76)  # or 0x77
+### Step 2: The BME280 Driver
 
-class BME280:
-    """Simplified BME280 driver for environmental monitoring"""
-
-    def __init__(self, i2c, addr=BME280_ADDR):
-        self.i2c = i2c
-        self.addr = addr
-
-        # Verify device
-        chip_id = self.i2c.readfrom_mem(self.addr, 0xD0, 1)[0]
-        if chip_id != 0x60:
-            raise RuntimeError("BME280 not found")
-
-        # Configure sensor for normal operation
-        self.i2c.writeto_mem(self.addr, 0xF2, b'\x01')  # Humidity oversampling x1
-        self.i2c.writeto_mem(self.addr, 0xF4, b'\x27')  # Temp/press oversampling, normal mode
-        self.i2c.writeto_mem(self.addr, 0xF5, b'\xA0')  # Standby 1000ms, filter off
-
-        time.sleep_ms(10)  # Wait for config
-
-    def read_data(self):
-        """Read temperature, pressure, and humidity"""
-        # Read all data registers (0xF7-0xFE)
-        data = self.i2c.readfrom_mem(self.addr, 0xF7, 8)
-
-        # Extract raw values
-        press_raw = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4)
-        temp_raw = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
-        hum_raw = (data[6] << 8) | data[7]
-
-        # Simplified conversion (no calibration for brevity)
-        # Real implementation should use calibration data
-        temperature = temp_raw / 5120.0  # Approximate
-        pressure = press_raw / 256.0     # Approximate
-        humidity = hum_raw / 1024.0      # Approximate
-
-        return temperature, pressure, humidity
-```
-
-> **Note**: For production use, implement proper calibration compensation as shown in earlier lessons.
+Use the `bme280.py` you saved in [lesson 4](/learn/i2c_spi/04_reading-i2c-sensor.html). Its `read()` method returns the temperature in degrees Celsius, the pressure in hPa and the humidity in percent, already calibrated.
 
 ### Step 3: Main Application
 
@@ -176,8 +137,12 @@ class BME280:
 # main.py
 from machine import Pin, I2C
 import time
-import ssd1306
 from bme280 import BME280
+
+try:
+    import ssd1306          # only needed if you have the OLED
+except ImportError:
+    ssd1306 = None
 
 class EnvironmentalMonitor:
     """Complete environmental monitoring system"""
@@ -194,23 +159,26 @@ class EnvironmentalMonitor:
         # Initialize BME280 sensor
         if 0x76 in devices:
             self.sensor = BME280(self.i2c, addr=0x76)
-            print("✓ BME280 initialized at 0x76")
+            print("[OK] BME280 initialized at 0x76")
         elif 0x77 in devices:
             self.sensor = BME280(self.i2c, addr=0x77)
-            print("✓ BME280 initialized at 0x77")
+            print("[OK] BME280 initialized at 0x77")
         else:
             raise RuntimeError("BME280 not found")
 
         # Initialize OLED display (128x64)
-        if 0x3C in devices:
+        if ssd1306 is None:
+            self.display = None
+            print("ssd1306.py not found - continuing without display")
+        elif 0x3C in devices:
             self.display = ssd1306.SSD1306_I2C(128, 64, self.i2c, addr=0x3C)
-            print("✓ OLED display initialized at 0x3C")
+            print("[OK] OLED display initialized at 0x3C")
         elif 0x3D in devices:
             self.display = ssd1306.SSD1306_I2C(128, 64, self.i2c, addr=0x3D)
-            print("✓ OLED display initialized at 0x3D")
+            print("[OK] OLED display initialized at 0x3D")
         else:
             self.display = None
-            print("⚠️  OLED display not found - continuing without display")
+            print("[WARNING] OLED display not found - continuing without display")
 
         # Alert thresholds
         self.temp_low = 15.0    # °C
@@ -225,20 +193,21 @@ class EnvironmentalMonitor:
         # Statistics
         self.reading_count = 0
         self.error_count = 0
+        self.start_ms = time.ticks_ms()
 
     def init_log_file(self):
         """Create CSV file with headers"""
         try:
             with open(self.log_file, "w") as f:
-                f.write("Timestamp,Temperature_C,Pressure_hPa,Humidity_%,Status\n")
-            print(f"✓ Log file '{self.log_file}' created")
+                f.write("Uptime_s,Temperature_C,Pressure_hPa,Humidity_%,Status\n")
+            print(f"[OK] Log file '{self.log_file}' created")
         except Exception as e:
-            print(f"⚠️  Could not create log file: {e}")
+            print(f"[WARNING] Could not create log file: {e}")
 
     def read_sensors(self):
         """Read all sensor data with error handling"""
         try:
-            temp, press, hum = self.sensor.read_data()
+            temp, press, hum = self.sensor.read()
             self.reading_count += 1
             return temp, press, hum, True
         except Exception as e:
@@ -288,9 +257,10 @@ class EnvironmentalMonitor:
     def log_data(self, temp, press, hum, status):
         """Log data to CSV file"""
         try:
-            timestamp = time.time()
+            # The Pico has no battery-backed clock, so log seconds since start-up
+            uptime = time.ticks_diff(time.ticks_ms(), self.start_ms) // 1000
             with open(self.log_file, "a") as f:
-                f.write(f"{timestamp},{temp:.2f},{press:.2f},{hum:.2f},{status}\n")
+                f.write(f"{uptime},{temp:.2f},{press:.2f},{hum:.2f},{status}\n")
         except Exception as e:
             print(f"Log error: {e}")
 
@@ -303,11 +273,11 @@ class EnvironmentalMonitor:
         print(f"Humidity:     {hum:.2f}%")
 
         if alerts:
-            print("\n⚠️  ALERTS:")
+            print("\n[WARNING] ALERTS:")
             for alert in alerts:
                 print(f"  - {alert}")
         else:
-            print("\n✓ All readings normal")
+            print("\n[OK] All readings normal")
 
         print(f"\nErrors: {self.error_count}")
         print("="*50)
@@ -324,7 +294,7 @@ class EnvironmentalMonitor:
         print("Environmental Monitor Starting")
         print("="*50)
         print(f"Interval: {interval}s")
-        print(f"Duration: {'Forever' if duration is None else f'{duration}s'}")
+        print("Duration:", "Forever" if duration is None else duration)
         print("Press Ctrl+C to stop")
         print()
 
@@ -350,7 +320,7 @@ class EnvironmentalMonitor:
                     self.print_summary(temp, press, hum, alerts)
 
                 else:
-                    print("⚠️  Sensor read failed - retrying next cycle")
+                    print("[WARNING] Sensor read failed - retrying next cycle")
 
                 # Check duration
                 if duration and (time.time() - start_time) >= duration:
@@ -370,7 +340,9 @@ class EnvironmentalMonitor:
         print(f"Duration:      {elapsed:.1f} seconds")
         print(f"Readings:      {self.reading_count}")
         print(f"Errors:        {self.error_count}")
-        print(f"Success rate:  {100*self.reading_count/(self.reading_count+self.error_count):.1f}%")
+        attempts = self.reading_count + self.error_count
+        if attempts:
+            print(f"Success rate:  {100 * self.reading_count / attempts:.1f}%")
         print(f"Data logged to: {self.log_file}")
         print("="*50)
 
@@ -386,19 +358,19 @@ if __name__ == "__main__":
 
 1. **Wire hardware** following the circuit diagram
 2. **Install libraries**:
-   - `bme280.py` (from earlier lessons or create simplified version)
-   - `ssd1306.py` (from MicroPython package manager)
-3. **Upload `main.py`** to your Pico
-4. **Run the program**
+   - `bme280.py` (the driver from lesson 4)
+   - `ssd1306.py` (Step 1 above)
+3. **Save the program** on your Pico as `main.py` (File, Save as, Raspberry Pi Pico) so it also starts on power-up
+4. **Run the program** from Thonny
 
 ### Expected Output
 
 ```
 I2C initialized
 Found devices: ['0x3c', '0x76']
-✓ BME280 initialized at 0x76
-✓ OLED display initialized at 0x3C
-✓ Log file 'environment.csv' created
+[OK] BME280 initialized at 0x76
+[OK] OLED display initialized at 0x3C
+[OK] Log file 'environment.csv' created
 
 ==================================================
 Environmental Monitor Starting
@@ -413,7 +385,7 @@ Temperature:  22.45°C (72.41°F)
 Pressure:     1013.25 hPa
 Humidity:     45.67%
 
-✓ All readings normal
+[OK] All readings normal
 
 Errors: 0
 ==================================================
@@ -440,7 +412,8 @@ OK
 1. **Add more sensors**:
 
 ```python
-# Add a light sensor (BH1750)
+# Add a light sensor (BH1750, which answers at 0x23 or 0x5C).
+# You will need to find or write a BH1750 driver for this one.
 if 0x23 in devices:
     self.light_sensor = BH1750(self.i2c)
     light = self.light_sensor.read_lux()
@@ -450,7 +423,7 @@ if 0x23 in devices:
 2. **Implement data visualization**:
 
 ```python
-# Add simple bar graph to display
+# Add simple bar graph to display (a method for the EnvironmentalMonitor class)
 def draw_bar(self, value, max_value, y_pos):
     bar_width = int((value / max_value) * 120)
     self.display.fill_rect(0, y_pos, bar_width, 8, 1)
@@ -470,15 +443,18 @@ if button.value() == 0:  # Button pressed
 1. **Add WiFi data upload** (Pico W):
 
 ```python
-import network
-import urequests
+# On a Pico W, after connecting to Wi-Fi. Install once with:
+#   import mip; mip.install("requests")
+import requests
 
 def upload_to_cloud(temp, hum, press):
-    """Send data to cloud service"""
+    """Send data to a web service you control (replace the URL)"""
     url = "https://api.example.com/data"
     data = {"temperature": temp, "humidity": hum, "pressure": press}
-    urequests.post(url, json=data)
+    response = requests.post(url, json=data)
+    response.close()
 ```
+{: .no-snakie }
 
 2. **Implement data smoothing**:
 
@@ -498,7 +474,9 @@ class MovingAverage:
 3. **Add SPI SD card logging**:
 
 ```python
-from machine import SPI
+# The SD card driver is another file you add yourself:
+#   mip.install("sdcard") on a Pico W, or save sdcard.py from micropython-lib
+from machine import SPI, Pin
 import sdcard
 import os
 
@@ -509,6 +487,7 @@ os.mount(sd, '/sd')
 # Log to SD card instead of flash
 log_file = '/sd/environment.csv'
 ```
+{: .no-snakie }
 
 ### Advanced Challenges
 
@@ -561,7 +540,50 @@ def predict_trend(readings):
         return "STABLE"
 ```
 
-## Troubleshooting
+## Try it Yourself
+
+1. Change the alert thresholds in `__init__` to match your room, then breathe on the sensor to trigger the humidity alert
+2. Change the reading interval from 5 seconds to 30 and compare the size of the log file after ten minutes
+3. Add the pressure to the alert check, and show "LOW PRESSURE" on the display when it falls below 1000 hPa
+4. Challenge: show a rising or falling indicator next to the temperature using the `predict_trend` idea in the challenges above
+
+## Common Issues
+
+- **Problem**: `ImportError: no module named 'ssd1306'` (or `'bme280'`)
+- **Solution**: Save the missing driver on the Pico as described in Step 1 or lesson 4
+- **Why**: Neither driver is part of the MicroPython firmware
+
+- **Problem**: The program starts but the screen stays blank
+- **Solution**: Check the scan shows 0x3C (or 0x3D), and that the OLED is an I2C one with four pins, not an SPI one with seven
+- **Why**: The program only creates the display if the scan finds it, and SPI OLEDs use different wiring and a different driver class
+
+- **Problem**: `OSError: [Errno 5] EIO` part-way through a run
+- **Solution**: Re-seat the wires and shorten them; the program counts the error and tries again next cycle
+- **Why**: A loose jumper on the shared bus affects both devices
+
+## Check your understanding
+
+{% quiz %}
+? Why can the BME280 and the OLED share the same two wires?
+- [ ] They run at different voltages
+- [x] They have different I2C addresses
+- [ ] The Pico has two buses
+> Each device answers only to its own address, so the controller can pick either one.
+
+? Why does the log file use seconds since start-up instead of the date?
+- [ ] Dates cannot be stored in CSV files
+- [x] The Pico has no battery-backed clock, so it does not know the real time
+> You can set the time with Thonny or from the network, but start-up time is always available.
+
+? What happens if one sensor reading fails?
+- [ ] The program stops
+- [x] The error is counted and the program tries again on the next cycle
+> The `read_sensors` method catches the exception and returns a failure flag.
+{% endquiz %}
+
+> **Teachers**: This capstone suits a double lesson, or two single lessons (wiring and scan first, then the program). If OLED displays are scarce, the project can run without one using only the console and log file. Writing a log to the Pico's own flash is fine for a short class run; remind learners the file is overwritten each time the program starts.
+
+## Debugging Tips
 
 ### Display Not Updating
 
@@ -594,7 +616,7 @@ class SensorWithAverage:
         temps, presses, hums = [], [], []
 
         for _ in range(samples):
-            t, p, h = self.sensor.read_data()
+            t, p, h = self.sensor.read()
             temps.append(t)
             presses.append(p)
             hums.append(h)
@@ -622,26 +644,24 @@ Congratulations! You've completed "Talking to the World - Working with I2C and S
 
 ### What You Accomplished
 
-- ✓ Mastered I2C protocol and implementation
-- ✓ Mastered SPI protocol and implementation
-- ✓ Read real sensors (BME280, MAX31855)
-- ✓ Controlled displays via I2C
-- ✓ Understood datasheets and register maps
-- ✓ Built robust error handling
-- ✓ Created a complete working project
+- Learned how the I2C and SPI buses work
+- Read a real sensor (BME280) over I2C and a thermocouple chip (MAX31855) over SPI
+- Used scans, datasheets and register maps to talk to a chip directly
+- Chose between I2C and SPI for different jobs
+- Built a complete working project with display, logging and alerts
 
 ### Next Steps
 
 **Expand this project**:
 - Add more sensors (light, motion, air quality)
 - Implement cloud connectivity
-- Create mobile app interface
-- Build weatherproof enclosure
+- Build a weatherproof enclosure
 
-**Explore related topics**:
-- [Adding WiFi Communication](/learn/micropython-wifi/) - Network your sensors
-- [Display Projects](/learn/displays/) - Advanced display techniques
-- [IoT Weather Station](/learn/weather-station/) - Complete weather station build
+**Explore related courses**:
+- [Pico Temperature Sensor](/learn/pico_temp_sensor/) - Another sensor project on the Pico
+- [Controlling 16 servos with the PCA9685](/learn/pca9685/) - Another I2C device, using the skills from this course
+- [Intermediate MicroPython](/learn/intermediate_micropython/) - Go further with classes, files and structure
+- [Introduction to MicroPython](/learn/micropython/) - Revisit the basics
 
 **Share your project**:
 - Post on social media
@@ -650,9 +670,8 @@ Congratulations! You've completed "Talking to the World - Working with I2C and S
 
 ## Course Resources
 
-**Code repository**: All examples from this course
-**Datasheets**: BME280, MAX31855, SSD1306
-**Community forum**: Get help and share projects
-**Video tutorials**: Watch the companion video series
+**Datasheets**: BME280 (Bosch Sensortec), MAX31855 (Analog Devices/Maxim), SSD1306 (Solomon Systech)
+**MicroPython docs**: the `machine.I2C`, `machine.SoftI2C` and `machine.SPI` pages on docs.micropython.org
+**Video**: the companion video in this course
 
 Thank you for taking this journey into I2C and SPI communication. You now have the skills to connect your Raspberry Pi Pico to hundreds of sensors and devices. Keep building, keep learning, and most importantly - have fun!

@@ -362,11 +362,11 @@
   description: Master I2C and SPI communication protocols on Raspberry Pi Pico. Learn
     to connect sensors, scan for devices, read datasheets, and build real-world projects
     with practical hands-on examples using the BME280 sensor.
-  duration: 1h 56m
+  duration: 2h 29m
   groups:
   - micropython
   - electronics
-  - raspberry pi
+  - pico
   lessons: 14
   level: intermediate
   link: /learn/i2c_spi/00_intro.html
