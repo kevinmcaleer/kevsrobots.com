@@ -4558,48 +4558,52 @@
   {
     "slug": "rust",
     "name": "Introduction to Rust",
-    "description": "Learning Rust with me, is a course that will teach you how to use Rust on Raspberry Pi.",
+    "description": "Learn the Rust programming language from scratch, with a Python and MicroPython maker in mind. Write and run real programs on your computer, build a small web server, then set up Rust to blink an LED on the Raspberry Pi Pico.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-03-09",
     "groups": [
-      "rust",
       "pico"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
-        "section": "Overview",
-        "url": "/learn/rust/01_intro.html"
+        "file": "00_intro.md",
+        "section": "Getting Started",
+        "url": "/learn/rust/00_intro.html"
+      },
+      {
+        "file": "01_install-and-hello.md",
+        "section": "Getting Started",
+        "url": "/learn/rust/01_install-and-hello.html"
       },
       {
         "file": "02_rust_and_python.md",
-        "section": "Setting Up a Rust Environment",
+        "section": "Getting Started",
         "url": "/learn/rust/02_rust_and_python.html"
       },
       {
         "file": "03_rust_basics.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/03_rust_basics.html"
       },
       {
         "file": "04_ownership_and_borrowing.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/04_ownership_and_borrowing.html"
       },
       {
         "file": "05_structs_and_enums.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/05_structs_and_enums.html"
       },
       {
         "file": "06_error_handling.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/06_error_handling.html"
       },
       {
         "file": "07_common_collections.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/07_common_collections.html"
       },
       {

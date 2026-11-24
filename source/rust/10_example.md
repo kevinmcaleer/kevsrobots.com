@@ -1,96 +1,175 @@
 ---
 title: "Project: Building a Simple Web Application"
-description: >- 
-    Apply what you've learned in Rust by building a simple web application. This project will cover setup, logic implementation, and finalization.
+description: >-
+    Build a small web server in Rust with the warp crate that answers a health check and reports a robot's status as JSON.
 layout: lesson
-cover: /learn/scrawly_wally/assets/10.png
+type: page
+cover: /learn/rust/assets/banners/10_example.jpg
+date_updated: 2026-11-24
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-Now that you're familiar with Rust's fundamentals, its concurrency model, error handling, and ecosystem, it's time to put your knowledge into practice by building a simple web application. This project will guide you through setting up your project environment, implementing the application logic, and finalizing your project.
-
----
-
-## Learning Objectives
-
-- Set up a Rust project for a web application.
-- Implement basic web server logic using Rust.
-- Finalize and run your web application.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-### Setting up
+By the end of this lesson you will be able to build and run a Rust web server with two routes, one of which returns JSON, and test it with `curl`.
 
-First, create a new Rust project:
+---
+
+## What we are building
+
+Many robots expose a tiny web service so a phone or another computer can ask how they are doing. We will build one that answers two requests:
+
+- `GET /health` replies `OK`
+- `GET /robot/status` replies with the robot's name, battery and distance sensor as JSON
+
+```mermaid
+sequenceDiagram
+    participant Phone as Browser or curl
+    participant Server as Rust server on port 3030
+    Phone->>Server: GET /robot/status
+    Server-->>Phone: {"name":"Scout","battery_percent":87,"distance_cm":42.5}
+```
+
+We use three crates: **warp** for routing, **tokio** to run asynchronous code, and **serde** to turn a struct into JSON. This project uses `async` code, which lets one program wait on many connections at once. You do not need to understand it fully yet: `#[tokio::main]` and `.await` are the only pieces to copy.
+
+## Step 1: create the project
 
 ```bash
 cargo new rust_web_app
 cd rust_web_app
+cargo add warp --features server
+cargo add tokio --features full
+cargo add serde --features derive
 ```
 
-Then, add necessary dependencies in your `Cargo.toml`:
+`cargo add` edits `Cargo.toml` for you. At the time of writing it gives you:
 
 ```toml
 [dependencies]
-warp = "0.3"
+serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }
+warp = { version = "0.4", features = ["server"] }
 ```
 
-We'll use `warp` for the web server framework, `tokio` for asynchronous runtime, and `serde` for serializing and deserializing the JSON data.
+Warp 0.4 needs its `server` feature turned on, or `warp::serve` will not exist. Older tutorials for warp 0.3 leave this out.
 
-### Implementing Logic
+## Step 2: write the routes
 
-Create a new file in the `src` directory called `server.rs`. Here, you will define your routes and request handlers. Start with a simple health check endpoint:
+Create `src/server.rs`:
 
 ```rust
+use serde::Serialize;
 use warp::Filter;
 
-async fn health_check() -> Result<impl warp::Reply, warp::Rejection> {
-    Ok("OK")
+#[derive(Serialize)]
+struct RobotStatus {
+    name: &'static str,
+    battery_percent: u8,
+    distance_cm: f32,
 }
 
-pub fn routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    warp::path!("health").and(warp::get()).and_then(health_check)
+pub fn routes() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+    let health = warp::path!("health").and(warp::get()).map(|| "OK");
+
+    let status = warp::path!("robot" / "status").and(warp::get()).map(|| {
+        warp::reply::json(&RobotStatus {
+            name: "Scout",
+            battery_percent: 87,
+            distance_cm: 42.5,
+        })
+    });
+
+    health.or(status)
 }
 ```
 
-In your `main.rs`, set up the server to run:
+A warp **filter** matches part of a request. `path!("health")` matches that path, `.and(warp::get())` requires the GET method, and `.map(...)` builds the reply. `.or` combines two routes. `#[derive(Serialize)]` teaches serde to write the struct as JSON.
+
+## Step 3: start the server
+
+Replace `src/main.rs` with:
 
 ```rust
-use warp::Filter;
-
 mod server;
 
 #[tokio::main]
 async fn main() {
     let routes = server::routes();
-
+    println!("Listening on http://127.0.0.1:3030");
     warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 }
 ```
 
-### Finalizing the Project
+`mod server;` pulls in the other file. The address `127.0.0.1` means "this computer only", which is the safe choice while testing.
 
-Before running your application, review the code to ensure it follows best practices and that you've handled potential errors. Run your project:
+## Step 4: run and test
 
 ```bash
 cargo run
 ```
 
-Test your application by visiting `http://127.0.0.1:3030/health` in a web browser or using a tool like `curl`:
+The first build downloads and compiles the crates, so it takes a little while. When it says `Listening on http://127.0.0.1:3030`, open a second terminal:
 
 ```bash
 curl http://127.0.0.1:3030/health
+curl http://127.0.0.1:3030/robot/status
 ```
 
----
+You should see:
 
-## Summary
+```text
+OK
+{"name":"Scout","battery_percent":87,"distance_cm":42.5}
+```
 
-In this project, you've built a simple web application using Rust. You set up the project environment, implemented a basic web server, and learned how to run and test your Rust web application. This project serves as a foundation for building more complex web applications with Rust.
+You can also visit those addresses in a browser. Any other path, such as `/nope`, returns a `404 Not Found`. Stop the server with Ctrl+C.
 
----
+## Why this matters
+
+The same ownership rules that protect single programs protect servers handling many requests at once. And because it compiles to one small program, you can copy it to a Raspberry Pi and run it there.
+
+> **Teachers**: the first `cargo run` downloads and compiles about fifty crates, which needs internet access and takes a minute or more per machine. On a school network where many learners build at once, this can be slow or blocked. Prepare by building once and sharing the project folder, or by asking IT to allow crates.io. The server only listens on `127.0.0.1`, so learners cannot reach each other's servers. Keep it that way in a classroom.
+
+## Try it Yourself
+
+1. Visit `/robot/status` in your browser and change the battery value in the code. Rebuild and check it changed.
+2. Add a third route `/robot/name` that returns just the robot's name as plain text.
+3. Add a `bool` field `online` to `RobotStatus` and return it as part of the JSON.
+4. Challenge: change `distance_cm` to be a number that changes on each request, for example by counting requests with an `Arc<Mutex<u32>>` from lesson 8.
+
+## Common Issues
+
+- **Problem**: `cannot find function serve in crate warp`.
+- **Solution**: Add the `server` feature: `warp = { version = "0.4", features = ["server"] }`.
+- **Why**: Warp 0.4 made its server code an optional feature.
+
+- **Problem**: `Address already in use`.
+- **Solution**: Stop the earlier copy of the server with Ctrl+C, or change `3030` to another port.
+- **Why**: Only one program can listen on a port at a time.
+
+- **Problem**: `curl: (7) Failed to connect`.
+- **Solution**: Check the server is still running and that you used the same port.
+- **Why**: Nothing is listening until `cargo run` has finished building and printed its message.
+
+## Check your understanding
+
+{% quiz %}
+? What does `#[derive(Serialize)]` let you do?
+- [ ] Run the struct on a thread
+- [x] Turn the struct into JSON
+- [ ] Make the struct immutable
+> serde's `Serialize` lets `warp::reply::json` write the struct as JSON.
+
+? Why does the server listen on `127.0.0.1`?
+- [x] That address means only this computer can connect
+- [ ] It is the fastest address
+- [ ] It makes the server public
+> `127.0.0.1` is the loopback address, which keeps testing private.
+
+? What does `cargo add tokio --features full` do?
+- [ ] Installs Tokio on your whole system
+- [x] Adds Tokio, with all its features, to `Cargo.toml`
+- [ ] Runs your program
+> `cargo add` edits the `[dependencies]` section for you.
+{% endquiz %}

@@ -3,26 +3,28 @@ layout: lesson
 title: Rust for Raspberry Pi Pico
 author: Kevin McAleer
 type: page
-cover: /learn/scrawly_wally/assets/11.png
+cover: /learn/rust/assets/banners/11_rust_for_pico.jpg
 date: 2024-03-09
 previous: 10_example.html
 next: 12_summary_and_resources.html
-description: Learn how to set up Rust for development on the Raspberry Pi Pico, including
-  environment setup, installation, debugging, and a sample program.
-percent: 77
-duration: 3
+description: Set up the Rust toolchain for the Raspberry Pi Pico, understand a no_std
+  program, and build and flash an LED blinker.
+percent: 84
+duration: 7
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Introduction to Rust
 - content:
-  - section: Overview
+  - section: Getting Started
     content:
     - name: Introduction to Rust
-      link: 01_intro.html
-  - section: Setting Up a Rust Environment
-    content:
+      link: 00_intro.html
+    - name: Installing Rust and Your First Program
+      link: 01_install-and-hello.html
     - name: 'Rust vs. Python: Understanding the Differences'
       link: 02_rust_and_python.html
-  - section: Basics
+  - section: The Language
     content:
     - name: Rust Basics
       link: 03_rust_basics.html
@@ -53,79 +55,125 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-The Raspberry Pi Pico is a popular microcontroller for various projects. This lesson will guide you through setting up Rust for development on the Pico, how to install your Rust programs on the device, techniques for debugging, and walking through a sample program.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
-
-- Set up the Rust build environment for the Raspberry Pi Pico.
-- Understand how to install Rust programs onto the Raspberry Pi Pico.
-- Learn debugging techniques for Rust programs on the Pico.
-- Implement and understand an example Rust program on the Pico.
+By the end of this lesson you will be able to set up a Rust project for the original Raspberry Pi Pico, explain what `#![no_std]` means, and flash a blinking LED program.
 
 ---
 
-### Setting up the Build Environment
+## Which board?
 
-To develop Rust programs for the Raspberry Pi Pico, you'll need to set up your build environment:
+This lesson targets the **original Raspberry Pi Pico**, which has the RP2040 chip, a Cortex-M0+ processor, and an LED wired straight to a pin. Two close relatives need different set-up:
 
-1. Install the standard Rust toolchain via [rustup](https://rustup.rs/).
-2. Install the `cross` tool for cross-compiling: `cargo install cross`.
-3. Configure the Rust toolchain for cross-compiling to the ARM Cortex-M0+ processor used by the Pico.
+- The **Pico W** has its LED on the wireless chip, not on a normal pin, so the blink below will not light it.
+- The **Pico 2** uses a different chip, the RP2350, with its own crate (`rp235x-hal`) and set-up. Check that crate's documentation.
+
+The crates here were checked in November 2026: `rp-pico` 0.9.0 (which builds on `rp2040-hal` 0.10), `cortex-m` 0.7.7, `cortex-m-rt` 0.7.7, `embedded-hal` 1.0.0 and `panic-halt` 1.0.0.
+
+## How a Rust program reaches the Pico
+
+```mermaid
+flowchart LR
+    A["main.rs"] -->|"cargo build, target thumbv6m-none-eabi"| B["ELF file"]
+    B -->|"elf2uf2-rs"| C["UF2 file"]
+    C -->|"copied to the RPI-RP2 drive"| D["Pico runs it"]
+```
+
+Your computer is not a Cortex-M0+, so Cargo **cross-compiles**: it builds for another processor. You tell it the target, `thumbv6m-none-eabi`. The Pico's bootloader accepts UF2 files, so a tool converts and copies the result.
+
+## Step 1: install the tools
 
 ```bash
 rustup target add thumbv6m-none-eabi
+cargo install elf2uf2-rs --locked
 ```
 
-4. Set up your development environment to access the USB port of the Raspberry Pi Pico (this process varies between operating systems).
+The first adds the standard-library pieces for the Pico's processor. The second installs `elf2uf2-rs`, which converts the program to UF2 and copies it to a Pico in bootloader mode. You do not need the `cross` tool.
 
-### How to Install on Pico
-
-After developing your Rust application, you'll need to compile it for the Pico and upload it:
-
-1. Build your project for the ARM Cortex-M0+ architecture:
+## Step 2: create the project
 
 ```bash
-cargo build --release --target thumbv6m-none-eabi
+cargo new pico_blinky
+cd pico_blinky
 ```
 
-2. Convert the compiled program to UF2 format, which is necessary for the Raspberry Pi Pico bootloader.
+Edit `Cargo.toml` so it reads:
 
-3. Push the RESET button on your Pico while holding the BOOTSEL button, release the BOOTSEL after the device is connected. It should mount as a Mass Storage Device.
+```toml
+[package]
+name = "pico_blinky"
+version = "0.1.0"
+edition = "2021"
 
-4. Copy your `.uf2` file to the Raspberry Pi Pico mass storage device.
+[dependencies]
+cortex-m = "0.7.7"
+cortex-m-rt = "0.7.7"
+embedded-hal = "1.0.0"
+panic-halt = "1.0.0"
+rp-pico = "0.9.0"
+```
 
-### Debugging
+Create `.cargo/config.toml` (a `.cargo` folder inside the project) with the build settings used by the rp-hal project:
 
-Debugging microcontroller applications can be challenging. Here are some techniques for debugging Rust programs on the Pico:
+```toml
+[build]
+target = "thumbv6m-none-eabi"
 
-- Use `println!` debugging to send output to a connected serial terminal.
-- Use an in-circuit debugger (ICD) like the Raspberry Pi Pico's built-in SWD port for real-time debugging.
-- Employ unit tests for parts of your code that can be tested on the host machine.
+[target.thumbv6m-none-eabi]
+rustflags = [
+    "-C", "link-arg=--nmagic",
+    "-C", "link-arg=-Tlink.x",
+    "-C", "no-vectorize-loops",
+]
+runner = "elf2uf2-rs -d"
+```
 
-### Example Program
+Create `memory.x` in the project root. It tells the linker how the Pico's memory is laid out: 256 bytes of second-stage bootloader, then flash up to 2 MB, then 256 KB of RAM.
 
-Here's a simple Rust program that blinks an LED on the Raspberry Pi Pico:
+```text
+MEMORY {
+    BOOT2 : ORIGIN = 0x10000000, LENGTH = 0x100
+    FLASH : ORIGIN = 0x10000100, LENGTH = 2048K - 0x100
+    RAM   : ORIGIN = 0x20000000, LENGTH = 256K
+}
+
+EXTERN(BOOT2_FIRMWARE)
+
+SECTIONS {
+    /* ### Boot loader */
+    .boot2 ENTRY(BOOT2_FIRMWARE) :
+    {
+        KEEP(*(.boot2));
+    } > BOOT2
+} INSERT BEFORE .text;
+```
+
+## Step 3: the blink program
+
+Replace `src/main.rs` with this program, adapted from the `pico_blinky` example in the `rp-pico` crate:
 
 ```rust
 #![no_std]
 #![no_main]
 
+use rp_pico::entry;
+use embedded_hal::digital::OutputPin;
 use panic_halt as _;
-use rp_pico::hal::{prelude::*, Timer};
-use cortex_m_rt::entry;
+use rp_pico::hal::prelude::*;
+use rp_pico::hal::pac;
+use rp_pico::hal;
 
 #[entry]
 fn main() -> ! {
-    let mut pac = rp_pico::pac::Peripherals::take().unwrap();
-    let mut watchdog = Watchdog::new(pac.WATCHDOG);
-    let clocks = rp_pico::hal::clocks::init_clocks_and_plls(
-        rp2040::XOSC_CRYSTAL_FREQ,
+    let mut pac = pac::Peripherals::take().unwrap();
+    let core = pac::CorePeripherals::take().unwrap();
+
+    let mut watchdog = hal::Watchdog::new(pac.WATCHDOG);
+
+    let clocks = hal::clocks::init_clocks_and_plls(
+        rp_pico::XOSC_CRYSTAL_FREQ,
         pac.XOSC,
         pac.CLOCKS,
         pac.PLL_SYS,
@@ -136,9 +184,9 @@ fn main() -> ! {
     .ok()
     .unwrap();
 
-    let mut delay = Timer::new(pac.TIMER, &mut pac.RESETS);
+    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
 
-    let sio = Sio::new(pac.SIO);
+    let sio = hal::Sio::new(pac.SIO);
     let pins = rp_pico::Pins::new(
         pac.IO_BANK0,
         pac.PADS_BANK0,
@@ -147,7 +195,7 @@ fn main() -> ! {
     );
 
     let mut led_pin = pins.led.into_push_pull_output();
-    
+
     loop {
         led_pin.set_high().unwrap();
         delay.delay_ms(500);
@@ -157,12 +205,73 @@ fn main() -> ! {
 }
 ```
 
-This program initializes the board's peripherals, sets up an LED pin, and then blinks the LED on and off every 500 milliseconds.
+## Reading the program
 
----
+- `#![no_std]` means no standard library. The Pico has no operating system, so there are no files, threads or `println!`. You get the `core` library instead, which includes `Option`, `Result`, iterators and the rest of the language you learned.
+- `#![no_main]` and `#[entry]` replace the usual `main`. The start-up code from `cortex-m-rt` calls your function, which returns `!` (never) because firmware must not end.
+- `panic_halt` decides what a panic does: stop forever. This is the same panic as `unwrap()` in lesson 6.
+- `Peripherals::take().unwrap()` hands you the chip's hardware exactly once. That is ownership applied to hardware: no two parts of the program can own the same peripheral.
+- The clock set-up, `Pins::new` and `pins.led` are the board crate telling you which pin the LED is on.
 
-## Summary
+## Step 4: flash it
 
-In this lesson, you've learned how to set up a Rust development environment for the Raspberry Pi Pico, how to install Rust programs on the device, strategies for debugging, and you've walked through an example program that blinks an LED.
+Hold the **BOOTSEL** button, plug the Pico in with a USB cable, then release the button. A drive called `RPI-RP2` appears. Then run:
 
----
+```bash
+cargo run --release
+```
+
+The runner converts the program and copies it to the drive, and the LED starts blinking once a second. If the drive is not detected, copy the UF2 file across by hand.
+
+## Debugging without println
+
+With no standard library there is no `println!`. You have three options: blink the LED in patterns; use a USB serial example (the `rp-pico` crate has `pico_usb_serial`); or use a debug probe, a second Pico running probe firmware, or Raspberry Pi's Debug Probe, wired to the SWD pins, with `probe-rs`. The Pico has no built-in debugger, so a probe is separate hardware. The rp-hal project's own config shows the matching runner for it: `probe-rs run --chip RP2040`, used in place of the `elf2uf2-rs` runner.
+
+> **Teachers**: you need one original Pico per learner or pair, plus data-capable USB cables (some cables charge only). School computers may block the `RPI-RP2` drive or stop you running `cargo install`, so test one machine first. Avoid Pico W boards for this lesson, because their LED is not on a normal pin. If hardware is short, learners can read the program and the diagram and still complete the quiz.
+
+## Try it Yourself
+
+1. Change both delays to 100 and flash again. How does the blink change?
+2. Make a double blink: on, off, on, off, then a longer pause.
+3. Remove `panic_halt` and read the compiler error about a missing panic handler.
+4. Challenge: read the `pico_pwm_blink` example in the `rp-pico` crate and make the LED fade.
+
+## Common Issues
+
+- **Problem**: `can't find crate for core`.
+- **Solution**: Run `rustup target add thumbv6m-none-eabi`.
+- **Why**: The core library for the Pico's processor has to be installed before you can build for it.
+
+- **Problem**: The linker cannot find `memory.x` or `link.x`.
+- **Solution**: Put `memory.x` in the project root and check the `-Tlink.x` flag is in `.cargo/config.toml`.
+- **Why**: The linker script comes from `cortex-m-rt` and reads your `memory.x` to know where to put the code.
+
+- **Problem**: `elf2uf2-rs` cannot find the Pico.
+- **Solution**: Unplug, hold BOOTSEL while plugging in, and wait for the `RPI-RP2` drive.
+- **Why**: The Pico only accepts new programs while in bootloader mode.
+
+- **Problem**: The program flashes but nothing blinks on a Pico W.
+- **Solution**: Use an original Pico, or wire an external LED and resistor to a normal pin.
+- **Why**: On the Pico W the on-board LED is controlled through the wireless chip.
+
+## Check your understanding
+
+{% quiz %}
+? What does `#![no_std]` mean?
+- [ ] The program has no variables
+- [x] The standard library is not used, because there is no operating system
+- [ ] The program cannot panic
+> Firmware uses the `core` library instead of `std`, so there is no `println!`.
+
+? Which target do you build for on the original Pico?
+- [ ] `x86_64-unknown-linux-gnu`
+- [x] `thumbv6m-none-eabi`
+- [ ] `wasm32-unknown-unknown`
+> The RP2040's Cortex-M0+ processor needs the `thumbv6m-none-eabi` target.
+
+? How does a UF2 file get onto the Pico?
+- [ ] Over Wi-Fi
+- [x] Copied to the RPI-RP2 drive while the Pico is in BOOTSEL mode
+- [ ] Typed into the REPL
+> `elf2uf2-rs -d` converts the build and copies it to the mounted drive.
+{% endquiz %}

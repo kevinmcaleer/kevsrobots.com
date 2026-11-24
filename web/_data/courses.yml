@@ -864,15 +864,15 @@
 - author: Kevin McAleer
   cover: /learn/rust/assets/cover.png
   date_published: 2024-03-09
-  description: Learning Rust with me, is a course that will teach you how to use Rust
-    on Raspberry Pi.
-  duration: 0h 33m
+  description: Learn the Rust programming language from scratch, with a Python and
+    MicroPython maker in mind. Write and run real programs on your computer, build
+    a small web server, then set up Rust to blink an LED on the Raspberry Pi Pico.
+  duration: 1h 7m
   groups:
-  - rust
   - pico
-  lessons: 13
+  lessons: 14
   level: intermediate
-  link: /learn/rust/01_intro.html
+  link: /learn/rust/00_intro.html
   name: Introduction to Rust
   video: M9LekkoQyf0
 - author: Kevin McAleer

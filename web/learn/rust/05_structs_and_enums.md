@@ -3,26 +3,28 @@ layout: lesson
 title: Structs and Enums
 author: Kevin McAleer
 type: page
-cover: /learn/scrawly_wally/assets/5.png
+cover: /learn/rust/assets/banners/05_structs_and_enums.jpg
 date: 2024-03-09
 previous: 04_ownership_and_borrowing.html
 next: 06_error_handling.html
-description: Learn how to organize data using Rust's structs and enums, and understand
-  how pattern matching works with these types.
-percent: 35
-duration: 2
+description: Model a robot with structs and enums, add methods with impl, and handle
+  commands with pattern matching.
+percent: 42
+duration: 4
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Introduction to Rust
 - content:
-  - section: Overview
+  - section: Getting Started
     content:
     - name: Introduction to Rust
-      link: 01_intro.html
-  - section: Setting Up a Rust Environment
-    content:
+      link: 00_intro.html
+    - name: Installing Rust and Your First Program
+      link: 01_install-and-hello.html
     - name: 'Rust vs. Python: Understanding the Differences'
       link: 02_rust_and_python.html
-  - section: Basics
+  - section: The Language
     content:
     - name: Rust Basics
       link: 03_rust_basics.html
@@ -53,73 +55,139 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-Structs and enums are the building blocks for creating new types in Rust’s type system. While structs allow you to create custom types that group related data together, enums enable you to define a type by enumerating its possible variants. This lesson explores how to define and use structs and enums, and introduces pattern matching.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
-
-- Understand how to define and use structs in Rust.
-- Learn about enums and their role in Rust.
-- Discover how pattern matching works in conjunction with enums.
+By the end of this lesson you will be able to define a struct and an enum, add methods to them, and use `match` to respond to each variant.
 
 ---
 
-### Defining Structs
+## Describing a robot
 
-In Rust, a struct is a way to group related data together into a meaningful composite type. Each piece of data in the struct is called a 'field'. Structs are similar to tuples, but each field has a name, providing more clarity.
+A **struct** groups related data under one name. An **enum** describes something that can be one of several choices. Together they let you model a robot and the commands you send it. Let's build a small program that does exactly that:
 
 ```rust
-struct User {
-    username: String,
-    email: String,
-    sign_in_count: u64,
-    active: bool,
+#[derive(Debug)]
+enum Command {
+    Stop,
+    Forward(u8),
+    Turn { degrees: i16 },
+}
+
+struct Robot {
+    name: String,
+    battery_percent: u8,
+    speed: u8,
+}
+
+impl Robot {
+    fn new(name: &str) -> Robot {
+        Robot { name: String::from(name), battery_percent: 100, speed: 0 }
+    }
+
+    fn run(&mut self, command: Command) {
+        match command {
+            Command::Stop => {
+                self.speed = 0;
+                println!("{}: stopping", self.name);
+            }
+            Command::Forward(speed) => {
+                self.speed = speed;
+                println!("{}: driving at {}%", self.name, speed);
+            }
+            Command::Turn { degrees } => {
+                println!("{}: turning {} degrees", self.name, degrees);
+            }
+        }
+        self.battery_percent -= 1;
+    }
+}
+
+fn main() {
+    let mut robot = Robot::new("Scout");
+    let plan = [Command::Forward(60), Command::Turn { degrees: -90 }, Command::Stop];
+    for command in plan {
+        println!("command: {:?}", command);
+        robot.run(command);
+    }
+    println!("battery {}%, speed {}", robot.battery_percent, robot.speed);
 }
 ```
 
-### Enums and Pattern Matching
+Running it prints:
 
-Enums in Rust are types that can encompass different 'variants'. Enums are particularly useful for defining a type which could be one of a few different variants. Combined with Rust's pattern matching, enums are powerful for handling different scenarios.
-
-```rust
-enum Message {
-    Quit,
-    Move { x: i32, y: i32 },
-    Write(String),
-    ChangeColor(i32, i32, i32),
-}
-
-let msg = Message::Write(String::from("hello"));
+```text
+command: Forward(60)
+Scout: driving at 60%
+command: Turn { degrees: -90 }
+Scout: turning -90 degrees
+command: Stop
+Scout: stopping
+battery 97%, speed 0
 ```
 
-Pattern matching in Rust allows you to compare a value against a series of patterns and execute code based on which pattern matches. It can be used with enums to handle different scenarios:
+## Structs
 
-```rust
-match msg {
-    Message::Quit => {
-        println!("The Quit variant has no data to destructure.");
-    },
-    Message::Move { x, y } => {
-        println!("Move in the x direction {} and in the y direction {}", x, y);
-    },
-    Message::Write(text) => {
-        println!("Text message: {}", text);
-    },
-    Message::ChangeColor(r, g, b) => {
-        println!("Change the color to red {}, green {}, and blue {}", r, g, b);
-    },
-}
+`struct Robot` has three named **fields**. A struct is like a Python class with only data, plus the methods you attach in an `impl` block. `Robot::new` is an ordinary function that builds a robot, and `run` is a method that takes `&mut self`, so it can change the robot's fields.
+
+**Why this matters:** instead of passing `name`, `speed` and `battery` around as separate variables, you carry one `Robot` and the compiler knows which fields belong together.
+
+## Enums
+
+An enum lists every possible variant. `Command` is a stop, a forward with a speed, or a turn with an angle. Each variant can carry different data: `Forward(u8)` holds one number, and `Turn { degrees: i16 }` holds a named field. The line `#[derive(Debug)]` lets us print a command with `{:?}`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Driving: Forward
+    Driving --> Driving: Turn
+    Driving --> Idle: Stop
 ```
 
----
+## Pattern matching
 
-## Summary
+`match` compares a value against each pattern and runs the first one that fits. The compiler also checks that you covered **every** variant. Delete the `Stop` arm and the program will not build, with an error like `non-exhaustive patterns: Command::Stop not covered`. That is a powerful guard: if you later add a `Reverse` command, the compiler points to every `match` that needs updating.
 
-In this lesson, you learned about struct and enum types in Rust, how to define them, and how to use them in conjunction with pattern matching to handle different kinds of data and control flow in a type-safe way.
+## Try it Yourself
 
----
+1. Add a `Reverse(u8)` variant to `Command` and see where the compiler asks you to handle it.
+2. Add a `fn status(&self) -> String` method to `Robot` that returns the name and battery level.
+3. Make `run` refuse a `Forward` command when `battery_percent` is under 10, and print a warning instead.
+4. Challenge: add a `Beep { times: u8 }` variant and print "beep" that many times.
+
+## Common Issues
+
+- **Problem**: `non-exhaustive patterns` from `match`.
+- **Solution**: Add an arm for the missing variant, or a catch-all `_ => {}` arm if you really want to ignore the rest.
+- **Why**: Rust wants every case handled so a new variant cannot be silently ignored.
+
+- **Problem**: `cannot borrow robot as mutable` when calling `run`.
+- **Solution**: Declare it with `let mut robot`.
+- **Why**: `run` takes `&mut self` because it changes the robot.
+
+- **Problem**: `attempt to subtract with overflow` panic.
+- **Solution**: Use `saturating_sub`, for example `self.battery_percent = self.battery_percent.saturating_sub(1);`.
+- **Why**: A `u8` cannot go below 0, and in a debug build going below stops the program.
+
+## Check your understanding
+
+{% quiz %}
+? What does `impl Robot { ... }` do?
+- [ ] Imports the Robot type
+- [x] Attaches methods and functions to the Robot struct
+- [ ] Makes Robot immutable
+> An `impl` block holds the functions and methods for a type.
+
+? What does Rust check about a `match` on an enum?
+- [ ] That the variants are in alphabetical order
+- [x] That every variant is handled
+- [ ] Nothing, it picks one at random
+> The compiler requires exhaustive matches.
+
+? How can one enum variant carry data?
+- [ ] It cannot
+- [x] Put values in brackets or named fields after the variant, such as `Forward(u8)`
+- [ ] Only by using a struct instead
+> Variants like `Forward(u8)` and `Turn { degrees: i16 }` hold their own data.
+{% endquiz %}
