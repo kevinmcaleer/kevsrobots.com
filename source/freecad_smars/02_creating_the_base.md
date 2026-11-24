@@ -2,7 +2,11 @@
 title: Creating the Base
 description: Build the foundation of your SMARS robot - a parametric 3D sketch extruded into a solid
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/02_creating_the_base.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What We're Building

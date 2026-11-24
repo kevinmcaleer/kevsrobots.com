@@ -3,11 +3,11 @@ title: Q-Learning on Gymnasium
 description: Port your tabular Q-learning agent from the previous course to run against CartPole-v1 — the same algorithm, now against a standard Gymnasium environment.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/05_qlearning_on_gymnasium.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

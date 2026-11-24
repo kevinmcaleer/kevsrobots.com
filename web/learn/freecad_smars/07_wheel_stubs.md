@@ -3,7 +3,7 @@ layout: lesson
 title: Wheel Stubs
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/07_wheel_stubs.jpg
 date: 2025-12-12
 previous: 06_arduino_slots.html
 next: 08_motor_holder.html
@@ -46,6 +46,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What We're Building
 

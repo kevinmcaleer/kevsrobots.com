@@ -3,8 +3,12 @@ title: Creating Motion Sequences
 description: Learn how to animate your servos using Bottango’s timeline and keyframes.
 layout: lesson
 type: page
-cover: assets/bottango_motion.png
+cover: /learn/bottango/assets/banners/05_create_motion.jpg
 date_updated: 2025-05-03
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Now that your servos are configured, let’s bring your project to life by creating motion sequences using Bottango’s timeline editor.

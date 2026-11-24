@@ -3,7 +3,7 @@ layout: lesson
 title: Course Summary and Next Steps
 author: Kevin McAleer
 type: page
-cover: assets/bottango_summary.png
+cover: /learn/bottango/assets/banners/10_summary.jpg
 date: 2025-05-10
 previous: 09_use_with_gamepad.html
 description: "Review what you\u2019ve learned and discover ideas for expanding your\
@@ -50,6 +50,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Congratulations — you’ve completed the **Bottango Basics** course! 🎉
 

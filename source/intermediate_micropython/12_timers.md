@@ -3,7 +3,11 @@ title: Timers
 description: Learn about timers in MicroPython and how to use them for time-sensitive applications.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/12_timers.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Timers

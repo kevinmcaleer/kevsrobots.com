@@ -3,10 +3,12 @@ title: Introduction
 description: Start here to learn what DuckDB is, why it shines for analytics, and how this course is structured.
 type: page
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/duckdb/assets/banners/00_intro.jpg
 ---
 
-![]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## DuckDB for Analytics — Introduction
 

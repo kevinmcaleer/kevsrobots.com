@@ -3,7 +3,11 @@ title: Functions - Goodbye setup and loop!
 description: Learn how to define and use functions in MicroPython, including the shift away from Arduino's setup() and loop() pattern
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/04_functions.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Functions: The Python Way

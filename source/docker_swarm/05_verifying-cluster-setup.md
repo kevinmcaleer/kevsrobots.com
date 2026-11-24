@@ -3,6 +3,10 @@ title: Verifying Cluster Setup
 description: Learn how to verify and troubleshoot your Docker Swarm cluster setup on Raspberry Pi, ensuring all nodes are correctly configured and operational.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/05_verifying-cluster-setup.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

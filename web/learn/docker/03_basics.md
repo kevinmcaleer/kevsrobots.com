@@ -3,7 +3,7 @@ layout: lesson
 title: Docker Basics
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/03_basics.jpg
 date: 2024-01-21
 previous: 02_installing-docker.html
 next: 04_building.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding the Basics of Docker
 

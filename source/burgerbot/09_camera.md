@@ -3,6 +3,11 @@ title: Camera
 description: Learn how to upgrade your BurgerBot with a camera.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/09_camera.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Vision

@@ -99,7 +99,7 @@
     no-code motion tool for animating servos and creating interactive scenes.  This
     course walks you through installing Bottango, wiring servos, programming boards,
     and creating expressive motion sequences.
-  duration: 0h 34m
+  duration: 0h 35m
   groups:
   - animation
   - robotics
@@ -189,7 +189,7 @@
   description: This course guides beginners through the process of setting up a Raspberry
     Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
     and scale a mini-computing cluster for various projects.
-  duration: 0h 50m
+  duration: 0h 49m
   groups:
   - docker
   - raspberry pi
@@ -293,7 +293,7 @@
   date_published: 2026-11-04
   description: 'Learn to track your code and projects with Git: commits, history,
     undoing mistakes, branches, merging, and sharing your work on GitHub.'
-  duration: 1h 14m
+  duration: 1h 15m
   groups:
   - git
   - github

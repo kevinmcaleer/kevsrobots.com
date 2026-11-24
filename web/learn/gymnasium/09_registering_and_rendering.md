@@ -3,7 +3,7 @@ layout: lesson
 title: Registering and Rendering
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/09_registering_and_rendering.jpg
 date: 2026-06-14
 previous: 08_wrapping_the_burgerbot.html
 next: 10_wrappers.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

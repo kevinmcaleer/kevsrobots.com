@@ -3,7 +3,11 @@ title: Robot Project - Simple Motor Control
 description: Build a basic robot control system with motors, sensors, and autonomous behavior using MicroPython
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/10_robot_project.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Building a Simple Robot

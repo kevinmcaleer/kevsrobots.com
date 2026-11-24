@@ -4,6 +4,11 @@ description: >-
     Put everything together: start a brand new MicroPython robot project with Git, build a feature on a branch, merge it, tag a release and publish it on GitHub
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/12_project-version-control-a-robot.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## The project

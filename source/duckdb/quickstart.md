@@ -3,6 +3,11 @@ title: Quickstart
 description: "One-page guide: install DuckDB, run first queries, export data, use Python."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/quickstart.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## TL;DR

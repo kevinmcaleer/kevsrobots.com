@@ -4,6 +4,11 @@ description: >-
     What to do next after installing MicroPython on your Raspberry Pi Pico
 layout: lesson
 type: page
+cover: /learn/how_to_install_micropython/assets/banners/04_next_steps.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 There are many exciting projects you can build now that you have MicroPython installed on you Raspberry Pi Pico. 

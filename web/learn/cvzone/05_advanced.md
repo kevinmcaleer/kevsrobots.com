@@ -3,7 +3,7 @@ layout: lesson
 title: Annotating Your Video
 author: Kevin McAleer
 type: page
-cover: /learn/cvzone/assets/computer_vision.jpg
+cover: /learn/cvzone/assets/banners/05_advanced.jpg
 date: 2023-10-07
 previous: 04_posture.html
 description: Overlay live text and feedback on your video with CVZone's putTextRect,
@@ -34,6 +34,10 @@ navigation:
       link: 05_advanced.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Annotating your video
 

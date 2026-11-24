@@ -2,7 +2,11 @@
 title: Save as STL
 description: Export your SMARS base for 3D printing with optimal settings
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/09_save_as_stl.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What We're Building

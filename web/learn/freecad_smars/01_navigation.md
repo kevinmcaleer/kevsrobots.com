@@ -3,7 +3,7 @@ layout: lesson
 title: Navigation in FreeCAD
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/01_navigation.jpg
 date: 2025-12-12
 previous: 00_intro.html
 next: 02_creating_the_base.html
@@ -45,6 +45,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Why Navigation Matters
 

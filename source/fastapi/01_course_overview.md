@@ -3,10 +3,12 @@ title: Introduction to FastAPI and User Authentication Basics
 description: Learn the basics of FastAPI and the principles of user authentication to secure your static sites.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/fastapi/assets/banners/01_course_overview.jpg
 ---
 
-![FastAPI cover image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is FastAPI?
 

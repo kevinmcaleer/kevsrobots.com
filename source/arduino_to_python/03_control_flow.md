@@ -3,7 +3,11 @@ title: Control Flow - If, Loops, and No Braces!
 description: Learn how if/else statements, for loops, and while loops work in MicroPython without curly braces - indentation is everything
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/03_control_flow.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Control Flow: The Python Way

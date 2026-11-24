@@ -3,7 +3,11 @@ title: Pin Control - Goodbye pinMode, Hello Pin Class!
 description: Learn how to control GPIO pins in MicroPython using the Pin class instead of Arduino's pinMode, digitalWrite, and digitalRead
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/05_pin_control.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Digital Pin Control: A New Approach

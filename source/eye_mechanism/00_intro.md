@@ -3,10 +3,12 @@ title: Overview
 description: Design a robot eye mechanism with moving eyelids in Fusion 360
 layout: lesson
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/00_intro.jpg
 ---
 
-![Page cover photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

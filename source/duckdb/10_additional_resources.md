@@ -3,6 +3,11 @@ title: Additional Resources
 description: Handy links, datasets, and tools to go deeper with DuckDB and analytics.
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/10_additional_resources.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Additional Resources

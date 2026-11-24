@@ -3,7 +3,7 @@ layout: lesson
 title: Docker Volumes and Persistent Data
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/07_volumes.jpg
 date: 2024-01-21
 previous: 06_networking.html
 next: 08_docker-compose.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Handling Data Persistence in Docker
 

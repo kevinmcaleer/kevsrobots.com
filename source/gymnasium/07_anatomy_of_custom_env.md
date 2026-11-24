@@ -3,11 +3,11 @@ title: Anatomy of a Custom Environment
 description: Learn the gym.Env contract — what you must implement to write a valid Gymnasium environment — and validate it with check_env.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/07_anatomy_of_custom_env.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

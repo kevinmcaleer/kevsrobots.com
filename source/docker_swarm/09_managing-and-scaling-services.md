@@ -3,6 +3,10 @@ title: Managing and Scaling Services
 description: This lesson covers the essentials of managing and dynamically scaling services within your Docker Swarm cluster to meet demand and ensure high availability.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/09_managing-and-scaling-services.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

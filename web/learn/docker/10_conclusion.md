@@ -3,7 +3,7 @@ layout: lesson
 title: Conclusion and Next Steps
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/10_conclusion.jpg
 date: 2024-01-21
 previous: 09_dockerise.html
 description: Wrapping up the Docker for Beginners course and exploring further learning
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Course Recap
 

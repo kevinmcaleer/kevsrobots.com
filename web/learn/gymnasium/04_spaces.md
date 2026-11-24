@@ -3,7 +3,7 @@ layout: lesson
 title: Observation Spaces and Action Spaces
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/04_spaces.jpg
 date: 2026-06-14
 previous: 03_terminated_vs_truncated.html
 next: 05_qlearning_on_gymnasium.html
@@ -59,7 +59,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

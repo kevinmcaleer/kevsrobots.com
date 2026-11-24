@@ -3,7 +3,7 @@ layout: lesson
 title: Pin Control - Goodbye pinMode, Hello Pin Class!
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/05_pin_control.jpg
 date: 2025-11-20
 previous: 04_functions.html
 next: 06_analog_pwm.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Digital Pin Control: A New Approach
 

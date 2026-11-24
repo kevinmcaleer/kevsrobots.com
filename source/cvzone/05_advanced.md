@@ -4,6 +4,11 @@ description: >-
     Overlay live text and feedback on your video with CVZone's putTextRect, and build a curl counter
 layout: lesson
 type: page
+cover: /learn/cvzone/assets/banners/05_advanced.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Annotating your video

@@ -3,7 +3,11 @@ title: MP Remote
 description: MicroPython Remote - a command-line tool for managing MicroPython devices.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/13_mp_remote.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## MP Remote

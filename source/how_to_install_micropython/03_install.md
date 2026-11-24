@@ -4,6 +4,11 @@ description: >-
     Learn how to install MicroPython on your Raspberry Pi Pico 
 layout: lesson
 type: page
+cover: /learn/how_to_install_micropython/assets/banners/03_install.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## How to install MicroPython on your Raspberry Pi Pico

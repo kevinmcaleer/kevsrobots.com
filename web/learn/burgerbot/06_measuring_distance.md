@@ -3,7 +3,7 @@ layout: lesson
 title: Measuring Distance
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/06_measuring_distance.jpg
 date: 2023-04-27
 previous: 05_basic_movement.html
 next: 07_object_avoidance.html
@@ -56,6 +56,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Ultrasonic Range Finder
 

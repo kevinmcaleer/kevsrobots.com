@@ -3,7 +3,7 @@ layout: lesson
 title: Why MicroPython?
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/01_why_micropython.jpg
 date: 2025-11-20
 previous: 00_intro.html
 next: 02_syntax_basics.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Why Learn MicroPython?
 

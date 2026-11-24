@@ -3,7 +3,7 @@ layout: lesson
 title: Functions - Goodbye setup and loop!
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/04_functions.jpg
 date: 2025-11-20
 previous: 03_control_flow.html
 next: 05_pin_control.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Functions: The Python Way
 

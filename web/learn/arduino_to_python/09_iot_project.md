@@ -3,7 +3,7 @@ layout: lesson
 title: IoT Project - WiFi Temperature Monitor
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/09_iot_project.jpg
 date: 2025-11-20
 previous: 08_serial_basics.html
 next: 10_robot_project.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Building Your First IoT Project
 

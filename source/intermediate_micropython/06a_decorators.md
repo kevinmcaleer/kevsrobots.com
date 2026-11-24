@@ -3,7 +3,11 @@ title: Decorators
 description: Learn about decorators in MicroPython and how they extend the functionality of functions and methods.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/06a_decorators.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Decorators

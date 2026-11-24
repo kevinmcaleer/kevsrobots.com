@@ -3,11 +3,11 @@ title: Setting Up Your Board
 description: Connect and configure your Arduino or ESP32 board so it can talk to Bottango.
 layout: lesson
 type: page
-cover: assets/bottango_setup_board.png
+cover: /learn/bottango/assets/banners/02_setup_board.jpg
 date_updated: 2025-05-03
 ---
 
-![Cover](assets/intro.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

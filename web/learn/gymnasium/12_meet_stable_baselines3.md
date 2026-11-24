@@ -3,7 +3,7 @@ layout: lesson
 title: Meet Stable-Baselines3
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/12_meet_stable_baselines3.jpg
 date: 2026-06-14
 previous: 11_vectorized_envs.html
 next: 13_train_evaluate_export.html
@@ -59,7 +59,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

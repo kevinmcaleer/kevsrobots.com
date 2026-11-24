@@ -3,11 +3,11 @@ title: Terminated vs Truncated
 description: Learn why Gymnasium separates the done flag into terminated and truncated, and why this distinction matters for correct RL training.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/03_terminated_vs_truncated.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

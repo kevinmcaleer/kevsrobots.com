@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/duckdb/assets/banners/00_intro.jpg
 date: 2025-09-04
 next: quickstart.html
 description: Start here to learn what DuckDB is, why it shines for analytics, and
@@ -54,7 +54,9 @@ navigation:
 ---
 
 
-![]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## DuckDB for Analytics — Introduction
 

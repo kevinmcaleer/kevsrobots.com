@@ -3,8 +3,12 @@ title: Configuring Bottango
 description: Learn how to configure your project, assign servos, and get ready to animate.
 layout: lesson
 type: page
-cover: assets/bottango_configure.png
+cover: /learn/bottango/assets/banners/04_configure_bottango.jpg
 date_updated: 2025-05-03
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Now that your servos are wired up and your board is connected, it’s time to configure Bottango so you can start animating.

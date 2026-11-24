@@ -3,7 +3,7 @@ layout: lesson
 title: Next Steps and Quick Reference
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/11_next_steps.jpg
 date: 2025-11-20
 previous: 10_robot_project.html
 description: Course summary, quick reference guide for converting Arduino C++ to MicroPython,
@@ -47,6 +47,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Congratulations!
 

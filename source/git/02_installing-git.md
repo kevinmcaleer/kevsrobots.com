@@ -4,6 +4,11 @@ description: >-
     Install Git on Windows, macOS, Linux or Raspberry Pi, and set your name, email and default branch
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/02_installing-git.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Is Git already installed?

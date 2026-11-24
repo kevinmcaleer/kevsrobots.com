@@ -3,8 +3,12 @@ title: Building the Plotter
 description: Learn how to build the BrachioGraph plotter from scratch using simple components and tools.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/01_build.jpg
 date_updated: 2024-07-30
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Assembling the BrachioGraph

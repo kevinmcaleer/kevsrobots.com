@@ -3,7 +3,7 @@ layout: lesson
 title: Install MicroPython
 author: Kevin McAleer
 type: page
-cover: /learn/how_to_install_micropython/assets/cover.jpg
+cover: /learn/how_to_install_micropython/assets/banners/03_install.jpg
 date: 2024-08-10
 previous: 02_types.html
 next: 04_next_steps.html
@@ -29,6 +29,10 @@ navigation:
       link: 04_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## How to install MicroPython on your Raspberry Pi Pico
 

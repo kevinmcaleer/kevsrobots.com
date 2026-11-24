@@ -3,8 +3,12 @@ title: Advanced Arduino Mode
 description: Learn how to export Bottango animations to your Arduino so they can run without a computer.
 layout: lesson
 type: page
-cover: assets/bottango_arduino_mode.png
+cover: /learn/bottango/assets/banners/08_arduino_mode.jpg
 date_updated: 2025-05-03
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 By default, Bottango requires a live USB connection to your microcontroller. But what if you want your project to run **without a computer**? That’s where **Arduino Mode** comes in.

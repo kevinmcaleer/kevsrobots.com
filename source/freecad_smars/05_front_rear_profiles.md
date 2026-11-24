@@ -2,7 +2,11 @@
 title: Front and Rear Profiles
 description: Create cable routing and component access openings using symmetric constraints
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/05_front_rear_profiles.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What We're Building

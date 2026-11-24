@@ -3,7 +3,11 @@ title: Next Steps and Quick Reference
 description: Course summary, quick reference guide for converting Arduino C++ to MicroPython, and resources for continuing your learning journey
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/11_next_steps.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Congratulations!

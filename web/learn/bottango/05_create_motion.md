@@ -3,7 +3,7 @@ layout: lesson
 title: Creating Motion Sequences
 author: Kevin McAleer
 type: page
-cover: assets/bottango_motion.png
+cover: /learn/bottango/assets/banners/05_create_motion.jpg
 date: 2025-05-10
 previous: 04_configure_bottango.html
 next: 06_triggers.html
@@ -51,6 +51,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Now that your servos are configured, let’s bring your project to life by creating motion sequences using Bottango’s timeline editor.
 

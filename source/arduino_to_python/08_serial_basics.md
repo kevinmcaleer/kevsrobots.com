@@ -3,7 +3,11 @@ title: Serial Communication and REPL - No More Serial.begin!
 description: Learn how print() replaces Serial.print() and discover the power of MicroPython's REPL for interactive debugging
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/08_serial_basics.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Serial Communication: Simpler in Python

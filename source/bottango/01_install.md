@@ -3,11 +3,11 @@ title: Installing Bottango
 description: Learn how to download, install, and launch Bottango on your Windows or Mac computer.
 layout: lesson
 type: page
-cover: assets/bottango_install.png
+cover: /learn/bottango/assets/banners/01_install.jpg
 date_updated: 2025-05-03
 ---
 
-![Cover](assets/intro.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

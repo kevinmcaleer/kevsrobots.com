@@ -3,7 +3,7 @@ layout: lesson
 title: DocStrings
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/10_docstrings.jpg
 date: 2024-07-07
 previous: 09_pypi.html
 next: 11_interrupts.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## DocStrings
 

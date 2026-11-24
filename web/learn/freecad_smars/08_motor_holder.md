@@ -3,7 +3,7 @@ layout: lesson
 title: Motor Holder
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/08_motor_holder.jpg
 date: 2025-12-12
 previous: 07_wheel_stubs.html
 next: 09_save_as_stl.html
@@ -46,6 +46,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What We're Building
 

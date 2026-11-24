@@ -3,6 +3,11 @@ title: Basic Queries
 description: Learn SELECT, WHERE, GROUP BY, JOIN, and ordering in DuckDB with practical, file-based examples.
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/02_basic_queries.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Basic Queries

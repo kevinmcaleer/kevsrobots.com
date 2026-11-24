@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Arduino Mode
 author: Kevin McAleer
 type: page
-cover: assets/bottango_arduino_mode.png
+cover: /learn/bottango/assets/banners/08_arduino_mode.jpg
 date: 2025-05-10
 previous: 07_sync_music.html
 next: 09_use_with_gamepad.html
@@ -51,6 +51,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 By default, Bottango requires a live USB connection to your microcontroller. But what if you want your project to run **without a computer**? That’s where **Arduino Mode** comes in.
 

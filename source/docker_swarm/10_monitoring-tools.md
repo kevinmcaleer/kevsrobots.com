@@ -3,6 +3,10 @@ title: Monitoring Tools for Docker Swarm
 description: Explore various tools and strategies for monitoring your Docker Swarm cluster, ensuring the health, performance, and efficiency of your services.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/10_monitoring-tools.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

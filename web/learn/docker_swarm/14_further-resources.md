@@ -3,7 +3,7 @@ layout: lesson
 title: Further Resources
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/14_further-resources.jpg
 date: 2024-02-03
 previous: 13_project-ideas.html
 description: A curated list of resources to deepen your knowledge and proficiency
@@ -57,6 +57,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Enhancing Your Docker Swarm Expertise
 

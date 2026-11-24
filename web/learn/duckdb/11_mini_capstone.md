@@ -3,7 +3,7 @@ layout: lesson
 title: 'Mini capstone: local analytics project'
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/11_mini_capstone.jpg
 date: 2025-09-04
 previous: 10_additional_resources.html
 description: Plan and build a tiny analytics project end-to-end with DuckDB, Parquet,
@@ -53,6 +53,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Goal
 Build a small, repeatable analytics workflow on your machine:

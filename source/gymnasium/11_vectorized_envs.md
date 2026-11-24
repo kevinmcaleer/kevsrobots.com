@@ -3,11 +3,11 @@ title: Vectorised Environments
 description: Speed up training by running multiple environment copies in parallel with SyncVectorEnv, and understand how batched observations and rewards work.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/11_vectorized_envs.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

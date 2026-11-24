@@ -3,7 +3,7 @@ layout: lesson
 title: Line Following
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/08_line_following.jpg
 date: 2023-04-27
 previous: 08_pen.html
 next: 08_line_following_code.html
@@ -56,6 +56,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Line following Upgrade
 

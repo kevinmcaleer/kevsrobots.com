@@ -3,7 +3,7 @@ layout: lesson
 title: Abstraction
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/03_abstraction.jpg
 date: 2024-07-07
 previous: 02a_classes.html
 next: 04_inheritance.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Abstraction
 

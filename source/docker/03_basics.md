@@ -3,6 +3,11 @@ title: Docker Basics
 description: An introductory guide to the fundamental concepts and components of Docker.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/03_basics.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Understanding the Basics of Docker

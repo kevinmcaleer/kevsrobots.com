@@ -3,8 +3,12 @@ title: Course Summary and Next Steps
 description: Review what you’ve learned and discover ideas for expanding your Bottango-powered projects.
 layout: lesson
 type: page
-cover: assets/bottango_summary.png
+cover: /learn/bottango/assets/banners/10_summary.jpg
 date_updated: 2025-05-03
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Congratulations — you’ve completed the **Bottango Basics** course! 🎉

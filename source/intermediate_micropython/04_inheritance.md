@@ -3,7 +3,11 @@ title: Inheritance
 description: Learn about inheritance and composition in object-oriented programming.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/04_inheritance.jpg
+
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
