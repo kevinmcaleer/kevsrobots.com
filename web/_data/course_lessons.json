@@ -632,7 +632,8 @@
     "author": "Kevin McAleer",
     "date_published": "2023-04-27",
     "groups": [
-      "robotics",
+      "robots",
+      "3dprinting",
       "micropython",
       "pico"
     ],

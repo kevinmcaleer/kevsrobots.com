@@ -10,8 +10,9 @@ next: 02_assembly.html
 description: Learn about BurgerBot, a Raspberry Pi Pico-powered robot that is quick
   and easy to print and assemble, with a low build cost.
 percent: 18
-duration: 3
-quiz_total: 11
+duration: 5
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Build your own BurgerBot
 - content:
@@ -62,6 +63,10 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to name the parts of BurgerBot, say what each one does, and find the files you need to print.
+
+---
+
 `BurgerBot`, as the name suggests, is a Burger-shaped robot. BurgerBot is quick and easy to print and assemble, with a low build cost and is designed for education and hobbyists. The Raspberry Pi Pico and Pico W board power the robot making it easy to program with MicroPython.
 
 ---
@@ -102,6 +107,8 @@ It uses two Micro Metal Motors which connect to the [Motor SHIM for Pico](https:
 
 BurgerBot has an ultrasonic rangefinder mounted at the front; however, this needs to be the 3.3V variant, because the Pico's pins can't handle the 5V signal from a standard HC-SR04. The wiring is covered in the [Measuring Distance](06_measuring_distance.html) lesson.
 
+> **Check your motor driver board.** The parts list uses the Pimoroni Motor SHIM for Pico. The current `burgerbot.py` library drives each motor with one speed (PWM) pin and one direction pin, which is not how the Motor SHIM's DRV8833 chip is controlled. [Getting the code](03_getting_the_code.html) explains the pins the library expects, so read it before you buy or wire a motor driver.
+
 BurgerBot also features two moon-buggy wheels that attach directly to the motors. In addition, there are two little 'nubs' underneath to stop the robot from falling over backwards or forwards.
 
 The original top section has four mounting holes to secure the Pico using four M2 screws.
@@ -128,12 +135,44 @@ The parts for the original BurgerBot are still available too:
 
 ---
 
+## Try it Yourself
+
+1. Look at the two parts tables. Which printed part holds the sensor, and which holds the Pico and battery in v2?
+2. Open the v2 STL files in a slicer. How long does each part take to print on your printer? Add them up so you know when to start printing.
+3. Challenge: the original BurgerBot has the Pico on top, and v2 puts it inside the rear support. Which is better for adding the pen module, and why?
+
+---
+
+## Common Issues
+
+- **Problem**: The range finder works on the bench but the Pico stops responding, or gets hot
+- **Solution**: Check that you bought the 3.3V HC-SR04P and not a standard 5V HC-SR04
+- **Why**: A standard HC-SR04 sends a 5V echo signal into a Pico pin that can only take 3.3V
+
+> **Teachers**: 3D printing is the slowest part of this course. The parts take several hours to print in total, so plan for a print queue and start a week ahead, or ask a local maker space to print them. Print one set per robot and a spare motor holder, because the small parts are the ones that fail.
+
+---
+
+## Check your understanding
+
 {% quiz %}
 ? Why does BurgerBot need the 3.3V version of the HC-SR04 range finder?
 - [ ] It's smaller and fits the holder
 - [x] The Pico's GPIO pins can't safely take the 5V signal from a standard HC-SR04
 - [ ] The 3.3V version measures further
 > The Pico is a 3.3V device, and a 5V echo signal could damage its input pin.
+
+? How many motor holders do you print for BurgerBot?
+- [ ] One
+- [x] Two, one for each motor
+- [ ] Four
+> The STL list says to print 2 motor holders, one for each motor.
+
+? What stops BurgerBot tipping forwards or backwards?
+- [ ] The battery weight
+- [ ] The range finder holder
+- [x] Two small nubs underneath the base
+> The base has two solid nubs underneath that act as casters.
 {% endquiz %}
 
 ---
