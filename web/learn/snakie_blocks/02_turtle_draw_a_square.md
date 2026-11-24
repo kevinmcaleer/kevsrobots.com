@@ -10,9 +10,9 @@ next: 03_variables_maths_and_loops.html
 description: Build your first Snakie blocks program by drawing a square with the turtle,
   then change it into other shapes
 percent: 21
-duration: 4
+duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to draw a square, and other regular shapes, with turtle blocks, and say what Python they write.
 
 Your first blocks program draws a square. No wires, no board.
 
@@ -135,6 +137,8 @@ for _ in range(5):
 
 ---
 
+> **Teachers**: The turtle needs no hardware, so this is a good first lesson for a whole class on laptops or Chromebooks. The live boxes in the lesson list the turtle's moves in the console but do not draw, so learners should click **Open in Snakie** and press Run there to watch the drawing.
+
 ## Try it Yourself
 
 1. Change the square into a triangle, then a hexagon.
@@ -144,17 +148,17 @@ for _ in range(5):
 
 ## Common Issues
 
-**Problem**: The turtle draws one line and stops.
-**Solution**: Make sure both turtle blocks are *inside* the repeat block's mouth.
-**Why**: Only the blocks inside the repeat are repeated. A block underneath it runs once, afterwards.
+- **Problem**: The turtle draws one line and stops.
+- **Solution**: Make sure both turtle blocks are *inside* the repeat block's mouth.
+- **Why**: Only the blocks inside the repeat are repeated. A block underneath it runs once, afterwards.
 
-**Problem**: Nothing appears when I press Run.
-**Solution**: Check the Turtle instrument is open on the right. Press **Clear** on it and run again.
-**Why**: The drawing goes to the Turtle instrument, not the console.
+- **Problem**: Nothing appears when I press Run.
+- **Solution**: Check the Turtle instrument is open on the right. Press **Clear** on it and run again.
+- **Why**: The drawing goes to the Turtle instrument, not the console.
 
-**Problem**: The shape doesn't close up.
-**Solution**: Check that sides × turn = 360.
-**Why**: The turtle must turn a full circle in total to end up facing the way it started.
+- **Problem**: The shape doesn't close up.
+- **Solution**: Check that sides × turn = 360.
+- **Why**: The turtle must turn a full circle in total to end up facing the way it started.
 
 ## Check your understanding
 

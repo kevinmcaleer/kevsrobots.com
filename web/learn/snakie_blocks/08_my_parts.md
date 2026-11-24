@@ -12,7 +12,7 @@ description: See how wiring a part in the Snakie Electronics workspace gives you
 percent: 63
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how the My parts drawer fills with blocks for the parts you wire up in the Electronics workspace.
 
 So far every hardware block has been a general one: an LED, a button, a buzzer. Real projects use particular parts, such as a BME280 weather sensor or an OLED display. Snakie has a clever answer for those.
 
@@ -119,7 +121,7 @@ These blocks show the name of the driver's class in a box you can edit, because 
 
 Wiring and code usually live in different places, and they drift apart. You move a wire and forget to change the pin number. In Snakie the circuit and the blocks share the same information, so the pins in your program are the pins on your breadboard.
 
-We'll build circuits properly in the Wire It Up course, which is next in the Start with Snakie pathway. For now, it's enough to know the drawer is there and what fills it.
+We'll build circuits properly in the [Wire It Up](/learn/snakie_electronics/) course, which is next in the Start with Snakie pathway. For now, it's enough to know the drawer is there and what fills it.
 
 ---
 
@@ -131,17 +133,17 @@ We'll build circuits properly in the Wire It Up course, which is next in the Sta
 
 ## Common Issues
 
-**Problem**: My parts is empty.
-**Solution**: Wire at least one part to the board in Electronics.
-**Why**: The drawer only shows parts that are actually connected.
+- **Problem**: My parts is empty.
+- **Solution**: Wire at least one part to the board in Electronics.
+- **Why**: The drawer only shows parts that are actually connected.
 
-**Problem**: `ImportError: no module named 'bme280'`
-**Solution**: Accept Snakie's offer to install the driver, or install it from the Packages panel.
-**Why**: The driver has to be on the board before your program can import it.
+- **Problem**: `ImportError: no module named 'bme280'`
+- **Solution**: Accept Snakie's offer to install the driver, or install it from the Packages panel.
+- **Why**: The driver has to be on the board before your program can import it.
 
-**Problem**: The pins on the block are wrong.
-**Solution**: Fix the wiring in Electronics, not the block.
-**Why**: The block reads its pins from the circuit.
+- **Problem**: The pins on the block are wrong.
+- **Solution**: Fix the wiring in Electronics, not the block.
+- **Why**: The block reads its pins from the circuit.
 
 ## Check your understanding
 

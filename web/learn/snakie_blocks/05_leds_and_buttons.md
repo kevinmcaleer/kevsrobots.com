@@ -12,7 +12,7 @@ description: Blink an LED and read a button with Snakie hardware blocks, and und
 percent: 42
 duration: 6
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to blink an LED and read a button with hardware blocks, and read the Python they write.
 
 Time to leave the screen and control some pins. The LED half of this lesson runs on the simulator. For the button half you'll want a real Pico, because the simulator has no button to press yet.
 
@@ -151,6 +153,8 @@ To try this for real, connect an LED (with a 330Ω resistor) between GP15 and GN
 
 ---
 
+> **Teachers**: The LED half runs on the simulator, but the simulator has no button to press yet, so the button half needs a real Pico, a breadboard, an LED with a 330 ohm resistor and a push button. If you have only a few boards, let learners do the LED half on the simulator first and share boards for the button.
+
 ## Try it Yourself
 
 1. Make the LED blink twice as fast.
@@ -160,21 +164,21 @@ To try this for real, connect an LED (with a 330Ω resistor) between GP15 and GN
 
 ## Common Issues
 
-**Problem**: The LED stays on, or never lights.
-**Solution**: Check the **wait** block is inside the forever loop.
-**Why**: With no wait, the pin flips thousands of times a second and looks permanently dim or lit.
+- **Problem**: The LED stays on, or never lights.
+- **Solution**: Check the **wait** block is inside the forever loop.
+- **Why**: With no wait, the pin flips thousands of times a second and looks permanently dim or lit.
 
-**Problem**: The button works backwards.
-**Solution**: With a pull-up, compare with `0` for pressed. Or use the **button is pressed** block.
-**Why**: The pull-up holds the pin at 1 until the button pulls it to ground.
+- **Problem**: The button works backwards.
+- **Solution**: With a pull-up, compare with `0` for pressed. Or use the **button is pressed** block.
+- **Why**: The pull-up holds the pin at 1 until the button pulls it to ground.
 
-**Problem**: On the simulator the LED is always on.
-**Solution**: Try it on a real Pico with a button.
-**Why**: The simulator's input pins read 0, which with a pull-up means pressed.
+- **Problem**: On the simulator the LED is always on.
+- **Solution**: Try it on a real Pico with a button.
+- **Why**: The simulator's input pins read 0, which with a pull-up means pressed.
 
-**Problem**: On a real board, nothing happens.
-**Solution**: Check the LED is the right way round (long leg towards GP15) and the pin in the block matches your wiring.
-**Why**: An LED only lets current through one way.
+- **Problem**: On a real board, nothing happens.
+- **Solution**: Check the LED is the right way round (long leg towards GP15) and the pin in the block matches your wiring.
+- **Why**: An LED only lets current through one way.
 
 ## Check your understanding
 

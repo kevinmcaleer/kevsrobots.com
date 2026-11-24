@@ -11,7 +11,7 @@ description: Learn to program a Raspberry Pi Pico with drag-and-drop blocks in S
 percent: 7
 duration: 3
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:

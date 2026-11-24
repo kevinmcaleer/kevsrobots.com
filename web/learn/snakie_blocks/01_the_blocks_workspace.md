@@ -10,9 +10,9 @@ next: 02_turtle_draw_a_square.html
 description: Find your way around the Snakie Blocks workspace, the toolbox and the
   split view that shows blocks and Python side by side
 percent: 14
-duration: 4
+duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find your way around the Blocks workspace and switch to the split view to see blocks and Python together.
 
 Before we build anything, let's look at where everything lives.
 
@@ -141,13 +143,13 @@ At the bottom left of the canvas is a box that says **What block is this? Drop o
 
 ## Common Issues
 
-**Problem**: I can't see the Python.
-**Solution**: Click the dot between **Blocks** and **Code** at the top of the window.
-**Why**: Blocks on its own hides the code pane. The dot is the halfway stop that shows both.
+- **Problem**: I can't see the Python.
+- **Solution**: Click the dot between **Blocks** and **Code** at the top of the window.
+- **Why**: Blocks on its own hides the code pane. The dot is the halfway stop that shows both.
 
-**Problem**: A drawer is missing blocks I've seen in a screenshot.
-**Solution**: Turn on **Show advanced blocks** under the toolbox.
-**Why**: Snakie starts with the simple set. We'll meet the advanced ones in a later lesson.
+- **Problem**: A drawer is missing blocks I've seen in a screenshot.
+- **Solution**: Turn on **Show advanced blocks** under the toolbox.
+- **Why**: Snakie starts with the simple set. We'll meet the advanced ones in a later lesson.
 
 ## Check your understanding
 
