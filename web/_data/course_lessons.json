@@ -4361,20 +4361,19 @@
   {
     "slug": "redis",
     "name": "Using Redis with Python",
-    "description": "Learn how to use Redis with Python to build fast, scalable applications.",
+    "description": "Learn how to use Redis with Python to share robot sensor readings, queue jobs, count visitors, rank scores and send live messages, then build a robot telemetry hub with a live dashboard.",
     "cover": "assets/redis-cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-04-12",
     "groups": [
-      "redis",
       "python",
-      "databases"
+      "raspberrypi"
     ],
     "lessons": [
       {
-        "file": "01_introduction.md",
+        "file": "00_intro.md",
         "section": "Introduction to Redis",
-        "url": "/learn/redis/01_introduction.html"
+        "url": "/learn/redis/00_intro.html"
       },
       {
         "file": "02_redis_basics.md",
@@ -4417,9 +4416,19 @@
         "url": "/learn/redis/09_redis_pub_sub.html"
       },
       {
-        "file": "10_summary.md",
-        "section": "Conclusion",
-        "url": "/learn/redis/10_summary.html"
+        "file": "10_expiry_and_persistence.md",
+        "section": "Keeping data",
+        "url": "/learn/redis/10_expiry_and_persistence.html"
+      },
+      {
+        "file": "11_robot_telemetry_hub.md",
+        "section": "Project and Conclusion",
+        "url": "/learn/redis/11_robot_telemetry_hub.html"
+      },
+      {
+        "file": "12_summary.md",
+        "section": "Project and Conclusion",
+        "url": "/learn/redis/12_summary.html"
       }
     ]
   },

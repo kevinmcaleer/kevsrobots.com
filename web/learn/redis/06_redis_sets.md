@@ -7,17 +7,20 @@ cover: /learn/redis/assets/banners/06_redis_sets.jpg
 date: 2023-04-12
 previous: 05_redis_lists.html
 next: 07_redis_hashes.html
-description: Learn about Redis sets and how to use them with Python.
-percent: 60
-duration: 3
-quiz_total: 14
+description: Count unique visitors and compare groups with Redis sets, using a maker
+  stand and an RFID door reader as examples.
+percent: 48
+duration: 5
+quiz_total: 37
+code_target: cpython
+date_updated: 2026-11-24
 navigation:
 - name: Using Redis with Python
 - content:
   - section: Introduction to Redis
     content:
     - name: Introduction to Redis
-      link: 01_introduction.html
+      link: 00_intro.html
     - name: Redis Basics
       link: 02_redis_basics.html
   - section: Working with data
@@ -40,10 +43,16 @@ navigation:
     content:
     - name: Redis Pub/Sub
       link: 09_redis_pub_sub.html
-  - section: Conclusion
+  - section: Keeping data
     content:
+    - name: Expiry and Persistence
+      link: 10_expiry_and_persistence.html
+  - section: Project and Conclusion
+    content:
+    - name: 'Project: A Robot Telemetry Hub'
+      link: 11_robot_telemetry_hub.html
     - name: Conclusion and Additional Resources
-      link: 10_summary.html
+      link: 12_summary.html
 ---
 
 
@@ -51,80 +60,133 @@ navigation:
 
 ---
 
-### Overview
-
-In this lesson, we will cover Redis sets and how to use them with Python. Redis sets are a data type that can be used to store an unordered collection of unique strings. We will cover how to add, retrieve, and manipulate set elements in Redis, and how to use sets in Python.
+By the end of this lesson you will be able to count unique items with a Redis set, test membership, and combine sets to find who came on both days.
 
 ---
 
-### Lesson Content
+## Overview
 
-In this lesson, we will cover:
+Imagine your robot greets people at a maker fair, or an RFID reader logs who opens the workshop door. People walk past again and again, but you only want to count each person **once**. That is exactly what a Redis set does: it stores unique strings with no order, and quietly ignores anything you add twice.
 
-* [Redis sets](#redis-sets)
-* [Adding and retrieving set elements](#adding-and-retrieving-set-elements)
-* [Manipulating set elements](#manipulating-set-elements)
-* [Using Redis sets with Python](#using-redis-sets-with-python)
-
----
-
-### Redis Sets
-
-Redis sets are a data type that can be used to store an unordered collection of unique strings. Sets in Redis are implemented as hash tables, which means that adding, removing, and checking for membership of elements in a set is very fast.
-
----
-
-### Adding and Retrieving Set Elements
-
-To add an element to a set in Redis, you can use the `sadd` command. To check if an element is a member of a set, you can use the `sismember` command. Here are some examples of adding and retrieving elements from a Redis set:
-
-```redis
-sadd myset "element1"
-(integer) 1
-sadd myset "element2"
-(integer) 1
-sismember myset "element1"
-(integer) 1
+```mermaid
+flowchart LR
+    A["Scan: alice"] --> S[("visitors:day1")]
+    B["Scan: bob"] --> S
+    C["Scan: alice again"] -->|"ignored, already in the set"| S
+    S --> N["SCARD = 2 unique visitors"]
 ```
 
----
+Adding, removing and checking membership all take the same short time however big the set gets, so sets stay quick even with thousands of members.
 
-### Manipulating Set Elements
+## Adding and checking
 
-In addition to adding and retrieving set elements, Redis provides several commands for manipulating set elements. Here are some examples of manipulating set elements in Redis:
+```
+127.0.0.1:6379> sadd visitors:day1 alice bob carol
+(integer) 3
+127.0.0.1:6379> sadd visitors:day1 alice
+(integer) 0
+127.0.0.1:6379> scard visitors:day1
+(integer) 3
+127.0.0.1:6379> sismember visitors:day1 bob
+(integer) 1
+127.0.0.1:6379> sismember visitors:day1 zed
+(integer) 0
+```
 
-* `srem`: Remove an element from a set
-* `spop`: Remove and return a random element from a set
-* `smembers`: Get all members of a set
-* `sinter`, `sunion`, `sdiff`: Find the members two sets have in common, all members of both, or the difference
+- `sadd` returns how many members were **new**, so adding `alice` a second time gives `0`
+- `scard` counts the members, which is your unique-visitor total
+- `sismember` answers `1` for yes and `0` for no. Python gives you the same `1` or `0`, so `if r.sismember(...)` still works
+- `srem` removes a member, `smembers` lists them all, and `spop` removes and returns a random one
 
----
+## Comparing sets
 
-### Using Redis Sets with Python
+Sets really shine when you combine them. Let's add a second day:
 
-To use Redis sets in Python, you can use the `set` methods of the Redis Python library. Here's an example of how to use Redis sets in Python:
+```
+127.0.0.1:6379> sadd visitors:day2 bob dave
+(integer) 2
+127.0.0.1:6379> sinter visitors:day1 visitors:day2
+1) "bob"
+127.0.0.1:6379> sunion visitors:day1 visitors:day2
+1) "alice"
+2) "bob"
+3) "carol"
+4) "dave"
+127.0.0.1:6379> sdiff visitors:day2 visitors:day1
+1) "dave"
+```
+
+- `sinter` is the **intersection**: who came on both days
+- `sunion` is the **union**: everyone who came on either day
+- `sdiff` is the **difference**: members of the first set that are not in the second, so here, people who are new on day 2
+
+Redis does not promise any order for set members, so the order you see may differ from ours.
+
+## A door log in Python
+
+Save this as `door_log.py`. It pretends an RFID reader scanned some badges over two days:
 
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r.delete('visitors:day1', 'visitors:day2')
 
-# Add elements to a set
-redis_client.sadd('myset', 'element1', 'element2')
+day1_scans = ['alice', 'bob', 'alice', 'carol', 'bob', 'alice']
+day2_scans = ['bob', 'dave', 'bob']
 
-# Check if an element is a member of a set
-is_member = redis_client.sismember('myset', 'element1')
+for badge in day1_scans:
+    r.sadd('visitors:day1', badge)
+for badge in day2_scans:
+    r.sadd('visitors:day2', badge)
 
-# Remove an element from a set
-redis_client.srem('myset', 'element2')
-
-# Get all members of a set
-members = redis_client.smembers('myset')
+print('Scans on day 1:', len(day1_scans))
+print('Unique visitors on day 1:', r.scard('visitors:day1'))
+print('Back for day 2:', sorted(r.sinter('visitors:day1', 'visitors:day2')))
+print('Everyone:', sorted(r.sunion('visitors:day1', 'visitors:day2')))
+print('New on day 2:', sorted(r.sdiff('visitors:day2', 'visitors:day1')))
+print('Is carol a visitor?', r.sismember('visitors:day1', 'carol'))
 ```
 
-In this example, we use the Redis Python library to add elements to a set using the `sadd` method, check if an element is a member of a set using the `sismember` method, remove an element from a set using the `srem` method, and get all members of a set using the `smembers` method.
+It prints:
 
----
+```
+Scans on day 1: 6
+Unique visitors on day 1: 3
+Back for day 2: ['bob']
+Everyone: ['alice', 'bob', 'carol', 'dave']
+New on day 2: ['dave']
+Is carol a visitor? 1
+```
+
+Six scans, but only three people. We wrapped the results in `sorted()` only to make the printed order predictable, because sets have no order.
+
+> ## Counting really big crowds
+>
+> A set stores every member, so a million visitors means a million strings in memory. Redis has a cheaper, approximate counter called HyperLogLog for huge counts, but a set is the right tool while you need exact answers or want to ask "is this one in there?".
+
+## Try it Yourself
+
+1. In `redis-cli`, create a set `sensors:fitted` holding `ultrasonic`, `camera` and `imu`. Check whether `lidar` is a member
+2. Add a third day to `door_log.py` and find who has come on all three days. Hint: `sinter` takes several keys
+3. Use `sdiff` to find who came on day 1 but not on day 2
+4. Challenge: make the set remove itself at midnight by giving it a time to live (the expiry lesson shows how)
+
+## Common Issues
+
+- **Problem**: The members print in a different order from the lesson.
+- **Solution**: Wrap the result in `sorted()` if you need a stable order.
+- **Why**: Sets are unordered, and Redis may return members in any order.
+
+- **Problem**: `sadd` returns `0` and you think it failed.
+- **Solution**: Nothing is wrong. Use `scard` to confirm the member is there.
+- **Why**: `0` means the member was already in the set, so nothing new was added.
+
+- **Problem**: `smembers` on a huge set freezes the server for a moment.
+- **Solution**: Use `scard` to count, `sismember` to check one member, or `sscan` to read it in small chunks.
+- **Why**: `smembers` returns every member in one go.
+
+## Check your understanding
 
 {% quiz %}
 ? What does `sadd` return when you add an element that's already in the set?
@@ -132,23 +194,18 @@ In this example, we use the Redis Python library to add elements to a set using 
 - [ ] 1
 - [ ] An error
 > It returns how many new elements were added, so a duplicate gives 0.
+
+? Which command finds the visitors who came on both days?
+- [ ] `sunion`
+- [x] `sinter`
+- [ ] `sdiff`
+> `sinter` is the intersection: members found in every set you name.
+
+? Six badge scans came from three different people. What does `scard` report?
+- [ ] 6
+- [x] 3
+- [ ] 0
+> A set holds each member once, so `scard` counts unique members.
 {% endquiz %}
 
----
-
-### Key Takeaways
-
-After completing this lesson, you should be able to:
-
-* Describe Redis sets and their implementation in Redis
-* Add and retrieve elements from Redis sets
-* Manipulate elements in Redis sets
-* Use Redis sets in Python
-
----
-
-### Conclusion
-
-In this lesson, we covered Redis sets and how to use them with Python. We described Redis sets and their implementation in Redis, and demonstrated how to add, retrieve, and manipulate set elements in Redis, and how to use Redis sets in Python using the Redis Python library. In the next lesson, we will cover Redis hashes.
-
----
+> **Teachers**: a visitor log is personal data. If learners scan real names or school badge numbers, remember data protection rules at your school, and keep the data on a local server. A good classroom alternative is to use made-up nicknames or random numbers, which teach the same idea with nothing sensitive stored.
