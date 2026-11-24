@@ -927,7 +927,7 @@
     and watch the real MicroPython appear beside them. Draw with the turtle, drive
     LEDs, buttons, servos and buzzers, then build a reaction timer game and read every
     line of its Python.
-  duration: 1h 1m
+  duration: 1h 6m
   groups:
   - micropython
   - pico
@@ -959,7 +959,7 @@
     hover help, linting and one-click refactors, install packages, compile to .mpy
     and keep your project under Git, then put it all to work on an ultrasonic sensor
     driver.
-  duration: 1h 15m
+  duration: 1h 18m
   groups:
   - micropython
   - pico
@@ -993,7 +993,7 @@
   description: Meet Snakie, the robotics-first MicroPython editor. Write and run your
     first programs on the built-in simulator, then find your board, flash MicroPython,
     and build a traffic light on a real Raspberry Pi Pico.
-  duration: 0h 47m
+  duration: 0h 51m
   groups:
   - micropython
   - pico

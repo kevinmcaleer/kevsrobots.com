@@ -10,9 +10,9 @@ next: 08_connect_run_stop.html
 description: Put MicroPython firmware onto a Raspberry Pi Pico or ESP32 using the
   Snakie firmware flasher
 percent: 64
-duration: 4
-quiz_total: 20
-date_updated: 2026-11-20
+duration: 5
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -54,6 +54,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to put MicroPython firmware onto a board with the Snakie flasher.
 
 A brand new board doesn't know any Python. It needs MicroPython itself, the firmware, copied onto it first. People call this *flashing*, and Snakie does it for you.
 
@@ -127,6 +129,8 @@ When a board is connected, Snakie can check whether a newer MicroPython is avail
 
 ---
 
+> **Teachers**: This is the first lesson that needs real boards. Each learner or group needs a board and a USB data cable, because a charge-only cable will not work. Flashing means putting the board in bootloader mode, so plan a few minutes per board, and have a spare board or cable ready in case one does not show up as a drive.
+
 ## Try it Yourself
 
 1. Put your board in bootloader mode and find its drive on your computer.
@@ -135,17 +139,17 @@ When a board is connected, Snakie can check whether a newer MicroPython is avail
 
 ## Common Issues
 
-**Problem**: No drive appears when I hold BOOTSEL.
-**Solution**: Try another USB cable, and make sure you're holding the button *before* the cable goes in.
-**Why**: Charge-only cables have no data wires, so the computer never sees the board.
+- **Problem**: No drive appears when I hold BOOTSEL.
+- **Solution**: Try another USB cable, and make sure you're holding the button *before* the cable goes in.
+- **Why**: Charge-only cables have no data wires, so the computer never sees the board.
 
-**Problem**: The board works but WiFi doesn't.
-**Solution**: Check you flashed the W build. A Pico W needs the Pico W firmware.
-**Why**: The plain Pico build has no driver for the radio.
+- **Problem**: The board works but WiFi doesn't.
+- **Solution**: Check you flashed the W build. A Pico W needs the Pico W firmware.
+- **Why**: The plain Pico build has no driver for the radio.
 
-**Problem**: On an ESP32 the desktop app says `esptool` is missing.
-**Solution**: Install it once with `pip install esptool`.
-**Why**: The desktop app uses Espressif's own tool to write ESP firmware.
+- **Problem**: On an ESP32 the desktop app says `esptool` is missing.
+- **Solution**: Install it once with `pip install esptool`.
+- **Why**: The desktop app uses Espressif's own tool to write ESP firmware.
 
 ## Check your understanding
 

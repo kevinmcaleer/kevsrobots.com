@@ -11,8 +11,8 @@ description: Connect a real MicroPython board to Snakie and control it with Run,
   and Reset
 percent: 72
 duration: 4
-quiz_total: 20
-date_updated: 2026-11-20
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -54,6 +54,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to connect a real board to Snakie and use Run, Stop and Reset.
 
 Your board has MicroPython on it. Let's get Snakie talking to it and run a program on real hardware.
 
@@ -132,17 +134,17 @@ In the desktop app, Run is <kbd>Ctrl</kbd>+<kbd>R</kbd> and Stop is <kbd>Ctrl</k
 
 ## Common Issues
 
-**Problem**: My board isn't in the list.
-**Solution**: Try a different cable or USB port, and close anything else that may be using the board, such as Thonny or a serial monitor.
-**Why**: Only one program can hold a serial port at a time.
+- **Problem**: My board isn't in the list.
+- **Solution**: Try a different cable or USB port, and close anything else that may be using the board, such as Thonny or a serial monitor.
+- **Why**: Only one program can hold a serial port at a time.
 
-**Problem**: The device list won't open.
-**Solution**: Press **Disconnect** first.
-**Why**: The list is locked while a device is connected.
+- **Problem**: The device list won't open.
+- **Solution**: Press **Disconnect** first.
+- **Why**: The list is locked while a device is connected.
 
-**Problem**: `NameError: name 'led' isn't defined` after a reset.
-**Solution**: Run the program again.
-**Why**: Reset wipes the board's memory, so `led` no longer exists.
+- **Problem**: `NameError: name 'led' isn't defined` after a reset.
+- **Solution**: Run the program again.
+- **Why**: Reset wipes the board's memory, so `led` no longer exists.
 
 ## Check your understanding
 

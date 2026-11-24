@@ -4,12 +4,14 @@ description: Find your way around Snakie - the toolbar, the side bar, and the Bl
 layout: lesson
 type: page
 cover: /learn/snakie_getting_started/assets/banners/02_tour_of_the_workspaces.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to name the four Snakie workspaces and say what each one is for.
 
 Snakie can look busy the first time you open it. It's really four workspaces sharing one toolbar, and once you know what each is for, everything has an obvious home.
 
@@ -93,9 +95,9 @@ Two panels are worth opening on day one.
 
 ## Common Issues
 
-**Problem**: A panel has disappeared.
-**Solution**: Click its icon in the side bar again, or look for a small arrow at the edge of the window to bring it back.
-**Why**: Every panel can be collapsed to make room, and Snakie remembers the layout for each workspace.
+- **Problem**: A panel has disappeared.
+- **Solution**: Click its icon in the side bar again, or look for a small arrow at the edge of the window to bring it back.
+- **Why**: Every panel can be collapsed to make room, and Snakie remembers the layout for each workspace.
 
 ## Check your understanding
 
