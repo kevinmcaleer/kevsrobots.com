@@ -27,7 +27,8 @@ The two eyelids pivot around the same screw hole. A **joint** tells Fusion 360 h
 
 ## Test the movement
 
-* **Drive Joints** - Right-click the joint in the browser and choose `Drive Joints`, then drag the slider or type an angle to watch the lower eyelid swing open. Try a few angles and look for the point where the eyelids touch.
+* **Drive Joints** - Right-click the joint in the browser (or the timeline) and choose `Drive Joints`, then drag the slider or type an angle such as `-60` to watch the lower eyelid swing open. Try a few angles and look for the point where the eyelids touch.
+* **Animate** - Right-click the joint again and choose `Animate Joint` to see it open and close on its own. Press `Esc` to stop.
 
 If the eyelids hit each other, check the hinge dimensions in [lesson 8](08_hinge.html).
 
@@ -41,7 +42,7 @@ Each eyelid is printed separately.
 * **Choose STL** - Set the format to `STL` and the refinement to `High`, then save.
 * **Repeat** - Do the same for the `Lower Eyelid`.
 
-Open the STL files in your slicer. Your slicer will suggest how to orient each eyelid; look at where it adds supports and choose the orientation that needs the least. The hinge hole in our sketch is 2mm across, so choose a screw or pin to match; test-print the hinge first and check the fit before printing everything.
+Open the STL files in your slicer. Print each eyelid with its open side facing up so the dome doesn't need support, and use an M2 screw (2mm, the size of our screw hole) as the hinge pin. Test-print the hinge first and check the fit before printing everything.
 
 ---
 
