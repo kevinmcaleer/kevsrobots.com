@@ -7,9 +7,12 @@ cover: /learn/obsidian/assets/banners/02_first_vault.jpg
 date: 2025-08-24
 previous: 01_installing.html
 next: 03_creating_notes.html
-description: How to create and set up your first Obsidian vault.
+description: Create a vault for your robot build log and see that it is just a folder
+  of Markdown files.
 percent: 21
-duration: 3
+duration: 4
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Obsidian
 - content:
@@ -47,7 +50,7 @@ navigation:
     content:
     - name: Markdown in Obsidian
       link: 10_markdown_in_obsidian.html
-    - name: 'Learn More: Markdown Course'
+    - name: Summary and What's Next
       link: 11_markdown_course_link.html
 ---
 
@@ -56,62 +59,100 @@ navigation:
 
 ---
 
-## Creating Your First Vault
+By the end of this lesson you will be able to create a vault, explain what is inside it, and add your first note.
 
-A **Vault** in Obsidian is simply a folder where all your notes are stored. Each vault is a separate workspace, allowing you to organize different projects or areas of your life.
+A **vault** in Obsidian is simply a folder where all your notes are stored. That's it. There is no hidden database and no account. Let's make one for our robot, which we will call **Rover Build Log**.
 
 ---
 
-## Steps to Create Your First Vault
+## Steps to create your first vault
 
 1. **Open Obsidian.**
-2. On the welcome screen, click **"Create new vault"**.
-3. **Name your vault** — choose something meaningful, like "Personal Notes" or "Work Projects".
-4. **Choose a location** on your computer where you want your vault folder to be stored.
-5. Click **"Create"**.
+2. On the welcome screen, choose **Create new vault**.
+3. **Name your vault.** Call it `Rover Build Log`.
+4. **Choose a location** on your computer for the vault folder, somewhere you will remember such as your Documents folder.
+5. Confirm to create it.
 
-Obsidian will create the folder and open it as your new workspace.
-
----
-
-## Understanding Vault Structure
-
-- Your vault is just a folder on your computer. All your notes (Markdown files), images, and attachments are stored here.
-- You can have multiple vaults for different purposes (e.g., work, study, personal).
-- Each vault is independent — settings, plugins, and notes are not shared between vaults.
+Obsidian creates the folder and opens it as your workspace.
 
 ---
 
-## Adding Your First Note
+## What is inside a vault?
 
-1. Click the **"New note"** button (new note icon) in the sidebar.
-2. Give your note a title, such as "Welcome to Obsidian".
-3. Start typing! Your notes are saved automatically as you write.
+```mermaid
+flowchart TD
+    V["Rover Build Log (folder)"] --> N1["Welcome.md"]
+    V --> F1["Parts (folder)"]
+    F1 --> N2["Motor driver.md"]
+    V --> A["Images and attachments"]
+    V --> S[".obsidian (settings folder)"]
+```
+
+- Your notes are Markdown files with the `.md` extension, which you can open with any text editor.
+- Folders in the vault are normal folders. You can move notes around inside Obsidian or with your file manager.
+- Obsidian keeps its own settings for the vault in a hidden folder called `.obsidian` inside it. That is why settings and plugins are **per vault** and are not shared between vaults.
+- You can have as many vaults as you like, for example one for robots and one for school.
+
+Because it is all plain files, you can back up a vault by copying the folder, and you can keep it in a cloud-synced folder if you want it on several devices.
 
 ---
 
-## Organizing Your Vault
+## Adding your first note
 
-- **Folders:** Create folders to organize your notes by topic or project.
-- **Tags:** Add tags to your notes for easy searching and grouping.
-- **Links:** Start linking notes together using `[[note name]]` to build your knowledge network.
+1. Click the **New note** button in the sidebar.
+2. Give your note a title, such as `Welcome`.
+3. Type a line: `This vault holds the build log for the Rover robot.`
 
-## Tips
-
-- You can move, rename, or delete notes and folders directly from within Obsidian or using your file manager.
-- All your notes are stored as plain Markdown files, so you always have access to your data.
+Your notes save automatically as you type. Open your vault folder in your file manager and you will see `Welcome.md` sitting there.
 
 ---
 
 > ## Offline, by default
 >
-> Obsidian is designed to work offline, storing all your notes locally on your device. This means you can access and edit your notes without an internet connection.
-> There are options to synchronize your notes across devices using third-party services like iCloud, Dropbox or Google Drive, but this is not required to use Obsidian effectively.
->
-> Obsidian also has a paid `sync` service that allows you to sync your notes across devices seamlessly.
+> Obsidian stores your notes locally on your own device, so you can edit them without an internet connection. If you want the notes on several devices, you can put the vault folder in a service you already use such as iCloud, Dropbox or Google Drive, but this is not required. Obsidian also offers a paid Sync service.
 
 ---
 
-By creating your first vault, you’ve set up the foundation for your personal knowledge base. In the next lessons, you’ll learn how to create, organize, and connect your notes to make the most of Obsidian’s features.
+## Try it Yourself
+
+1. Create the `Rover Build Log` vault and a `Welcome` note.
+2. Open the vault folder in your file manager and find `Welcome.md`. Open it in a basic text editor and confirm you can read your text.
+3. Create a second vault called `Scratch`, then switch between the two. Notice that they do not share anything.
 
 ---
+
+## Common Issues
+
+- **Problem**: I cannot find my vault folder on the computer.
+- **Solution**: In Obsidian, look in the vault settings or vault switcher for the location, or search your files for the vault name.
+- **Why**: Obsidian lets you choose where each vault lives, so there is no single fixed location.
+
+- **Problem**: My note does not appear in the file list.
+- **Solution**: Check you are in the right vault, and that you did not create the note in a folder that is collapsed.
+- **Why**: Each vault is its own folder, and notes live in whichever folder you made them in.
+
+> **Teachers**: on shared school computers, store each learner's vault on a USB stick or in their own network folder, and tell them where it is. If the machine is wiped at logout, a vault stored on the local disk is lost.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What is a vault?
+- [ ] A cloud database that Obsidian hosts for you
+- [x] A folder on your computer that holds your notes
+- [ ] A paid Obsidian subscription
+> A vault is just a folder, and your notes are plain Markdown files in it.
+
+? What file extension do Obsidian notes use?
+- [ ] `.obs`
+- [ ] `.docx`
+- [x] `.md`
+> Notes are Markdown files, so you can open them with any text editor.
+
+? Why are plugins and settings not shared between two vaults?
+- [x] Each vault keeps its own settings in its own `.obsidian` folder
+- [ ] Obsidian only allows one vault to use plugins
+- [ ] Plugins are deleted when you switch vaults
+> Settings live inside each vault's own folder.
+{% endquiz %}

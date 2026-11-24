@@ -613,11 +613,13 @@
 - author: Kevin McAleer
   cover: /learn/obsidian/assets/cover.jpg
   date_published: 2025-08-24
-  description: Learn how to use Obsidian for note-taking and knowledge management.
-  duration: 0h 31m
+  description: Learn how to use Obsidian for note-taking and knowledge management,
+    by building a robot build log vault with linked notes, tags, properties, tasks,
+    a canvas and a Base.
+  duration: 0h 57m
   groups:
-  - obsidian
-  - raspberry pi
+  - productivity
+  - raspberrypi
   lessons: 13
   level: beginner
   link: /learn/obsidian/00_intro.html

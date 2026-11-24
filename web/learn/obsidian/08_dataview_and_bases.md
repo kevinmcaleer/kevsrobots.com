@@ -7,10 +7,12 @@ cover: /learn/obsidian/assets/banners/08_dataview_and_bases.jpg
 date: 2025-08-24
 previous: 07_tasks.html
 next: 09_properties.html
-description: Use the Dataview plugin to create dashboards and databases from your
-  notes.
+description: Turn your notes into a table of test results with Bases, and meet the
+  Dataview community plugin.
 percent: 63
-duration: 3
+duration: 5
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Obsidian
 - content:
@@ -48,7 +50,7 @@ navigation:
     content:
     - name: Markdown in Obsidian
       link: 10_markdown_in_obsidian.html
-    - name: 'Learn More: Markdown Course'
+    - name: Summary and What's Next
       link: 11_markdown_course_link.html
 ---
 
@@ -57,100 +59,147 @@ navigation:
 
 ---
 
-## Dataview and Bases
+By the end of this lesson you will be able to build a Base that lists your robot test notes as a table, and explain how it differs from a Dataview query.
 
-Obsidian's Dataview plugin and the new Bases feature (introduced in version 1.9.10) let you turn your notes into powerful, interactive databases and dashboards.
+After a few weeks your build log will hold dozens of test notes. Opening each one to see which passed is slow. What you want is a table: one row per test, with columns for the result and the date. Obsidian can build that for you from the **properties** at the top of each note, using a built-in feature called **Bases**. A community plugin called **Dataview** does a similar job with queries.
+
+```mermaid
+flowchart LR
+    N1["Test 1 note: result fail"] --> B["Base"]
+    N2["Test 2 note: result pass"] --> B
+    N3["Test 3 note: result pass"] --> B
+    B --> T["One table, one row per note"]
+```
 
 ---
 
-## What is Dataview?
+## Bases
 
-Dataview is a community plugin that allows you to query your notes and display the results as tables, lists, or task lists. You can use it to:
-- Create dynamic tables of notes by tag, folder, or property
-- Summarize tasks, projects, or reading lists
-- Build custom dashboards for your vault
+A Base is a database view of your notes. It reads the properties of your notes and shows them as a table or cards, which you can filter, sort and group. Bases are built in, so no plugin is needed.
+
+{% include gallery.html images="assets/bases.jpg" titles="A Base showing notes as a table" noborder=true smalltitle=true cols=2 %}
+
+### Create a Base
+
+Any of these works:
+
+- Open the command palette and run **Bases: Create new base**, which makes one in the same folder as the open note.
+- Right-click a folder in the file explorer and choose **New base**.
+- Run **Bases: Insert new base** to create one and embed it in the current note.
+
+A Base is saved as a `.base` file. It stores the *view*, and the data still lives in the properties of your notes.
+
+### What a Base file looks like
+
+You normally build a Base by clicking, but the file is just YAML, so you can read it. Here is one that shows every note tagged `test`:
+
+```yaml
+filters:
+  and:
+    - file.hasTag("test")
+properties:
+  note.result:
+    displayName: Result
+views:
+  - type: table
+    name: Test results
+    order:
+      - file.name
+      - note.result
+      - note.date
+    groupBy:
+      property: note.result
+      direction: ASC
+```
+
+The pieces are:
+
+- `filters` decide which notes are included. Here, notes with the tag `test`.
+- `properties` can give columns friendlier names.
+- `views` describe the table: which columns to show (`order`) and how to group.
+
+For this to work, each test note needs properties at the top such as:
+
+```yaml
+---
+tags:
+  - test
+result: pass
+date: 2026-11-24
+---
+```
+
+We look at properties properly in the next lesson.
+
+### Embedding a Base
+
+Put `![[Test results.base]]` in a note to show the Base inside it. You can also write the YAML straight into a code block with the language `base`.
 
 ---
 
-**Example: List all notes with the tag #project**
+## Dataview
+
+Dataview is a **community plugin**, so it is off until you install and enable it. It lets you write queries in a code block:
 
 ````markdown
 ```dataview
-table file.mtime as "Last Modified"
-from #project
-sort file.mtime desc
+TABLE file.mtime AS "Last modified"
+FROM #test
+SORT file.mtime DESC
 ```
 ````
 
----
+This lists every note tagged `test`, newest edit first. Dataview is more powerful for complicated queries, but you have to learn its query language, and it depends on a plugin kept up to date by someone else. Its documentation is at <https://blacksmithgu.github.io/obsidian-dataview/>.
 
-## What are Bases?
-
-Bases are a new core feature in Obsidian 1.9.10 that let you create and manage databases directly in your vault—no plugin required! With Bases, you can:
-
-- Create a database view for any folder or tag
-- Add, edit, and filter properties (columns) for your notes
-- Sort and group notes visually, like a spreadsheet or Notion database
-
-{% include gallery.html images="assets/bases.jpg" titles="Bases Overview" noborder=true smalltitle=true cols=2 %}
+**Which should you use?** Start with Bases. It is built in, you can build it with the mouse, and it is enough for most build logs. Reach for Dataview if you hit something Bases cannot do.
 
 ---
 
-**How to Create a Base:**
+## Try it Yourself
 
-1. Create a Base:
-	- Click the ribbon button: **New base**, or
-	- Right‑click empty space in the File Explorer and choose **New base**, or
-	- Use the Command Palette: **Bases: New base**.
-2. Scope your Base using Filters:
-	- Filter by folder (e.g., `file.path startswith "Projects/"`).
-	- Filter by tag (e.g., `file has tag "project"`).
-3. Add/show properties as columns, sort and group as needed. Edit values directly in Table or Cards views.
-
-Notes:
-
-- Bases are saved as `.base` files and backed by your Markdown files’ YAML properties.
-- You can embed Bases and “Pin view…” to lock a specific view when embedding.
+1. Add `tags: test`, `result` and `date` properties to three test notes.
+2. Create a Base, filter it to the `test` tag and show the `result` and `date` columns.
+3. Group the Base by `result`, so passes and fails sit together.
+4. Challenge: embed your Base in a `Dashboard` note next to your open tasks.
 
 ---
 
-### Example - pinning a view
+## Common Issues
 
-````markdown
-```base 
-views:
-  - type: table
-    name: table
-    order:
-      - file.name
-      - file.mtime
-    sort:
-      - property: file.name
-        direction: DESC
-      - property: file.mtime
-        direction: ASC
-```
-````
+- **Problem**: My Base is empty.
+- **Solution**: Check the filter. Make sure the notes really have the tag, and that you wrote it the same way, such as `test` and not `tests`.
+- **Why**: A Base only shows notes that match its filters exactly.
+
+- **Problem**: A column is blank for some notes.
+- **Solution**: Open those notes and add the missing property.
+- **Why**: Bases read properties from each note, so a note without the property has nothing to show.
+
+- **Problem**: My Dataview code block just shows the text of the query.
+- **Solution**: Install and enable the Dataview community plugin.
+- **Why**: The block is only run by the plugin.
+
+> **Teachers**: Bases is part of Obsidian, so it works without installing anything. Prefer it over plugins for class use, and check the version your learners have, because a Base needs a version of Obsidian that includes the feature.
 
 ---
 
-## Use Cases for Dataview and Bases
+## Check your understanding
 
-- Project management (track status, deadlines, owners)
-- Reading lists and book notes
-- Habit and goal tracking
-- Research and knowledge management
+{% quiz %}
+? Where does the data in a Base come from?
+- [ ] A separate database file
+- [x] The properties in your notes
+- [ ] The internet
+> Bases read the properties at the top of each note.
 
----
+? What is the difference between Bases and Dataview?
+- [ ] Bases need a plugin, Dataview is built in
+- [x] Bases are built in, Dataview is a community plugin
+- [ ] They are the same thing
+> Dataview is a community plugin and must be turned on.
 
-## Tips
-
-- Use properties (frontmatter) in your notes for best results (e.g., `status:`, `due:`, `tags:`)
-- Combine Dataview queries and Bases for advanced workflows
-- Check the [Dataview documentation](https://blacksmithgu.github.io/obsidian-dataview/) for more examples
-
----
-
-With Dataview and Bases, you can turn your notes into a flexible, powerful database—customize your setup to fit your workflow!
-
----
+? What file type does a Base use?
+- [ ] `.md`
+- [x] `.base`
+- [ ] `.json`
+> Bases are saved as `.base` files.
+{% endquiz %}
