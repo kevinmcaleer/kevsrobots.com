@@ -1,200 +1,131 @@
 ---
 title: Markdown in Obsidian
-description: How to use Markdown syntax and features within Obsidian.
+description: The Markdown syntax you will use every day in Obsidian, with callouts, tables, code blocks and embeds, for a robot build log.
 type: page
 layout: lesson
 cover: /learn/obsidian/assets/banners/10_markdown_in_obsidian.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Markdown in Obsidian
+By the end of this lesson you will be able to write a well-formatted build-log note using headings, lists, links, tables, code blocks and callouts.
 
-Obsidian stores notes as plain Markdown. Here’s a quick, practical reference tailored for Obsidian.
-
----
-
-## Headings
-
-Use `#` to `######` for H1–H6. Keep one H1 per note (Obsidian can show the filename as title).
-
-```markdown
-# Heading 1
-## Heading 2
-### Heading 3
-```
-
----
-
-## Emphasis
-
-```markdown
-*italic*  _italic_
-**bold**  __bold__
-~~strikethrough~~
-```
-
----
-
-## Lists
-
-```markdown
-- Unordered item
-  - Nested item
-1. Ordered item
-2. Another item
-```
-
-Tips:
-
-- Leave a blank line before and after lists for best rendering.
-
----
-
-## Links
-
-- Wiki-links (best for note-to-note): `[[Note Name]]` or `[[Note Name|Custom text]]`
-- External links: `[Text](https://example.com)`
-
-```markdown
-See [[This is a note with a tag]] or [Obsidian](https://obsidian.md).
-```
-
----
-
-## Images
-
-Use standard Markdown or drag-and-drop. For site images in this repo:
-
-```markdown
-![Graph View](assets/graph.png)
-```
-
----
-
-## Callouts (Obsidian-specific)
-
-```markdown
-> [!note]
-> Helpful note.
->
-> [!tip]
-> A handy tip.
->
-> [!warning]
-> Use with care.
-```
-
----
-
-## Tables
-
-```markdown
-| Feature  | Supported |
-|---------:|:---------:|
-| Tables   |    Yes    |
-| Callouts |    Yes    |
-```
-
----
-
-## Code blocks and inline code
-
-Inline: ``Use `code` for short snippets``
-
-Fenced blocks:
-
-```markdown
-```python
-print("Hello from Obsidian")
-```
-```
-
----
-
-## Tasks
-
-```markdown
-- [ ] Incomplete task
-- [x] Completed task
-```
-
-Tip: With the Tasks community plugin, you can query tasks across notes.
-
----
-
-## Footnotes
-
-```markdown
-Here’s a claim with a footnote.[^1]
-
-[^1]: The footnote text.
-```
-
----
-
-## Frontmatter (properties)
-
-```yaml
----
-title: "Sample Note"
-tags:
-  - demo
-status: in-progress
----
-```
-
-Pairs nicely with Dataview and Bases.
-
----
-
-## Embeds (notes, images, bases)
-
-- Embed a note: `![[This is a note with a tag]]`
-- Embed an image: `![[assets/cover.jpg]]`
-- Embed a Base view (pin a specific view):
-
+Obsidian stores everything as plain Markdown, so the best investment you can make is learning the handful of symbols that matter. Here is a single test note that uses most of them. We will take it apart below.
 
 ````markdown
-```base
-views:
-  - type: table
-    name: Table
-    order:
-      - file.name
-    sort:
-      - property: file.name
-        direction: ASC
+# Test 3 - turning left
+
+Tried a **gentle** left turn at *half speed*. See [[Motor driver wiring]].
+
+## Settings used
+
+- Left motor speed: 40%
+- Right motor speed: 70%
+
+1. Place robot on the floor
+2. Run the turn
+3. Measure the angle
+
+| Run | Angle | Result |
+| --- | ----- | ------ |
+| 1   | 80    | pass   |
+| 2   | 45    | fail   |
+
+> [!warning]
+> Check the battery is above 7 V before testing.
+
+```python
+left_speed = 40
+right_speed = 70
 ```
 ````
 
 ---
 
-## Math (optional)
+## The basics
 
-Enable MathJax to use LaTeX:
+- **Headings**: one to six `#` characters at the start of a line. Use one top heading per note and `##` below it.
+- **Emphasis**: `*italic*`, `**bold**`, and `~~strikethrough~~`.
+- **Lists**: start lines with `-` for bullets or `1.` for numbered items, and indent for nesting. Leave a blank line before and after a list.
+- **External links**: `[text](https://example.com)`. For links to other notes use `[[wikilinks]]`, as in the linking lesson.
+- **Task lists**: `- [ ]` and `- [x]`, as in the tasks lesson.
 
-```markdown
-Inline: $E=mc^2$
+## Tables
 
-Block:
-$$
-\int_a^b f(x)\,dx
-$$
+Tables use pipes and a divider row of dashes. Obsidian renders them in the note, and you can align columns with colons in the divider row (`:---`, `:---:`, `---:`).
+
+## Code blocks
+
+Put three backticks, then the language name, then your code, then three backticks to finish. Short snippets inside a sentence use single backticks, like `speed = 40`. Code blocks keep their spacing exactly, which is what you want for wiring tables and pin lists.
+
+## Callouts
+
+A callout is a highlighted box. Start a quote with `> [!note]`, `> [!tip]` or `> [!warning]` and the following lines. They are an Obsidian extension, so they will not look the same in other Markdown tools. They are good for safety notes such as battery warnings.
+
+## Images and embeds
+
+- Embed an image that is in your vault with `![[robot.jpg]]`.
+- Embed another note with `![[Parts list]]`.
+- The standard Markdown form `![alt text](images/robot.jpg)` also works.
+
+---
+
+## Switching between views
+
+Each note can show **Live Preview**, where formatting appears as you type, or **Source mode**, which shows the raw symbols. Look in the note's more-options menu to switch. Source mode is handy when you are puzzling over why something is not rendering.
+
+```mermaid
+flowchart LR
+    S["Source mode: raw Markdown"] <--> L["Live Preview: formatted as you type"]
+    L --> R["Reading view: finished page"]
 ```
 
 ---
 
-## Keyboard shortcuts
+## Try it Yourself
 
-Use Cmd+P to open the Command Palette. Toggle Live Preview/Source Mode via the More menu (…) per note.
+1. Re-create the sample test note above in your vault and check it renders.
+2. Add a callout with a tip about your own robot.
+3. Make a table of three motor speeds and the result of each.
+4. Challenge: embed your `Parts list` note inside a `Project overview` note and add a task list beneath it.
 
 ---
 
-## Try it now
+## Common Issues
 
-- Create a new note and add a callout and a task list.
-- Link it to another note using wiki-links, then inspect backlinks.
-- Add a small table and a fenced code block to test formatting.
+- **Problem**: My list or table does not render properly.
+- **Solution**: Add a blank line before it, and check the pipes and dashes line up.
+- **Why**: Markdown needs a blank line to start a new block, and a table needs its divider row.
+
+- **Problem**: My callout shows as a plain quote.
+- **Solution**: Check the first line is exactly `> [!warning]` with the type in square brackets after an exclamation mark.
+- **Why**: The `[!type]` marker is what turns a quote into a callout.
+
+> **Teachers**: Markdown is a good first formatting language for learners, and notes can be printed or exported later. If your class will hand work in, agree whether callouts are allowed, since not every tool displays them.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? How do you start a callout?
+- [ ] With `#`
+- [x] With a quote line such as `> [!warning]`
+- [ ] With `[[ ]]`
+> A callout is a quote that begins with `[!type]`.
+
+? What does `![[Parts list]]` do?
+- [ ] Links to the note
+- [x] Embeds the note's content
+- [ ] Deletes the note
+> A leading `!` makes a wikilink into an embed.
+
+? Why leave a blank line before a list?
+- [x] Markdown needs it to start a new block
+- [ ] It makes the text bigger
+- [ ] Obsidian crashes without it
+> The blank line tells Markdown a new block begins.
+{% endquiz %}
