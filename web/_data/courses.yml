@@ -14,6 +14,7 @@
   level: beginner
   link: /learn/arduino_to_python/00_intro.html
   name: Arduino to MicroPython - A Quick Start Guide
+  video: A7ZJ5TC-zUk
 - author: Kevin McAleer
   cover: /learn/arduino_uno_q/assets/cover.jpg
   date_published: 2026-11-21
@@ -124,6 +125,7 @@
   level: beginner
   link: /learn/brachiograph/00_intro.html
   name: BrachioGraph Tutorial
+  video: tkAv3HIw3CY
 - author: Kevin McAleer
   cover: /learn/burgerbot/assets/burgerbot.jpg
   date_published: 2023-04-27
@@ -189,7 +191,7 @@
   description: This course guides beginners through the process of setting up a Raspberry
     Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
     and scale a mini-computing cluster for various projects.
-  duration: 0h 49m
+  duration: 0h 50m
   groups:
   - docker
   - raspberry pi
@@ -197,6 +199,7 @@
   level: intermediate
   link: /learn/docker_swarm/00_intro.html
   name: Raspberry Pi 5 Cluster with Docker Swarm
+  video: tDENgLiJSh0
 - author: Kevin McAleer
   cover: /learn/duckdb/assets/cover.jpg
   date_published: 2025-09-04
@@ -279,7 +282,7 @@
     modeling techniques, and design-for-manufacturing principles while building the
     iconic SMARS robot base. Perfect for makers who want to design their own robot
     parts.
-  duration: 1h 5m
+  duration: 1h 6m
   groups:
   - freecad
   - 3d modeling
@@ -288,6 +291,7 @@
   level: beginner
   link: /learn/freecad_smars/00_intro.html
   name: Building SMARS with FreeCAD
+  video: S7EoZHd03FY
 - author: Kevin McAleer
   cover: /learn/git/assets/cover.jpg
   date_published: 2026-11-04
@@ -429,6 +433,7 @@
   level: beginner
   link: /learn/linux_intro/01_intro_terminal.html
   name: Introduction to the Linux Command Line on Raspberry Pi OS
+  video: UDo6tvoOQHg
 - author: Kevin McAleer
   cover: /learn/markdown/assets/markdown.png
   date_published: 2024-03-21
@@ -539,6 +544,7 @@
   level: intermediate
   link: /learn/micropython_robotics/01_intro.html
   name: MicroPython Robotics Projects with the Raspberry Pi Pico
+  video: ZuX45_rid68
 - author: Kevin McAleer
   cover: /learn/mini_rack/assets/cover.jpg
   date_published: 2025-02-16
@@ -552,6 +558,7 @@
   level: beginner
   link: /learn/mini_rack/00_intro.html
   name: Mini-Rack 3D Design Tutorial
+  video: fJC68N9nphA
 - author: Kevin McAleer
   cover: /learn/mongodb/assets/cover.jpg
   date_published: 2026-10-18
@@ -592,7 +599,7 @@
     Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment,
     and run real-time detection on Raspberry Pi hardware. Complete hands-on course
     from dataset creation to production deployment.
-  duration: 1h 0m
+  duration: 1h 1m
   groups:
   - python
   - ai
@@ -602,6 +609,7 @@
   level: intermediate
   link: /learn/object_model/00_intro.html
   name: Building Object Detection Models with Raspberry Pi AI Camera
+  video: ARCtzjHfyMg
 - author: Kevin McAleer
   cover: /learn/obsidian/assets/cover.jpg
   date_published: 2025-08-24
@@ -614,6 +622,7 @@
   level: beginner
   link: /learn/obsidian/00_intro.html
   name: Obsidian
+  video: zo3mb3EeJXQ
 - author: Kevin McAleer
   cover: /learn/obsidian_rag/assets/cover.jpg
   date_published: 2026-08-23
@@ -690,6 +699,7 @@
   level: beginner
   link: /learn/pca9685/01_course_introduction.html
   name: Building a Robot Arm with Raspberry Pi and PCA9685
+  video: _JJAV97Mm98
 - author: Kevin McAleer
   cover: /learn/pico_temp_sensor/assets/cover.jpg
   date_published: 2024-11-22
@@ -782,6 +792,7 @@
   level: beginner
   link: /learn/reinforcement_learning/00_intro.html
   name: Reinforcement Learning for Beginners
+  video: epuO7xpz6i4
 - author: Kevin McAleer
   cover: /learn/robotics_101/assets/basics_101.jpg
   date_published: 2023-01-17
@@ -811,6 +822,7 @@
   level: intermediate
   link: /learn/rust/01_intro.html
   name: Introduction to Rust
+  video: M9LekkoQyf0
 - author: Kevin McAleer
   cover: /learn/scrawly_wally//assets/cover.png
   date_published: 2024-08-02
@@ -827,6 +839,7 @@
   level: beginner
   link: /learn/scrawly_wally/01_intro.html
   name: Wall Drawing Robot Tutorial
+  video: JB4rPNBCL3Q
 - author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19

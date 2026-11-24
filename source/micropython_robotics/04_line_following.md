@@ -11,6 +11,8 @@ date_updated: 2025-05-10
 
 ---
 
+{% include youtubeplayer.html id="ZuX45_rid68" %}
+
 Line-following robots are one of the most classic and satisfying robotics projects. In this lesson, you'll learn how to use an IR sensor to detect a black line on a white surface and steer your robot to follow it.
 
 ---

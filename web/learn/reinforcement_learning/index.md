@@ -13,6 +13,7 @@ level: beginner
 course_duration: 1h 45m
 lesson_count: 16
 first_lesson: 00_intro.html
+video: epuO7xpz6i4
 navigation:
 - name: Reinforcement Learning for Beginners
 - content:

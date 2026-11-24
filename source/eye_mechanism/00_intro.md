@@ -16,6 +16,10 @@ This course goes with the video below, which shows every step in action.
 
 {% include youtubeplayer.html id="JbWKsdy5iOk" %}
 
+There is also a newer build of the mechanism in this video:
+
+{% include youtubeplayer.html id="XpKnyTx_1mQ" %}
+
 ---
 
 ## Overview

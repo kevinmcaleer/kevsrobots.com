@@ -11,6 +11,8 @@ cover: /learn/object_model/assets/banners/00_intro.jpg
 
 ---
 
+{% include youtubeplayer.html id="ARCtzjHfyMg" %}
+
 ## Overview
 
 Welcome to **Building Object Detection Models with Raspberry Pi AI Camera**!

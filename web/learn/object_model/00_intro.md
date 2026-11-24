@@ -9,7 +9,7 @@ next: 01_setup.html
 description: Learn how to build custom object detection models using the Raspberry
   Pi AI Camera and PyTorch. Train models to detect your own objects in real-time.
 percent: 11
-duration: 3
+duration: 4
 navigation:
 - name: Building Object Detection Models with Raspberry Pi AI Camera
 - content:
@@ -47,6 +47,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+{% include youtubeplayer.html id="ARCtzjHfyMg" %}
 
 ## Overview
 

@@ -11,6 +11,7 @@ level: beginner
 course_duration: 1h 38m
 lesson_count: 12
 first_lesson: 00_intro.html
+video: A7ZJ5TC-zUk
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:

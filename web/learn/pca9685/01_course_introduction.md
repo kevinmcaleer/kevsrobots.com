@@ -54,6 +54,8 @@ navigation:
 
 ---
 
+{% include youtubeplayer.html id="_JJAV97Mm98" %}
+
 ## Welcome to the Course
 
 In this comprehensive course, you'll embark on an exciting journey to build and program a robot arm using the Raspberry Pi, the PCA9685 servo driver board, and Python. Whether you're a beginner in robotics or looking to expand your skill set, this course is designed to provide you with a solid foundation in robotics engineering and programming.

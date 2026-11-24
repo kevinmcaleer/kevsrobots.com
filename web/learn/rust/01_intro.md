@@ -56,6 +56,8 @@ navigation:
 
 ---
 
+{% include youtubeplayer.html id="M9LekkoQyf0" %}
+
 ## Introduction
 
 `Rust` is a system programming language focused on safety, especially safe concurrency, supporting functional and imperative-procedural paradigms. This lesson is an introduction to Rust programming, especially tailored for programmers with a background in Python or MicroPython.

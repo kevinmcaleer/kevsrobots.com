@@ -10,6 +10,8 @@ cover: /learn/mini_rack/assets/banners/00_intro.jpg
 
 ---
 
+{% include youtubeplayer.html id="fJC68N9nphA" %}
+
 Learn how to design and build your own 10" mini-rack for your Raspberry Pi cluster or home lab. This project is perfect for upgrading your home lab and keeping your equipment organized and easily accessible.
 
 ---

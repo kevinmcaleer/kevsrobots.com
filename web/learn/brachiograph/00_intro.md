@@ -45,6 +45,8 @@ navigation:
 
 ---
 
+{% include youtubeplayer.html id="tkAv3HIw3CY" %}
+
 ## Overview
 
 A BrachioGraph (from the Greek `Brachio`; *Arm*, and `Graph`; *draw*) is a simple pen plotter that you can build at home using a few simple components. It's a fun project that will help you learn about robotics, programming, and electronics while creating a working drawing robot!

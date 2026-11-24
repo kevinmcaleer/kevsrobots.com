@@ -65,6 +65,8 @@ navigation:
 
 ---
 
+{% include youtubeplayer.html id="HJYdGICcw0k" %}
+
 This is the payoff lesson. We've trained a policy, understood its limitations, and built the sensor infrastructure. Now we put it all together: the Q-table travels from the laptop to the Pico as a JSON file, and a MicroPython script runs the greedy policy in a continuous loop, reading sensors and driving motors in real time.
 
 Let's go.

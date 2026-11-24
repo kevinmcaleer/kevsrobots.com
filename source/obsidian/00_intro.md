@@ -10,6 +10,8 @@ cover: /learn/obsidian/assets/banners/00_intro.jpg
 
 ---
 
+{% include youtubeplayer.html id="zo3mb3EeJXQ" %}
+
 # Introduction to Obsidian
 
 Welcome to the Introduction to Obsidian course! In this course, you'll learn how to use Obsidian, a powerful and flexible note-taking app that helps you organize your thoughts, ideas, and projects using Markdown and linked notes.

@@ -9,7 +9,7 @@ previous: 00_intro.html
 next: 02_creating_the_base.html
 description: Master the 3D workspace - the foundation skill for efficient CAD work
 percent: 18
-duration: 4
+duration: 5
 navigation:
 - name: Building SMARS with FreeCAD
 - content:

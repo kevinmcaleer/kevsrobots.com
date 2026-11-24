@@ -50,6 +50,8 @@ navigation:
 
 ---
 
+{% include youtubeplayer.html id="JB4rPNBCL3Q" %}
+
 ## Introduction
 
 Welcome to the Wall Drawing Robot tutorial! In this course, you'll learn how to build a robot that can draw on a wall using a Raspberry Pi Zero 2 W, stepper motors, and a gondola with a marker. The robot will be able to create intricate drawings by controlling the movement of the gondola across the wall.

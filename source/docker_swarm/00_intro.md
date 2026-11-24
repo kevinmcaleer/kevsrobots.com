@@ -12,6 +12,8 @@ cover: /learn/docker_swarm/assets/banners/00_intro.jpg
 
 ---
 
+{% include youtubeplayer.html id="tDENgLiJSh0" %}
+
 ## Welcome to Docker Swarm on Raspberry Pi 5
 
 Embark on an exciting journey to master Docker Swarm, the powerful container orchestration tool, optimized for the Raspberry Pi 5. This course is designed to take you from a beginner to a proficient user, capable of deploying and managing a scalable and resilient Docker Swarm cluster. Whether you're a hobbyist, a professional seeking to enhance your DevOps skills, or an educator looking to introduce your students to the world of microservices, this course offers the foundational knowledge and hands-on experience you need.

@@ -8,9 +8,10 @@ description: This course guides beginners through the process of setting up a Ra
   Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
   and scale a mini-computing cluster for various projects.
 level: intermediate
-course_duration: 0h 49m
+course_duration: 0h 50m
 lesson_count: 16
 first_lesson: 00_intro.html
+video: tDENgLiJSh0
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:

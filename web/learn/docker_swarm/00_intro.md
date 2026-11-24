@@ -10,7 +10,7 @@ description: Kickstart your journey into container orchestration with Docker Swa
   on the powerful Raspberry Pi 5, mastering the essentials of deploying and managing
   a robust, scalable microservices architecture.
 percent: 6
-duration: 2
+duration: 3
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+{% include youtubeplayer.html id="tDENgLiJSh0" %}
 
 ## Welcome to Docker Swarm on Raspberry Pi 5
 

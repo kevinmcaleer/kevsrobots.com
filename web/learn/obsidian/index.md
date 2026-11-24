@@ -9,6 +9,7 @@ level: beginner
 course_duration: 0h 31m
 lesson_count: 13
 first_lesson: 00_intro.html
+video: zo3mb3EeJXQ
 navigation:
 - name: Obsidian
 - content:
