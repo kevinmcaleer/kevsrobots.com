@@ -783,6 +783,22 @@
   link: /learn/reinforcement_learning/00_intro.html
   name: Reinforcement Learning for Beginners
 - author: Kevin McAleer
+  cover: /learn/robot_senses/assets/cover.jpg
+  date_published: 2026-11-24
+  description: 'Give one small tracked robot a sense at a time. Learn what each sensor
+    measures, how to read it in MicroPython, and how to turn the readings into behaviour.
+    Then move up to navigation: wall following, and the ideas behind mapping and SLAM.'
+  duration: 1h 21m
+  groups:
+  - robots
+  - arduino
+  - electronics
+  lessons: 17
+  level: beginner
+  link: /learn/robot_senses/00_intro.html
+  name: Give Your Robot Senses
+  video: 1K1A1YGcOEE
+- author: Kevin McAleer
   cover: /learn/robotics_101/assets/basics_101.jpg
   date_published: 2023-01-17
   description: 'A friendly first look at robots: what a robot is, a quick history

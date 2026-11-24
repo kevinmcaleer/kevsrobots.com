@@ -13,6 +13,7 @@ stages:
   - Build a SMARS Robot
   build:
   - Motors and motor drivers
+  - Give Your Robot Senses
   - Learn how to program SMARS with Arduino
   - Build your own BurgerBot
   - Building a Robot Arm with Raspberry Pi and PCA9685

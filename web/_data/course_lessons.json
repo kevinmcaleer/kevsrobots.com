@@ -4216,6 +4216,106 @@
     ]
   },
   {
+    "slug": "robot_senses",
+    "name": "Give Your Robot Senses",
+    "description": "Give one small tracked robot a sense at a time. Learn what each sensor measures, how to read it in MicroPython, and how to turn the readings into behaviour. Then move up to navigation: wall following, and the ideas behind mapping and SLAM.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "robots",
+      "arduino",
+      "electronics"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/robot_senses/00_intro.html"
+      },
+      {
+        "file": "01_how_robots_sense.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/01_how_robots_sense.html"
+      },
+      {
+        "file": "02_meet_modulino_smars.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/02_meet_modulino_smars.html"
+      },
+      {
+        "file": "03_qwiic_and_i2c.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/03_qwiic_and_i2c.html"
+      },
+      {
+        "file": "04_first_connection.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/04_first_connection.html"
+      },
+      {
+        "file": "05_see_distance.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/05_see_distance.html"
+      },
+      {
+        "file": "06_feel_movement.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/06_feel_movement.html"
+      },
+      {
+        "file": "07_speak_the_buzzer.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/07_speak_the_buzzer.html"
+      },
+      {
+        "file": "08_show_the_led_matrix.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/08_show_the_led_matrix.html"
+      },
+      {
+        "file": "09_move_the_motors.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/09_move_the_motors.html"
+      },
+      {
+        "file": "10_readings_to_decisions.md",
+        "section": "From readings to behaviour",
+        "url": "/learn/robot_senses/10_readings_to_decisions.html"
+      },
+      {
+        "file": "11_combining_senses.md",
+        "section": "From readings to behaviour",
+        "url": "/learn/robot_senses/11_combining_senses.html"
+      },
+      {
+        "file": "12_project_reactive_robot.md",
+        "section": "From readings to behaviour",
+        "url": "/learn/robot_senses/12_project_reactive_robot.html"
+      },
+      {
+        "file": "13_wall_following.md",
+        "section": "Navigation",
+        "url": "/learn/robot_senses/13_wall_following.html"
+      },
+      {
+        "file": "14_mapping_and_slam.md",
+        "section": "Navigation",
+        "url": "/learn/robot_senses/14_mapping_and_slam.html"
+      },
+      {
+        "file": "15_troubleshooting.md",
+        "section": "Wrapping up",
+        "url": "/learn/robot_senses/15_troubleshooting.html"
+      },
+      {
+        "file": "16_summary.md",
+        "section": "Wrapping up",
+        "url": "/learn/robot_senses/16_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "robotics_101",
     "name": "Robotics 101",
     "description": "A friendly first look at robots: what a robot is, a quick history from ancient automata to today, the skills you need to build one, and the parts that make a robot work.",
