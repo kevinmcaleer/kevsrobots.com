@@ -12,7 +12,7 @@ description: Bring a real part into BetterCad as a reference body that you can d
 percent: 14
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Design Robot Parts with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to bring a real part into a model as a reference body, switch a body between reference and printed, and explain what happens to reference bodies on export.
 
 You're making a bracket for a motor. The quickest way to get it right is to have the motor sitting in the model while you draw, so you can see where it touches and measure straight off it.
 
@@ -123,17 +125,17 @@ When you export, reference bodies are skipped. There's one rough edge worth know
 
 ## Common Issues
 
-**Problem**: My imported part is solid, not see-through.
-**Solution**: You used **Import STL, STEP or 3MF…**. Select the body and click **Printed** in Properties to make it a reference.
-**Why**: The plain import brings a file in as a part to print.
+- **Problem**: My imported part is solid, not see-through.
+- **Solution**: You used **Import STL, STEP or 3MF…**. Select the body and click **Printed** in Properties to make it a reference.
+- **Why**: The plain import brings a file in as a part to print.
 
-**Problem**: I can't resize the imported part.
-**Solution**: That's expected. A body from a file keeps the size it came with.
-**Why**: An STL is a skin of triangles with no sizes to edit. Lesson 11 shows how to get editable holes out of one.
+- **Problem**: I can't resize the imported part.
+- **Solution**: That's expected. A body from a file keeps the size it came with.
+- **Why**: An STL is a skin of triangles with no sizes to edit. Lesson 11 shows how to get editable holes out of one.
 
-**Problem**: Export says "Reference bodies aren't exported. Turn off Reference in Properties to export one."
-**Solution**: Select a printed body as well, or choose **All bodies**.
-**Why**: References never export, so there was nothing left to write.
+- **Problem**: Export says "Reference bodies aren't exported. Turn off Reference in Properties to export one."
+- **Solution**: Select a printed body as well, or choose **All bodies**.
+- **Why**: References never export, so there was nothing left to write.
 
 ## Check your understanding
 

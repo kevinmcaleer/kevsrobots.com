@@ -12,7 +12,7 @@ description: Check a catalogue part against the real thing with the BetterCad Me
 percent: 28
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Design Robot Parts with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to check a catalogue part against the real thing with the Measure tool and callipers, and read a part's mass.
 
 The catalogue told you something important twice in the last lesson: **"Sizes aren't checked: measure yours."** It's worth a short lesson, because it's the difference between a servo that drops into its pocket and one that needs a file.
 
@@ -126,6 +128,8 @@ The catalogue also knows what each part weighs. That isn't used for printing, bu
 
 ---
 
+> **Teachers**: this lesson needs real parts and callipers, so it is the one most affected by shared kit. One pair of callipers and one servo per group is enough. The lesson's own warning is that catalogue sizes are not checked, so have groups record the measurements of the servo they actually hold before anything is printed.
+
 ## Try it Yourself
 
 1. With Measure, click one long side face of the servo's body, then the opposite one. What distance do you get?
@@ -134,13 +138,13 @@ The catalogue also knows what each part weighs. That isn't used for printing, bu
 
 ## Common Issues
 
-**Problem**: Measure picks the deck when I want the servo.
-**Solution**: Turn the view so the servo is clear of the deck, or hide the deck with <kbd>Shift</kbd>+<kbd>H</kbd> while you measure.
-**Why**: Measure takes whatever is under the pointer.
+- **Problem**: Measure picks the deck when I want the servo.
+- **Solution**: Turn the view so the servo is clear of the deck, or hide the deck with <kbd>Shift</kbd>+<kbd>H</kbd> while you measure.
+- **Why**: Measure takes whatever is under the pointer.
 
-**Problem**: My servo is 0.5 mm longer than the catalogue's.
-**Solution**: Cut the pocket, then edit the pocket's sketch on the timeline to match your part.
-**Why**: Clones vary, and the pocket is made of normal steps for exactly this reason.
+- **Problem**: My servo is 0.5 mm longer than the catalogue's.
+- **Solution**: Cut the pocket, then edit the pocket's sketch on the timeline to match your part.
+- **Why**: Clones vary, and the pocket is made of normal steps for exactly this reason.
 
 ## Check your understanding
 

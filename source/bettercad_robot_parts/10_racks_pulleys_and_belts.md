@@ -4,12 +4,14 @@ description: Turn rotation into straight-line motion with a rack, and drive acro
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/10_racks_pulleys_and_belts.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to make a rack and a GT2 pulley, fit a belt, and decide between gears and a belt.
 
 Spur gears turn one spin into another spin, close by. Two more forms of the Gear tool cover the other jobs a robot needs: moving something in a straight line, and carrying a turn across a gap.
 
@@ -118,17 +120,17 @@ The belt itself isn't drawn. BetterCad sets the spacing and leaves the rubber to
 
 ## Common Issues
 
-**Problem**: There's no Fit a belt in the menu.
-**Solution**: Select two pulleys first, then right-click one of them.
-**Why**: A belt needs two pulleys, and both must be GT2 pulleys from the Gear tool.
+- **Problem**: There's no Fit a belt in the menu.
+- **Solution**: Select two pulleys first, then right-click one of them.
+- **Why**: A belt needs two pulleys, and both must be GT2 pulleys from the Gear tool.
 
-**Problem**: The belt is slack on the printed parts.
-**Solution**: Add a slot to one motor mount so it can slide a millimetre or two, or add a small idler to take up the slack.
-**Why**: Printed pulleys come out fractionally small and belts stretch a little. Every belt drive needs some adjustment.
+- **Problem**: The belt is slack on the printed parts.
+- **Solution**: Add a slot to one motor mount so it can slide a millimetre or two, or add a small idler to take up the slack.
+- **Why**: Printed pulleys come out fractionally small and belts stretch a little. Every belt drive needs some adjustment.
 
-**Problem**: The belt climbs off a pulley.
-**Solution**: Keep **Flanges** on for at least one pulley of the pair, and check the two shafts are parallel.
-**Why**: A belt always walks towards the tighter side.
+- **Problem**: The belt climbs off a pulley.
+- **Solution**: Keep **Flanges** on for at least one pulley of the pair, and check the two shafts are parallel.
+- **Why**: A belt always walks towards the tighter side.
 
 ## Check your understanding
 
