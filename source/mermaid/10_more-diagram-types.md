@@ -4,10 +4,15 @@ description: >-
     Pie charts, mind maps, Git graphs and quadrant charts - four more handy Mermaid diagrams for makers
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/10_more-diagram-types.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a pie chart, a mind map, a Git graph and a quadrant chart, and pick the right one for the job.
 
 ---
 

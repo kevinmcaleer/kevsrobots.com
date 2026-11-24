@@ -4,10 +4,15 @@ description: >-
     Put Mermaid diagrams in READMEs and notes, export them as PNG or SVG images, and render them from the command line with mermaid-cli
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/12_exporting-and-sharing.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to share a diagram as code in a README or note, and export it as a PNG or SVG image, in the Live Editor or with mermaid-cli.
 
 ---
 
@@ -115,6 +120,10 @@ mmdc -i build-guide.template.md -o build-guide.md
 That's handy for documentation sites that don't support Mermaid themselves.
 
 > If you don't want to install it globally, `npx -p @mermaid-js/mermaid-cli mmdc -i robot.mmd -o robot.svg` downloads and runs it in one go. mermaid-cli uses a hidden copy of the Chrome browser to draw the diagram, so the first run downloads that too and can take a minute.
+
+---
+
+> **Teachers**: The command-line part needs Node.js and permission to install global packages, which school machines often do not allow; `npx` or the Live Editor export make good fallbacks. mermaid-cli downloads a copy of the Chrome browser the first time it runs, so do this once on a good connection rather than with a whole class at once. Posting to GitHub needs an account, and many schools set a minimum age for these, so check your own policy.
 
 ---
 

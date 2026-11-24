@@ -12,6 +12,7 @@ description: Design database tables and the links between them, like a parts inv
 percent: 54
 duration: 6
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to design database tables for a parts inventory and draw them, with their relationships, as an entity relationship diagram.
 
 ---
 

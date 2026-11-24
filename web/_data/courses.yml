@@ -478,11 +478,8 @@
   description: Learn to draw flowcharts, sequence diagrams, state machines, database
     diagrams and more by writing simple text with Mermaid, then put them in your READMEs,
     notes and project docs.
-  duration: 1h 20m
+  duration: 1h 23m
   groups:
-  - mermaid
-  - markdown
-  - documentation
   - productivity
   lessons: 15
   level: beginner

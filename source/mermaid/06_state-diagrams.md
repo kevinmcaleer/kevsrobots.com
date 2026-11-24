@@ -4,10 +4,15 @@ description: >-
     Draw the states a robot can be in, and what makes it change between them, with Mermaid state diagrams
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/06_state-diagrams.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a state diagram of a robot's states and the events that move it between them.
 
 ---
 
