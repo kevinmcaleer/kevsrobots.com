@@ -3,14 +3,30 @@ title: Getting Started with Python and SQLite3
 description: >-
    We will cover the initial steps to set up Python and SQLite3, establish a connection to a database, and perform basic operations using Python's sqlite3 module
 layout: lesson
+type: page
 cover: /learn/sqlite3/assets/banners/02_getting_started_with_sqlite3.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to connect to a SQLite database from Python, create a table, save rows with `commit()` and read them back.
+
 In Module 2, we will cover the initial steps to set up Python and SQLite3, establish a connection to a database, and perform basic operations using Python's `sqlite3` module.
+
+```mermaid
+flowchart LR
+    A["connect()"] --> B["execute() SQL"]
+    B --> C{"changed data?"}
+    C -->|yes| D["commit()"]
+    C -->|no| E["fetchall() results"]
+    D --> F["close()"]
+    E --> F
+```
+
+The snippets below all share one `connection`, so run them in order in a single script.
 
 ### Setting up Python and SQLite3
 
@@ -39,7 +55,7 @@ import sqlite3
 connection = sqlite3.connect('mydatabase.db')
 ```
 
-This code creates a connection to a database file named `mydatabase.db`. If the file doesn't exist, SQLite will create a new database file at that location.
+This code creates a connection to a database file named `mydatabase.db`. If the file doesn't exist, SQLite will create a new database file at that location. A plain name like this means "in the folder the program is run from", so if you can't find the file later, check which folder your editor ran the program in.
 
 #### Closing the Connection
 
@@ -139,9 +155,34 @@ By incorporating exception handling, we can provide informative error messages a
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
-Put it all together in one script: connect, create the `books` table (use `CREATE TABLE IF NOT EXISTS` so you can run it more than once), insert three of your favourite books, commit, print them, and close. Run it, then open the `.db` file with one of the tools in the [Tools](17_tools.html) lesson to see your data.
+1. Put it all together in one script: connect, create the `books` table (use `CREATE TABLE IF NOT EXISTS` so you can run it more than once), insert three of your favourite books, commit, print them, and close. Run it, then open the `.db` file with one of the tools in the [Tools](17_tools.html) lesson to see your data.
+2. Break it on purpose: delete the `commit()` and run the script twice. How many books are in the table now? Then fix it with a `with connection:` block.
+3. Try `connection.execute("SELECT * FROM books WHERE year > ?", (1950))` without the comma and read the error. Then add the comma.
+4. Challenge: make a `robots` table (name, wheels) and insert three of your own robots using `?` placeholders.
+
+## Common Issues
+
+- **Problem**: Your rows vanish after the program ends.
+- **Solution**: Call `connection.commit()` (or use `with connection:`) before closing.
+- **Why**: Python's `sqlite3` keeps changes in an open transaction until you commit. Closing throws the transaction away.
+
+- **Problem**: `sqlite3.ProgrammingError: parameters are of unsupported type`, or `Incorrect number of bindings supplied`.
+- **Solution**: Pass the values as a tuple with one item per `?`, and for a single value write `(value,)` with the trailing comma.
+- **Why**: `(1950)` is just the number 1950 in brackets. The comma is what makes it a tuple.
+
+- **Problem**: `sqlite3.OperationalError: no such table: books`, even though you created it earlier.
+- **Solution**: Check you are connecting to the same `.db` file, in the same folder.
+- **Why**: A different file name or folder gives you a brand new, empty database.
+
+
+
+> **Teachers**: Python's `sqlite3` module needs nothing installed, which suits school machines. A relative file name creates the `.db` in the folder the program runs from. On a shared login that folder may be read-only or on a network drive, so have learners use a folder they can write to (and a different file name each, if they share one folder).
+
+---
+
+## Check your understanding
 
 {% quiz %}
 ? You insert some rows and call `connection.close()` without `commit()`. What happens to the rows?
@@ -155,6 +196,16 @@ Put it all together in one script: connect, create the `books` table (use `CREAT
 - [x] They safely insert values and prevent SQL injection
 - [ ] SQLite requires them for every query
 > The database handles the quoting, so your data can never be mistaken for SQL.
+
+? Does a `with connection:` block close the connection when it finishes?
+- [ ] Yes, it closes it
+- [x] No, it only commits (or rolls back on an error), so the connection stays open
+> You can keep using the connection after the block, and call `close()` yourself when you are done.
+
+? What goes wrong with `connection.execute("... WHERE year > ?", (1950))`?
+- [ ] Nothing, it works
+- [x] `(1950)` is not a tuple, so you need `(1950,)`
+> A single value needs a trailing comma to become a one-item tuple.
 {% endquiz %}
 
 ---

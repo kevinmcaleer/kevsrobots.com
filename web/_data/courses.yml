@@ -1085,11 +1085,9 @@
   cover: /learn/sqlite3/assets/database.png
   date_published: 2023-07-15
   description: Learn how to create databases in Python with sqlite3
-  duration: 1h 8m
+  duration: 1h 43m
   groups:
   - python
-  - sqlite3
-  - databases
   lessons: 18
   level: beginner
   link: /learn/sqlite3/00_intro.html

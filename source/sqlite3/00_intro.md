@@ -3,7 +3,9 @@ title: Course Overview
 description: >-
     What you'll learn
 layout: lesson
+type: page
 cover: /learn/sqlite3/assets/banners/00_intro.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -37,7 +39,7 @@ Module | Title                                      | What you'll learn
 9      | Indexes and Performance                    | Making queries faster with indexes and `EXPLAIN QUERY PLAN`
 10     | Securing and Backing Up                    | Keeping your data safe, and backing it up properly
 Bonus  | Normal forms, a demo program and tools     | How to design tables well, a complete example, and desktop apps for SQLite
-{:class="table table-striped"}
+{:class="table table-single"}
 
 ---
 
@@ -57,12 +59,15 @@ After completing this course, you will be able to:
 
 * A computer with Python 3 installed (Windows, macOS, Linux or a Raspberry Pi)
 * A code editor such as [Thonny](https://thonny.org) or [VS Code](https://code.visualstudio.com)
+* Nothing else to buy: the `sqlite3` module is part of Python, and the bonus tools lesson suggests free desktop apps for looking inside your databases
 
 ---
 
 ## Prerequisites
 
-You should be comfortable writing simple Python programs. If you're new to Python, take [Python for beginners](/learn/python/) first.
+You should be comfortable writing simple Python programs. If you're new to Python, take [Python for beginners](/learn/python/) first. When you finish, [Getting Started with SQL](/learn/sql/) goes deeper into the SQL language itself.
+
+> **Teachers**: This course suits learners aged about 13 and up who can already write short Python programs (variables, loops, functions). Allow 30 to 45 minutes per lesson; the ten core lessons fit about six sessions, and the bonus normal-form lessons are a good stand-alone session on design. Each learner needs a computer with Python 3 and nothing else. There is no hardware. The demo program lesson has a run box that works in the browser, and the normal-form lessons are pencil-and-paper design, so a class with no installs can still do those. Have learners use made-up data, and each keep their own `.db` file on a local disk.
 
 ---
 
