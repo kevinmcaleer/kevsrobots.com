@@ -7,10 +7,12 @@ cover: /learn/docker_swarm/assets/banners/07_writing-a-docker-compose-file.jpg
 date: 2024-02-03
 previous: 06_docker-compose-and-swarm-stacks.html
 next: 08_deploying-a-stack.html
-description: This lesson guides you through the process of writing a Docker Compose
-  file, enabling you to define and deploy multi-container applications with ease.
+description: Write a stack file for Swarm with a web service and a cache, using the
+  deploy key for replicas, rolling updates, limits and placement.
 percent: 48
-duration: 3
+duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -54,8 +56,8 @@ navigation:
     content:
     - name: Project Ideas
       link: 13_project-ideas.html
-    - name: Further Resources
-      link: 14_further-resources.html
+    - name: Summary and Next Steps
+      link: 14_summary-and-next-steps.html
 ---
 
 
@@ -63,80 +65,153 @@ navigation:
 
 ---
 
-## Crafting Your Docker Compose Configuration
-
-Docker Compose files are YAML files that describe a multi-container application. Writing an effective Docker Compose file is a foundational skill for deploying applications in both development environments and production Docker Swarms. This lesson will walk you through creating a basic Docker Compose file to define a simple web application stack.
+By the end of this lesson you will be able to write a stack file with the `deploy:` settings that tell Swarm how many copies to run, how to update them and where to put them.
 
 ---
 
-### Understanding Docker Compose File Structure
+## The shape of a stack file
 
-A Docker Compose file is structured into several sections, including `services`, `networks`, and `volumes`, each defining different aspects of your application:
+A stack file has the same top-level sections as any Compose file:
 
-- **Services**: Define the containers you want to run, their Docker images, and configuration options like ports, environment variables, and dependencies.
-- **Networks**: Specify the networks your containers should use to communicate with each other.
-- **Volumes**: Define persistent storage for your containers, ensuring data is maintained across container restarts.
+- `services:` the containers you want, each with an `image:`, `ports:` and so on
+- `volumes:` named storage
+- `networks:` extra networks (Swarm creates a default one for the stack)
+- `configs:` and `secrets:` small files Swarm hands to containers
+
+What makes it a *swarm* file is the `deploy:` key inside each service. Docker Compose on a single machine ignores most of it. `docker stack deploy` reads all of it.
 
 ---
 
-### Basic Docker Compose File Example
+## Our example: a web service and a cache
 
-Here's a simple example of a Docker Compose file that defines a web application and a database service:
+Save this as `stack.yml` on a manager. Both images are official and are published for `arm64`:
 
 ```yaml
-version: '3.8'
 services:
   web:
-    image: nginx:latest
+    image: nginx:alpine
     ports:
-      - "80:80"
-    depends_on:
-      - db
-    networks:
-      - webnet
+      - "8180:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          memory: 64M
 
-  db:
-    image: postgres:latest
-    environment:
-      POSTGRES_PASSWORD: example
+  cache:
+    image: redis:7-alpine
     volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - webnet
-
-networks:
-  webnet:
+      - cache-data:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
 
 volumes:
-  db-data:
+  cache-data:
 ```
 
----
+Let's walk through it.
 
-### Key Components Explained
+### `image` and `ports`
 
-- **version**: Specifies the Docker Compose file version. It's recommended to use `3.8` or above for Docker Swarm compatibility.
-- **services**: This section defines two services, `web` (an Nginx web server) and `db` (a PostgreSQL database).
-  - **image**: The Docker image to use for the container.
-  - **ports**: Maps ports from the container to the host, formatted as `<host>:<container>`.
-  - **depends_on**: Specifies that the `web` service depends on the `db` service, ensuring `db` starts before `web`.
-  - **environment**: Sets environment variables in the container. Here, it's used to set the PostgreSQL password.
-  - **volumes**: Maps persistent storage to the container. For `db`, it ensures data persists across container restarts.
-- **networks**: Defines a network named `webnet` for inter-service communication.
-- **volumes**: Declares a named volume `db-data` for the database storage, ensuring data persists.
+`web` runs the small `nginx:alpine` image. `"8180:80"` publishes container port 80 on port 8180 of **every** node, thanks to the routing mesh from lesson 5.
 
----
+### `healthcheck`
 
-### Tips for Writing Docker Compose Files
+Swarm only sends traffic to, and counts as ready, a task whose health check passes. Here every ten seconds we fetch the home page from inside the container. We use `127.0.0.1` rather than `localhost` to avoid IPv6 surprises.
 
-- **Use environment variables**: For sensitive information like passwords, consider using environment variables instead of hardcoding them in the file.
-- **Leverage volumes for persistence**: Define volumes for data that should persist between container restarts or updates, such as database files.
-- **Networks for communication**: Define networks to facilitate communication between services, especially when deploying to Docker Swarm.
+### `deploy: replicas`
 
----
+Three copies of `web`. If one dies, Swarm starts another to get back to three.
 
-### Summary
+### `deploy: update_config`
 
-Writing a Docker Compose file is an essential step in deploying containerized applications. By understanding and utilizing the key components of a Docker Compose file, you can effectively define, deploy, and manage complex applications with multiple interdependent services. This foundational knowledge will be invaluable as you progress to deploying and scaling applications across a Docker Swarm cluster.
+How a rolling update behaves. `parallelism: 1` changes one task at a time, `delay: 10s` waits between them, `order: start-first` starts the new task before stopping the old one so nothing goes dark, and `failure_action: rollback` automatically goes back if the new version fails.
+
+### `deploy: restart_policy` and `resources`
+
+`on-failure` restarts crashed tasks. `limits: memory: 64M` stops one greedy container from starving the whole Pi.
+
+### `deploy: placement`
+
+Constraints pin a service to certain nodes. Our cache uses a **named volume**, and a named volume lives on one node's disk only. If Swarm moved the cache to another node, it would start with an empty volume. Pinning it to the manager keeps the data where it is. This is the most common surprise for newcomers, and we revisit it in the backup lesson.
 
 ---
+
+## Check your file before deploying
+
+Swarm will not interpret every key as you expect, so preview it:
+
+```bash
+docker stack config -c stack.yml
+```
+
+This prints the file as Docker understands it, and complains about syntax errors. Indentation in YAML matters: use spaces, never tabs.
+
+---
+
+## Secrets, not passwords in files
+
+Notice we put no password anywhere. For a real database you would store it as a Swarm **secret**, created with `docker secret create`, which containers read from a file under `/run/secrets/`. It is far safer than an `environment:` line committed to Git. We don't use one in this stack, but the Try it Yourself below has you explore it.
+
+---
+
+## Try it Yourself
+
+1. Change `replicas: 3` to `replicas: 4` and `"8180:80"` to `"8181:80"`, then run `docker stack config -c stack.yml` and spot the change.
+2. Add `cpus: "0.50"` under `resources: limits:` for `web` and check the file still validates.
+3. Challenge: read about `docker secret create` and sketch how you would give a `postgres` service its password without writing it in `stack.yml`.
+
+---
+
+## Common Issues
+
+- **Problem**: `yaml: line 12: found character that cannot start any token` or similar.
+- **Solution**: Replace tab characters with spaces and keep each level indented by two spaces.
+- **Why**: YAML uses indentation for structure and forbids tabs.
+
+- **Problem**: The cache loses its data after a node is rebooted or the task moves.
+- **Solution**: Pin it with a `placement` constraint, or use shared storage such as NFS.
+- **Why**: A named volume is stored on a single node, so a task placed elsewhere starts with a fresh empty volume.
+
+- **Problem**: The service never becomes healthy.
+- **Solution**: Test the health command by hand with `docker exec <container> wget -q -O /dev/null http://127.0.0.1/`.
+- **Why**: A wrong command or port makes the check fail forever, and Swarm keeps restarting the task.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does `order: start-first` do during an update?
+- [ ] Starts all tasks at once
+- [x] Starts the new task before stopping the old one
+- [ ] Updates the manager first
+> `start-first` means there is always a task running during the update, so there is no gap in service.
+
+? Why did we pin `cache` to the manager?
+- [ ] Managers have faster disks
+- [x] A named volume lives on one node, so the task must stay where the data is
+- [ ] Redis only runs on managers
+> Local volumes are not shared between nodes, so a moved task would find an empty volume.
+
+? Which command previews how Docker reads your stack file?
+- [x] `docker stack config -c stack.yml`
+- [ ] `docker stack lint`
+- [ ] `docker compose rm`
+> `docker stack config` prints the processed file and reports errors before you deploy.
+{% endquiz %}

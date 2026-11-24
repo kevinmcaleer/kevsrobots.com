@@ -4,14 +4,32 @@ title: Raspberry Pi 5 Cluster with Docker Swarm
 author: Kevin McAleer
 cover: /learn/docker_swarm/assets/docker_swarm.jpg
 date: 2024-02-03
-description: This course guides beginners through the process of setting up a Raspberry
-  Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
-  and scale a mini-computing cluster for various projects.
+description: Build a Raspberry Pi 5 cluster and turn it into a Docker Swarm. Deploy
+  stacks, scale and update services, rebalance after a node failure, then monitor,
+  maintain and back up your cluster.
 level: intermediate
-course_duration: 0h 50m
+course_duration: 1h 23m
 lesson_count: 16
 first_lesson: 00_intro.html
+quiz_total: 45
 video: tDENgLiJSh0
+outcomes:
+- Plan a Raspberry Pi cluster with the right number of managers and workers
+- Prepare identical nodes and create a Docker Swarm with docker swarm init and join
+- Write a stack file with deploy settings and run it with docker stack deploy
+- Scale a service, roll out an update and roll it back
+- Drain, rebalance and replace nodes without taking your services offline
+- Back up your volumes and swarm state, and recover from a lost manager
+prerequisites:
+- The Docker course, or equivalent knowledge of images, containers and Compose files
+- Basic Linux command line skills
+- A rough idea of IP addresses and ports
+you_need:
+- Two to four Raspberry Pi 5 boards with power supplies (three is ideal)
+- A microSD card per Pi, 32 GB or larger, or an SSD
+- An Ethernet switch and cables
+- A computer on the same network with SSH and Raspberry Pi Imager
+- 64-bit Raspberry Pi OS on every Pi
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -55,6 +73,6 @@ navigation:
     content:
     - name: Project Ideas
       link: 13_project-ideas.html
-    - name: Further Resources
-      link: 14_further-resources.html
+    - name: Summary and Next Steps
+      link: 14_summary-and-next-steps.html
 ---

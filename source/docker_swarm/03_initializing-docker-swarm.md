@@ -1,97 +1,139 @@
 ---
 title: Initializing Docker Swarm
-description: This lesson guides you through the process of initializing Docker Swarm on your Raspberry Pi cluster, transforming individual Pis into a powerful, unified computing resource.
+description: >-
+    Create a swarm on your first Raspberry Pi with docker swarm init, and understand what the join tokens and manager role mean.
 layout: lesson
 type: page
 cover: /learn/docker_swarm/assets/banners/03_initializing-docker-swarm.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Setting Up Docker Swarm on Raspberry Pi
-
-With your Raspberry Pis prepared and running the cloned OS, the next step is to initialize Docker Swarm. Docker Swarm turns a group of Docker engines into a single, virtual Docker engine, where you can deploy and manage containers across multiple Raspberry Pi nodes seamlessly.
+By the end of this lesson you will be able to create a swarm on a Raspberry Pi with `docker swarm init` and explain what the join tokens are for.
 
 ---
 
-### What is Docker Swarm?
+## What does "initialising" do?
 
-Docker Swarm is a container orchestration tool, part of Docker, that allows you to manage multiple Docker hosts as a single entity. It's designed for ease of use and simplicity, making it an excellent choice for beginners and for use with Raspberry Pi clusters.
+Right now each Pi runs Docker on its own. Running `docker swarm init` on one of them switches its Docker Engine into **swarm mode**. That Pi becomes the first manager (and the *leader*), creates the cluster's encryption keys and certificates, and starts listening on port 2377 for other nodes.
 
----
+Nothing is installed: swarm mode is a feature of the Docker Engine you already have.
 
-### Prerequisites
-
-- All Raspberry Pis are set up with the cloned Raspberry Pi OS and are networked together.
-- Docker is installed on all Raspberry Pis. Refer to the previous lesson if you haven't installed Docker yet.
-
----
-
-### Step 1: Choose a Manager Node
-
-- In a Docker Swarm, at least one node acts as the manager (or multiple for redundancy), which orchestrates the deployment and manages the cluster state.
-- Decide which Raspberry Pi will be the manager node. Ideally, pick a Pi that you can easily access for administrative tasks.
+```mermaid
+sequenceDiagram
+    participant You
+    participant N1 as pi-node1
+    You->>N1: docker swarm init --advertise-addr 192.168.50.11
+    N1->>N1: Create swarm, become leader manager
+    N1-->>You: Prints worker join command and token
+```
 
 ---
 
-### Step 2: Initializing the Swarm
+## Step 1: pick the first manager
 
-1. **Open a Terminal** on your chosen manager Raspberry Pi.
-1. **Run the Docker Swarm Init Command**: Execute the following command:
+Choose any Pi. We'll use `pi-node1` at `192.168.50.11`. SSH to it.
 
-   ```sh
-   docker swarm init --advertise-addr <MANAGER_IP>
-   ```
+## Step 2: run the init command
 
-   Replace `<MANAGER_IP>` with the IP address of your manager Raspberry Pi. This IP should be static or reserved to prevent issues.
+```bash
+docker swarm init --advertise-addr 192.168.50.11
+```
 
-1. **Note the Join Token**: Upon successful initialization, Docker will output a token that worker nodes will use to join the Swarm. It looks something like this:
+Replace the address with your Pi's own fixed IP. `--advertise-addr` tells the swarm which address other nodes should use to reach this one.
 
-   ```plaintext
-   docker swarm join --token SWMTKN-1-<token_string> <MANAGER_IP>:2377
-   ```
+You will see something like this:
 
-   Keep this token secure; you'll need it to add worker nodes to your Swarm.
+```plaintext
+Swarm initialized: current node (weot4gg43bm3j6il40skyczpn) is now a manager.
 
-### Step 3: Adding Worker Nodes
+To add a worker to this swarm, run the following command:
 
----
+    docker swarm join --token SWMTKN-1-<long-secret-string> 192.168.50.11:2377
 
-1. **Access Each Worker Node**: Log into each Raspberry Pi you wish to add as a worker node.
-1. **Join the Swarm**: On each worker node, execute the join command you noted earlier. This will connect the node to the Swarm as a worker.
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+```
 
-### Step 4: Verifying the Swarm
-
-- **Check the Swarm's Status**: On the manager node, run:
-
-  ```sh
-  docker node ls
-  ```
-
-  This command lists all nodes in the Swarm, showing their roles (manager or worker) and statuses.
+The `SWMTKN-1-...` string is a **join token**. Anyone who has the token and can reach port 2377 can join your swarm, so treat it like a password. There are two separate tokens, one for workers and one for managers.
 
 ---
 
-### Docker Swarm Management
+## Step 3: look at your one-node swarm
 
-- **Promoting Nodes**: You can promote worker nodes to manager status for redundancy using:
+```bash
+docker node ls
+```
 
-  ```sh
-  docker node promote <NODE_NAME>
-  ```
-
-- **Demoting Nodes**: Similarly, managers can be demoted to workers with:
-
-  ```sh
-  docker node demote <NODE_NAME>
-  ```
+You should see a single row for `pi-node1`, marked `Leader` under MANAGER STATUS. A swarm of one is a perfectly valid swarm, and you can already deploy services to it.
 
 ---
 
-### Summary
+## Getting the tokens back
 
-Initializing Docker Swarm on your Raspberry Pi cluster is a pivotal step in creating a unified computing platform. With Swarm, you can deploy containers across multiple Pis, manage workload distribution, and ensure your applications are highly available. In the upcoming lessons, we'll explore how to add applications and services to your newly formed Docker Swarm cluster.
+Lost the output? Ask a manager:
+
+```bash
+docker swarm join-token worker
+docker swarm join-token manager
+```
+
+If a token leaks, rotate it. Existing nodes stay in the swarm; only new joins need the new token:
+
+```bash
+docker swarm join-token --rotate worker
+```
 
 ---
+
+## Why `--advertise-addr` matters
+
+If your Pi has more than one network connection, for example Ethernet and Wi-Fi both up, `docker swarm init` cannot guess which address to use and stops with an error asking you to choose. Even with one connection, giving the address explicitly is a good habit because the swarm is bound to it. Pick the Ethernet address of the Pi.
+
+> **Teachers**: Join tokens are the "key to the building". If several groups share one network, each group's swarm listens on its own manager. Make sure groups only use their own tokens and addresses, or learners will accidentally join each other's clusters. Consider a different subnet or VLAN per group, or label each Pi.
+
+---
+
+## Try it Yourself
+
+1. Run `docker swarm init` on your first Pi and capture the output in a notes file.
+2. Run `docker info | grep -i swarm` and read the Swarm section. What does it report?
+3. Challenge: rotate the worker token with `--rotate`. How does the printed token differ from before?
+
+---
+
+## Common Issues
+
+- **Problem**: `Error response from daemon: could not choose an IP address to advertise`.
+- **Solution**: Add `--advertise-addr` with your Pi's Ethernet IP address.
+- **Why**: The Pi has more than one network interface, so Docker cannot tell which one the cluster should use.
+
+- **Problem**: `This node is already part of a swarm`.
+- **Solution**: Run `docker swarm leave --force` first if you really want to start over on this node.
+- **Why**: A node can only belong to one swarm at a time.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does `docker swarm init` do?
+- [ ] Installs Docker Swarm on the Pi
+- [x] Switches this Docker Engine into swarm mode and makes it the first manager
+- [ ] Joins the Pi to an existing swarm
+> Swarm mode is already built into Docker Engine. `init` turns it on and creates the swarm.
+
+? Why should a join token be kept private?
+- [ ] It contains your Wi-Fi password
+- [x] Anyone with it who can reach port 2377 can join your swarm
+- [ ] It expires after one use
+> The token authorises new nodes. Rotate it with `docker swarm join-token --rotate` if it leaks.
+
+? What is the quickest way to see the worker join command again?
+- [x] `docker swarm join-token worker` on a manager
+- [ ] Re-run `docker swarm init`
+- [ ] Reboot the manager
+> The join-token command reprints the join command at any time.
+{% endquiz %}
