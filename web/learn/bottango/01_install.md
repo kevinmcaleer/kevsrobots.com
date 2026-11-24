@@ -56,22 +56,22 @@ navigation:
 
 ---
 
-## 💾 Step 1: Download Bottango
+## Step 1: Download Bottango
 
 To get started, head over to the official Bottango website:
 
-🔗 [https://bottango.com](https://bottango.com)
+[https://bottango.com](https://bottango.com)
 
 Click the **Download Bottango** button. Choose the version that matches your operating system:
 
-- 🪟 **Windows 10 or later**
-- 🍎 **macOS 10.14 Mojave or later**
+- **Windows 10 or later**
+- **macOS 10.14 Mojave or later**
 
 Save the installer to your computer.
 
 ---
 
-## 💻 Step 2: Install Bottango
+## Step 2: Install Bottango
 
 ### On Windows:
 
@@ -90,7 +90,7 @@ Save the installer to your computer.
 
 ---
 
-## 🧪 Step 3: Launch Bottango
+## Step 3: Launch Bottango
 
 After installation, open Bottango and you’ll see the main interface:
 
@@ -102,7 +102,7 @@ You’re ready to connect a board and start animating!
 
 ---
 
-## 🧰 Troubleshooting
+## Troubleshooting
 
 If Bottango doesn’t start or crashes:
 

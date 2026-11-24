@@ -17,7 +17,7 @@ This is your chance to get creative and build something unique using the techniq
 
 ---
 
-## 🛠️ Project Guidelines
+## Project Guidelines
 
 Your final project should:
 
@@ -28,7 +28,7 @@ Your final project should:
 
 ---
 
-## 🎯 Project Ideas
+## Project Ideas
 
 Need inspiration? Try one of these:
 
@@ -40,7 +40,7 @@ Need inspiration? Try one of these:
 
 ---
 
-## 📋 Planning Your Project
+## Planning Your Project
 
 Start with a plan:
 
@@ -52,7 +52,7 @@ Start with a plan:
 
 ---
 
-## 🧩 Sharing Your Work
+## Sharing Your Work
 
 Take photos and videos of your build, and share your code and wiring diagrams. Include:
 
@@ -65,7 +65,7 @@ This is a great way to reflect on what you’ve learned — and show off your sk
 
 ---
 
-## 🏁 Final Tips
+## Final Tips
 
 - Keep it simple and achievable
 - Start with basic behavior, then improve it

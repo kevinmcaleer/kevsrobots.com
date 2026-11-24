@@ -17,7 +17,7 @@ It parses `docker-compose.yml` files and launches containers using Podman — of
 
 ---
 
-## 📦 What is `podman-compose`?
+## What is `podman-compose`?
 
 `podman-compose` is a Python-based CLI tool that:
 
@@ -25,11 +25,11 @@ It parses `docker-compose.yml` files and launches containers using Podman — of
 - Creates a Podman **pod** and runs each service inside it
 - Tries to maintain CLI and file compatibility with Docker Compose
 
-> 🛠 It’s great for local development and small deployments — but not a 1:1 drop-in replacement in all cases.
+> It’s great for local development and small deployments — but not a 1:1 drop-in replacement in all cases.
 
 ---
 
-## 🛠 Installing `podman-compose`
+## Installing `podman-compose`
 
 ```bash
 pip3 install podman-compose
@@ -43,7 +43,7 @@ podman-compose version
 
 ---
 
-## ▶️ Running a Compose File with Podman
+## ▶Running a Compose File with Podman
 
 Assume you have this `docker-compose.yml`:
 
@@ -70,11 +70,11 @@ Stop it with:
 podman-compose down
 ```
 
-> ✅ By default, Podman Compose creates a pod named after your project and places all containers inside it.
+> By default, Podman Compose creates a pod named after your project and places all containers inside it.
 
 ---
 
-## 🔍 Checking Pod Status
+## Checking Pod Status
 
 Check running pods and containers:
 
@@ -91,22 +91,22 @@ podman pod inspect <pod-id>
 
 ---
 
-## ⚠️ Limitations Compared to Docker Compose
+## Limitations Compared to Docker Compose
 
 | Feature                  | Docker Compose  | Podman Compose         |
 | ------------------------ | --------------- | ---------------------- |
-| Service restart policies | ✅ Supported     | ⚠️ Limited/partial     |
-| Health checks            | ✅ Supported     | ❌ Not yet supported    |
-| Compose v2 syntax        | ✅ Supported     | ⚠️ Partially supported |
+| Service restart policies | Supported     | Limited/partial     |
+| Health checks            | Supported     | Not yet supported    |
+| Compose v2 syntax        | Supported     | Partially supported |
 | Networking               | Built-in bridge | Pod network/pod-based  |
 | Volumes                  | Supported       | Supported              |
 {:class="table table-striped"}
 
-> 🧪 Podman Compose works best with **basic service definitions** and standard port/volume usage. Advanced features may require tweaking or systemd integration.
+> Podman Compose works best with **basic service definitions** and standard port/volume usage. Advanced features may require tweaking or systemd integration.
 
 ---
 
-## 🧰 Alternative: Manual Pod + Systemd
+## Alternative: Manual Pod + Systemd
 
 For production use, many Podman users skip Compose altogether and:
 
@@ -116,7 +116,7 @@ For production use, many Podman users skip Compose altogether and:
 
 ---
 
-## 🗂 Best Practices
+## Best Practices
 
 - Use `podman-compose` for local testing and development
 - Prefer systemd or `podman play kube` for production

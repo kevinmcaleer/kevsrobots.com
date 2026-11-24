@@ -68,7 +68,7 @@ This makes switching from Docker to Podman easier than you might expect.
 
 ---
 
-## 🧪 Try It: Podman vs Docker Commands
+## Try It: Podman vs Docker Commands
 
 | Task                        | Docker Command                  | Podman Command                 |
 |-----------------------------|----------------------------------|--------------------------------|
@@ -84,14 +84,14 @@ This makes switching from Docker to Podman easier than you might expect.
 
 ---
 
-> 🧠 **Tip:** You can even create an alias:
+> **Tip:** You can even create an alias:
 > ```bash
 > alias docker=podman
 > ```
 
 ---
 
-## 🔍 What’s the Same?
+## What’s the Same?
 
 - Most of the Docker CLI commands
 - Image management using `pull`, `push`, `build`
@@ -100,25 +100,25 @@ This makes switching from Docker to Podman easier than you might expect.
 
 ---
 
-## 🔄 What’s Different?
+## What’s Different?
 
-### 🔧 No Daemon
+### No Daemon
 
 Podman commands run directly without a background service. This affects:
 
 - How containers are started and monitored
 - How logs and container state are handled
 
-### 🛠 Rootless by Default
+### Rootless by Default
 
 Most Podman installations use rootless mode:
 
 - Your containers run as your user (no `sudo` needed)
 - Files created by containers belong to your user
 
-> 📁 Volumes and files created in containers are owned by the current user, not `root`, in rootless mode.
+> Volumes and files created in containers are owned by the current user, not `root`, in rootless mode.
 
-### 🧰 System Commands
+### System Commands
 
 Some Docker-style commands (e.g., `docker system prune`) may behave differently or be absent in Podman. Podman provides alternatives like:
 
@@ -129,7 +129,7 @@ podman container prune
 
 ---
 
-## 🧪 Try It Yourself
+## Try It Yourself
 
 Start a container and explore the CLI:
 
@@ -151,7 +151,7 @@ podman ps -a
 
 ---
 
-## 🔐 Rootless vs Rootful Mode
+## Rootless vs Rootful Mode
 
 You can choose to run Podman in root mode if needed:
 

@@ -74,7 +74,7 @@ GPIO stands for **General Purpose Input/Output** — these are the physical pins
 - 1x 330Ω resistor
 - Jumper wires
 
-> ⚠️ Be sure to connect the long leg (anode) of the LED to the GPIO pin, and the short leg (cathode) to GND through the resistor.
+> Be sure to connect the long leg (anode) of the LED to the GPIO pin, and the short leg (cathode) to GND through the resistor.
 >
 > You can use the mnemonic - 'long is live' to remember that the long leg is positive (anode) and connects to the GPIO pin.
 

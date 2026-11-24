@@ -80,9 +80,9 @@ This lesson covers how to deploy the **Kubernetes Dashboard**, add basic **metri
 
 ---
 
-## 🧭 Option 1: Kubernetes Dashboard
+## Option 1: Kubernetes Dashboard
 
-### 🔹 Step 1: Deploy the Dashboard
+### Step 1: Deploy the Dashboard
 
 Apply the official YAML:
 
@@ -98,7 +98,7 @@ This deploys:
 
 ---
 
-### 🔹 Step 2: Create Admin User
+### Step 2: Create Admin User
 
 Create a file `dashboard-admin.yaml`:
 
@@ -131,7 +131,7 @@ kubectl apply -f dashboard-admin.yaml
 
 ---
 
-### 🔹 Step 3: Access the Dashboard
+### Step 3: Access the Dashboard
 
 Start the proxy:
 
@@ -155,7 +155,7 @@ Paste the token into the login screen.
 
 ---
 
-## 📊 Option 2: Metrics Server (Optional for K3s)
+## Option 2: Metrics Server (Optional for K3s)
 
 K3s includes a built-in lightweight metrics server, but if not available:
 
@@ -172,7 +172,7 @@ kubectl top pods
 
 ---
 
-## 🧩 Other Lightweight Monitoring Tools
+## Other Lightweight Monitoring Tools
 
 | Tool                     | Description                           |
 | ------------------------ | ------------------------------------- |
@@ -182,11 +182,11 @@ kubectl top pods
 | **Lens**                 | Powerful GUI app for remote clusters  |
 {:class="table table-striped"}
 
-> 🧠 Tip: For Raspberry Pi, prioritize tools with low memory footprint.
+> Tip: For Raspberry Pi, prioritize tools with low memory footprint.
 
 ---
 
-## 🧪 Verifying Everything Works
+## Verifying Everything Works
 
 * Open Dashboard and view cluster state
 * Check `kubectl top nodes` for metrics
@@ -194,7 +194,7 @@ kubectl top pods
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 

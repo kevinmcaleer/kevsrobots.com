@@ -13,7 +13,7 @@ Arduino Mode allows you to export motion sequences as code and upload them to yo
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 In Arduino Mode:
 
@@ -25,7 +25,7 @@ Perfect for costumes, props, or permanent installations!
 
 ---
 
-## 🛠️ Step 1: Design Your Animation
+## Step 1: Design Your Animation
 
 1. Create your motion in Bottango as usual
 2. Keep it simple — Arduino Mode supports basic motion and triggers
@@ -33,7 +33,7 @@ Perfect for costumes, props, or permanent installations!
 
 ---
 
-## 🔄 Step 2: Export for Arduino Mode
+## Step 2: Export for Arduino Mode
 
 1. Go to **File > Export for Arduino Mode**
 2. Choose your board type (e.g., Arduino Uno)
@@ -41,7 +41,7 @@ Perfect for costumes, props, or permanent installations!
 
 ---
 
-## 📦 Step 3: Open in Arduino IDE
+## Step 3: Open in Arduino IDE
 
 1. Open the exported `.ino` file in the [Arduino IDE](https://arduino.cc)
 2. Install any required libraries if prompted
@@ -52,7 +52,7 @@ Once uploaded, your board will run the motion sequence immediately on power-up.
 
 ---
 
-## 🧪 Optional: Add Custom Logic
+## Optional: Add Custom Logic
 
 Since the exported sketch is real Arduino code, you can modify it! For example:
 
@@ -62,7 +62,7 @@ Since the exported sketch is real Arduino code, you can modify it! For example:
 
 ---
 
-## 🧰 Tips for Arduino Mode
+## Tips for Arduino Mode
 
 - Export each sequence as a separate project if you want to switch between them
 - Keep your animation short and loopable for best performance
@@ -70,7 +70,7 @@ Since the exported sketch is real Arduino code, you can modify it! For example:
 
 ---
 
-## 🎯 Example: Halloween Prop
+## Example: Halloween Prop
 
 1. Animate a jaw moving up and down in Bottango
 2. Export using Arduino Mode
