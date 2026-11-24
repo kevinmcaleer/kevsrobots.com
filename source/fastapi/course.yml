@@ -6,15 +6,32 @@
   layout: course
   cover: assets/cover.png
   groups:
-    - fastapi
     - python
+    - raspberrypi
   description: >-
-    This course teaches you how to build a user authentication system using Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll learn to implement features like registration, login, and user management, integrating these with a frontend built with Jekyll.
+    Build a robot telemetry API with Python and FastAPI: a Pico or any robot posts sensor readings, a static Jekyll dashboard shows them, and only logged-in users can switch the robot's LEDs. You will use Pydantic v2 models, SQLite, hashed passwords, signed tokens, CORS and a safe deployment.
+  outcomes:
+    - Build and run a FastAPI app with fastapi dev, and explain what uvicorn does
+    - Validate requests with Pydantic v2 models and Annotated parameters
+    - Store users and sensor readings in SQLite with a lifespan handler and a database dependency
+    - Register users, hash their passwords and issue signed login tokens
+    - Protect routes so only logged-in users, or only admins, can reach them
+    - Let a static Jekyll page call the API with CORS, and deploy with settings from the environment
+  prerequisites:
+    - Python basics, such as functions, dictionaries and imports
+    - Helpful but not required, the Pydantic course (Mastering Pydantic for Robust Data Validation)
+    - Helpful but not required, Create Databases with Python and SQLite3
+  you_need:
+    - A computer with Python 3.10 or newer and a terminal
+    - A text editor such as Thonny, VS Code or Snakie, and a web browser
+    - Internet access to install packages with pip
+    - Optional, a Raspberry Pi Pico W or other robot to act as the sensor
+    - Optional, a Jekyll site, or the Docker setup from the Jekyll course
   content:
     - section:
         name: Introduction to User Authentication
         content:
-          - 01_course_overview.md
+          - 00_intro.md
           - 02_setting_up_the_environment.md
     - section:
         name: FastAPI and User Authentication Basics
@@ -32,3 +49,4 @@
         content:
           - 08_integrating_with_jekyll.md
           - 09_deploying_the_solution.md
+          - 10_summary.md
