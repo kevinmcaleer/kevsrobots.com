@@ -5,15 +5,31 @@
   level: intermediate
   layout: course
   cover: assets/how_to_build_a_quad.jpg
+  video: 32GXhAuXZrQ
   groups:
-      - smars
-      - robotics
-      - raspberry pi
+      - robots
+      - raspberrypi
       - python
   description: >- 
      3D print, assemble and wire up the SMARS Quad, a four-legged walking robot with
      eight SG90 servos, a PCA9685 servo board and a Raspberry Pi Zero, then make it
      walk with Python.
+  outcomes:
+    - Print and assemble a four-legged SMARS Quad with eight servos
+    - Wire a PCA9685 servo board to a Raspberry Pi and power the servos from their own supply
+    - Work out which PCA9685 channel drives which leg and foot
+    - Turn a servo angle into a PCA9685 count
+    - Explain a creeping gait and why three feet stay on the ground
+    - Run SMARSLab and your own Python script to make the quad walk
+  prerequisites:
+    - Build a SMARS Robot (helpful, not essential)
+    - Some Python and comfort typing commands in a terminal
+  you_need:
+    - A 3D printer and the SMARS Quad files from Thingiverse
+    - A Raspberry Pi Zero 2 WH with Raspberry Pi OS on a microSD card
+    - A PCA9685 16-channel servo board and 8 SG90 servos
+    - A separate 5V supply or battery pack for the servos, able to give at least 2 A
+    - Jumper wires and a small screwdriver
   content:
   - section:
       name: Overview

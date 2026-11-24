@@ -5066,9 +5066,8 @@
     "author": "Kevin McAleer",
     "date_published": "2023-03-04",
     "groups": [
-      "smars",
-      "robotics",
-      "raspberry pi",
+      "robots",
+      "raspberrypi",
       "python"
     ],
     "lessons": [

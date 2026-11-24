@@ -962,11 +962,10 @@
   description: 3D print, assemble and wire up the SMARS Quad, a four-legged walking
     robot with eight SG90 servos, a PCA9685 servo board and a Raspberry Pi Zero, then
     make it walk with Python.
-  duration: 0h 17m
+  duration: 0h 57m
   groups:
-  - smars
-  - robotics
-  - raspberry pi
+  - robots
+  - raspberrypi
   - python
   lessons: 15
   level: intermediate
