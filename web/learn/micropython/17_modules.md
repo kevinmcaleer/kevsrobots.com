@@ -126,6 +126,7 @@ From the `REPL` type:
 ```python
 dir(machine)
 ```
+{: .no-snakie }
 
 In the example above you'll discover a list of all the functions, classes and Constants in the module named `machine`.
 

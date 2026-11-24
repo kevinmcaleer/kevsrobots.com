@@ -141,6 +141,7 @@ state = (row, col, distance_band)
 state = (2, 3, "near")   # at grid cell (2,3), obstacle very close ahead
 state = (0, 0, "far")    # at top-left corner, clear ahead
 ```
+{: .no-snakie }
 
 Using a tuple as a dictionary key works perfectly in Python:
 
@@ -186,6 +187,7 @@ state = (row, col, heading, distance_band)
 # On a 5x5 grid: 5 * 5 * 4 * 3 = 300 states
 # Very manageable for a lookup table!
 ```
+{: .no-snakie }
 
 Compare that to using raw sensor data. A 16-bit distance reading plus a continuous heading in tenths of a degree gives 65,536 × 3,600 = 235,929,600 possible states. A lookup table with that many rows would use gigabytes of memory and take millions of training episodes to fill.
 

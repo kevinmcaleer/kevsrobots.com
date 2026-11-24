@@ -154,6 +154,7 @@ if 0x76 in devices:
 elif 0x77 in devices:
     BME280_ADDR = 0x77
 ```
+{: .no-snakie }
 
 ### Section 4: Register Map - The Most Important Section
 

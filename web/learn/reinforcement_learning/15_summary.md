@@ -143,6 +143,7 @@ q_table[state][action] += alpha * (
 # gamma (discount):       how much I trust the future — typically 0.9–0.99
 # TD error:               positive = I was too pessimistic, negative = too optimistic
 ```
+{: .no-snakie }
 
 ---
 
