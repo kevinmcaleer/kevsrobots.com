@@ -9,9 +9,9 @@ next: 01_look_around_and_sketch.html
 description: Design your own 3D printable parts in BetterCad, the free CAD tool that
   runs in your browser
 percent: 7
-duration: 5
+duration: 6
 quiz_total: 39
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Learn BetterCad
 - content:
@@ -142,6 +142,8 @@ Every lesson ends with an exercise, some common problems and a short quiz.
 ## Prerequisites
 
 None. If you've used Tinkercad or Fusion, some of this will feel familiar, and the course points out where BetterCad does things differently. If you've never used CAD, you're in the right place.
+
+> **Teachers**: this course suits complete beginners to CAD, with no prerequisites. It is 12 lessons after this one, each written as five to ten minutes of work, so plan several short sessions and allow longer for a class new to 3D views. Each learner needs only a computer with a recent browser: BetterCad runs in the browser, needs no install and no account, and works offline once it has loaded. A mouse with a scroll wheel helps. A 3D printer is optional, because the whole course can be done on screen. BetterCad is in alpha, so open the lesson yourself before class in case a button has moved. On shared computers, read the notes in lessons 3 and 10 about where files end up.
 
 ## Try it Yourself
 

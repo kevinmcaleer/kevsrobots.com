@@ -4,12 +4,14 @@ description: Learn what constraints and degrees of freedom are, and how to draw 
 layout: lesson
 type: page
 cover: /learn/bettercad/assets/banners/04_sketching_with_constraints.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain what constraints and degrees of freedom are, and read a sketch's colours to tell whether it is fully constrained.
 
 Your first block worked because you typed its size as you drew it. This lesson explains what was going on underneath, because it's the idea that makes a CAD sketch different from a drawing: a sketch is a set of **rules**, not a set of lines.
 
@@ -108,17 +110,17 @@ Keep this sketch open. You'll add a hole to it in the next lesson.
 
 ## Common Issues
 
-**Problem**: My rectangle is still blue after I typed its width and height.
-**Solution**: It knows its size but not its position. Start it on the Origin, or add a Fix to one corner.
-**Why**: Sliding left-right and up-down are two degrees of freedom that sizes don't remove.
+- **Problem**: My rectangle is still blue after I typed its width and height.
+- **Solution**: It knows its size but not its position. Start it on the Origin, or add a Fix to one corner.
+- **Why**: Sliding left-right and up-down are two degrees of freedom that sizes don't remove.
 
-**Problem**: The sketch turned red.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, or delete one of the constraints marked "(fights)" in Properties.
-**Why**: Two rules can't both be true, such as a line that is 50 mm and also equal to a 30 mm line.
+- **Problem**: The sketch turned red.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, or delete one of the constraints marked "(fights)" in Properties.
+- **Why**: Two rules can't both be true, such as a line that is 50 mm and also equal to a 30 mm line.
 
-**Problem**: I pressed D twice and the Dimension tool went away.
-**Solution**: Press <kbd>D</kbd> once more.
-**Why**: A tool's key switches it on and off. Dimension stays on after each size so you can add several in a row.
+- **Problem**: I pressed D twice and the Dimension tool went away.
+- **Solution**: Press <kbd>D</kbd> once more.
+- **Why**: A tool's key switches it on and off. Dimension stays on after each size so you can add several in a row.
 
 ## Check your understanding
 

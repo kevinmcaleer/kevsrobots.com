@@ -4,12 +4,14 @@ description: Choose between STL, 3MF and STEP, pick a resolution and export one 
 layout: lesson
 type: page
 cover: /learn/bettercad_printing/assets/banners/09_exporting_for_your_slicer.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose between STL, 3MF and STEP, pick a resolution, and export one file or many.
 
 The checks pass and the settings are saved. The last step in BetterCad is to write a file your slicer can open. There are a few choices to make, and each has a right answer most of the time.
 
@@ -105,17 +107,17 @@ A short checklist on the other side:
 
 ## Common Issues
 
-**Problem**: The part opens tiny in my slicer.
-**Solution**: Export 3MF, or set the slicer's import units to millimetres.
-**Why**: STL files don't record units, so slicers guess.
+- **Problem**: The part opens tiny in my slicer.
+- **Solution**: Export 3MF, or set the slicer's import units to millimetres.
+- **Why**: STL files don't record units, so slicers guess.
 
-**Problem**: A part is missing from the exported file.
-**Solution**: Check it isn't hidden, and that it isn't a hole shape waiting to be grouped.
-**Why**: Hidden bodies and loose holes aren't exported.
+- **Problem**: A part is missing from the exported file.
+- **Solution**: Check it isn't hidden, and that it isn't a hole shape waiting to be grouped.
+- **Why**: Hidden bodies and loose holes aren't exported.
 
-**Problem**: Export is slow at Fine.
-**Solution**: Use Normal.
-**Why**: Fine makes many more triangles, and on a filleted part that takes time.
+- **Problem**: Export is slow at Fine.
+- **Solution**: Use Normal.
+- **Why**: Fine makes many more triangles, and on a filleted part that takes time.
 
 ## Check your understanding
 

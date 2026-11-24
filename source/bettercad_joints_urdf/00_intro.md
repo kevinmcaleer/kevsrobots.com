@@ -4,7 +4,7 @@ description: Add joints, poses, clash checks and drive links to a BetterCad desi
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/00_intro.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -66,3 +66,33 @@ The arm grows lesson by lesson, so keep your model saved as you go. If you'd rat
 Most lessons end with a **Try it Yourself** section and a short quiz. The answers are explained as soon as you pick one.
 
 BetterCad changes quickly. The screenshots are from November 2026, so a button may have moved a little by the time you read this. The ideas stay the same.
+
+> **Teachers**: this course suits learners who have finished Learn BetterCad. It is all done on screen: no printer, no hardware, no install and no account, just a computer with a recent browser and a mouse. The desk arm grows lesson by lesson, so ask learners to save a `.bcad` file at the end of each session, because browser autosave belongs to one browser on one computer. A learner who misses a session can start from the stage file the lessons provide. Lesson 11 uses the geared servo deck from Design Robot Parts with BetterCad, and a finished copy can be downloaded if the class has not built it. BetterCad is in alpha, so check a lesson before class in case a button has moved.
+
+## Try it Yourself
+
+1. Open [BetterCad](https://bettercad.kevsrobots.com) and look along the tabs at the top. Click **Assemble** and read the tools it offers.
+2. Download the finished [desk-arm.bcad](/learn/bettercad_joints_urdf/assets/desk-arm.bcad) and open it with **Open...** in the Save menu. Which parts do you think move?
+3. Look at the list of Key Results above. Which one are you most looking forward to, and why?
+
+## Check your understanding
+
+{% quiz %}
+? What is the project in this course?
+- [ ] A phone stand
+- [x] A two-joint desk arm
+- [ ] A box with a lid
+> The arm is a base, an upper arm and a forearm, joined at a shoulder and an elbow.
+
+? Do you need a 3D printer for this course?
+- [ ] Yes, to print the arm
+- [x] No, everything happens on screen
+- [ ] Only for the export
+> The course says you do not need to print anything.
+
+? Which file format does the course export, and what reads it?
+- [ ] STL, read by slicers
+- [x] URDF, read by robot simulators and ROS
+- [ ] GLB, read by web pages
+> BetterCad writes a URDF file that simulators and ROS read.
+{% endquiz %}

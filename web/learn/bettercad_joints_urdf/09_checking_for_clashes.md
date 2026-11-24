@@ -11,8 +11,8 @@ description: Use the BetterCad clash check to find parts that overlap or touch i
   any pose, and read the results
 percent: 70
 duration: 5
-quiz_total: 39
-date_updated: 2026-11-21
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to run the clash check on a pose and read its results.
 
 On screen, two parts can pass straight through each other and nothing complains. On the bench, something cracks. The **clash check** finds every place where two parts are trying to be in the same space.
 

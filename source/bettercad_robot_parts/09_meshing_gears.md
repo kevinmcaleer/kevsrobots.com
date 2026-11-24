@@ -4,12 +4,14 @@ description: Add a mating gear in BetterCad, read the gear ratio, and keep a pai
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/09_meshing_gears.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add a mating gear, read the gear ratio, and keep a pair meshed when you change one of them.
 
 One gear does nothing. Two gears are a machine. The hard part of a gear pair is the distance between their centres: a fraction too close and they jam, a fraction too far and they skip. BetterCad places the second gear for you.
 
@@ -105,17 +107,17 @@ A few habits that save reprints:
 
 ## Common Issues
 
-**Problem**: There's no Add mating gear in the menu.
-**Solution**: Right-click a gear made with the Gear tool.
-**Why**: BetterCad needs the gear's settings to build a partner. An imported gear STL has none.
+- **Problem**: There's no Add mating gear in the menu.
+- **Solution**: Right-click a gear made with the Gear tool.
+- **Why**: BetterCad needs the gear's settings to build a partner. An imported gear STL has none.
 
-**Problem**: The mating gear has holes I didn't ask for.
-**Solution**: Change its **Bore**. It copied the first gear's.
-**Why**: A new mate starts with its partner's settings.
+- **Problem**: The mating gear has holes I didn't ask for.
+- **Solution**: Change its **Bore**. It copied the first gear's.
+- **Why**: A new mate starts with its partner's settings.
 
-**Problem**: Printed gears are too tight at the distance BetterCad chose.
-**Solution**: Raise **Backlash** on both gears. Don't move them apart by hand.
-**Why**: The centre distance is right. The teeth are printing fat.
+- **Problem**: Printed gears are too tight at the distance BetterCad chose.
+- **Solution**: Raise **Backlash** on both gears. Don't move them apart by hand.
+- **Why**: The centre distance is right. The teeth are printing fat.
 
 ## Check your understanding
 

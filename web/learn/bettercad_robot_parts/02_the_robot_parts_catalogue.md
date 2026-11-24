@@ -12,7 +12,7 @@ description: Place servos, motors, boards, sensors and bearings from the BetterC
 percent: 21
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Design Robot Parts with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to open the robot parts catalogue, place a servo on a plate, and move it to an exact position.
 
 Importing an STL works when you have one. For the parts nearly every small robot uses, you don't need to go looking: BetterCad has them built in.
 
@@ -145,17 +147,17 @@ The catalogue is part of the app, so it works offline too.
 
 ## Common Issues
 
-**Problem**: The part lands on the ground, not on my plate.
-**Solution**: Click on a flat face of the plate itself. Turn the view so its top is clearly visible first.
-**Why**: Clicking empty space places the part on the ground.
+- **Problem**: The part lands on the ground, not on my plate.
+- **Solution**: Click on a flat face of the plate itself. Turn the view so its top is clearly visible first.
+- **Why**: Clicking empty space places the part on the ground.
 
-**Problem**: The servo seems to be sunk into the plate.
-**Solution**: That's correct. Its body hangs below the tabs and needs a pocket.
-**Why**: The part's zero is the surface it screws to.
+- **Problem**: The servo seems to be sunk into the plate.
+- **Solution**: That's correct. Its body hangs below the tabs and needs a pocket.
+- **Why**: The part's zero is the surface it screws to.
 
-**Problem**: I can't change the servo's size.
-**Solution**: You can't, by design. Pick a different part if you need one.
-**Why**: A catalogue part keeps the part's size.
+- **Problem**: I can't change the servo's size.
+- **Solution**: You can't, by design. Pick a different part if you need one.
+- **Why**: A catalogue part keeps the part's size.
 
 ## Check your understanding
 

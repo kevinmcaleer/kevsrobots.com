@@ -4,12 +4,14 @@ description: Decide which way up to print a part using BetterCad's orientation s
 layout: lesson
 type: page
 cover: /learn/bettercad_printing/assets/banners/04_choosing_an_orientation.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use BetterCad's orientation suggestions to decide which way up to print a part.
 
 The same part can be an easy print or a nightmare depending on which face you put on the bed. Orientation decides how much support you need, how strong the part is and which surfaces look good. It costs nothing to change, so it's worth a minute's thought on every print.
 
@@ -93,17 +95,17 @@ When strength and support disagree, strength wins for a working part. Supports c
 
 ## Common Issues
 
-**Problem**: None of the suggestions is the way I want it.
-**Solution**: Use the **Turn** tool (<kbd>R</kbd>), or type a Rotation in Properties, then click **Centre on bed**.
-**Why**: The suggestions only cover ways the model can rest flat.
+- **Problem**: None of the suggestions is the way I want it.
+- **Solution**: Use the **Turn** tool (<kbd>R</kbd>), or type a Rotation in Properties, then click **Centre on bed**.
+- **Why**: The suggestions only cover ways the model can rest flat.
 
-**Problem**: The suggestion I picked is no longer highlighted.
-**Solution**: Nothing is wrong. The picture marked **As it lies** always shows the current position.
-**Why**: After turning, the new position becomes "as it lies" and the others are worked out again.
+- **Problem**: The suggestion I picked is no longer highlighted.
+- **Solution**: Nothing is wrong. The picture marked **As it lies** always shows the current position.
+- **Why**: After turning, the new position becomes "as it lies" and the others are worked out again.
 
-**Problem**: My model has several parts and they all turned together.
-**Solution**: Export each part on its own and orient them in the slicer, or turn parts one at a time with the Turn tool.
-**Why**: A suggestion turns the whole model as one.
+- **Problem**: My model has several parts and they all turned together.
+- **Solution**: Export each part on its own and orient them in the slicer, or turn parts one at a time with the Turn tool.
+- **Why**: A suggestion turns the whole model as one.
 
 ## Check your understanding
 

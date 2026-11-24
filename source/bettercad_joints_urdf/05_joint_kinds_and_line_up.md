@@ -4,12 +4,14 @@ description: Choose between hinge, wheel, slider and fixed joints in BetterCad a
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/05_joint_kinds_and_line_up.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose between hinge, wheel, slider and fixed joints, and adjust a joint with angle, gap, offsets and flip.
 
 Both joints so far are hinges, because that's what the Joint tool gives you first. BetterCad has four kinds, and between them they cover nearly every hobby robot.
 

@@ -4,12 +4,14 @@ description: Learn to move around the 3D view in BetterCad, then draw your first
 layout: lesson
 type: page
 cover: /learn/bettercad/assets/banners/01_look_around_and_sketch.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to move around the 3D view, start a sketch on the ground plane, and draw a rectangle with an exact size.
 
 Every part in this course starts the same way: a flat drawing, called a **sketch**, that you then pull into 3D. In this lesson you'll learn to move around and draw one.
 
@@ -94,17 +96,17 @@ That flat outline is called a **profile**. In the next lesson you'll pull it up 
 
 ## Common Issues
 
-**Problem**: Pressing K or R does nothing.
-**Solution**: Click on the 3D view first, then press the key.
-**Why**: Single-letter shortcuts are switched off while the cursor is in a text box, so typing a size never fires a tool by accident.
+- **Problem**: Pressing K or R does nothing.
+- **Solution**: Click on the 3D view first, then press the key.
+- **Why**: Single-letter shortcuts are switched off while the cursor is in a text box, so typing a size never fires a tool by accident.
 
-**Problem**: BetterCad asks about an open shape when I finish.
-**Solution**: Make sure the ends of your lines meet. Drag one end onto the other to join them.
-**Why**: Only a closed shape can become a solid. An open one has no inside.
+- **Problem**: BetterCad asks about an open shape when I finish.
+- **Solution**: Make sure the ends of your lines meet. Drag one end onto the other to join them.
+- **Why**: Only a closed shape can become a solid. An open one has no inside.
 
-**Problem**: My rectangle is tiny or off screen.
-**Solution**: Scroll to zoom, or right-drag to pan. This works while you're sketching too.
-**Why**: The view starts zoomed out so the whole printer bed fits.
+- **Problem**: My rectangle is tiny or off screen.
+- **Solution**: Scroll to zoom, or right-drag to pan. This works while you're sketching too.
+- **Why**: The view starts zoomed out so the whole printer bed fits.
 
 ## Check your understanding
 

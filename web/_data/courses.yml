@@ -39,7 +39,7 @@
   description: Design your own 3D printable parts in BetterCad, the free CAD tool
     that runs in your browser. Sketch, extrude, add screw holes that fit, hollow out
     an enclosure, drive a model with parameters, then build a phone stand from scratch.
-  duration: 1h 13m
+  duration: 1h 15m
   groups:
   - 3ddesign
   - 3dprinting
@@ -54,7 +54,7 @@
     and slider joints in BetterCad, pose them, drag an arm by its tip, check every
     pose for clashes, link joints through gears, and export the lot as URDF. The project
     is a two-joint desk arm.
-  duration: 1h 10m
+  duration: 1h 18m
   groups:
   - 3ddesign
   - robots
@@ -69,7 +69,7 @@
   description: Get parts that fit first time. Set up your printer in BetterCad, catch
     overhangs and thin walls before you print, calibrate holes and fits to your own
     machine, then design a box with a lid that closes just right.
-  duration: 1h 5m
+  duration: 1h 9m
   groups:
   - 3dprinting
   - 3ddesign
@@ -84,7 +84,7 @@
     uses. Drop parts in from BetterCad's robot catalogue, cut their pockets in one
     click, add standoffs and horn mounts, generate gears that mesh, and finish with
     a geared servo deck for a Raspberry Pi Pico.
-  duration: 1h 16m
+  duration: 1h 17m
   groups:
   - 3ddesign
   - 3dprinting

@@ -10,9 +10,9 @@ next: 11_summary.html
 description: Resize BetterCad's box with a lid for your own project, set the lid's
   fit from your calibration, check it and export both parts
 percent: 88
-duration: 7
+duration: 8
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Print It Right with BetterCad
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to resize the box with a lid for your own project, set the lid's fit from your calibration, and export both parts.
 
 A box with a lid is the classic test of whether a designer and a printer understand each other. The lid has to go on without a fight and stay on without rattling. Everything in this course feeds into that one joint.
 
@@ -179,6 +181,8 @@ When it's right, that gap is *your* number for lids on this printer in this mate
 
 ---
 
+> **Teachers**: the box and its lid are two printed parts, so allow printer time for both, and for a second attempt. Only the lid changes when the gap changes, so a reprint costs a few grams. Learners without a printer can still do every design step, check and export on screen. Supervise printers as you would any workshop tool.
+
 ## Try it Yourself
 
 1. Resize the box for a real thing you own, and print it.
@@ -187,17 +191,17 @@ When it's right, that gap is *your* number for lids on this printer in this mate
 
 ## Common Issues
 
-**Problem**: The lid fits one way round but not the other.
-**Solution**: Check the bed is level and the first layer isn't squashed, which spreads the base of the lip.
-**Why**: A squashed first layer makes the bottom of a part slightly bigger, known as elephant's foot.
+- **Problem**: The lid fits one way round but not the other.
+- **Solution**: Check the bed is level and the first layer isn't squashed, which spreads the base of the lip.
+- **Why**: A squashed first layer makes the bottom of a part slightly bigger, known as elephant's foot.
 
-**Problem**: The lid is tight only at the corners.
-**Solution**: Fillet the four upright edges of the lip by 1 mm, or raise `gap` slightly.
-**Why**: Printers slow down and deposit a little extra plastic at sharp corners, so they bulge.
+- **Problem**: The lid is tight only at the corners.
+- **Solution**: Fillet the four upright edges of the lip by 1 mm, or raise `gap` slightly.
+- **Why**: Printers slow down and deposit a little extra plastic at sharp corners, so they bulge.
 
-**Problem**: The lid goes on but the lip is too shallow to hold.
-**Solution**: Make the lip taller. Double-click the **Size Lip** step and raise its height from 4 mm.
-**Why**: A taller lip has more wall to bear against.
+- **Problem**: The lid goes on but the lip is too shallow to hold.
+- **Solution**: Make the lip taller. Double-click the **Size Lip** step and raise its height from 4 mm.
+- **Why**: A taller lip has more wall to bear against.
 
 ## Check your understanding
 

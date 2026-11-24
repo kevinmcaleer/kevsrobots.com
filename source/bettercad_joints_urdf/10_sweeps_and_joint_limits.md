@@ -4,12 +4,14 @@ description: Sweep every BetterCad joint through its range to find where parts c
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/10_sweeps_and_joint_limits.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to sweep every joint through its range to find collisions, and set safe joint limits in one click.
 
 Checking one pose answers one question. A robot has endless poses, and the one that breaks it is never the one you thought to check.
 
@@ -60,6 +62,16 @@ The bar says "Set the limits of Shoulder". Edit the joint and you'll find Lower 
 "Nothing hits from end to end."
 
 That sentence is the goal. When a sweep says it, no single joint can drive the arm into itself.
+
+```mermaid
+flowchart TD
+    H["Click Home"] --> S["Click Sweep"]
+    S --> R{"Anything listed?"}
+    R -->|"Yes"| W["Click Show to see why it hits"]
+    W --> L["Set the limits, or fix the design"]
+    L --> S
+    R -->|"No"| D["Nothing hits from end to end"]
+```
 
 ---
 

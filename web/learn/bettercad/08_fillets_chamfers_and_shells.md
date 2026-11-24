@@ -12,7 +12,7 @@ description: Round and bevel edges, then hollow a solid into a thin-walled enclo
 percent: 63
 duration: 6
 quiz_total: 39
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Learn BetterCad
 - content:
@@ -60,6 +60,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to round and bevel edges, choose between a fillet and a chamfer, and hollow a solid into an enclosure with Shell.
 
 Your enclosure is still a solid brick with holes in it. Two tools finish it: **Fillet** softens the corners, and **Shell** scoops out the inside. The order you use them in matters, and this lesson shows why.
 
@@ -153,17 +155,17 @@ You'll want your enclosure for the next lesson, so save the sample for afterward
 
 ## Common Issues
 
-**Problem**: I can't reach the edge at the back.
-**Solution**: Turn the view with a drag or the arrow keys while the Fillet tool is on, then click it.
-**Why**: You can only pick what's in view. The tool waits while you look around.
+- **Problem**: I can't reach the edge at the back.
+- **Solution**: Turn the view with a drag or the arrow keys while the Fillet tool is on, then click it.
+- **Why**: You can only pick what's in view. The tool waits while you look around.
 
-**Problem**: Shell failed, or the inside looks broken.
-**Solution**: Use a thinner wall, or make the fillets larger than the wall.
-**Why**: The inside is the outside shrunk by the wall thickness. If a feature is smaller than the wall, there's nothing left of it to shrink.
+- **Problem**: Shell failed, or the inside looks broken.
+- **Solution**: Use a thinner wall, or make the fillets larger than the wall.
+- **Why**: The inside is the outside shrunk by the wall thickness. If a feature is smaller than the wall, there's nothing left of it to shrink.
 
-**Problem**: I shelled first and my holes have no posts.
-**Solution**: Drag the Shell step to after the Hole step on the timeline, or undo and do them in the other order.
-**Why**: Shell only wraps a wall around what exists when it runs.
+- **Problem**: I shelled first and my holes have no posts.
+- **Solution**: Drag the Shell step to after the Hole step on the timeline, or undo and do them in the other order.
+- **Why**: Shell only wraps a wall around what exists when it runs.
 
 ## Check your understanding
 
