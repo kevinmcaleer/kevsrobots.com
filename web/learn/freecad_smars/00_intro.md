@@ -9,7 +9,9 @@ next: 01_navigation.html
 description: Learn to design a real robot chassis from scratch using free, open-source
   CAD software
 percent: 9
-duration: 6
+duration: 7
+quiz_total: 30
+date_updated: 2026-11-24
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
@@ -52,7 +54,7 @@ navigation:
 
 {% include youtubeplayer.html id="S7EoZHd03FY" %}
 
-## Welcome, Robot Builders!
+## Overview
 
 You're about to learn one of the most valuable skills in robotics: **designing your own robot parts from scratch**. By the end of this course, you'll have created a complete, 3D-printable robot chassis using FreeCAD - and you'll understand every design decision that went into it.
 
@@ -73,7 +75,7 @@ The SMARS base we'll design holds two DC motors, an Arduino, batteries, and has 
 
 ---
 
-## What You'll Learn
+## Key Results
 
 By completing this course, you'll be able to:
 
@@ -95,11 +97,11 @@ By completing this course, you'll be able to:
 | Mirroring | Mirror | Duplicating symmetric features |
 | Patterning | Polar Pattern | Repeating features around a center |
 | Revolving | Revolve | Creating round features like stubs and shafts |
-{: .table .table-single }
+{:class="table table-single"}
 
 ---
 
-## Course Structure
+## Course Content
 
 This course is organized into 4 sections with 10 hands-on lessons:
 
@@ -123,9 +125,11 @@ This course is organized into 4 sections with 10 hands-on lessons:
 
 **Estimated time**: 3-4 hours (take breaks - CAD is mentally intensive!)
 
+> **Teachers**: This course suits ages 11 and up working at a computer, individually or in pairs. Allow roughly 20 to 40 minutes per lesson, so plan about six to eight sessions. Each learner needs a computer that can run FreeCAD (installs are often blocked on school machines, so ask IT ahead of time) and ideally a mouse with a middle button. Learners save their work as `.FCStd` files, so agree a save location before lesson one. Printing is optional: the whole course works with no printer, and a printed base takes about 2 to 4 hours of printer time per learner, so plan for a queue or an outside print service. Keep learners away from a hot or running printer.
+
 ---
 
-## What You'll Need
+## What you'll need
 
 ### Software (Free!)
 
@@ -145,6 +149,8 @@ Don't have a printer? No problem! You can:
 - Just follow along to learn the CAD skills
 
 ### Knowledge Prerequisites
+
+New to FreeCAD? The [Introduction to FreeCAD for Beginners](/learn/freecad/) course covers the interface and the basic shapes in more depth, and is a good warm-up. If you want to build the finished robot, the [Build a SMARS Robot](/learn/smars/) course takes you through the assembly.
 
 **You should know:**
 - Basic computer skills (files, folders, menus)
@@ -175,7 +181,7 @@ You might wonder why we're using FreeCAD when there are other options like Fusio
 
 ---
 
-## How This Course Works
+## How the course works
 
 ### Step-by-Step with Screenshots
 
@@ -190,7 +196,7 @@ We don't just tell you "make this 70mm". We explain:
 
 ### Try It Yourself Challenges
 
-Some lessons include optional challenges to deepen your understanding. These are marked with a wrench icon.
+Some lessons include optional challenges to deepen your understanding. Each lesson has a **Try It Yourself** section, and a short quiz at the end to check what stuck.
 
 ### Common Issues Sections
 
@@ -217,6 +223,8 @@ These aren't arbitrary numbers - each was chosen to work with specific component
 ## Let's Get Started!
 
 In the next lesson, we'll master FreeCAD navigation. It might seem basic, but **smooth navigation is the foundation of efficient CAD work**. Professionals can orbit, pan, and zoom without thinking - and soon you will too.
+
+Menu and button names can differ slightly between FreeCAD versions, so if something is labelled a little differently on your screen, look for the closest match and compare it with the screenshot.
 
 Ready to design your first robot? Let's go!
 

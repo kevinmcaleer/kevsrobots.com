@@ -3,11 +3,15 @@ title: Summary and Next Steps
 description: Review what you've learned and explore where to go next
 layout: lesson
 cover: /learn/freecad_smars/assets/banners/10_summary.jpg
+type: page
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to name the FreeCAD operations used to build the SMARS base and choose where to take your CAD skills next.
 
 ## Congratulations, Robot Designer!
 
@@ -32,7 +36,7 @@ You designed a complete robot chassis featuring:
 | Arduino mounting | Mirror tool | Any symmetric feature |
 | Wheel stubs | Revolve | Shafts, knobs, cylindrical features |
 | Motor holders | Multiple sketches | Complex assemblies |
-{: .table .table-single }
+{:class="table table-single"}
 
 ### Skills Mastered
 
@@ -93,7 +97,7 @@ You now have a mental toolkit for approaching any design:
 | Create round parts | Revolve |
 | Duplicate symmetrically | Mirror |
 | Repeat around a center | Polar Pattern |
-{: .table .table-single .table-narrow }
+{:class="table table-single"}
 
 ---
 
@@ -120,7 +124,7 @@ Features we didn't cover but are worth exploring:
 | **Boolean** | Combine/subtract bodies | Complex assemblies |
 | **Assembly workbench** | Combine multiple parts | Full robot design |
 | **FEM workbench** | Stress analysis | Ensure parts won't break |
-{: .table .table-single .table-narrow }
+{:class="table table-single"}
 
 
 ### Other Robot Projects
@@ -162,7 +166,7 @@ Everything you learned applies to other CAD software:
 | Fillet | Fillet | Fillet | Fillet |
 | Revolve | Revolve | Revolve | Revolve |
 | Mirror | Mirror | Mirror | Mirror |
-{: .table .table-single }
+{:class="table table-single"}
 
 The concepts are universal - only the button names change!
 
@@ -213,6 +217,38 @@ Keep this handy for your next project:
 
 ---
 
+## Try It Yourself
+
+1. **Name the steps**: Without looking back, list the operations used to go from a sketch to a finished base, in order.
+2. **Pick the tool**: For each item in "Expand Your SMARS" (a sensor mount, say), decide which operations from the toolkit table you would need.
+3. **Challenge**: Sketch on paper a battery compartment for your SMARS, mark the key dimensions, then model it in FreeCAD and export it as an STL.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which FreeCAD operation is called Extrude in Fusion 360?
+- [x] Pad
+- [ ] Pocket
+- [ ] Fillet
+> Pocket is Extrude (cut) in Fusion 360.
+
+? Which operation makes the model hollow?
+- [ ] Fillet
+- [x] Thickness (Shell)
+- [ ] Mirror
+> We used it to create the interior of the base.
+
+? Which operation duplicates a feature across a plane?
+- [ ] Polar Pattern
+- [x] Mirror
+- [ ] Revolve
+> Polar Pattern repeats around an axis.
+{% endquiz %}
+
+---
+
 ## Thank You!
 
 Thank you for completing this course. You've invested your time in learning a valuable skill that will serve you for years to come.
@@ -229,5 +265,7 @@ Built your SMARS? Share it!
 - Contribute your modifications back to the project
 
 Happy making!
+
+Want to turn your printed parts into a working robot? Continue with [Build a SMARS Robot](/learn/smars/), or revisit [Introduction to FreeCAD for Beginners](/learn/freecad/) to deepen your CAD skills.
 
 ---

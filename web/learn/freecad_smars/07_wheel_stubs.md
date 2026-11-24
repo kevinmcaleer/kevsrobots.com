@@ -10,7 +10,9 @@ next: 08_motor_holder.html
 description: Create rotational features with Revolve and duplicate them with Polar
   Pattern
 percent: 72
-duration: 7
+duration: 8
+quiz_total: 30
+date_updated: 2026-11-24
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
@@ -51,6 +53,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to revolve a profile into a wheel stub, cut a key slot, and repeat the stub with a Polar Pattern.
+
 ## What We're Building
 
 The wheel stubs are circular posts that connect to SMARS wheels. Each stub has:
@@ -64,7 +68,7 @@ The wheel stubs are circular posts that connect to SMARS wheels. Each stub has:
 | 135° chamfer | Easy wheel insertion |
 | Keyed slot | Prevents wheel from spinning on shaft |
 | Polar pattern | Creates both stubs from one design |
-{: .table .table-single }
+{:class="table table-single"}
 
 
 ---
@@ -366,20 +370,48 @@ Click `OK`.
 ## Common Issues
 
 ### "Revolve creates wrong shape"
-**Problem**: The revolved shape doesn't look like a stub.
-**Solution**: Check your revolve axis. It should be the vertical edge, not a horizontal one. Also verify your profile is on the correct side of the axis.
+- **Problem**: The revolved shape doesn't look like a stub.
+- **Solution**: Check your revolve axis. It should be the vertical edge, not a horizontal one. Also verify your profile is on the correct side of the axis.
+- **Why**: Revolve spins the profile around the chosen axis.
 
 ### "Polar Pattern only copies some features"
-**Problem**: The stub appears but the key slot doesn't.
-**Solution**: Apply separate Polar Patterns to each feature (Revolve, Pad, Pocket) if needed.
+- **Problem**: The stub appears but the key slot doesn't.
+- **Solution**: Apply separate Polar Patterns to each feature (Revolve, Pad, Pocket) if needed.
+- **Why**: A pattern only repeats the features you select.
 
 ### "Tangent constraint fails"
-**Problem**: Can't make rectangle tangent to circle.
-**Solution**: The rectangle edges must be able to touch the circle. If it's too big or small, adjust dimensions first.
+- **Problem**: Can't make rectangle tangent to circle.
+- **Solution**: The rectangle edges must be able to touch the circle. If it's too big or small, adjust dimensions first.
+- **Why**: The rectangle edges can only touch the circle if their size allows it.
 
 ### "Key slot is in wrong position"
-**Problem**: The keyed slot isn't centered or is rotated wrong.
-**Solution**: Verify the construction line from midpoint to circle center is vertical.
+- **Problem**: The keyed slot isn't centered or is rotated wrong.
+- **Solution**: Verify the construction line from midpoint to circle center is vertical.
+- **Why**: A tilted construction line tilts the key.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What is the difference between Pad and Revolve?
+- [ ] Pad cuts and Revolve adds
+- [x] Pad pushes a shape straight out, Revolve spins it around an axis
+- [ ] They are the same
+> Revolve suits round parts such as the stub.
+
+? What angle is the chamfer on the stub?
+- [ ] 45 degrees
+- [ ] 90 degrees
+- [x] 135 degrees
+> It makes wheel insertion easy.
+
+? What does the key slot do?
+- [ ] Lets the stub spin freely
+- [x] Stops the wheel spinning on the stub
+- [ ] Holds the motor in place
+> The wheel locks onto the slot.
+{% endquiz %}
 
 ---
 

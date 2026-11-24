@@ -3,11 +3,15 @@ title: Arduino Slots
 description: Create mounting slots with the Mirror tool for perfect symmetry
 layout: lesson
 cover: /learn/freecad_smars/assets/banners/06_arduino_slots.jpg
+type: page
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create an Arduino slot, build a datum plane, and use Mirror to copy the slot to the opposite wall.
 
 ## What We're Building
 
@@ -22,7 +26,7 @@ The Arduino Nano sits inside the SMARS base on two slots - one on each side wall
 | Slot width | 2mm | Matches Arduino PCB thickness (1.6mm) + clearance |
 | Slot depth | 0.5mm | Shallow grip - won't weaken the wall |
 | Position | 5.5mm from top | Centers Arduino at ideal viewing height |
-{: .table .table-single }
+{:class="table table-single"}
 
 ---
 
@@ -265,20 +269,48 @@ These skills transfer to any parametric CAD software!
 ## Common Issues
 
 ### "The mirror creates the slot in the wrong location"
-**Problem**: The mirrored feature isn't on the opposite wall.
-**Solution**: Check that your datum plane is truly centered. Edit the reference sketch and verify the midpoint is constrained to the center.
+- **Problem**: The mirrored feature isn't on the opposite wall.
+- **Solution**: Check that your datum plane is truly centered. Edit the reference sketch and verify the midpoint is constrained to the center.
+- **Why**: The datum plane defines the mirror, so if it is off-centre the copy lands off-centre.
 
 ### "Clipping view won't close"
-**Problem**: The clipping plane dialog is off-screen.
-**Solution**: On Mac, double-click the title bar. On Windows/Linux, drag the dialog or restart FreeCAD.
+- **Problem**: The clipping plane dialog is off-screen.
+- **Solution**: On Mac, double-click the title bar. On Windows/Linux, drag the dialog or restart FreeCAD.
+- **Why**: The pane may open off-screen on a small display.
 
 ### "The slot sketch won't close properly"
-**Problem**: FreeCAD says the sketch isn't valid for pocket.
-**Solution**: Check that all regions are fully enclosed. Use construction lines for reference but solid lines for the actual cut area.
+- **Problem**: FreeCAD says the sketch isn't valid for pocket.
+- **Solution**: Check that all regions are fully enclosed. Use construction lines for reference but solid lines for the actual cut area.
+- **Why**: An open outline has no inside to cut.
 
 ### "Datum plane won't create"
-**Problem**: The Datum Plane button is grayed out.
-**Solution**: Make sure you have a sketch or point selected that can serve as a reference.
+- **Problem**: The Datum Plane button is grayed out.
+- **Solution**: Make sure you have a sketch or point selected that can serve as a reference.
+- **Why**: A datum plane needs something to attach to.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does the Mirror tool need in this lesson?
+- [ ] A construction line
+- [x] A datum plane in the centre of the base
+- [ ] A second sketch for the other wall
+> We built a datum plane from the midpoint sketch and mirrored the slot pocket across it.
+
+? Why must the slot sketch be a closed shape?
+- [ ] FreeCAD cannot draw open lines
+- [x] FreeCAD requires sketch shapes to be fully enclosed
+- [ ] The clipping plane needs it
+> The slot meets the rhombus cutout, so we joined points along its diagonal edges to close the shape.
+
+? What does the clipping plane do to your model?
+- [ ] Cuts away part of it permanently
+- [x] Temporarily hides part of it so you can see inside
+- [ ] Mirrors it
+> It is only a view setting.
+{% endquiz %}
 
 ---
 

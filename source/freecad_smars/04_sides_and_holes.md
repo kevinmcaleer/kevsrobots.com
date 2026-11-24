@@ -3,11 +3,15 @@ title: Side Holes
 description: Create the iconic SMARS side profile and motor shaft holes using sketches and pockets
 layout: lesson
 cover: /learn/freecad_smars/assets/banners/04_sides_and_holes.jpg
+type: page
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to sketch and centre the SMARS rhombus, add 4.5mm motor holes, and pocket both through the base.
 
 ## What We're Building
 
@@ -22,7 +26,7 @@ This lesson creates two critical features:
 | Rhombus bottom | 16mm | Tapers toward motor area |
 | Rhombus height | 20mm | Maximizes opening while maintaining strength |
 | Motor holes | 4.5mm diameter | Fits N20 motor shaft (4mm) with 0.5mm clearance |
-{: .table .table-single }
+{:class="table table-single"}
 
 ---
 
@@ -217,24 +221,53 @@ This is the **parametric power** of FreeCAD - everything stays connected!
 ## Common Issues
 
 ### "My rhombus isn't symmetric"
-**Problem**: One side is longer than the other.
-**Solution**: Ensure the centerline has a Vertical constraint. If not, select it and apply one.
+- **Problem**: One side is longer than the other.
+- **Solution**: Ensure the centerline has a Vertical constraint. If not, select it and apply one.
+- **Why**: Without a vertical centreline the two midpoints are free to slide sideways.
 
 ### "The pocket didn't cut all the way through"
-**Problem**: The rhombus or holes only appear on one side.
-**Solution**: The pocket length should be 58mm (the full width of the base). Check your dimension.
+- **Problem**: The rhombus or holes only appear on one side.
+- **Solution**: The pocket length should be 58mm (the full width of the base). Check your dimension.
+- **Why**: A shorter pocket stops before the far wall.
 
 ### "Circles show as orange/white, not green"
-**Problem**: The circles aren't fully constrained.
-**Solution**: Make sure both the diameter AND position (distance from edges) are dimensioned.
+- **Problem**: The circles aren't fully constrained.
+- **Solution**: Make sure both the diameter AND position (distance from edges) are dimensioned.
+- **Why**: Fully constrained needs both size and position.
 
 ### "I can't select the side face"
-**Problem**: Clicking selects something else.
-**Solution**: Rotate the view so the side face is directly visible. Click in the center of the face, not near edges.
+- **Problem**: Clicking selects something else.
+- **Solution**: Rotate the view so the side face is directly visible. Click in the center of the face, not near edges.
+- **Why**: Edges and faces compete for your click near the boundary.
 
 ### "External geometry isn't visible"
-**Problem**: Projected lines don't appear.
-**Solution**: Make sure you clicked directly on the edge you want to project. The projected geometry appears as dashed purple lines.
+- **Problem**: Projected lines don't appear.
+- **Solution**: Make sure you clicked directly on the edge you want to project. The projected geometry appears as dashed purple lines.
+- **Why**: Only the edges you click are projected.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why are the motor holes 4.5mm across?
+- [ ] N20 shafts are 4.5mm thick
+- [x] The lesson gives the shaft as 4mm, and the extra 0.5mm is clearance for print inaccuracies
+- [ ] It is the standard drill size
+> Too tight and the motor works harder and wastes battery.
+
+? What forces the rhombus to be symmetric?
+- [ ] A horizontal constraint on the top line
+- [x] A vertical constraint on the construction centreline joining the two midpoints
+- [ ] Pocketing from both sides
+> The vertical centreline pins both midpoints on the same vertical.
+
+? What pocket length cuts through both side walls?
+- [ ] 32mm
+- [ ] 70mm
+- [x] 58mm
+> 58mm is the full width of the base.
+{% endquiz %}
 
 ---
 

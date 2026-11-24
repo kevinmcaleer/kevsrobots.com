@@ -303,11 +303,11 @@
     modeling techniques, and design-for-manufacturing principles while building the
     iconic SMARS robot base. Perfect for makers who want to design their own robot
     parts.
-  duration: 1h 6m
+  duration: 1h 20m
   groups:
-  - freecad
-  - 3d modeling
-  - robotics
+  - 3ddesign
+  - 3dprinting
+  - robots
   lessons: 11
   level: beginner
   link: /learn/freecad_smars/00_intro.html
