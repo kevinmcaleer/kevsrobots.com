@@ -4713,9 +4713,9 @@
     "author": "Kevin McAleer",
     "date_published": "2023-02-19",
     "groups": [
-      "smars",
-      "robotics",
-      "arduino"
+      "robots",
+      "arduino",
+      "3dprinting"
     ],
     "lessons": [
       {
