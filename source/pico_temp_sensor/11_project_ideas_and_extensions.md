@@ -4,175 +4,172 @@ description: Explore exciting project ideas and advanced extensions to take your
 layout: lesson
 type: page
 cover: /learn/pico_temp_sensor/assets/banners/11_project_ideas_and_extensions.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Introduction
+By the end of this lesson you will be able to log readings to a file, drive the on-board LED from a threshold, and show the temperature on an I2C OLED display.
 
-Now that you've built a functional temperature monitoring and alert system, it's time to expand your skills by exploring additional projects and extensions. In this lesson, we’ll discuss creative ways to enhance your project and integrate it with other systems.
+You have built a working monitor, so let's make it do more. This lesson gives you three complete projects to try, then a list of bigger ideas to dream about. Pick the one that sounds most fun. You do not have to do them all.
 
----
-
-## Project Ideas
-
-### 1. **Temperature Data Logger**
-
-   - Store temperature readings over time for analysis.
-   - The Pico has about 1.4 MB of its own flash storage, so you can save a `.csv` file straight onto it without any extra hardware. For long-term logging, a microSD card module gives you far more space.
-   - Example script, which adds one line to the file every minute:
-
-     ```python
-     import machine
-     import time
-
-     sensor_adc = machine.ADC(4)
-
-     while True:
-         voltage = sensor_adc.read_u16() * 3.3 / 65535
-         temperature = 27 - (voltage - 0.706) / 0.001721
-         t = time.localtime()  # a tuple in MicroPython
-
-         with open("temperature_log.csv", "a") as log:
-             log.write(f"{t[3]:02}:{t[4]:02}:{t[5]:02},{temperature:.2f}\n")
-
-         time.sleep(60)
-     ```
-
-   - Flash memory wears out after many thousands of writes, so log every minute or so rather than every second.
+```mermaid
+flowchart TD
+    A["Pico temperature sensor"] --> B["Data logger: file on the Pico"]
+    A --> C["Indicator: on-board LED"]
+    A --> D["Display: OLED screen"]
+    A --> E["Bigger ideas: Wi-Fi, fan, battery"]
+```
 
 ---
 
-### 2. **Visual Temperature Indicator**
+## Project 1: Temperature data logger
 
-   - Use an LED or RGB LED to visually indicate temperature status:
-     - Green: Normal range
-     - Red: Too high
-     - Blue: Too low
-   - Example using the Pico's onboard LED, which lights up when it's too hot:
-   
-     ```python
-     import machine
-     import time
+Store temperature readings over time for analysis. The Pico has about 1.4 MB of its own flash storage, so you can save a `.csv` file straight onto it without any extra hardware. For long-term logging, a microSD card module gives you far more space.
 
-     MAX_TEMP = 30
+This program adds one line to the file every minute:
 
-     sensor_adc = machine.ADC(4)
-     led = machine.Pin("LED", machine.Pin.OUT)  # the onboard LED
+```python
+import machine
+import time
 
-     while True:
-         voltage = sensor_adc.read_u16() * 3.3 / 65535
-         temperature = 27 - (voltage - 0.706) / 0.001721
-         led.value(temperature > MAX_TEMP)
-         time.sleep(1)
-     ```
+sensor_adc = machine.ADC(4)
 
-   - `Pin("LED")` works on the Pico, Pico W and Pico 2. On the Pico W the LED is wired to the Wi-Fi chip, so the older `Pin(25)` does not work there.
+while True:
+    voltage = sensor_adc.read_u16() * 3.3 / 65535
+    temperature = 27 - (voltage - 0.706) / 0.001721
+    t = time.localtime()  # a tuple in MicroPython
 
----
+    with open("temperature_log.csv", "a") as log:
+        log.write(f"{t[3]:02}:{t[4]:02}:{t[5]:02},{temperature:.2f}\n")
 
-### 3. **Web-Based Temperature Dashboard**
+    time.sleep(60)
+```
 
-   - Send temperature data to a web server or IoT platform (e.g., ThingSpeak, Adafruit IO).
-   - Use a Wi-Fi-enabled microcontroller like the Raspberry Pi Pico W to publish data online.
-   - Display real-time temperature on a web dashboard.
+Flash memory wears out after many thousands of writes, so log every minute or so rather than every second. Remember that the time is only real if Thonny set the clock, as we saw in lesson 7. To read the file afterwards, open `temperature_log.csv` from the Pico in Thonny's **File > Open**.
 
----
+## Project 2: Visual temperature indicator
 
-### 4. **Smart Temperature-Controlled System**
+Use the on-board LED to show when it is too hot. This one lights up above `MAX_TEMP`:
 
-   - Create a system that activates a fan or heater when the temperature exceeds thresholds.
-   - Example:
-     - Turn on a fan when the temperature is too high.
-     - Turn on a heater when the temperature is too low.
+```python
+import machine
+import time
 
----
+MAX_TEMP = 30
 
-### 5. **Environment Monitoring System**
+sensor_adc = machine.ADC(4)
+led = machine.Pin("LED", machine.Pin.OUT)  # the onboard LED
 
-   - Combine the temperature sensor with other sensors (e.g., humidity, light) for a full environmental monitoring system.
+while True:
+    voltage = sensor_adc.read_u16() * 3.3 / 65535
+    temperature = 27 - (voltage - 0.706) / 0.001721
+    led.value(temperature > MAX_TEMP)
+    time.sleep(1)
+```
 
----
+`Pin("LED")` works on the Pico, Pico W and Pico 2. On the Pico W the LED is wired to the Wi-Fi chip, so the older `Pin(25)` does not work there. Want a green, red and blue indicator? Add three external LEDs, each with a resistor of about 330 ohms, on spare GPIO pins, and set them in the same `if` / `elif` / `else` chain from lesson 8.
 
-## Advanced Extensions
+## Project 3: Display on an OLED screen
 
-### 1. **Notification System**
+Connect a small SSD1306 OLED and show the temperature without a computer. Wire it like this:
 
-   - Send alerts via email or SMS when temperature thresholds are exceeded.
-   - Use a service like IFTTT or Twilio for integration.
+| OLED pin | Pico pin |
+| --- | --- |
+| GND | GND (physical pin 3) |
+| VCC | 3V3(OUT) (physical pin 36) |
+| SDA | GP0 (physical pin 1) |
+| SCL | GP1 (physical pin 2) |
+{:class="table table-single"}
 
----
+Check your display's printed pin labels, because some boards order them differently. Most SSD1306 modules run happily on 3.3 V.
 
-### 2. **Graphical Display**
+The `ssd1306` driver is **not** built into MicroPython, so you have to copy it onto the Pico first. Pick one method:
 
-   - Connect an OLED or LCD screen to display real-time temperature readings and status.
-   - The `ssd1306` driver is not built into MicroPython. Install it first from Thonny's **Tools > Manage packages** (search for `ssd1306`), or from the Shell with `import mip` then `mip.install("ssd1306")` on a Pico W.
-   - Example with an I2C OLED wired to GP0 (SDA) and GP1 (SCL):
+- **From Thonny** (any Pico): open **Tools > Manage packages**, search for `ssd1306` and install it. Thonny copies it to the board for you.
+- **From the Shell on a Pico W with Wi-Fi connected**: run `import mip` then `mip.install("ssd1306")`.
+- **By hand**: download `ssd1306.py` from the `micropython-lib` repository on GitHub (it is under `micropython/drivers/display/ssd1306`), open it in Thonny, and use **File > Save as > Raspberry Pi Pico** to save it on the board with the same name.
 
-     ```python
-     import machine
-     from ssd1306 import SSD1306_I2C
+Then save and run this program:
 
-     import time
+```python
+import machine
+from ssd1306 import SSD1306_I2C
 
-     sensor_adc = machine.ADC(4)
-     i2c = machine.I2C(0, sda=machine.Pin(0), scl=machine.Pin(1))
-     oled = SSD1306_I2C(128, 64, i2c)
+import time
 
-     while True:
-         voltage = sensor_adc.read_u16() * 3.3 / 65535
-         temperature = 27 - (voltage - 0.706) / 0.001721
+sensor_adc = machine.ADC(4)
+i2c = machine.I2C(0, sda=machine.Pin(0), scl=machine.Pin(1))
+oled = SSD1306_I2C(128, 64, i2c)
 
-         oled.fill(0)  # clear the screen
-         oled.text(f"Temp: {temperature:.1f}C", 0, 0)
-         oled.show()
-         time.sleep(1)
-     ```
+while True:
+    voltage = sensor_adc.read_u16() * 3.3 / 65535
+    temperature = 27 - (voltage - 0.706) / 0.001721
 
-   - The built-in font has no degree symbol, which is why the example writes just `C`.
+    oled.fill(0)  # clear the screen
+    oled.text(f"Temp: {temperature:.1f}C", 0, 0)
+    oled.show()
+    time.sleep(1)
+```
 
----
+The built-in font has no degree symbol, which is why the example writes just `C`. If your screen is 128 x 32 pixels, change `64` to `32`.
 
-### 3. **Battery-Powered Temperature Monitor**
+## Bigger ideas
 
-   - Add a battery pack to make your temperature monitor portable.
-   - Use low-power modes such as `machine.lightsleep()` between readings to save energy.
+- **Web dashboard**: a Pico W can publish readings to a service such as ThingSpeak or Adafruit IO and draw a live chart.
+- **Smart fan**: switch a fan on through a transistor or relay board when it gets hot. Never connect a motor straight to a GPIO pin.
+- **Battery monitor**: run from a battery pack, and use `machine.lightsleep()` between readings to save energy.
+- **Graphs on your computer**: copy the CSV from the logger and plot it with Matplotlib or a spreadsheet.
+- **Environment station**: add a humidity or light sensor and show everything on the OLED.
 
----
-
-### 4. **Data Visualization**
-
-   - Use Python libraries like Matplotlib or Pandas on your PC to visualize logged temperature data.
-   - Create time-series graphs for temperature trends.
-
----
-
-### 5. **Integration with Home Automation**
-
-   - Integrate the system with platforms like Home Assistant to automate actions based on temperature.
+> **Teachers**: the logger and the LED indicator need no extra parts, so every learner can complete them. The OLED and Wi-Fi extensions need extra kit, and Wi-Fi projects usually need the school network to allow the Pico W to connect, which many do not for unknown devices. A mobile hotspot or a spare router can be a workaround. Check with your IT team before planning a cloud dashboard.
 
 ---
 
-## Challenges to Explore
+## Try it Yourself
 
-1. Optimize the system to handle rapid temperature changes.
-2. Experiment with calibrating the temperature sensor for more accurate readings.
-3. Create a modular design to easily switch between various sensors and output devices.
+1. Run the logger for ten minutes, then open the file and count the lines.
+2. Change the indicator project so the LED lights when the temperature is *below* a limit instead.
+3. Challenge: combine the OLED and the alert, showing `TOO HOT` as well as the number when it is above your maximum.
 
----
+## Common Issues
 
-## What You’ve Learned
+- **Problem**: `ImportError: no module named 'ssd1306'`.
+- **Solution**: Copy `ssd1306.py` to the Pico using one of the three methods above.
+- **Why**: The driver is a separate file, not part of the MicroPython firmware.
 
-- Creative ways to extend your temperature monitoring system.
-- How to integrate additional components and systems.
-- How to apply your knowledge to real-world problems.
+- **Problem**: `OSError: [Errno 5] EIO` on the OLED line.
+- **Solution**: Check the four wires against the table, and that SDA is on GP0 and SCL on GP1.
+- **Why**: The Pico cannot find the display on the I2C bus when the wires are swapped or loose.
 
----
+- **Problem**: The OLED stays blank but there is no error.
+- **Solution**: Confirm `oled.show()` is called, and that the width and height match your display.
+- **Why**: Drawing only updates a memory buffer. `show()` sends it to the screen.
 
-## Ready to Build More?
+- **Problem**: The log file is empty.
+- **Solution**: Wait for the first minute, then look again in the Pico's file list.
+- **Why**: The program writes only once every 60 seconds.
 
-This lesson has provided you with ideas and tools to expand your project and take it to the next level. The possibilities are endless—let your creativity lead the way!
+## Check your understanding
 
----
+{% quiz %}
+? Why log every minute rather than every second?
+- [ ] The ADC cannot read faster
+- [x] Flash memory wears out after many thousands of writes
+- [ ] The CSV format needs a minute
+> Frequent writes shorten the life of the Pico's flash storage.
+
+? The OLED example uses `ssd1306`. What must you do first?
+- [ ] Nothing, it is built in
+- [x] Copy the driver onto the Pico
+- [ ] Change the ADC channel
+> The `ssd1306` driver is not part of the firmware and must be installed.
+
+? In the OLED wiring, which Pico pin does SDA connect to?
+- [ ] GP1
+- [x] GP0
+- [ ] 3V3(OUT)
+> SDA goes to GP0 and SCL to GP1 in this lesson's code.
+{% endquiz %}

@@ -3732,9 +3732,9 @@
     ],
     "lessons": [
       {
-        "file": "01_course_introduction.md",
+        "file": "00_intro.md",
         "section": "Introduction to the Raspberry Pi Pico and MicroPython",
-        "url": "/learn/pico_temp_sensor/01_course_introduction.html"
+        "url": "/learn/pico_temp_sensor/00_intro.html"
       },
       {
         "file": "02_setting_up_thonny.md",
@@ -3790,6 +3790,11 @@
         "file": "12_troubleshooting_temperature_readings.md",
         "section": "Project Challenges and Next Steps",
         "url": "/learn/pico_temp_sensor/12_troubleshooting_temperature_readings.html"
+      },
+      {
+        "file": "13_summary_and_next_steps.md",
+        "section": "Project Challenges and Next Steps",
+        "url": "/learn/pico_temp_sensor/13_summary_and_next_steps.html"
       }
     ]
   },
