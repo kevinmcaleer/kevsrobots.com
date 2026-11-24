@@ -6,18 +6,29 @@
   layout: course
   cover: assets/basics_101.jpg
   groups:
-      - robotics
-      - raspberry pi
-      - ros
+      - robots
+      - arduino
+      - micropython
   description: >- 
      A friendly first look at robots: what a robot is, a quick history from ancient
      automata to today, the skills you need to build one, and the parts that make a
      robot work.
+  outcomes:
+    - Explain what makes a machine a robot, using the program, machine, sensors and controls model
+    - Name some landmark automata and robots from history and say why they matter
+    - Describe the three skill areas behind every robot - design, programming and electronics
+    - Name the main parts of a robot and what each one does
+    - Describe the sense, think, act loop a robot runs
+  prerequisites:
+    - None. This is a good first course.
+  you_need:
+    - A web browser
+    - Curiosity - no code or hardware is needed
   content:
   - section:
       name: Overview
       content:
-      - 00_overview.md
+      - 00_intro.md
   - section:
       name: Robotics 101
       content:

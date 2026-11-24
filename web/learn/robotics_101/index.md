@@ -8,18 +8,30 @@ description: 'A friendly first look at robots: what a robot is, a quick history 
   ancient automata to today, the skills you need to build one, and the parts that
   make a robot work.'
 level: beginner
-course_duration: 0h 15m
+course_duration: 0h 27m
 lesson_count: 6
-first_lesson: 00_overview.html
-quiz_total: 12
+first_lesson: 00_intro.html
+quiz_total: 17
 video: bHOi_JGL0QE
+outcomes:
+- Explain what makes a machine a robot, using the program, machine, sensors and controls
+  model
+- Name some landmark automata and robots from history and say why they matter
+- Describe the three skill areas behind every robot - design, programming and electronics
+- Name the main parts of a robot and what each one does
+- Describe the sense, think, act loop a robot runs
+prerequisites:
+- None. This is a good first course.
+you_need:
+- A web browser
+- Curiosity - no code or hardware is needed
 navigation:
 - name: Robotics 101
 - content:
   - section: Overview
     content:
     - name: Introduction
-      link: 00_overview.html
+      link: 00_intro.html
   - section: Robotics 101
     content:
     - name: What is a Robot - a Definition
