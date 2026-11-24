@@ -4,12 +4,14 @@ description: Browse and search Snakie's library of boards, sensors, motors and b
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/02_the_parts_library.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to search the parts library, read a part's pinout and voltage, and add several parts at once from the full-screen catalog.
 
 A wiring tool is only as good as its parts. Snakie comes with a **Standard Parts** library of 80 real components, and each one knows its own pins.
 
