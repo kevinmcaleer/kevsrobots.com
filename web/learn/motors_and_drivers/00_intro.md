@@ -9,8 +9,9 @@ next: 01_how_motors_work.html
 description: Meet the course, the Scout drive base project, and what you need to get
   started with motors on the Raspberry Pi Pico.
 percent: 5
-duration: 4
-date_updated: 2026-11-21
+duration: 5
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -126,6 +127,10 @@ We use the same pin numbers as the [MicroPython Robotics](/learn/micropython_rob
 | GP14, GP15 | Wheel encoders (lesson 14) |
 | GP16 to GP19 | Stepper IN1 to IN4 (lesson 13) |
 {:class="table table-single"}
+
+If you use a DRV8833 instead of an L298N it has no enable pins, so GP2 and GP5 stay unused and the speed PWM goes on the IN pins. Lesson 5 shows both wirings.
+
+> **Teachers**: this course suits learners aged about 11 and up who have done a first Pico course, and it works well in groups of two or three with one robot each. Allow 30 to 45 minutes per lesson, and two sessions for the Scout project in lesson 15. Per group you need a Pico, a motor driver, two TT motors on a chassis, a servo and a 4xAA battery pack (alkaline or NiMH is the safest choice for a classroom). The stepper in lesson 13 and the encoders in lesson 14 are optional. Lessons 1 to 4 and the code-only parts of 6, 8, 9 and 10 can be read and discussed with no hardware at all, and the pure-Python maths functions run in Thonny on a Pico with nothing attached. Keep batteries out of boards between sessions, and run robots on the floor, not on desks.
 
 Take it slowly, and do not worry if a wheel spins the wrong way the first time. Every robot builder has swapped a pair of wires and laughed about it.
 

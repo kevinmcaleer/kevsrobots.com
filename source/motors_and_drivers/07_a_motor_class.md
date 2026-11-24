@@ -4,12 +4,14 @@ description: Wrap the L298N and DRV8833 wiring in a clean, reusable Motor class 
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/07_a_motor_class.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wrap an L298N or DRV8833 channel in a reusable motor class with speed, brake and coast methods.
 
 Our test scripts work, but they are cluttered with pins and truth tables. Scout will have two motors, so let's wrap the details in a **class**. After this lesson, the rest of the course just says `left.speed(60)`.
 
@@ -117,6 +119,16 @@ class DRV8833Motor:
         self.in2.duty_u16(0)
 ```
 
+Here is what happens when you call `left.speed(60)`:
+
+```mermaid
+flowchart TD
+    C["left.speed(60)"] --> I{"invert?"}
+    I --> F["speed_to_duty gives direction and duty"]
+    F --> L["Motor: set IN1 and IN2, PWM duty on EN"]
+    F --> R["DRV8833Motor: PWM duty on the active input"]
+```
+
 ### How it works
 
 - `speed_to_duty` is the maths from lesson 6, extended for negative speeds. It returns a direction and a duty so the class only has to set pins.
@@ -173,10 +185,32 @@ finally:
 
 ## Common Issues
 
-**Problem**: `ImportError: no module named 'motor'`.
-**Solution**: Save the file on the Pico itself (File, Save as, Raspberry Pi Pico), not just on your computer.
-**Why**: MicroPython can only import files that are in the Pico's own filesystem.
+- **Problem**: `ImportError: no module named 'motor'`.
+- **Solution**: Save the file on the Pico itself (File, Save as, Raspberry Pi Pico), not just on your computer.
+- **Why**: MicroPython can only import files that are in the Pico's own filesystem.
 
-**Problem**: The wheel only moves in one direction.
-**Solution**: Check IN1 and IN2 are both wired and in the right order, and test them with the plain script from lesson 5.
-**Why**: One direction pin that is not connected leaves the bridge stuck pushing one way.
+- **Problem**: The wheel only moves in one direction.
+- **Solution**: Check IN1 and IN2 are both wired and in the right order, and test them with the plain script from lesson 5.
+- **Why**: One direction pin that is not connected leaves the bridge stuck pushing one way.
+
+## Check your understanding
+
+{% quiz %}
+? What range of values does speed() take?
+- [x] -100 (full reverse) to 100 (full forward)
+- [ ] 0 to 65535
+- [ ] 0 to 360
+> Negative is reverse and positive is forward, so one number holds both speed and direction.
+
+? A wheel spins the wrong way. What is the tidy fix?
+- [x] Pass invert=True to that motor
+- [ ] Rewrite speed_to_duty
+- [ ] Swap the Pico's GP numbers
+> invert lets you fix a backwards motor in code rather than with a screwdriver.
+
+? What is the key difference between the Motor and DRV8833Motor classes?
+- [x] Motor puts PWM on the enable pin, DRV8833Motor puts PWM on the active input
+- [ ] Motor is for servos
+- [ ] DRV8833Motor has no brake
+> Both have the same methods, so the rest of your code does not care which driver you built.
+{% endquiz %}

@@ -10,8 +10,9 @@ next: 16_summary.html
 description: Bring every lesson together into one program that makes Scout drive a
   square, spin on the spot and look left and right.
 percent: 80
-duration: 8
-date_updated: 2026-11-21
+duration: 9
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -68,6 +69,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to combine Motor, DriveBase, ramp_to and Servo into one program, and calibrate Scout so it drives a square that closes.
+
 This is the moment the whole course has been heading towards. Scout, our two-wheeled drive base with a servo head, is going to do three things in a row:
 
 1. Look left and right with its head
@@ -116,6 +119,20 @@ def ms_for_angle(deg):
 ```
 
 Those two constants are placeholders. Yours will differ, and the calibration step below measures them properly.
+
+Here is the whole program as a flow, so you can see the shape before you read the code:
+
+```mermaid
+flowchart TD
+    A["Head to centre, wait 3 seconds"] --> B["look_around"]
+    B --> C["Square: 4 times"]
+    C --> D["drive_mm, then head right"]
+    D --> E["turn_deg 90, then head centre"]
+    E -->|"next side"| C
+    E -->|"after side 4"| F["turn_deg 360"]
+    F --> G["look_around again"]
+    G --> H["finally: coast the wheels and relax the servo"]
+```
 
 ## The complete main.py
 
@@ -280,24 +297,54 @@ Check the single 90 degree turn after the 360, since a short turn has proportion
 
 ## Common Issues
 
-**Problem**: Scout does not move at all, but the code runs.
-**Solution**: Check the battery pack is switched on and connected to the driver, the ENA jumpers are removed, and your `DEADZONE` is not too low.
-**Why**: Speeds below the dead zone produce no motion, and without motor power, the driver does nothing.
+- **Problem**: Scout does not move at all, but the code runs.
+- **Solution**: Check the battery pack is switched on and connected to the driver, the ENA jumpers are removed, and your `DEADZONE` is not too low.
+- **Why**: Speeds below the dead zone produce no motion, and without motor power, the driver does nothing.
 
-**Problem**: The square drifts further out on each lap.
-**Solution**: Recalibrate `MM_PER_S` and `DEG_PER_S`, then check the wheels are not slipping on the floor.
-**Why**: Dead reckoning accumulates small errors with each move, so tiny mistakes add up.
+- **Problem**: The square drifts further out on each lap.
+- **Solution**: Recalibrate `MM_PER_S` and `DEG_PER_S`, then check the wheels are not slipping on the floor.
+- **Why**: Dead reckoning accumulates small errors with each move, so tiny mistakes add up.
 
-**Problem**: The Pico resets when Scout starts moving.
-**Solution**: Use a separate battery for the motors, lengthen `RAMP_MS`, and add a 100 uF capacitor on the motor supply.
-**Why**: A sudden surge makes the shared supply dip, which browns out the Pico.
+- **Problem**: The Pico resets when Scout starts moving.
+- **Solution**: Use a separate battery for the motors, lengthen `RAMP_MS`, and add a 100 uF capacitor on the motor supply.
+- **Why**: A sudden surge makes the shared supply dip, which browns out the Pico.
 
-**Problem**: The head turns the wrong way for "left".
-**Solution**: Swap the values of `LEFT_ANGLE` and `RIGHT_ANGLE`.
-**Why**: The servo's direction depends on how the horn was mounted.
+- **Problem**: The head turns the wrong way for "left".
+- **Solution**: Swap the values of `LEFT_ANGLE` and `RIGHT_ANGLE`.
+- **Why**: The servo's direction depends on how the horn was mounted.
 
-**Problem**: The head buzzes against its end stops.
-**Solution**: Reduce the limits in `Servo(10, min_us=..., max_us=...)`.
-**Why**: Asking for a pulse beyond the servo's real travel makes it strain.
+- **Problem**: The head buzzes against its end stops.
+- **Solution**: Reduce the limits in `Servo(10, min_us=..., max_us=...)`.
+- **Why**: Asking for a pulse beyond the servo's real travel makes it strain.
 
 Congratulations. You have built a real robot platform from the ground up, and you know exactly why every wire is where it is.
+
+> **Teachers**: allow two sessions, one to run and one to calibrate. Groups of two or three work well, with one robot each and a marked square of floor. Keep robots off desks, use the 3 second delay to set the robot down, and run a first test with the wheels in the air. Fresh batteries matter for calibration, so label cells with the date and swap them between sessions.
+
+## Check your understanding
+
+{% quiz %}
+? What is dead reckoning?
+- [x] Estimating distance from how long and how fast you drove
+- [ ] Measuring distance with a laser
+- [ ] Counting encoder ticks
+> With no encoders, Scout multiplies speed by time. Small errors add up with each move.
+
+? Scout was asked for 300 mm but travelled 270 mm with MM_PER_S at 150. What is the new MM_PER_S?
+- [x] 135
+- [ ] 165
+- [ ] 150
+> New value = old x (actual / requested) = 150 x 270 / 300 = 135.
+
+? What does the try and finally in main() guarantee?
+- [x] The wheels are released and the servo relaxed, even after an error or Ctrl+C
+- [ ] The square closes
+- [ ] The program runs faster
+> base.coast() and head.off() always run, whatever happened.
+
+? Why recalibrate as the batteries run down?
+- [x] Everything slows, so the measured speeds are no longer true
+- [ ] The servo changes its pulse width
+- [ ] The Pico forgets the constants
+> That is exactly the problem encoders from lesson 14 solve.
+{% endquiz %}

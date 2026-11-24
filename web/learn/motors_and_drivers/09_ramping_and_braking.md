@@ -10,8 +10,9 @@ next: 10_servo_basics.html
 description: Start and stop smoothly with a speed ramp, and choose between coasting
   and braking to stop where you mean to.
 percent: 50
-duration: 4
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -67,6 +68,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to ease Scout's speed up and down with a ramp, and choose between coast and brake to stop where you mean to.
 
 If you have jumped Scout straight to speed 100, you will have seen it lurch, maybe lift a wheel, and possibly reset the Pico. Real vehicles accelerate gradually. This lesson adds that to Scout, then looks at the two ways to stop.
 
@@ -136,6 +139,17 @@ finally:
 
 The same function turns Scout smoothly, for example `ramp_to(base, 60, -60)` goes from a stop into a spin, and from forward straight through zero into reverse without a jolt.
 
+A ramped move goes through these stages:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Stopped
+    Stopped --> RampingUp: ramp_to target speed
+    RampingUp --> Cruising
+    Cruising --> RampingDown: ramp_to zero
+    RampingDown --> Stopped: stop brakes
+```
+
 ## Coast versus brake
 
 Remember lesson 4: coast disconnects the motor, brake shorts it. Which one should Scout use? Try this side by side. Push Scout to a steady speed, then stop each way and measure how far it rolls:
@@ -185,10 +199,31 @@ Mark the floor where each stop finishes. Typically:
 
 ## Common Issues
 
-**Problem**: The ramp appears to do nothing, then jumps.
-**Solution**: Make sure your ramp passes through your dead zone gently. Use a smaller `deadzone` or a longer ramp.
-**Why**: Below the dead zone nothing moves, so the visible motion all happens in the top part of the ramp.
+- **Problem**: The ramp appears to do nothing, then jumps.
+- **Solution**: Set a `deadzone` on each `Motor` (lesson 6), so that speed 1 is already just above where the wheel turns, and use a longer ramp.
+- **Why**: With a `deadzone` of 0, nothing moves below your motor's starting duty, so all the visible motion happens in the top part of the ramp.
 
-**Problem**: Scout still rolls after `stop()`.
-**Solution**: Check you are calling `stop()` (brake) and not `coast()`, and that the EN pin is being driven high by the brake.
-**Why**: The L298N only brakes when its enable pin is high.
+- **Problem**: Scout still rolls after `stop()`.
+- **Solution**: Check you are calling `stop()` (brake) and not `coast()`, and that the EN pin is being driven high by the brake.
+- **Why**: The L298N only brakes when its enable pin is high.
+
+## Check your understanding
+
+{% quiz %}
+? Why ramp the speed up instead of jumping to full speed?
+- [x] It limits the current surge and stops the wheels slipping
+- [ ] It makes the motor quieter at rest
+- [ ] It saves memory
+> A sudden start draws a big surge and makes wheels slip, which ruins distance estimates.
+
+? Which stop style halts Scout within a centimetre or two?
+- [x] Brake
+- [ ] Coast
+> Brake shorts the motor terminals so back-EMF fights the motion. Coast rolls on for a while.
+
+? A 400 ms ramp in 20 ms steps takes how many steps?
+- [x] 20
+- [ ] 400
+- [ ] 8
+> 400 divided by 20 is 20 steps, so each step changes the speed by only a few percent.
+{% endquiz %}

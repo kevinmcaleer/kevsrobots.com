@@ -4,12 +4,14 @@ description: A friendly tour of DC motors, servos and stepper motors, and how to
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/01_how_motors_work.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to tell a DC motor, a servo and a stepper apart, and choose the right one for a wheel, a head or a plotter axis.
 
 Robots move because something turns electricity into motion. In hobby robotics that something is almost always one of three motors. Picking the right one saves you hours of fiddling, so let's meet them with Scout in mind: two wheels that need to spin, and a head that needs to point.
 
@@ -43,6 +45,17 @@ Inside is a coil on a rotor, and a pair of brushes that flip the current at the 
 
 **Why this matters:** Steppers give you accurate positioning without feedback, but they need a driver that sequences the coils, and they are slower than DC motors.
 
+Here is the same decision as a flow you can follow with your finger:
+
+```mermaid
+flowchart TD
+    Q["What does the job need?"] --> A{"Continuous spinning?"}
+    A -->|"Yes, speed matters"| DC["DC motor, like Scout's wheels"]
+    A -->|"No, a position matters"| B{"Limited travel, about 180 degrees?"}
+    B -->|"Yes"| SV["Hobby servo, like Scout's head"]
+    B -->|"No, exact turns or many steps"| ST["Stepper motor, like a plotter axis"]
+```
+
 ## Choosing a motor
 
 | Motor | Control | Good at | Not so good at |
@@ -62,6 +75,28 @@ Notice that none of these three can be wired straight to a Pico and run. The nex
 
 ## Common Issues
 
-**Problem**: I tried to turn a servo all the way round and it clicked or buzzed.
-**Solution**: Stop and move it back by sending a valid angle. Standard servos only travel about 180 degrees.
-**Why**: There is a mechanical stop inside the gearbox. Forcing it past that, by hand or by command, can strip gear teeth.
+- **Problem**: I tried to turn a servo all the way round and it clicked or buzzed.
+- **Solution**: Stop and move it back by sending a valid angle. Standard servos only travel about 180 degrees.
+- **Why**: There is a mechanical stop inside the gearbox. Forcing it past that, by hand or by command, can strip gear teeth.
+
+## Check your understanding
+
+{% quiz %}
+? Which motor has a position sensor and control circuit built into its case?
+- [ ] DC motor
+- [x] Hobby servo
+- [ ] Stepper motor
+> A servo packs a small DC motor, gearbox, position sensor and control circuit together, so you only send it a pulse.
+
+? What does a plain DC motor tell you about how far it has turned?
+- [x] Nothing, you set voltage and polarity and the floor decides the rest
+- [ ] Its exact angle
+- [ ] How many steps it has taken
+> DC motors give no feedback. That is why Scout's wheels are good for 'how fast' but not 'exactly how far'.
+
+? Which motor moves in small fixed steps and can turn an exact angle with no sensor?
+- [ ] Hobby servo
+- [ ] DC motor
+- [x] Stepper motor
+> Energising the coils in sequence advances a stepper one step at a time, so counting steps counts degrees.
+{% endquiz %}

@@ -580,7 +580,7 @@
     a motor driver, and how to control all three from a Raspberry Pi Pico with MicroPython.
     Along the way you will build Scout, a two-wheeled drive base with a servo-mounted
     head that drives a square, spins on the spot and looks left and right.
-  duration: 1h 16m
+  duration: 1h 38m
   groups:
   - robots
   - micropython

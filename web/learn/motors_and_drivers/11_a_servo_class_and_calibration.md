@@ -10,8 +10,9 @@ next: 12_continuous_rotation_servos.html
 description: Build a reusable Servo class, find your servo's real pulse range and
   make Scout's head move smoothly.
 percent: 60
-duration: 5
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -67,6 +68,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build a reusable Servo class and find the real minimum and maximum pulse widths of your own servo.
 
 Last lesson's maths works, but no one wants to write `PWM(Pin(10))` and convert microseconds every time. Let's package it as a `Servo` class, with two features that make a real difference: calibration limits and smooth movement.
 
@@ -170,6 +173,16 @@ Watch and listen. At each end, the horn stops moving even though the number keep
 
 Back off by about 50 us from each, to stay clear of the stop. On a typical SG90 you end up with roughly 600 us at one end and 2400 us at the other.
 
+The calibration routine, as steps:
+
+```mermaid
+flowchart TD
+    A["Sweep wide, 400 to 2600 us"] --> B["Note the last pulse that still moved the horn at each end"]
+    B --> C["Back off about 50 us from each end"]
+    C --> D["Use them as min_us and max_us"]
+    D --> E["pulse() now refuses to go beyond them"]
+```
+
 ## Scout's head
 
 Now fit the horn so the head looks straight ahead at 90 degrees, and use your numbers in a head test. The values here are typical; use your own:
@@ -205,14 +218,38 @@ If 90 is not quite straight, set `trim` rather than refitting the horn: `Servo(1
 
 ## Common Issues
 
-**Problem**: The horn buzzes at the end of its travel.
-**Solution**: Reduce `max_us` or `min_us` by 50 to 100 us.
-**Why**: The servo is trying to turn past its mechanical limit and is straining the gears.
+- **Problem**: The horn buzzes at the end of its travel.
+- **Solution**: Reduce `max_us` or `min_us` by 50 to 100 us.
+- **Why**: The servo is trying to turn past its mechanical limit and is straining the gears.
 
-**Problem**: `smooth()` jumps on the first call.
-**Solution**: Call `angle()` once first so the class knows where the servo is.
-**Why**: Until the first move, the class has no starting position to glide from.
+- **Problem**: `smooth()` jumps on the first call.
+- **Solution**: Call `angle()` once first so the class knows where the servo is.
+- **Why**: Until the first move, the class has no starting position to glide from.
 
-**Problem**: The head droops or twitches after `off()`.
-**Solution**: Keep sending pulses with `angle()` if the head must hold against a load, and only call `off()` while idle.
-**Why**: With no pulses a servo has no torque, so the horn can be pushed around.
+- **Problem**: The head droops or twitches after `off()`.
+- **Solution**: Keep sending pulses with `angle()` if the head must hold against a load, and only call `off()` while idle.
+- **Why**: With no pulses a servo has no torque, so the horn can be pushed around.
+
+> **Teachers**: a servo pushed against its end stop buzzes and strains its plastic gears, and cheap SG90 servos are easy to break that way. Tell learners to stop the program at the first buzz and back off the limits. Spare horns and a spare servo per group save lesson time.
+
+## Check your understanding
+
+{% quiz %}
+? What does Servo.pulse() do with a pulse outside min_us and max_us?
+- [x] It clamps the pulse to the safe range
+- [ ] It raises an error
+- [ ] It sends it anyway
+> The limits protect the gears, so pulse() refuses to go beyond your servo's real range.
+
+? After finding where the horn stops moving at each end, what should you do?
+- [x] Back off about 50 us from each end
+- [ ] Use the exact end values
+- [ ] Double them
+> Staying clear of the mechanical stop avoids buzzing and strain.
+
+? Scout's head looks slightly off-centre at 90 degrees. What is the simple fix?
+- [x] Set trim to a small number of degrees
+- [ ] Refit the horn every time
+- [ ] Change the PWM frequency
+> trim is added to every move, so Servo(10, min_us=600, max_us=2400, trim=-3) shifts everything by minus 3 degrees.
+{% endquiz %}

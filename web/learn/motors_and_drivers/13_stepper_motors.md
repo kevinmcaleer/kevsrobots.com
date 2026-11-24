@@ -10,8 +10,9 @@ next: 14_measuring_speed_with_encoders.html
 description: Drive a 28BYJ-48 stepper motor through a ULN2003 board with a half-step
   sequence and move it an exact number of degrees.
 percent: 70
-duration: 5
-date_updated: 2026-11-21
+duration: 7
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -68,6 +69,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to drive a 28BYJ-48 stepper through a ULN2003 board and turn it by an exact number of degrees.
+
 DC motors spin, servos point, and steppers *count*. A stepper moves one tiny, precise step each time its coils are energised in the next pattern. No sensor, no feedback, just a sequence and a counter. This lesson is a side quest from Scout's drive base, but steppers are everywhere in maker projects, so it is worth meeting one.
 
 This lesson is optional if you do not have a 28BYJ-48, so feel free to read it and skip the wiring.
@@ -114,6 +117,17 @@ FULL_STEP = [
 ```
 
 Run through the list in order for one direction, and backwards for the other. The motor's internal gears (about 64:1) mean the output shaft turns slowly with plenty of torque.
+
+Turning a number of degrees into coil changes goes like this:
+
+```mermaid
+flowchart LR
+    D["degrees"] --> S["degrees_to_steps"]
+    S --> L["step loops through the sequence"]
+    L --> P["GP16 to GP19 set the pattern"]
+    P --> U["ULN2003 switches the coils"]
+    U --> M["28BYJ-48 shaft turns"]
+```
 
 ## How many steps is a turn?
 
@@ -211,14 +225,38 @@ The `delay_ms` between steps sets the speed. At 2 ms per half-step, one revoluti
 
 ## Common Issues
 
-**Problem**: The motor hums and vibrates but does not turn.
-**Solution**: Check the wiring order of IN1 to IN4 against GP16 to GP19, and slow the `delay_ms` to 3 or 4.
-**Why**: The coil sequence has to be in order, and going too fast makes the rotor miss the magnetic field.
+- **Problem**: The motor hums and vibrates but does not turn.
+- **Solution**: Check the wiring order of IN1 to IN4 against GP16 to GP19, and slow the `delay_ms` to 3 or 4.
+- **Why**: The coil sequence has to be in order, and going too fast makes the rotor miss the magnetic field.
 
-**Problem**: The motor and the driver chip get warm when idle.
-**Solution**: Call `release()` after a move.
-**Why**: A stepper that is holding position keeps current flowing through a coil all the time.
+- **Problem**: The motor and the driver chip get warm when idle.
+- **Solution**: Call `release()` after a move.
+- **Why**: A stepper that is holding position keeps current flowing through a coil all the time.
 
-**Problem**: It turns the wrong way.
-**Solution**: Pass a negative number, or reverse the pin list to `(19, 18, 17, 16)`.
-**Why**: Direction is just the order in which the coils fire.
+- **Problem**: It turns the wrong way.
+- **Solution**: Pass a negative number, or reverse the pin list to `(19, 18, 17, 16)`.
+- **Why**: Direction is just the order in which the coils fire.
+
+> **Teachers**: this lesson is optional kit and works as reading only. A 28BYJ-48 and ULN2003 board is cheap, so one per pair is realistic. A stepper that is left holding position keeps a coil energised and warms up, so make `release()` part of the routine. Power it from USB VBUS or a separate 5 V supply, never the 3V3 pin.
+
+## Check your understanding
+
+{% quiz %}
+? How many half-steps make one output revolution, using the 8-entry sequence?
+- [x] 4096
+- [ ] 2048
+- [ ] 512
+> 8 entries x 512 cycles = 4096. The real gear ratio is about 63.68:1, so the true figure is nearer 4076.
+
+? Why call release() after a move?
+- [x] It de-energises the coils so the motor and driver stay cool
+- [ ] It resets the Pico
+- [ ] It reverses the motor
+> A stepper holding position keeps current flowing through a coil all the time.
+
+? Why can the ULN2003 board drive the motor when a GPIO pin cannot?
+- [x] It is seven transistor switches that handle the coil current
+- [ ] It lowers the battery voltage
+- [ ] It adds back-EMF
+> The Pico pins only carry the signal, the same lesson 2 idea as with DC motors.
+{% endquiz %}
