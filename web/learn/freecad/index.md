@@ -11,6 +11,7 @@ level: beginner
 course_duration: 0h 22m
 lesson_count: 11
 first_lesson: 01_introduction_to_freecad.html
+video: S7EoZHd03FY
 navigation:
 - name: Introduction to FreeCAD for Beginners
 - content:

@@ -12,6 +12,7 @@ level: intermediate
 course_duration: 1h 23m
 lesson_count: 15
 first_lesson: 00_intro.html
+video: epuO7xpz6i4
 navigation:
 - name: Reinforcement Learning with Gymnasium
 - content:

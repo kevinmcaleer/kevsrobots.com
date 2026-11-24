@@ -8,6 +8,12 @@ cover: assets/cover.png
 
 ![FreeCAD cover image]({{ page.cover }}){:class="cover"}
 
+See FreeCAD in action first: this video uses it to build a robot chassis from scratch.
+
+{% include youtubeplayer.html id="S7EoZHd03FY" %}
+
+---
+
 ## Welcome to FreeCAD
 
 FreeCAD is a powerful, open-source parametric 3D modeler made primarily to design real-life objects of any size. Parametric modeling allows users to easily modify designs by going back into their model history and changing parameters.

@@ -104,5 +104,6 @@ Open the STL files in your slicer. Print each eyelid with its open side facing u
 ## What's next
 
 - Watch the video at the start of the course to see the full mechanism with its servo
+- Want a bigger challenge? See [Will Cogley's Eyemech](https://www.youtube.com/watch?v=XpKnyTx_1mQ), a full animatronic eye I printed and built, and the [write-up on the blog](/blog/eyemech.html)
 - [Design a SMARS Robot in Fusion 360](/learn/smars_fusion360/): more Fusion 360 practice
 - [Introduction to FreeCAD for Beginners](/learn/freecad/): try a free, open-source CAD program

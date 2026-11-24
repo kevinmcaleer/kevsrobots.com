@@ -13,7 +13,7 @@ course_duration: 1h 1m
 lesson_count: 13
 first_lesson: 00_intro.html
 quiz_total: 36
-video: QVe9meIHZtk
+video: HJYdGICcw0k
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:

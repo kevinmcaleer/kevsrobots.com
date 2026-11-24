@@ -48,6 +48,12 @@ navigation:
 
 ![Course Cover](assets/cover.jpg){:class="cover"}
 
+Watch the video, then follow along here to build the chassis step by step.
+
+{% include youtubeplayer.html id="S7EoZHd03FY" %}
+
+---
+
 ## Welcome, Robot Builders!
 
 You're about to learn one of the most valuable skills in robotics: **designing your own robot parts from scratch**. By the end of this course, you'll have created a complete, 3D-printable robot chassis using FreeCAD - and you'll understand every design decision that went into it.

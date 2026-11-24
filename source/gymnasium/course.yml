@@ -5,6 +5,7 @@
   level: intermediate
   layout: course
   cover: assets/cover.jpg
+  video: epuO7xpz6i4
   groups:
       - ai
       - python

@@ -11,6 +11,12 @@ date_updated: 2026-06-13
 
 ---
 
+Want to see where this leads? In this video a computer learns to balance a pendulum from nothing but a score. It's the first step towards a robot duck that taught itself to walk.
+
+{% include youtubeplayer.html id="epuO7xpz6i4" %}
+
+---
+
 Ahoy there makers! What if your robot could figure things out on its own?
 
 Most robots we build follow instructions we wrote: "go forward, if distance < 20 cm then turn right". That works brilliantly when we know exactly what the environment looks like. But real floors are messy — furniture shifts, a dog wanders through, someone leaves a bag in the hallway. Hardcoded routines break down fast.
