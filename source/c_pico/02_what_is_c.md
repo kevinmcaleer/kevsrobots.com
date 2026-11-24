@@ -1,104 +1,133 @@
 ---
 title: What is C?
-description: Learn what the C programming language is, where it’s used, and why it’s a great choice for embedded systems like the Raspberry Pi Pico.
+description: Learn what the C programming language is, how a C program becomes machine code, and why it suits microcontrollers like the Raspberry Pi Pico.
 layout: lesson
 type: page
 cover: assets/2.jpg
-date_updated: 2025-06-15
+date_updated: 2026-11-24
 ---
 
 ![Cover]({{page.cover}}){:class="cover"}
 
 ---
 
-`C` is one of the oldest and most widely-used programming languages.  
-It’s fast, powerful, and gives you direct control over the hardware — which makes it perfect for microcontrollers like the **Raspberry Pi Pico**.
+By the end of this lesson you will be able to explain what a compiler does, and compile and run your first C program on your computer.
+
+C is one of the oldest programming languages still in everyday use. It is fast, small and gives you direct control of the hardware, which is why it turns up inside robots, 3D printers and car dashboards. The Raspberry Pi Pico's own SDK is written in C, so learning C means you can read the code the Pico is built on.
 
 ---
 
-## What is C?
+## A short history
 
-C is a **procedural programming language** developed in the early 1970s.
+Dennis Ritchie created C at Bell Labs in the early 1970s so that operating systems could be written in something friendlier than assembly. It is why the Linux kernel is mostly C, and why many other languages borrow its curly braces and `for` loops. The Python you may know is itself written in C.
 
-Key features:
+C is a **compiled** language. You write text (the **source code**), and a program called the **compiler** turns it into machine code the processor understands. Python reads your code line by line as it runs; C does all that work first.
 
-- Compiled (not interpreted)
-- Low-level (close to the machine, but easier than assembly)
-- Portable (runs on many platforms)
-- Efficient and fast
-- Foundation for many modern languages (like C++, Python, and Java)
+```mermaid
+flowchart LR
+    A["hello.c<br/>(your source code)"] --> B["Compiler<br/>(gcc)"]
+    B --> C["Program<br/>(machine code)"]
+    C --> D["Runs on<br/>your computer"]
+```
 
-> ## Origins of 'C'
->
-> The name "C" comes from an earlier language called "B", which was itself derived from the language "BCPL". C was developed by Dennis Ritchie at Bell Labs in 1972.
-> C was designed to be a **system programming language** for writing operating systems and low-level applications, but it quickly became popular for all kinds of software development.
-> C is still widely used today, especially in embedded systems, operating systems, and performance-critical applications, and languages such as Processing, Arduino, and even Python have roots in C.
-> C is often called the "mother of all programming languages" because it has influenced so many others.
-> It's a procedural language, meaning it focuses on functions and procedures to operate on data, it was later extended with object-oriented features in C++.
+For the Pico the middle step is a special compiler that makes code for the Pico's ARM chip, and the result is a `.uf2` file you copy onto the board. We'll do that in lesson 6.
 
 ---
 
-## Where is C Used?
+## Why C on the Pico?
 
-C is used in:
+You can program the Pico in MicroPython, and for many robots it is the right choice. C offers different strengths:
 
-- Operating systems (Linux, Windows, macOS internals)
-- Embedded systems (Arduino, Raspberry Pi Pico)
-- Game engines
-- Robotics
-- Device drivers and firmware
+| MicroPython | C with the Pico SDK |
+|-------------|---------------------|
+| Quick to write and change | More typing, but fast programs |
+| Runs through an interpreter | Compiled to machine code |
+| Memory is managed for you | You decide how memory is used |
+| Great for learning and prototypes | Common in finished products |
+{:class="table table-single"}
 
-Anywhere speed and control matter — you’ll likely find C.
-
----
-
-## Why Use C on the Pico?
-
-While you can use Python (via MicroPython) on the Pico, C has some big advantages:
-
-| MicroPython        | C (with Pico SDK)              |
-|--------------------|--------------------------------|
-| Easy to learn      | More powerful & efficient      |
-| Slower runtime     | Much faster execution          |
-| Limited features   | Full access to microcontroller |
-| Good for beginners | Better for production projects |
-{:class="table table-striped"}
-
-With C, you get **full control of the hardware**, **faster code**, and **better use of memory** — essential for building real-world embedded systems.
+The trade is a stricter language. The compiler catches many mistakes before the program ever runs, which is a gift once you get used to it.
 
 ---
 
-## What Does C Code Look Like?
+## Your first C program
 
-Here’s a tiny example:
+Save this as `hello.c`:
 
 ```c
 #include <stdio.h>
 
-int main() {
-    printf("Hello, world!\n");
+int main(void) {
+    printf("Hello, I am a robot!\n");
     return 0;
 }
 ```
 
-This program prints a message to the terminal. Don’t worry about the syntax yet — we’ll explain everything step-by-step in future lessons.
+Let's take it line by line.
 
-Notice the '`{ }`' brackets? They define blocks of code, like functions or loops; in MicroPython, you would use indentation instead.
+- `#include <stdio.h>` pulls in the standard input and output library, which gives us `printf`.
+- `int main(void)` is where every C program starts. `int` means it hands back a whole number when it finishes.
+- `{ }` mark a block of code. Python uses indentation instead; C uses braces, and the indentation is only for humans.
+- `printf("...\n");` prints text. The `\n` is a newline.
+- Each statement ends with a semicolon `;`.
+- `return 0;` tells the computer the program finished happily.
 
-Also notice each line ends with a semicolon (`;`). This tells the **compiler** that the statement is complete. In Python, you don’t need semicolons.
+Compile and run it. On Linux, macOS or WSL, with `gcc` installed:
 
-C is a **compiled language**, which means you write the code, then use a **compiler** to turn it into machine code that the Pico can run. This is different from interpreted languages like Python, where you run the code directly.
+```bash
+gcc -Wall -o hello hello.c
+./hello
+```
 
-C is a **typed language**, meaning you must declare the type of each variable (like `int`, `float`, `char`, etc.) before using it. This helps catch errors early and makes your code more efficient.
+You should see:
+
+```text
+Hello, I am a robot!
+```
+
+`-Wall` asks the compiler to warn you about suspicious code, and `-o hello` names the finished program. Get in the habit of always using `-Wall`.
 
 ---
 
-## Summary
+## Try it Yourself
 
-C is a powerful, efficient, and long-standing language that gives you precise control over how your programs run — ideal for working on microcontrollers like the Raspberry Pi Pico.
+1. Change the message to your robot's name and compile again.
+2. Add a second `printf` line that prints a different message.
+3. Remove the semicolon after the first `printf` and read the compiler's error. Put it back.
+4. Challenge: remove the `\n` and see where the shell prompt lands. What does `\n` really do?
 
-In the next lesson, we’ll dive into **variables and data types** in C so you can start writing your own logic.
+## Common Issues
 
-Next up: [Variables and Data Types](03_variables_and_types)
+- **Problem**: `gcc: command not found`
+- **Solution**: Install a compiler. On Debian or Ubuntu, `sudo apt install build-essential`. On Windows, use WSL or an online C compiler for lessons 2 to 5.
+- **Why**: A compiler is a separate program. It is not part of your operating system by default.
 
----
+- **Problem**: `error: expected ';' before 'return'`
+- **Solution**: Look at the line above the one the compiler names and add the missing `;`.
+- **Why**: The compiler only notices the missing semicolon when it reaches the next statement.
+
+- **Problem**: `./hello` says `No such file or directory`
+- **Solution**: Check that `gcc` finished without errors, and that you are in the folder holding `hello`.
+- **Why**: If compilation fails, no program is produced.
+
+## Check your understanding
+
+{% quiz %}
+? What does a compiler do?
+- [ ] It uploads code to the Pico
+- [x] It turns source code into machine code the processor can run
+- [ ] It runs your code line by line
+> The compiler translates the whole program before it runs. Running line by line is what an interpreter does.
+
+? What does `\n` do inside a `printf` string?
+- [ ] Ends the program
+- [x] Starts a new line
+- [ ] Prints the letter n
+> `\n` is the newline character.
+
+? What marks a block of code in C?
+- [ ] Indentation
+- [x] Curly braces `{ }`
+- [ ] A colon
+> C uses braces. Indentation is for human readers only.
+{% endquiz %}

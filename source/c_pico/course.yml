@@ -6,19 +6,34 @@
   layout: course
   cover: assets/cover.jpg
   groups:
-    - raspberry pi
+    - raspberrypi
     - pico
-    - c-programming
   description: >-
-    Learn how to program the Raspberry Pi Pico using the C programming language. 
-    This beginner-friendly course covers the fundamentals of C, how to set up your development environment, 
-    and how to write simple programs that run on real hardware. By the end of the course, you'll have a 
+    Learn how to program the Raspberry Pi Pico using the C programming language.
+    This beginner-friendly course covers the fundamentals of C, how to set up your development environment,
+    and how to write simple programs that run on real hardware. By the end of the course, you'll have a
     solid grasp of programming basics and will create your first hardware project; a blinking LED.
+  outcomes:
+    - Read and write small C programs using variables, conditions, loops and functions
+    - Install the Raspberry Pi Pico C/C++ SDK and build an example program into a .uf2 file
+    - Write a CMakeLists.txt file for your own Pico project
+    - Print messages from the Pico to your computer over USB serial
+    - Control a GPIO pin as an output from C
+    - Wire up and blink an external LED, and explain why it needs a resistor
+  prerequisites:
+    - No programming or electronics experience is needed
+    - Comfort typing commands in a terminal helps, such as Introduction to the Linux Command Line on Raspberry Pi OS
+  you_need:
+    - A Raspberry Pi Pico, Pico W or Pico 2 (with headers soldered for the breadboard project)
+    - A micro-USB cable for Pico and Pico W, or a USB-C cable for Pico 2 (data cable, not charge-only)
+    - A computer running Windows, macOS or Linux
+    - A breadboard, one LED, one 330 ohm resistor and two jumper wires
+    - Lessons 2 to 5 need only a computer with a C compiler such as gcc
   content:
     - section:
         name: Introduction
         content:
-          - 01_intro.md
+          - 00_intro.md
     - section:
         name: Programming Fundamentals
         content:
