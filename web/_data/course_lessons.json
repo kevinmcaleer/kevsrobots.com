@@ -3354,6 +3354,90 @@
     ]
   },
   {
+    "slug": "n8n_homelab",
+    "name": "Homelab Automation with n8n",
+    "description": "Turn a Raspberry Pi into an automation hub with n8n and Docker. Build a homelab robot butler that checks your services on a schedule, listens for readings from a Pico W, tidies the data with a little JavaScript, and tells you when something is wrong.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "raspberrypi",
+      "productivity"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Meet n8n",
+        "url": "/learn/n8n_homelab/00_intro.html"
+      },
+      {
+        "file": "01_what_is_n8n.md",
+        "section": "Meet n8n",
+        "url": "/learn/n8n_homelab/01_what_is_n8n.html"
+      },
+      {
+        "file": "02_install_n8n_with_docker_compose.md",
+        "section": "Meet n8n",
+        "url": "/learn/n8n_homelab/02_install_n8n_with_docker_compose.html"
+      },
+      {
+        "file": "03_the_editor_and_your_first_workflow.md",
+        "section": "Meet n8n",
+        "url": "/learn/n8n_homelab/03_the_editor_and_your_first_workflow.html"
+      },
+      {
+        "file": "04_a_scheduled_health_check.md",
+        "section": "Watching your homelab",
+        "url": "/learn/n8n_homelab/04_a_scheduled_health_check.html"
+      },
+      {
+        "file": "05_if_the_service_is_down.md",
+        "section": "Watching your homelab",
+        "url": "/learn/n8n_homelab/05_if_the_service_is_down.html"
+      },
+      {
+        "file": "06_a_webhook_for_the_pico.md",
+        "section": "Listening to your devices",
+        "url": "/learn/n8n_homelab/06_a_webhook_for_the_pico.html"
+      },
+      {
+        "file": "07_pico_w_sends_a_reading.md",
+        "section": "Listening to your devices",
+        "url": "/learn/n8n_homelab/07_pico_w_sends_a_reading.html"
+      },
+      {
+        "file": "08_tidy_data_with_the_code_node.md",
+        "section": "Listening to your devices",
+        "url": "/learn/n8n_homelab/08_tidy_data_with_the_code_node.html"
+      },
+      {
+        "file": "09_credentials_and_secrets.md",
+        "section": "Running it for real",
+        "url": "/learn/n8n_homelab/09_credentials_and_secrets.html"
+      },
+      {
+        "file": "10_executions_and_debugging.md",
+        "section": "Running it for real",
+        "url": "/learn/n8n_homelab/10_executions_and_debugging.html"
+      },
+      {
+        "file": "11_updates_and_backups.md",
+        "section": "Running it for real",
+        "url": "/learn/n8n_homelab/11_updates_and_backups.html"
+      },
+      {
+        "file": "12_troubleshooting.md",
+        "section": "Running it for real",
+        "url": "/learn/n8n_homelab/12_troubleshooting.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Running it for real",
+        "url": "/learn/n8n_homelab/13_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "object_model",
     "name": "Building Object Detection Models with Raspberry Pi AI Camera",
     "description": "Learn how to build custom object detection models using the Raspberry Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment, and run real-time detection on Raspberry Pi hardware. Complete hands-on course from dataset creation to production deployment.",

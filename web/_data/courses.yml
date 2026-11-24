@@ -628,6 +628,22 @@
   projects:
   - /projects/burgerbot/index.html
 - author: Kevin McAleer
+  cover: /learn/n8n_homelab/assets/cover.jpg
+  date_published: 2026-11-24
+  description: Turn a Raspberry Pi into an automation hub with n8n and Docker. Build
+    a homelab robot butler that checks your services on a schedule, listens for readings
+    from a Pico W, tidies the data with a little JavaScript, and tells you when something
+    is wrong.
+  duration: 0h 51m
+  groups:
+  - raspberrypi
+  - productivity
+  lessons: 14
+  level: beginner
+  link: /learn/n8n_homelab/00_intro.html
+  name: Homelab Automation with n8n
+  video: Yds3_vQR5xM
+- author: Kevin McAleer
   cover: /learn/object_model/assets/cover.jpg
   date_published: 2025-12-04
   description: Learn how to build custom object detection models using the Raspberry
