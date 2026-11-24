@@ -325,14 +325,15 @@
 - author: Kevin McAleer
   cover: /learn/how_to_install_micropython/assets/cover.jpg
   date_published: 2024-08-10
-  description: Install MicroPython on your Raspberry Pi Pico.
-  duration: 0h 10m
+  description: Work out which Raspberry Pi Pico you have, download the right MicroPython
+    firmware, install it with Thonny or by drag and drop, and check it worked.
+  duration: 0h 29m
   groups:
   - micropython
   - pico
-  lessons: 4
+  lessons: 7
   level: beginner
-  link: /learn/how_to_install_micropython/01_intro.html
+  link: /learn/how_to_install_micropython/00_intro.html
   name: How to install MicroPython
 - author: Kevin McAleer
   cover: /learn/i2c_spi/assets/cover.jpg
