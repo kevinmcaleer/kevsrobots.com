@@ -142,6 +142,24 @@
   name: Build your own BurgerBot
   video: 5G6psAuTYT4
 - author: Kevin McAleer
+  cover: /learn/bus_servos/assets/cover.jpg
+  date_published: 2026-11-24
+  description: 'Learn to drive Feetech STS3215 bus servos from a Raspberry Pi Pico.
+    Start with one servo on a single data wire, chain two, record and replay poses
+    by hand, then build Buddy: a six-joint robot arm with calibration, smooth synchronised
+    moves, inverse kinematics and its own web control panel.'
+  duration: 1h 24m
+  groups:
+  - robots
+  - micropython
+  - pico
+  - robotarms
+  lessons: 16
+  level: intermediate
+  link: /learn/bus_servos/00_intro.html
+  name: Bus Servos and the Buddy Robot Arm
+  video: nzBZOTdEdtE
+- author: Kevin McAleer
   cover: /learn/c_pico/assets/cover.jpg
   date_published: 2025-06-16
   description: Learn how to program the Raspberry Pi Pico using the C programming
