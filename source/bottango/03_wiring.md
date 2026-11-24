@@ -1,142 +1,116 @@
 ---
 title: Wiring and Connecting Servos
-description: Learn how to safely connect servos to your microcontroller for use with Bottango.
+description: Learn how to safely connect and power servos for use with Bottango, with a separate supply and a common ground.
 layout: lesson
 type: page
-cover: assets/bottango_wiring.png
-date_updated: 2025-05-03
+cover: /learn/bottango/assets/banners/03_wiring.jpg
+date_updated: 2026-11-24
 ---
 
-![Cover](assets/parrot.png){:class="cover"}
-
----
-
-Servos are the muscles of your project – they move parts back and forth in response to the motion sequences you create in Bottango. In this lesson, we’ll wire up the servos so they can be controlled by your board.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## What You'll Need
+By the end of this lesson you will be able to wire one or more servos to your board, powered from a separate supply with a common ground.
 
-- 1–3 servo motors (SG90 or MG90S are great)
-- Jumper wires (female-to-male or male-to-male depending on your board)
-- Optional: Breadboard
-- **External power supply** (for more than 1 servo, recommended)
+Servos are the muscles of your project. They move parts back and forth in response to the motion you create in Bottango. Wiring them takes five minutes, but powering them properly is the step that decides whether your project works or keeps resetting.
 
----
+## Servo wires
 
-## Servo Pinout
+Most hobby servos have three wires:
 
-Most servo motors have **3 wires**:
-
-- **Brown or Black** = GND (Ground)
-- **Red** = VCC (Power, usually 5V)
-- **Orange or Yellow** = Signal (PWM)
-
-Make sure to check your specific servo's color code.
-
----
-
-## Connect to Arduino Uno/Nano
-
-| Servo Wire | Arduino Pin |
-|------------|-------------|
-| GND        | GND         |
-| VCC        | 5V          |
-| Signal     | D3, D5, D6  |
+| Wire colour | Job |
+|-------------|-----|
+| Brown or black | Ground (GND) |
+| Red | Power (usually 5V) |
+| Orange or yellow | Signal |
 {:class="table table-single"}
 
-Use one digital pin per servo for signal. For example:
+Colours vary between makers, so check your servo's datasheet before you plug in. Plugging a servo in backwards can damage it.
 
-- Servo 1 → D3  
-- Servo 2 → D5  
-- Servo 3 → D6
+## The golden rule: do not power servos from your board
 
-You can connect VCC and GND for all servos to the same 5V and GND pins — but **be careful** not to overload your board.
+The Bottango docs have a page headed "Don't Power Servos from Your Microcontroller!" It is the single most important wiring rule in this course. Servos can draw far more current than a board's pins or regulator can supply, especially when they are pushing against a load or are stalled. Powering them from the board can make it reset, overheat or get damaged. Powering them from a computer's USB port is no better, because the port may shut down.
 
----
+So use a **separate power supply** for the servos, sized for the voltage of your servos (most small hobby servos are 5V) and the maximum current your build could draw with everything moving at once.
 
-## Powering More Than One Servo
+```mermaid
+flowchart LR
+    PSU["5V servo power supply"] -->|"+5V"| S["Servo red wire"]
+    PSU -->|"GND"| G["Common ground rail"]
+    G --> S2["Servo brown wire"]
+    G --> B["Board GND"]
+    B -->|"Signal pin"| S3["Servo signal wire"]
+    PC["Computer USB"] --> B
+```
 
-The Arduino’s onboard 5V regulator **can only power 1 small servo reliably**.
+## The common ground
 
-If you're using multiple servos:
+The signal wire only makes sense if the board and the servo agree where "zero volts" is. So **connect the ground of the servo supply to the ground of the board**. The wiring is:
 
-1. Use an external 5V power supply (like a USB power bank or battery pack).
-2. Connect servo VCC to the external power **+5V**.
-3. Connect **all grounds together** — including the Arduino GND and the external power GND.
+| Connection | Goes to |
+|------------|---------|
+| Servo red wire | Positive (+5V) of the servo supply, not the board's 5V pin |
+| Servo brown or black wire | Ground of the servo supply |
+| Servo signal wire | A signal pin on the board, for example D3, D5 or D6 on an Uno |
+| Servo supply ground | Also joined to a GND pin on the board |
+{:class="table table-single"}
 
-> **Never power high-current servos directly from the Arduino!**
+Use one signal pin per servo. For example, servo 1 on D3, servo 2 on D5 and servo 3 on D6. Avoid D0 and D1 on an Uno, as the board uses them for USB communication.
 
----
+## ESP32 boards
 
-## ESP32 Wiring
-
-Most ESP32 dev boards support 3.3V logic but are 5V-tolerant. You can safely connect:
-
-- GND → GND  
-- VCC → External 5V (do NOT use 3.3V)  
-- Signal → GPIO pins (e.g., D13, D14, D27)
-
-Consult your board’s pinout diagram for available GPIOs.
-
----
+ESP32 signal pins work at **3.3V**, and they are not 5V tolerant, so never feed 5V back into a signal pin. Power the servos from the separate supply as above, join the grounds, and connect each servo's signal wire to a suitable GPIO pin. Check your board's pinout diagram, because some pins have special jobs.
 
 ## Testing
 
-Once everything is wired:
-
-1. Open Bottango.
-2. Select your connected device.
-3. Click **Assign Servo** and choose the correct pin.
-4. Use the **manual control slider** to test movement.
-
-If your servo moves as expected, you're ready to animate!
-
----
+When you have set up your servos in the next lesson, use the slider to test each one. If a servo behaves badly, switch off the supply and check the wiring before you do anything else.
 
 ## Common Issues
 
-**Problem**: Servo doesn't move at all
+- **Problem**: The servo twitches or the board keeps resetting.
+- **Solution**: Power the servos from a separate supply, and check the board is not feeding them.
+- **Why**: Servos draw sudden bursts of current when they start or strain, which pulls down the voltage the board needs to stay alive.
 
-**Solution**: Check all three connections (GND, VCC, Signal). Verify the servo is plugged into a PWM-capable pin
+- **Problem**: The servo jitters or moves to random positions.
+- **Solution**: Join the ground of the servo supply to the board's ground.
+- **Why**: Without a shared ground the signal has no reference, so the servo reads noise as commands.
 
-**Why**: Loose connections or using a non-PWM pin prevents signal transmission
+- **Problem**: The servo does not move at all.
+- **Solution**: Check power, ground and signal in turn, then check the pin you chose in Bottango matches the pin you wired.
+- **Why**: Any one of the three wires missing will stop the servo, and a pin mismatch sends the signal to the wrong place.
 
-**Problem**: Servo jitters or vibrates
+- **Problem**: The servo hums, grinds or gets hot at the end of its travel.
+- **Solution**: Stop the movement, and reduce the servo's range in Bottango so the arm never hits a stop.
+- **Why**: A servo pushing against a hard stop is stalled, and a stalled servo draws its maximum current and can strip its gears.
 
-**Solution**:
-1. Add external power supply (don't power from Arduino 5V)
-2. Ensure all grounds are connected together (common ground)
-3. Check for loose wiring connections
+> **Teachers**: servo supplies are low voltage, but power rules matter. Use a regulated 5V supply or a battery pack made for servos, never mains wiring. Switch the supply off before changing wires, keep fingers away from moving horns, and watch for hot servos and short circuits between supply rails. Mixing up the red and brown wires can destroy a servo, so check each build before power goes on. Keep a spare servo in the kit.
 
-**Why**: Insufficient current causes voltage drops, making the servo unstable
+## Try it Yourself
 
-**Problem**: Multiple servos work individually but not together
+1. Draw your own wiring diagram for one servo, labelling the supply, board and ground connections.
+2. Wire a single servo with a separate supply and a shared ground, then check each connection against your diagram.
+3. Look up your servo's datasheet and write down its voltage range and wire colours.
+4. Challenge: plan the supply for three servos. Which number from the datasheet do you need to size the supply?
 
-**Solution**: Use an external 5V power supply rated for at least 1A per servo. Connect all grounds together
+## Check your understanding
 
-**Why**: Arduino's onboard regulator can't provide enough current for multiple servos
+{% quiz %}
+? Why should servos not be powered from your board?
+- [ ] Servos need 12V
+- [x] They can draw more current than the board can safely supply
+- [ ] Bottango will not detect them
+> The Bottango docs warn that servos can easily draw much more current than a microcontroller can handle.
 
-**Problem**: Servo moves the wrong direction or to wrong positions
+? What is a common ground for?
+- [ ] It makes the servos stronger
+- [x] It gives the board and the servo supply the same zero-volt reference
+- [ ] It replaces the signal wire
+> The signal wire only makes sense when both sides share the same ground.
 
-**Solution**: Check servo configuration in Bottango - you may need to invert the direction or adjust min/max PWM values
-
-**Why**: Different servo models have different PWM ranges (typical: 544-2400µs, but varies)
-
-**Problem**: ESP32 servo moves erratically
-
-**Solution**: Ensure you're using an ESP32 GPIO that supports PWM (LED PWM channels). Avoid pins used for other functions
-
-**Why**: Some ESP32 pins are reserved for special functions and don't support servo control
-
-**Problem**: Servo makes grinding/buzzing noise
-
-**Solution**: Check if servo is hitting physical limits. Adjust Bottango's servo range settings to prevent overtravel
-
-**Why**: Forcing a servo past its mechanical limits damages gears
-
----
-
-Next up: [Configuring Bottango and Assigning Servos](04_configure_bottango.md)
-
----
+? A servo grinds at the end of its travel. What is the likely cause?
+- [ ] The USB cable is charge-only
+- [x] It is pushing against a stop, so it is stalled
+- [ ] The Hardware window is closed
+> A stalled servo draws high current and can damage its gears, so reduce the range.
+{% endquiz %}

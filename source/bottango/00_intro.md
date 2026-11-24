@@ -1,111 +1,90 @@
 ---
 title: Introduction to Bottango
-description: Get started with Bottango – a visual tool for animating servos and bringing your robotic creations to life without writing code.
+description: Get started with Bottango, a visual tool for animating servos and bringing your robotic creations to life without writing code.
 layout: lesson
 type: page
 cover: /learn/bottango/assets/banners/00_intro.jpg
-date_updated: 2025-05-03
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Overview
+Ahoy there makers! Have you ever wanted a puppet that nods, a prop that jumps out at trick-or-treaters, or a parrot that moves its head to a song? Let's build one, without writing a single line of code.
 
-`Bottango` is a powerful and intuitive motion engine designed to let you **animate servos and other actuators** without writing any code. Whether you're creating a robotic puppet, an animatronic character, or simply want to add motion to your DIY project, Bottango makes it easy to bring your ideas to life.
-
-Bottango (<https://bottango.com>) is a free application for Windows and Mac that connects to microcontroller boards like **Arduino Uno** or **ESP32**. It gives you a timeline-style editor, similar to animation software, where you can create precise servo movements, add events, and even sync animations to music.
-
-Unlike traditional servo control that requires coding, Bottango provides a **drag-and-drop interface** and real-time playback, making it ideal for beginners and advanced makers alike.
+![Bottango start screen with New Studio Project, Open A Project and the Maxwell and Louie kits](/learn/bottango/assets/intro.png){:class="img-fluid w-100"}
 
 ---
+
+## Overview
+
+Bottango is free animation software for robots and animatronics. You build or import a character, attach servos to its joints, and animate it on a timeline with keyframes, much as you would in animation software. Bottango (<https://www.bottango.com>) can drive your hardware live over USB, or export your animations as Arduino-compatible code so the board can play them on its own.
+
+Bottango runs on Windows, Mac and Linux, and the software is free to download. The Arduino-compatible driver that runs on your board is open source. Always check the official site for the current system requirements and licence terms.
+
+Here is the journey we'll take:
+
+```mermaid
+flowchart LR
+    A["Install Bottango"] --> B["Put the driver on a board"]
+    B --> C["Wire and power servos"]
+    C --> D["Configure servos in Bottango"]
+    D --> E["Animate with keyframes"]
+    E --> F["Add audio and live control"]
+    F --> G["Export to run standalone"]
+```
 
 ## Course Content
 
-In this course, you'll explore:
-
-- Installing and configuring Bottango on your computer
-- Connecting and setting up microcontroller boards (Arduino, ESP32)
-- Wiring servos and understanding power requirements
-- Creating smooth motion sequences with the timeline editor
-- Using triggers and events for interactive animations
-- Syncing servo movements to music and audio
-- Controlling animations with gamepads and external inputs
-- Building complete animatronic projects from start to finish
-
----
+- Installing Bottango and finding your way around
+- Putting the Bottango driver on an Arduino or ESP32 board
+- Wiring servos and powering them safely
+- Setting up servos in a project
+- Creating motion with keyframes and easing
+- Making animations interactive
+- Syncing movement to audio
+- Exporting for standalone playback
+- Controlling servos live with a gamepad
 
 ## Key Results
 
-After completing this course, you'll be able to:
+After completing this course, you will be able to:
 
 - Set up Bottango with your Arduino or ESP32 board
-- Wire and configure servos for precise control
-- Create fluid, lifelike animations without writing code
-- Build interactive robotic projects with gamepad control
-- Sync servo movements to music for performances
-- Design and deploy complete animatronic characters
-
----
+- Wire servos with a separate power supply and a common ground
+- Create smooth, lifelike motion without code
+- Sync servo movements to music
+- Control servos live with a gamepad
+- Export an animation so it runs without your computer
 
 ## What you'll need
 
-Here's a list of recommended components to follow along with the course:
-
-- A Windows or Mac computer
-- A microcontroller (Arduino Uno, Nano, or ESP32)
-- 1–3 SG90 or MG90S servos
-- USB cable to connect your board
-- External power supply (for more than 1 servo)
-- Jumper wires and a breadboard (optional)
-
-You'll also need to download Bottango from the official site:
-
-[Download Bottango](https://bottango.com)
-
----
+- A Windows, Mac or Linux computer
+- An Arduino Uno R3 or an ESP32 board, with a data-capable USB cable
+- One to three hobby servos, such as SG90 or MG90S
+- A separate 5V power supply for the servos (a bench supply, battery pack or servo shield)
+- Jumper wires, and a breadboard if you like
+- Optional: a USB gamepad, and the Arduino IDE (free from arduino.cc)
 
 ## How the course works
 
-Throughout this course, you'll find:
+**One idea per lesson.** Each lesson starts with what you will be able to do, teaches one step, and ends with exercises and a short quiz. Your quiz score is kept in your browser and shown in the sidebar.
 
-- **Step-by-step instructions** with screenshots and diagrams
-- **Real-world examples** showing practical applications
-- **Troubleshooting tips** for common issues
-- **Hands-on exercises** to practice what you've learned
-- **Interactive challenges** to test your skills
+**Hardware optional at first.** You can learn the timeline in lessons 5 to 7 with the on-screen simulation alone, though the real thing is more fun.
 
-Each lesson builds on the previous one, starting with installation and progressing to advanced animation techniques. By the end, you'll have the skills to create your own animatronic projects.
+**Checked against the docs.** Bottango is updated often. We checked the course against the official documentation at [docs.bottango.com](https://docs.bottango.com), but button names and menus move between versions. If something looks a little different, trust the official docs.
 
-> **Note:** Code blocks and configuration examples will be shown in `monospace font` for easy identification.
-
----
+**Mistakes are normal.** Look at the Common Issues list in each lesson before assuming something is broken.
 
 ## Prerequisites
 
-This course assumes basic knowledge of:
-
-- Working with microcontrollers (helpful but not required)
-- Basic electronics concepts (servos, power supplies)
-
-No coding experience is required! That's the beauty of Bottango.
-
----
+You do not need to know how to code. A little electronics helps: [Electronics basics](/learn/electronics_basics/) covers power, ground and breadboards, and [Motors and motor drivers](/learn/motors_and_drivers/) explains why motors need their own power.
 
 ## What's Next
 
-After completing this course, you might enjoy:
+After this course, try the [Robot Eye Mechanism](/learn/eye_mechanism/) course, which is full of servo-driven movement, or [Robotics 101](/learn/robotics_101/) to see how robots are put together.
 
-- Building animatronic characters and puppets
-- Creating interactive robot projects
-- Exploring advanced servo control with MicroPython
-- Designing your own custom motion control systems
+> **Teachers**: this course suits learners aged about 11 and up, working in pairs. Allow 30 to 45 minutes per lesson, and a double lesson for wiring and the board setup (lessons 2 to 4). Each pair needs one computer, one board, one to three servos and a separate 5V supply, so plan for shared kit. Teach the power rules before anyone plugs anything in. School computers often block software installs and USB access, so ask your IT team to install Bottango and the Arduino IDE beforehand. Lessons 1, 5, 6 and 7 can be done with no hardware using the on-screen simulation.
 
----
-
-Let's dive in and get your board talking to Bottango!
-
-Next up: [Installing Bottango](01_install.md)
-
----
+Ready? Let's install Bottango.

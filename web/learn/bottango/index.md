@@ -9,9 +9,26 @@ description: Learn how to bring characters and props to life using Bottango, a p
   course walks you through installing Bottango, wiring servos, programming boards,
   and creating expressive motion sequences.
 level: beginner
-course_duration: 0h 33m
+course_duration: 0h 54m
 lesson_count: 11
 first_lesson: 00_intro.html
+quiz_total: 30
+outcomes:
+- Install Bottango and connect an Arduino-compatible board to it
+- Wire servos safely, with a separate power supply and a common ground
+- Create a motion with keyframes and easing in the Bottango timeline
+- Add audio and time movements to it
+- Control servos live with a gamepad using a control scheme
+- Export an animation so the board can play it without the computer
+prerequisites:
+- Helpful but not required, Electronics basics
+- No coding experience is needed
+you_need:
+- A Windows, Mac or Linux computer
+- An Arduino Uno R3 or an ESP32 board, and a data-capable USB cable
+- One to three hobby servos such as SG90 or MG90S
+- A separate 5V power supply for the servos, and jumper wires
+- Optional, a USB gamepad, and the Arduino IDE
 navigation:
 - name: Bottango Basics
 - content:

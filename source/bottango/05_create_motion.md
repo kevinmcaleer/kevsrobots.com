@@ -1,151 +1,119 @@
 ---
 title: Creating Motion Sequences
-description: Learn how to animate your servos using Bottango’s timeline and keyframes.
+description: Learn how to animate your servos using Bottango's timeline, keyframes and easing curves.
 layout: lesson
 type: page
 cover: /learn/bottango/assets/banners/05_create_motion.jpg
-date_updated: 2025-05-03
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Now that your servos are configured, let’s bring your project to life by creating motion sequences using Bottango’s timeline editor.
+By the end of this lesson you will be able to create a looping animation with keyframes and smooth it with easing.
 
----
+Now for the fun part. Instead of telling a servo "go to 90 degrees", we tell it "be at 90 degrees at second 0, and at 0 degrees at second 1", and Bottango works out everything in between. That is the idea behind **keyframes**.
 
-## Step 1: Understanding the Timeline
+![The Animate view with the Animations panel on the right](/learn/bottango/assets/parrot.png){:class="img-fluid w-100"}
 
-The Bottango timeline is similar to animation software:
+> **Note**: button names and shortcut keys differ between versions of Bottango. Kev's original steps are kept here, and the official [Starting Animating](https://docs.bottango.com) pages in the docs are the final word.
 
-- **Time is shown horizontally** from left to right.
-- **Each servo gets its own track** in the timeline.
-- **Keyframes** define servo positions at specific moments.
+## Step 1: The timeline
 
-You can create smooth, lifelike motion by placing multiple keyframes along the timeline.
+The Bottango timeline works like animation software:
 
----
+- Time runs from left to right.
+- Each servo gets its own track.
+- A **keyframe** says where a servo should be at a particular moment.
 
-## Step 2: Add Your First Keyframe
+Start in the **Animate** view and create a new animation from the **Animations** panel. You can use **New Empty Animation**, or **New Example Animation** to see how a finished one is built. An animation's duration is set from its settings button, and the docs say you enter it as minutes, seconds and frames.
 
-1. Select a servo from the left panel.
-2. Move the timeline cursor to the 1-second mark.
-3. Set the desired servo position using the **slider**.
-4. Click **Add Keyframe** (or press `K`).
+## Step 2: Add your first keyframes
 
-A keyframe will appear on the timeline — this marks the servo’s position at that point in time.
+1. Select a servo.
+2. Move the timeline cursor to a time.
+3. Set the servo position with the slider.
+4. Add a keyframe at that point.
 
----
+Then repeat at other times. For a simple back-and-forth movement:
 
-## Step 3: Add More Keyframes
+| Time | Position |
+|------|----------|
+| 0 s | 90 degrees |
+| 1 s | 0 degrees |
+| 2 s | 90 degrees |
+{:class="table table-single"}
 
-Move the timeline cursor forward, adjust the servo’s position, and add more keyframes. For example:
+Press play and the servo sweeps out and back. Bottango fills in the movement between your keyframes, which is called **interpolation**.
 
-- 0s → 90°  
-- 1s → 0°  
-- 2s → 90°  
+```mermaid
+flowchart LR
+    K1["Keyframe 0 s<br/>90 degrees"] -->|"interpolate"| K2["Keyframe 1 s<br/>0 degrees"]
+    K2 -->|"interpolate"| K3["Keyframe 2 s<br/>90 degrees"]
+    K3 -->|"loop"| K1
+```
 
-This will create a simple back-and-forth movement.
+## Step 3: Make it feel alive with easing
 
-> ⏯️ Click the **Play** button to preview the animation.
+If a servo moves at a constant speed it looks like a machine. Real things speed up and slow down. Bottango lets you change the **curve** between keyframes, and has a graph view for editing the curves by hand. The docs list **Graph View** and **Editing Keyframes** as the places to look.
 
----
+- Drag keyframes to change their timing.
+- Use ease-in and ease-out style curves so the movement starts and stops gently.
+- Close keyframes make fast movement, and wide gaps make slow movement.
 
-## Step 4: Fine-Tune the Motion
+## Good habits
 
-- **Drag keyframes** left or right to change timing.
-- **Right-click a keyframe** to delete or change easing.
-- Choose between **linear**, **ease-in**, **ease-out**, or **custom easing curves** for smoother transitions.
-
----
-
-## Best Practices for Animations
-
-- Start with slow, wide movements — fine-tune later.
-- Use easing to create more natural, lifelike motion.
-- Keep an eye on your servo’s physical limits to avoid stalling or jitter.
-
----
-
-## Looping & Playback
-
-You can loop the animation by enabling the **Loop Playback** option.
-
-To play the full sequence:
-
-- Click **Play** or press `Space`
-- Watch your servo(s) follow the animation in real time!
-
----
-
-## You're Animating!
-
-At this point, your project is moving based on the keyframes you created — no code required. Bottango takes care of the hard work.
-
----
+- Start with slow, wide movements, then refine.
+- Make the last keyframe the same as the first, so a loop does not jump.
+- Keep your servo inside its safe range. Pushing a servo to its mechanical limits makes it strain.
+- Save often, and use undo when you slip.
 
 ## Common Issues
 
-- **Problem**: Keyframe added but servo doesn't move during playback
-- **Solution**: Check that you've set different positions for each keyframe. If all keyframes are at the same position, there's no motion to display
-- **Why**: Keyframes define positions - the servo interpolates between them
+- **Problem**: I added keyframes but the servo does not move.
+- **Solution**: Check the keyframes have different positions, and that Master Live is on and the board is connected.
+- **Why**: Identical keyframes mean there is nothing to interpolate, and Master Live must be on for the real servo to follow.
 
-- **Problem**: Animation is too fast or too slow
-- **Solution**: Drag keyframes further apart (slower) or closer together (faster) on the timeline. You can also adjust playback speed in settings
-**Why**: Timeline spacing controls the duration of movement between keyframes
+- **Problem**: The animation is jerky or robotic.
+- **Solution**: Use easing curves on your keyframes, and avoid very large jumps over very short times.
+- **Why**: A constant speed looks mechanical, and a big jump asks the servo to move faster than it can.
 
-- **Problem**: Servo movement is jerky or robotic
-- **Solution**: Add easing curves to your keyframes. Right-click keyframe → choose "ease-in-out" for smoother, more natural motion
-- **Why**: Linear interpolation creates constant-speed movement which looks mechanical
+- **Problem**: The loop jumps at the end.
+- **Solution**: Make the last keyframe match the first.
+- **Why**: Otherwise the servo snaps back when the animation restarts.
 
-- **Problem**: Can't see keyframes on timeline
-- **Solution**: Zoom in using the timeline zoom controls (usually mouse wheel or zoom slider). Keyframes might be too close together at current zoom level
-- **Why**: Timeline view compresses when showing long animations
-
-- **Problem**: Animation loops but has a "jump" at the end
-- **Solution**: Make sure your last keyframe position matches your first keyframe position (e.g., both at 90°)
-- **Why**: If start/end positions differ, the servo will snap back to the beginning when looping
-
-- **Problem**: Deleted keyframe by accident
-- **Solution**: Use Ctrl+Z (Cmd+Z on Mac) to undo. Bottango supports multiple undo levels
-- **Why**: Undo feature helps recover from accidental deletions
-
-- **Problem**: Timeline playback stops in the middle
-- **Solution**: Check your timeline length setting. Extend the timeline duration if your keyframes go beyond current timeline end
-- **Why**: Playback stops when it reaches the timeline endpoint
-
----
+- **Problem**: The animation stops partway through.
+- **Solution**: Check the animation's duration in its settings and extend it.
+- **Why**: Playback stops at the end of the animation, however many keyframes you placed.
 
 ## Try it Yourself
 
-Ready to practice your new animation skills? Try these exercises:
+1. **Wave**: make a 3-second animation that moves a servo from 0 to 180 degrees and back. Check the servo stays inside a safe range first.
+2. **Easing experiment**: copy the same motion and give it different curves. How do they look and feel different?
+3. **Two servos**: make one servo move up while the other moves down, and swap at the 2-second mark.
+4. **Breathing**: make a loop that moves slowly from 90 to 95 degrees and back over about four seconds, with smooth easing.
 
-1. **Wave Motion**: Create a 3-second animation that makes your servo wave back and forth (0° → 180° → 0°)
+> **Teachers**: set a safe servo range before pupils animate, so keyframes at 0 or 180 cannot drive a horn into a stop. Pupils often fix a horn, set a keyframe and are surprised by sudden movement, so keep hands clear and ask them to announce "going live" before turning on Master Live.
 
-2. **Easing Experiment**: Create the same motion with three different easing types:
-   - Linear easing (constant speed)
-   - Ease-in-out (starts slow, speeds up, then slows down)
-   - Custom curve (experiment with the curve editor)
+## Check your understanding
 
-   Compare how each one looks and feels!
+{% quiz %}
+? What does a keyframe describe?
+- [ ] The colour of a servo wire
+- [x] Where a servo should be at a specific moment
+- [ ] The USB port speed
+> Keyframes mark positions at times, and Bottango fills in the rest.
 
-3. **Multi-Servo Challenge**: If you have 2+ servos, create a coordinated animation where:
-   - Servo 1 moves up while Servo 2 moves down
-   - They swap positions at the 2-second mark
-   - The animation loops smoothly
+? Why use easing curves?
+- [ ] They make servos draw less power
+- [x] They make movement speed up and slow down, so it looks more natural
+- [ ] They are needed to save the project
+> Constant speed movement looks mechanical.
 
-4. **Realistic Motion**: Create a "breathing" animation:
-   - Start at 90° (neutral)
-   - Slowly move to 95° over 2 seconds
-   - Return to 90° over 2 seconds
-   - Use ease-in-out for natural movement
-   - Enable looping
-
-**Bonus Challenge**: Can you create a 5-second animation that tells a story? Think of a character nodding "yes" or a robot arm reaching for something!
-
----
-
-Next up: [Using Triggers and Interactivity](06_triggers.md)
-
----
+? An animation loops with a jump at the end. What should you check?
+- [ ] That the servo has a separate power supply
+- [ ] That the first keyframe is deleted
+- [x] That the last keyframe matches the first
+> The servo snaps back to the start position if the end does not match.
+{% endquiz %}
