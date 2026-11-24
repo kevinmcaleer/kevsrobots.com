@@ -1,560 +1,168 @@
 ---
-title: Troubleshooting and Optimization
+title: Troubleshooting and Improving Your Model
 description: >-
-    Master troubleshooting techniques and optimization strategies for production-ready object detection systems
+    Measure precision and recall, work out whether your detector misses things or imagines things, and fix it with better data, thresholds and calibration.
 type: page
 layout: lesson
 cover: /learn/object_model/assets/banners/07_troubleshooting.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Overview
+By the end of this lesson you will be able to measure whether a detector misses objects or invents them, and choose the right fix for each.
 
-Even the best object detection systems encounter issues in real-world deployment. This lesson equips you with systematic troubleshooting techniques, performance optimization strategies, and solutions to common problems you'll face when deploying models to production.
+## Two different kinds of wrong
 
----
+"The model is bad" is not a diagnosis. A detector can go wrong in two opposite ways, and the cures differ.
 
-## Objectives
+- A **miss** (false negative): a real mug was there and the model said nothing.
+- A **false alarm** (false positive): the model boxed a mug that was not there.
 
-By the end of this lesson, you will:
+Two numbers describe them. **Recall** asks "of the real objects, how many did it find?" **Precision** asks "when it said mug, how often was it right?"
 
-- Diagnose and fix model accuracy issues
-- Resolve deployment and hardware problems
-- Optimize inference speed and resource usage
-- Handle edge cases and challenging conditions
-- Implement robust error handling
-- Monitor and maintain production systems
+```mermaid
+flowchart TD
+    A[Detector is wrong] --> B{What kind of wrong?}
+    B -- Misses real objects --> C[Low recall]
+    B -- Boxes things that are not there --> D[Low precision]
+    C --> C1[Lower the threshold]
+    C --> C2[Add photos of the missed cases]
+    D --> D1[Raise the threshold]
+    D --> D2[Add background photos with no objects]
+```
 
----
+## Measure it
 
-## Problem Category 1: Model Not Detecting Objects
+To count hits, you need to decide when a predicted box matches a real one. The standard test is **IoU** (intersection over union): the overlap area divided by the combined area. An IoU of 0.5 or more with the right class counts as a hit. This complete program scores three test images:
 
-### Symptom: Model runs but finds nothing
+```python
+def iou(a, b):
+    """Overlap of two boxes given as (x1, y1, x2, y2): 0 is none, 1 is identical."""
+    ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])
+    ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])
+    inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+    area_a = (a[2] - a[0]) * (a[3] - a[1])
+    area_b = (b[2] - b[0]) * (b[3] - b[1])
+    return inter / (area_a + area_b - inter)
 
-**Diagnosis Steps:**
 
-1. **Test on training images first:**
+def score_image(truths, predictions, min_iou=0.5):
+    """Count hits, false alarms and misses for one image."""
+    unmatched = list(truths)
+    hits = false_alarms = 0
+    for name, _score, box in sorted(predictions, key=lambda p: -p[1]):
+        best = None
+        for truth in unmatched:
+            if truth[0] == name and iou(box, truth[1]) >= min_iou:
+                best = truth
+                break
+        if best:
+            unmatched.remove(best)
+            hits += 1
+        else:
+            false_alarms += 1
+    return hits, false_alarms, len(unmatched)
 
-    ```python
-    # Load a known training image
-    test_image = cv2.imread('custom_dataset/train/images/img_001.jpg')
-    results = model.detect(test_image)
 
-    if len(results) == 0:
-        print("Model doesn't detect training images - model issue")
-    else:
-        print("Model works on training data - deployment issue")
-    ```
+# (class, box) for what is really there, (class, score, box) for what the model said.
+images = [
+    ([("mug", (100, 80, 340, 420))], [("mug", 0.90, (110, 90, 335, 410))]),
+    ([("mug", (50, 50, 150, 150)), ("laptop", (200, 200, 500, 450))],
+     [("laptop", 0.80, (210, 190, 490, 440))]),
+    ([], [("mug", 0.60, (300, 300, 380, 380))]),
+]
 
-2. **Check confidence threshold:**
+total_hits = total_fa = total_miss = 0
+for truths, predictions in images:
+    hits, fa, miss = score_image(truths, predictions)
+    total_hits += hits
+    total_fa += fa
+    total_miss += miss
 
-    ```python
-    # Try very low threshold
-    results = model.detect(image, confidence_threshold=0.1)
+precision = total_hits / (total_hits + total_fa)
+recall = total_hits / (total_hits + total_miss)
+print(f"Hits: {total_hits}, false alarms: {total_fa}, misses: {total_miss}")
+print(f"Precision: {precision:.2f} (when it speaks, how often is it right?)")
+print(f"Recall:    {recall:.2f} (of the real objects, how many did it find?)")
+```
 
-    if results:
-        print(f"Got detections at low threshold: {[r['score'] for r in results]}")
-        print("Issue: Threshold too high for your use case")
-    ```
+Output:
 
-3. **Verify class mappings:**
+```text
+Hits: 2, false alarms: 1, misses: 1
+Precision: 0.67 (when it speaks, how often is it right?)
+Recall:    0.67 (of the real objects, how many did it find?)
+```
 
-    ```python
-    # Print model's expected classes
-    print("Model classes:", model.class_names)
+Image 1 is a hit. Image 2 found the laptop but missed the mug. Image 3 boxed a mug in an empty scene. Ultralytics reports the same ideas for you: `model.val()` on your PyTorch weights prints precision, recall and mAP per class.
 
-    # Check they match your dataset
-    print("Dataset classes:", dataset.class_names)
+## Choose the fix to match the problem
 
-    if model.class_names != dataset.class_names:
-        print("ERROR: Class mismatch!")
-    ```
-
----
-
-**Common Causes & Solutions:**
-
-| Cause | Solution | Why |
-|-------|----------|-----|
-| Model undertrained | Train for more epochs (100+) | Needs more iterations to learn features |
-| Dataset too small | Collect 2-3x more images | Model needs diverse examples |
-| Wrong input size | Verify image preprocessing matches training | Size mismatch breaks learned features |
-| Class mapping wrong | Fix label indices in deployment code | Model outputs indices, not names |
-| Lighting mismatch | Collect data in target environment | Model trained on different conditions |
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Misses objects in dim light or odd angles | Training photos did not cover that case | Photograph those cases, label them, retrain |
+| Boxes the wrong object (mug vs cup) | Similar looking classes, or inconsistent labels | Fix label spellings and add contrasting examples |
+| Sees mugs on empty desks | No background examples | Add photos with no objects, with empty label files |
+| Works well in training scores but badly on the camera | Phone photos differ from the AI Camera | Add photos taken with the AI Camera itself |
+| Good on your PyTorch model, worse after export | Quantisation loss | Recalibrate with photos from the real scene, compare `model.val()` before and after |
 {:class="table table-single"}
 
----
+Change **one** thing at a time, and test on the same fixed set of photos each time. If you change the data and the threshold together, you will not know which helped.
 
-## Problem Category 2: High False Positive Rate
+## Pi-side problems
 
-### Symptom: Model detects objects that aren't there
+If the model works on your computer but not on the camera, work from the outside in:
 
-**Diagnosis:**
+1. Does the stock MobileNet SSD demo still run? If not, it is hardware or software.
+2. Does your `first_inference.py` receive output tensors? If not, the `.rpk` did not load.
+3. Do the numbers look sensible? Print one frame's outputs and compare them to the PyTorch model on the same photo.
 
-```python
-# Analyze false positives
-false_positives = []
+**Fast and honest tip:** a detector running on a live camera sees blur, glare and changing exposure that a still-photo dataset never showed it. Take 50 photos of real use on the AI Camera, add them to the dataset, and retrain. This single step fixes more problems than any setting.
 
-for detection in results:
-    if detection['score'] < 0.8:  # Likely false positive
-        false_positives.append(detection)
+> **Teachers**: This is a good lesson for pairs. One learner plays the camera, holding objects at awkward angles and in different light, while the other records hits, misses and false alarms in a table. Comparing tables between groups makes precision and recall concrete. Keep a shared folder of "hard photos" the whole class adds to, and retrain once together.
 
-print(f"False positives: {len(false_positives)}/{len(results)}")
-print("Common classes:", [d['label'] for d in false_positives])
-```
+## Try it Yourself
 
-**Solutions:**
+1. Change the third image in the program so the false alarm overlaps nothing, then work out what the new precision should be before running it.
+2. Add a fourth image that the model gets completely right and see how precision and recall move.
+3. Run `model.val()` with your `best.pt` and match its precision and recall numbers to what you have just learned.
+4. Challenge: record 20 real frames from the AI Camera, label which are hits, misses and false alarms by hand, and compute your real-world precision and recall.
 
-1. **Increase confidence threshold:**
-    ```python
-    # Be more selective
-    results = model.detect(image, confidence_threshold=0.7)  # Up from 0.5
-    ```
+## Common Issues
 
-2. **Add negative examples to dataset:**
-    ```bash
-    # Collect "background" images
-    # - Empty scenes
-    # - Similar but different objects
-    # - Common false positive scenarios
+- **Problem**: Everything is detected as one class.
+- **Solution**: Check `classes.txt` order against the numbers in your label files, and check class balance in the dataset.
+- **Why**: If one class has most of the examples, or numbers are mixed up, the model learns to guess it.
 
-    # Label them with no bounding boxes
-    ```
+- **Problem**: The camera shows no detections but the PyTorch model works on the same photo.
+- **Solution**: Check that your confidence threshold and label order match, and look at the raw output scores before you filter them.
+- **Why**: A wrong threshold or box format can hide valid detections.
 
-3. **Use non-maximum suppression (NMS):**
-    ```python
-    def apply_nms(detections, iou_threshold=0.5):
-        """Remove overlapping duplicate detections"""
-        import torch
-        from torchvision.ops import nms
+- **Problem**: Recall improves but precision collapses when you lower the threshold.
+- **Solution**: Pick the threshold your robot can live with, for example a higher one if a false alarm makes it stop for no reason.
+- **Why**: Precision and recall trade against each other, so the right balance depends on the job.
 
-        boxes = torch.tensor([d['box'] for d in detections])
-        scores = torch.tensor([d['score'] for d in detections])
+## Check your understanding
 
-        keep_indices = nms(boxes, scores, iou_threshold)
+{% quiz %}
+? A detector boxes a mug on an empty desk. What is that called?
+- [ ] A miss
+- [x] A false alarm (false positive)
+- [ ] A hit
+> A false positive is a detection of something that is not there.
 
-        return [detections[i] for i in keep_indices]
-    ```
+? Which change would most help a model that misses objects in dim light?
+- [ ] Raising the confidence threshold
+- [x] Adding labelled photos taken in dim light and retraining
+- [ ] Deleting the validation set
+> Data from the missing condition teaches the model what it does not yet know.
 
-4. **Filter by size:**
-    ```python
-    def filter_tiny_boxes(detections, min_area=500):
-        """Remove unreasonably small detections"""
-        filtered = []
-        for det in detections:
-            x1, y1, x2, y2 = det['box']
-            area = (x2 - x1) * (y2 - y1)
-            if area >= min_area:
-                filtered.append(det)
-        return filtered
-    ```
-
----
-
-## Problem Category 3: Performance Issues
-
-### Symptom: Slow inference, low FPS
-
-**Measure current performance:**
-
-```python
-import time
-import numpy as np
-
-# Benchmark 100 frames
-times = []
-for _ in range(100):
-    start = time.time()
-    frame = picam2.capture_array()
-    results = model.detect(frame)
-    times.append(time.time() - start)
-
-avg_time = np.mean(times)
-fps = 1 / avg_time
-
-print(f"Average inference: {avg_time*1000:.1f} ms")
-print(f"FPS: {fps:.1f}")
-print(f"Min: {min(times)*1000:.1f} ms, Max: {max(times)*1000:.1f} ms")
-```
-
-**Optimization Strategies:**
-
-### 1. Reduce Input Resolution
-
-    ```python
-    # Before: 640x480 = 307,200 pixels
-    config = picam2.create_preview_configuration(
-        main={"size": (640, 480)}
-    )
-
-    # After: 320x240 = 76,800 pixels (4x fewer!)
-    config = picam2.create_preview_configuration(
-        main={"size": (320, 240)}
-    )
-    # Result: ~2x faster inference
-    ```
-
-### 2. Model Quantization
-
-    ```python
-    # Convert to INT8 (already done in IMX500 conversion)
-    # But verify it worked:
-
-    import os
-    model_size_mb = os.path.getsize('model.onnx') / 1024 / 1024
-    rpk_size_mb = os.path.getsize('model.rpk') / 1024 / 1024
-
-    print(f"ONNX size: {model_size_mb:.1f} MB")
-    print(f"RPK size: {rpk_size_mb:.1f} MB")
-    print(f"Compression: {model_size_mb/rpk_size_mb:.1f}x")
-
-    # Should see 3-4x compression
-    ```
-
-### 3. Frame Skipping
-
-    ```python
-    class FrameSkipper:
-        def __init__(self, skip_frames=2):
-            self.skip_frames = skip_frames
-            self.frame_counter = 0
-            self.last_results = []
-
-        def process(self, frame):
-            self.frame_counter += 1
-
-            if self.frame_counter % (self.skip_frames + 1) == 0:
-                # Run inference on this frame
-                self.last_results = model.detect(frame)
-
-            # Return cached results for skipped frames
-            return self.last_results
-
-    # Usage:
-    skipper = FrameSkipper(skip_frames=2)  # Process every 3rd frame
-    while True:
-        frame = picam2.capture_array()
-        results = skipper.process(frame)  # 3x faster!
-    ```
-
-### 4. Optimize Drawing
-
-    ```python
-    # Slow: Drawing every box every frame
-    for detection in results:
-        draw_box(frame, detection)  # Expensive!
-
-    # Fast: Only draw if displaying
-    if display_enabled:
-        for detection in results:
-            draw_box(frame, detection)
-    ```
-
----
-
-## Problem Category 4: Memory Issues
-
-### Symptom: System crashes after hours of operation
-
-**Monitor memory usage:**
-
-```python
-import psutil
-import gc
-
-def log_memory():
-    process = psutil.Process()
-    mem_mb = process.memory_info().rss / 1024 / 1024
-    print(f"Memory usage: {mem_mb:.1f} MB")
-
-# Call every 100 frames
-if frame_counter % 100 == 0:
-    log_memory()
-    gc.collect()  # Force garbage collection
-```
-
-**Solutions:**
-
-1. **Release frames properly:**
-    ```python
-    # Bad:
-    frames = []
-    while True:
-        frame = picam2.capture_array()
-        frames.append(frame)  # Memory leak!
-
-    # Good:
-    while True:
-        frame = picam2.capture_array()
-        results = process(frame)
-        # frame is automatically released when out of scope
-    ```
-
-2. **Limit saved images:**
-    ```python
-    import glob
-
-    def cleanup_old_detections(max_files=100):
-        """Keep only the most recent N detection images"""
-        files = sorted(glob.glob('detection_*.jpg'))
-        if len(files) > max_files:
-            for f in files[:-max_files]:
-                os.remove(f)
-
-    # Call periodically
-    if frame_counter % 1000 == 0:
-        cleanup_old_detections()
-    ```
-
-3. **Restart periodically:**
-    ```python
-    MAX_FRAMES = 10000
-
-    while frame_counter < MAX_FRAMES:
-        # Main loop
-        frame_counter += 1
-
-    # Restart process
-    print("Restarting for memory cleanup...")
-    os.execv(sys.executable, ['python3'] + sys.argv)
-    ```
-
----
-
-## Problem Category 5: Environmental Challenges
-
-### Low Light Conditions
-
-**Problem**: Model fails at night or in dim lighting
-
-**Solutions:**
-
-1. **Camera settings:**
-    ```python
-    # Increase exposure time
-    picam2.set_controls({
-        "ExposureTime": 50000,  # Microseconds
-        "AnalogueGain": 8.0      # Amplify signal
-    })
-    ```
-
-2. **Add IR illumination:**
-    ```bash
-    # Use IR LEDs (invisible to humans, visible to camera)
-    # Models trained on visible light work on IR with some accuracy loss
-    ```
-
-3. **Collect night training data:**
-    ```bash
-    # Take 100-200 images in target lighting conditions
-    # Retrain or fine-tune model
-    ```
-
-### Glare and Reflections
-
-**Problem**: Windows, monitors cause false detections
-
-**Solutions:**
-
-1. **Filter by detection stability:**
-    ```python
-    class StableDetector:
-        def __init__(self, min_frames=3):
-            self.min_frames = min_frames
-            self.detection_history = []
-
-        def filter(self, detections):
-            # Only return detections seen in multiple frames
-            stable = []
-            for det in detections:
-                if self.appears_in_history(det):
-                    stable.append(det)
-            return stable
-    ```
-
-2. **Adjust camera angle:**
-    ```bash
-    # Mount camera to minimize direct reflections
-    # Use polarizing filter if necessary
-    ```
-
-### Motion Blur
-
-**Problem**: Fast-moving objects are blurry, not detected
-
-**Solutions:**
-
-1. **Increase frame rate:**
-    ```python
-    config = picam2.create_video_configuration(
-        main={"size": (640, 480), "format": "RGB888"},
-        controls={"FrameRate": 60}  # Up from 30
-    )
-    ```
-
-2. **Reduce exposure time:**
-    ```python
-    picam2.set_controls({
-        "ExposureTime": 10000  # Shorter exposure = less blur
-    })
-    ```
-
----
-
-## Production Best Practices
-
-### 1. Robust Error Handling
-
-    ```python
-    def safe_detection_loop():
-        consecutive_errors = 0
-        MAX_ERRORS = 5
-
-        while True:
-            try:
-                frame = picam2.capture_array()
-                results = model.detect(frame)
-                process_results(results)
-
-                consecutive_errors = 0  # Reset on success
-
-            except Exception as e:
-                consecutive_errors += 1
-                print(f"Error {consecutive_errors}/{MAX_ERRORS}: {e}")
-
-                if consecutive_errors >= MAX_ERRORS:
-                    print("Too many errors, restarting...")
-                    restart_system()
-
-                time.sleep(1)  # Backoff before retry
-    ```
-
-### 2. Logging and Monitoring
-
-    ```python
-    import logging
-    from datetime import datetime
-
-    # Setup logging
-    logging.basicConfig(
-        filename=f'detector_{datetime.now():%Y%m%d}.log',
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
-
-    # Log key events
-    logging.info(f"System started")
-    logging.info(f"Model loaded: {model_path}")
-
-    # Log detections
-    logging.info(f"Detected {len(results)} objects: {class_counts}")
-
-    # Log errors
-    logging.error(f"Failed to process frame: {e}")
-    ```
-
-### 3. Health Monitoring
-
-    ```python
-    class HealthMonitor:
-        def __init__(self):
-            self.last_detection_time = time.time()
-            self.total_detections = 0
-
-        def check_health(self):
-            # No detections for 5 minutes?
-            if time.time() - self.last_detection_time > 300:
-                logging.warning("No detections in 5 minutes")
-
-            # Check memory
-            if psutil.virtual_memory().percent > 90:
-                logging.warning("High memory usage!")
-
-            # Check temperature (Pi-specific)
-            temp = os.popen("vcgencmd measure_temp").readline()
-            if "temp=" in temp:
-                temp_c = float(temp.replace("temp=","").replace("'C\n",""))
-                if temp_c > 70:
-                    logging.warning(f"High temperature: {temp_c}°C")
-
-        def record_detection(self):
-            self.last_detection_time = time.time()
-            self.total_detections += 1
-    ```
-
----
-
-## Advanced Debugging
-
-### Visualize Model Outputs
-
-```python
-import matplotlib.pyplot as plt
-
-def visualize_confidence_distribution(results):
-    """See what confidence levels your model outputs"""
-    scores = [r['score'] for r in results]
-
-    plt.figure(figsize=(10, 5))
-    plt.hist(scores, bins=20, edgecolor='black')
-    plt.xlabel('Confidence Score')
-    plt.ylabel('Count')
-    plt.title('Detection Confidence Distribution')
-    plt.axvline(x=0.5, color='r', linestyle='--', label='Current Threshold')
-    plt.legend()
-    plt.savefig('confidence_dist.png')
-    plt.show()
-```
-
-### Compare Predictions to Ground Truth
-
-```python
-def calculate_accuracy(predictions, ground_truth, iou_threshold=0.5):
-    """Measure model performance on test set"""
-    true_positives = 0
-    false_positives = 0
-    false_negatives = 0
-
-    for pred_box in predictions:
-        best_iou = 0
-        for gt_box in ground_truth:
-            iou = calculate_iou(pred_box, gt_box)
-            best_iou = max(best_iou, iou)
-
-        if best_iou >= iou_threshold:
-            true_positives += 1
-        else:
-            false_positives += 1
-
-    false_negatives = len(ground_truth) - true_positives
-
-    precision = true_positives / (true_positives + false_positives)
-    recall = true_positives / (true_positives + false_negatives)
-
-    return precision, recall
-```
-
----
-
-## Summary
-
-You've mastered:
-- Systematic troubleshooting for accuracy, performance, and stability
-- Optimizing inference speed with multiple techniques
-- Handling environmental challenges (lighting, glare, motion)
-- Implementing production-ready error handling
-- Monitoring system health and performance
-- Advanced debugging and validation techniques
-
-You're now equipped to deploy and maintain robust object detection systems in production!
-
----
-
-## Next Lesson
-
-In the final lesson, you'll review everything you've learned and discover next steps for advancing your computer vision skills.
-
----
+? What does IoU measure?
+- [ ] How fast the model runs
+- [x] How much a predicted box overlaps a real box, as overlap divided by combined area
+- [ ] The number of classes
+> IoU is intersection over union, and a hit usually needs 0.5 or more.
+{% endquiz %}
