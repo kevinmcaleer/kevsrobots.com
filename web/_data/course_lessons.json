@@ -4223,15 +4223,15 @@
     "author": "Kevin McAleer",
     "date_published": "2023-01-17",
     "groups": [
-      "robotics",
-      "raspberry pi",
-      "ros"
+      "robots",
+      "arduino",
+      "micropython"
     ],
     "lessons": [
       {
-        "file": "00_overview.md",
+        "file": "00_intro.md",
         "section": "Overview",
-        "url": "/learn/robotics_101/00_overview.html"
+        "url": "/learn/robotics_101/00_intro.html"
       },
       {
         "file": "lesson_01.md",

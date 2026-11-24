@@ -799,14 +799,14 @@
   description: 'A friendly first look at robots: what a robot is, a quick history
     from ancient automata to today, the skills you need to build one, and the parts
     that make a robot work.'
-  duration: 0h 15m
+  duration: 0h 27m
   groups:
-  - robotics
-  - raspberry pi
-  - ros
+  - robots
+  - arduino
+  - micropython
   lessons: 6
   level: beginner
-  link: /learn/robotics_101/00_overview.html
+  link: /learn/robotics_101/00_intro.html
   name: Robotics 101
   video: bHOi_JGL0QE
 - author: Kevin McAleer
