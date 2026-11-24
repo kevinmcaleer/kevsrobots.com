@@ -3,25 +3,27 @@ layout: lesson
 title: 'Bonus Lesson: Creating and Using Cargo'
 author: Kevin McAleer
 type: page
-cover: /learn/scrawly_wally/assets/13.png
+cover: /learn/rust/assets/banners/13_cargo.jpg
 date: 2024-03-09
 previous: 12_summary_and_resources.html
-description: Learn how to create, manage, and build Rust projects using Cargo, Rust's
-  package manager and build system.
+description: Learn how Cargo creates projects, manages dependencies, and builds debug
+  and release versions of your Rust programs.
 percent: 100
-duration: 2
+duration: 5
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Introduction to Rust
 - content:
-  - section: Overview
+  - section: Getting Started
     content:
     - name: Introduction to Rust
-      link: 01_intro.html
-  - section: Setting Up a Rust Environment
-    content:
+      link: 00_intro.html
+    - name: Installing Rust and Your First Program
+      link: 01_install-and-hello.html
     - name: 'Rust vs. Python: Understanding the Differences'
       link: 02_rust_and_python.html
-  - section: Basics
+  - section: The Language
     content:
     - name: Rust Basics
       link: 03_rust_basics.html
@@ -52,65 +54,129 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-Cargo is not just a package manager; it's also a Rust project’s build system. It manages building your code, downloading the libraries your code depends on, and building those libraries. This bonus lesson will guide you through creating a new Rust project with Cargo, managing dependencies, and building projects.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
-
-- Understand how to create new Rust projects using Cargo.
-- Learn how to manage project dependencies.
-- Explore building and running Rust projects with Cargo.
+By the end of this lesson you will be able to create a project with Cargo, add a dependency, and choose between `cargo check`, `cargo build` and `cargo build --release`.
 
 ---
 
-### Creating a New Rust Project with Cargo
+## What Cargo does for you
 
-To start a new Rust project with Cargo, you can use the following command:
+Cargo is Rust's build system and package manager in one. It creates projects, downloads libraries (called **crates**) and their dependencies, runs the compiler with the right options, and runs tests. You used it in earlier lessons. Now let's look at how it works.
+
+## Creating a project
 
 ```bash
-cargo new project_name
+cargo new robot_math
+cd robot_math
 ```
 
-This command creates a new directory called `project_name` containing a `Cargo.toml` file (the manifest file for Rust projects) and a `src` directory with a `main.rs` file. The `Cargo.toml` file will include basic metadata about your project and a list of dependencies.
+Cargo creates:
 
-### Managing Dependencies
+```text
+robot_math/
+  Cargo.toml
+  src/
+    main.rs
+```
 
-Add dependencies to your project by listing them under `[dependencies]` in your `Cargo.toml` file. For example, to add the `serde` library:
+It also sets up a version-control repository with a sensible ignore file. `Cargo.toml` is the **manifest**. Here is what a fresh one looks like on current Rust:
+
+```toml
+[package]
+name = "robot_math"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+```
+
+The **edition** is the version of the language rules the project follows. New projects use the newest, and older code keeps working on its older edition. Everything under `[dependencies]` is a crate your project uses.
+
+## Adding a dependency
+
+The easiest way is the `cargo add` command, which edits `Cargo.toml` for you:
+
+```bash
+cargo add serde --features derive
+```
+
+Your manifest now includes a line like this, where the version number is the newest at the time you ran it:
 
 ```toml
 [dependencies]
-serde = "1.0"
+serde = { version = "1.0.229", features = ["derive"] }
 ```
 
-When you build your project, Cargo will automatically download and compile your dependencies and all of their dependencies.
+You can also type the line by hand. `"1.0"` means "any compatible 1.x version at or above 1.0". **Features** are optional parts of a crate you switch on. In lesson 10, `warp` needed the `server` feature.
 
-### Building and Running Projects
+The first time you build, Cargo downloads the crate and everything it depends on, and records the exact versions in a file called `Cargo.lock`. Commit `Cargo.lock` for programs, such as robot firmware, so that everyone builds with the same versions.
 
-To build your project, run the following command in your project directory:
+## Build, check, run
 
-```bash
-cargo build
+```mermaid
+flowchart LR
+    A["cargo check: fast, no program"] --> B["cargo build: debug program"]
+    B --> C["cargo run: build then run"]
+    C --> D["cargo build --release: fast optimised program"]
 ```
 
-This command compiles your project and all of its dependencies. If the build is successful, Cargo places the executable in `target/debug/project_name`.
+| Command | What it does | When to use it |
+| --- | --- | --- |
+| `cargo check` | Checks the code compiles, makes no program | While writing, it is the quickest |
+| `cargo build` | Builds a debug program in `target/debug/` | Everyday development |
+| `cargo run` | Builds if needed, then runs | Trying your program |
+| `cargo build --release` | Builds an optimised program in `target/release/` | Finished programs and robots |
+| `cargo test` | Builds and runs the tests | Before you trust a change |
+{:class="table table-single"}
 
-To build and run your project in one step, you can use:
+Debug builds compile fast but run slowly and include extra checks such as number overflow. Release builds take longer to compile and run much faster. If your robot code feels slow, check you ran it with `--release`.
 
-```bash
-cargo run
-```
+Everything Cargo creates goes in the `target` folder. It can get large, and you can delete it at any time with `cargo clean`: it will simply be rebuilt.
 
-If your project compiles successfully, Cargo will then run the resulting executable.
+**Why this matters:** on the Pico in lesson 11 you used `cargo run --release` for exactly this reason: debug builds are bigger and slower, which matters on a chip with limited memory.
 
----
+## Try it Yourself
 
-## Summary
+1. Make a project called `robot_math`, add `serde`, and run `cargo build`. Look inside `Cargo.lock`.
+2. Run `cargo build` and `cargo build --release`, then look in `target/` to find both programs.
+3. Add `[profile.release]` with `opt-level = "z"` to `Cargo.toml` and rebuild. Look up in the Cargo documentation what it does.
+4. Challenge: run `cargo doc --open` in a project with a dependency and browse the generated documentation.
 
-In this bonus lesson, you learned how to create a new Rust project using Cargo, manage your project's dependencies, and build and run your project. Cargo is a powerful tool that simplifies many aspects of Rust development, making it easier to manage large projects and their dependencies.
+## Common Issues
 
----
+- **Problem**: `error: no matching package named ... found`.
+- **Solution**: Check the crate name's spelling on crates.io. Crate names often use hyphens, for example `rp-pico`.
+- **Why**: Cargo looks up the exact name on the crates.io index.
+
+- **Problem**: A dependency fails to compile after you update.
+- **Solution**: Restore the old `Cargo.lock`, or pin an exact version such as `serde = "=1.0.229"`.
+- **Why**: `cargo update` moves to newer compatible versions, which may behave differently.
+
+- **Problem**: The `target` folder is taking a lot of disk space.
+- **Solution**: Run `cargo clean`.
+- **Why**: Cargo keeps every build of every dependency so rebuilds are quick.
+
+## Check your understanding
+
+{% quiz %}
+? What does `cargo check` do?
+- [x] Checks the code compiles without producing a program
+- [ ] Runs the tests
+- [ ] Deletes the target folder
+> It is the quickest way to find errors while you write.
+
+? What is the `Cargo.lock` file for?
+- [ ] Locking your files from being edited
+- [x] Recording the exact versions of every dependency used
+- [ ] Choosing the edition
+> It makes builds repeatable.
+
+? Where does `cargo build --release` put the program?
+- [ ] `target/debug/`
+- [x] `target/release/`
+- [ ] `src/`
+> Debug builds go in `target/debug/` and release builds in `target/release/`.
+{% endquiz %}
