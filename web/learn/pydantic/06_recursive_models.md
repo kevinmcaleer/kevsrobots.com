@@ -1,24 +1,27 @@
 ---
 layout: lesson
-title: Managing Recursive Models
+title: Nested and Recursive Models
 author: Kevin McAleer
 type: page
-cover: assets/6.png
+cover: /learn/pydantic/assets/banners/06_recursive_models.jpg
 date: 2024-03-23
 previous: 05_custom_data_types.html
 next: 07_integrating_pydantic_with_fastapi.html
-description: Explore how to effectively define and work with recursive models in Pydantic,
-  enabling sophisticated data structures like trees and nested objects.
+description: Validate nested robot configs, find errors by path, and model self-referencing
+  tree structures.
 percent: 48
-duration: 2
+duration: 5
+quiz_total: 39
+date_updated: 2026-11-24
+code_target: cpython
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:
   - section: Introduction to Pydantic
     content:
     - name: Overview of Pydantic and Data Validation
-      link: 01_overview_of_pydantic.html
-    - name: Setting Up Your Environment
+      link: 00_intro.html
+    - name: Setting Up Your Development Environment
       link: 02_setting_up_your_development_environment.html
     - name: Basic Data Models
       link: 03_basic_data_models.html
@@ -26,91 +29,178 @@ navigation:
     content:
     - name: Advanced Validation Techniques
       link: 04_advanced_validation_techniques.html
-    - name: Working with Custom Data Types
+    - name: Custom Data Types
       link: 05_custom_data_types.html
-    - name: Managing Recursive Models
+    - name: Nested and Recursive Models
       link: 06_recursive_models.html
   - section: Pydantic with FastAPI
     content:
     - name: Integrating Pydantic with FastAPI
       link: 07_integrating_pydantic_with_fastapi.html
-    - name: Advanced Features in FastAPI
+    - name: Request Validation and Serialization
       link: 08_request_validation_and_serialization.html
-    - name: Building a CRUD Application with FastAPI
+    - name: Building a CRUD Application
       link: 09_building_a_crud_application.html
   - section: Best Practices and Real-world Applications
     content:
-    - name: Deploying Your FastAPI & Pydantic App
+    - name: Pydantic Best Practices
       link: 10_pydantic_best_practices.html
-    - name: Pydantic Best Practices for FastAPI Applications
+    - name: Performance Optimization Tips
       link: 11_performance_optimization_tips.html
-    - name: Performance Optimization in FastAPI and Pydantic Applications
-      link: 12_case_studies_and_real_world_applications.html
+    - name: Case Study and Course Summary
+      link: 12_case_study_and_summary.html
 ---
 
 
-![Pydantic Recursive Models]({{ page.cover }}){:class="cover"}
-
-## Understanding Recursive Models
-
-Recursive models allow for the definition of complex, nested data structures within Pydantic. These are particularly useful for representing hierarchical data, such as organizational charts, file systems, or any nested relationships.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Defining Recursive Models
+By the end of this lesson you will be able to nest models inside each other, read the path to an error deep in the data, and build a model that contains itself.
 
-To define a recursive model in Pydantic, a model may reference itself within its fields. Pydantic supports this natively, but it requires forward declaration for self-referencing models, using a string to indicate the model's name before it's fully defined.
+Real robot configs are never flat. A hexapod has legs, each leg has servos, and each servo has an angle. Let's model that, and then go one step further with data that has no fixed depth, like a parts tree.
+
+## Nested models
+
+Use one model as the type of a field in another. Pydantic validates the whole structure, all the way down.
+
+```mermaid
+flowchart TD
+    R["Robot: name, legs"] --> L1["Leg: side, servos"]
+    R --> L2["Leg: side, servos"]
+    L1 --> S1["Servo: name, angle"]
+    L1 --> S2["Servo: name, angle"]
+    L2 --> S3["Servo: name, angle"]
+    L2 --> S4["Servo: name, angle"]
+```
+
+## Recursive models
+
+A recursive model refers to itself, such as `Part` containing a list of `Part`. Inside the class body the name `Part` does not exist yet, so write it as a string: `list["Part"]`. Pydantic resolves the name for you.
+
+Here is both ideas together:
 
 ```python
-from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ValidationError
 
-class TreeNode(BaseModel):
+
+class Servo(BaseModel):
     name: str
-    children: Optional[List['TreeNode']] = None
-```
+    angle: int = Field(default=90, ge=0, le=180)
 
-In this example, `TreeNode` is a model representing a node in a tree. Each node can have multiple children, which are also instances of `TreeNode`, demonstrating the recursive nature of the model.
 
----
+class Leg(BaseModel):
+    side: str
+    servos: list[Servo]
 
-## Working with Recursive Models
 
-Recursive models are instantiated and used in the same way as any other Pydantic model. However, when working with deeply nested data, consider the complexity and potential performance implications.
+class Robot(BaseModel):
+    name: str
+    legs: list[Leg] = []
 
-```python
-tree = TreeNode(
-    name="root",
-    children=[
-        TreeNode(name="child1"),
-        TreeNode(name="child2", children=[TreeNode(name="grandchild1")]),
+
+class Part(BaseModel):
+    name: str
+    children: list["Part"] = []
+
+
+def count_parts(part: Part) -> int:
+    return 1 + sum(count_parts(child) for child in part.children)
+
+
+config = {
+    "name": "Hexa",
+    "legs": [
+        {"side": "left", "servos": [{"name": "hip"}, {"name": "knee", "angle": 45}]},
+        {"side": "right", "servos": [{"name": "hip"}, {"name": "knee", "angle": 135}]},
     ],
-)
+}
+robot = Robot.model_validate(config)
+print(robot.legs[1].servos[1])
+print(robot.model_dump()["legs"][0])
 
-print(tree)
+try:
+    Robot.model_validate(
+        {"name": "Hexa", "legs": [{"side": "left", "servos": [{"name": "hip", "angle": 999}]}]}
+    )
+except ValidationError as err:
+    print(err.errors()[0]["loc"])
+    print(err.errors()[0]["msg"])
+
+tree = Part.model_validate(
+    {
+        "name": "robot",
+        "children": [
+            {"name": "head", "children": [{"name": "camera"}, {"name": "mic"}]},
+            {"name": "base", "children": [{"name": "motor"}, {"name": "motor"}]},
+        ],
+    }
+)
+print(count_parts(tree))
 ```
 
-This code creates a simple tree structure with a root node, two child nodes, and one grandchild node, showcasing the recursive model in action.
+Output:
 
----
+```
+name='knee' angle=135
+{'side': 'left', 'servos': [{'name': 'hip', 'angle': 90}, {'name': 'knee', 'angle': 45}]}
+('legs', 0, 'servos', 0, 'angle')
+Input should be less than or equal to 180
+7
+```
 
-## Handling Circular References
+## What to notice
 
-Pydantic's `parse_obj` method can be used to handle circular references or deeply nested structures by providing a dictionary representation of the data. This method ensures that instances are correctly created without exceeding Python's recursion limit.
+**The error path.** `('legs', 0, 'servos', 0, 'angle')` reads as "in the first leg, in the first servo, the angle field". Strings are field names and numbers are list positions. That path makes errors in a big config file easy to locate.
 
----
+**Nested dicts become objects.** `robot.legs[1].servos[1]` is a real `Servo`, so you get attribute access and your editor's autocompletion all the way down.
 
-## Lesson Assignment
+**Defaults flow through.** The hip servos had no `angle`, so they got the default of 90.
 
-Define a recursive model `Category` for representing a category tree where each category can have multiple subcategories. Each `Category` should have fields for `id`, `name`, and `subcategories` (optional, a list of `Category`).
+**The recursive part.** `count_parts` is a normal recursive function. The whole tree (7 parts: robot, head, camera, mic, base and two motors) was validated in one call, no matter how deep it goes.
 
-Create an instance of your `Category` model representing a simple category structure with at least one subcategory and test its instantiation and serialization capabilities.
+**Why this matters:** robot config files, scene graphs, menu structures and file trees are all nested. One model validates every level.
 
----
+**Common mistakes:**
 
-## Additional Resources
+- Writing `list[Part]` without quotes inside the `Part` class. older Pythons (before 3.14) raise a `NameError` because the class is not finished yet, so quote it.
+- Making a model contain itself with no way to stop. Real data needs an empty `children` list at the leaves, which our default of `[]` provides.
 
-- [Pydantic Documentation on Recursive Models](https://pydantic-docs.helpmanual.io/usage/models/#recursive-models)
-- [Python's Type Hints for Recursive Type](https://docs.python.org/3/library/typing.html#typing.ForwardRef)
+## Try it Yourself
 
----
+1. Add a `max_depth(part)` function that returns how deep the tree goes.
+2. Give `Leg` a `servos` list that must have at least 2 items using `Field(min_length=2)`.
+3. Dump the robot to JSON with `robot.model_dump_json(indent=2)` and read the structure.
+4. Challenge: add a `parent` link and think about why a model that refers back to its own parent cannot be built from plain JSON.
+
+## Common Issues
+
+- **Problem**: `NameError: name 'Part' is not defined` when a model contains itself (on Python before 3.14).
+- **Solution**: Quote the name in the annotation: `children: list["Part"] = []`.
+- **Why**: The class name does not exist yet while the class body is running. If Pydantic ever reports a class as "not fully defined", calling `Part.model_rebuild()` after all the classes exist finishes the job.
+
+- **Problem**: A long error path is hard to read.
+- **Solution**: Loop over `err.errors()` and print `".".join(str(p) for p in e["loc"])`.
+- **Why**: The `loc` tuple mixes strings and integers, so join them into one readable path.
+
+## Check your understanding
+
+{% quiz %}
+? What does the error location `('legs', 0, 'servos', 0, 'angle')` tell you?
+- [ ] The robot has zero legs
+- [x] The angle of the first servo of the first leg was invalid
+- [ ] The angle was a string
+> Strings are field names and integers are positions in a list.
+
+? How do you refer to a model from inside its own class body?
+- [ ] Write the name without quotes
+- [x] Write the name as a string, such as `list["Part"]`
+- [ ] It is not allowed
+> The class does not exist yet while its body runs, so the name is quoted and Pydantic resolves it later.
+
+? What happens to missing nested fields that have defaults?
+- [x] They are filled in with the defaults
+- [ ] They cause an error
+- [ ] They are set to None
+> The hip servos had no angle, so they received the default of 90.
+{% endquiz %}

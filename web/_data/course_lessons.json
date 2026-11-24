@@ -3885,15 +3885,13 @@
     "author": "Kevin McAleer",
     "date_published": "2024-03-23",
     "groups": [
-      "pydantic",
-      "data validation",
-      "fastapi"
+      "python"
     ],
     "lessons": [
       {
-        "file": "01_overview_of_pydantic.md",
+        "file": "00_intro.md",
         "section": "Introduction to Pydantic",
-        "url": "/learn/pydantic/01_overview_of_pydantic.html"
+        "url": "/learn/pydantic/00_intro.html"
       },
       {
         "file": "02_setting_up_your_development_environment.md",
@@ -3946,9 +3944,9 @@
         "url": "/learn/pydantic/11_performance_optimization_tips.html"
       },
       {
-        "file": "12_case_studies_and_real_world_applications.md",
+        "file": "12_case_study_and_summary.md",
         "section": "Best Practices and Real-world Applications",
-        "url": "/learn/pydantic/12_case_studies_and_real_world_applications.html"
+        "url": "/learn/pydantic/12_case_study_and_summary.html"
       }
     ]
   },

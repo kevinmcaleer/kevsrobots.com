@@ -1,24 +1,27 @@
 ---
 layout: lesson
-title: Deploying Your FastAPI & Pydantic App
+title: Pydantic Best Practices
 author: Kevin McAleer
 type: page
-cover: assets/10.png
+cover: /learn/pydantic/assets/banners/10_pydantic_best_practices.jpg
 date: 2024-03-23
 previous: 09_building_a_crud_application.html
 next: 11_performance_optimization_tips.html
-description: Learn how to deploy your FastAPI application, utilizing Pydantic for
-  data validation, to Heroku for production use.
+description: Use ConfigDict to make strict, frozen models, and load robot settings
+  from environment variables with pydantic-settings.
 percent: 80
-duration: 2
+duration: 5
+quiz_total: 39
+date_updated: 2026-11-24
+code_target: cpython
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:
   - section: Introduction to Pydantic
     content:
     - name: Overview of Pydantic and Data Validation
-      link: 01_overview_of_pydantic.html
-    - name: Setting Up Your Environment
+      link: 00_intro.html
+    - name: Setting Up Your Development Environment
       link: 02_setting_up_your_development_environment.html
     - name: Basic Data Models
       link: 03_basic_data_models.html
@@ -26,116 +29,178 @@ navigation:
     content:
     - name: Advanced Validation Techniques
       link: 04_advanced_validation_techniques.html
-    - name: Working with Custom Data Types
+    - name: Custom Data Types
       link: 05_custom_data_types.html
-    - name: Managing Recursive Models
+    - name: Nested and Recursive Models
       link: 06_recursive_models.html
   - section: Pydantic with FastAPI
     content:
     - name: Integrating Pydantic with FastAPI
       link: 07_integrating_pydantic_with_fastapi.html
-    - name: Advanced Features in FastAPI
+    - name: Request Validation and Serialization
       link: 08_request_validation_and_serialization.html
-    - name: Building a CRUD Application with FastAPI
+    - name: Building a CRUD Application
       link: 09_building_a_crud_application.html
   - section: Best Practices and Real-world Applications
     content:
-    - name: Deploying Your FastAPI & Pydantic App
+    - name: Pydantic Best Practices
       link: 10_pydantic_best_practices.html
-    - name: Pydantic Best Practices for FastAPI Applications
+    - name: Performance Optimization Tips
       link: 11_performance_optimization_tips.html
-    - name: Performance Optimization in FastAPI and Pydantic Applications
-      link: 12_case_studies_and_real_world_applications.html
+    - name: Case Study and Course Summary
+      link: 12_case_study_and_summary.html
 ---
 
 
-![Deploying FastAPI and Pydantic Application]({{ page.cover }}){:class="cover"}
-
-## Preparing for Deployment
-
-Deploying a FastAPI application involves several key steps to ensure your application is ready for production. This includes setting up a production server, ensuring your application is secure, and choosing the right hosting platform.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Requirements for Deployment
+By the end of this lesson you will be able to tighten a model with `ConfigDict`, and load a robot's settings from environment variables with `pydantic-settings`.
 
-Before deploying, ensure your application:
+You now know how to write models. This lesson is about writing them well: strict where it counts, and with settings kept out of your code so you never paste a secret into a program you share.
 
-- Is using a production-ready server like Uvicorn or Gunicorn.
-- Has environment variables configured for any sensitive data.
-- Includes a `requirements.txt` file with all the necessary Python packages.
+## Configuring a model with ConfigDict
 
----
+In v2 you configure a model with `model_config = ConfigDict(...)`. This replaces the old `class Config:` block from v1. Three options earn their keep on most robot projects:
 
-## Deploying to Heroku
+- `extra="forbid"` rejects fields you did not declare, which catches typos like `temprature_c`
+- `frozen=True` makes instances read-only, so a waypoint cannot change under your feet (it also makes them hashable)
+- `str_strip_whitespace=True` trims spaces from every string
 
-Heroku is a cloud platform that simplifies the deployment process. Here's a basic guide to deploying your FastAPI and Pydantic application to Heroku.
+## Settings from the environment
 
----
+`pydantic-settings` (a separate package, installed in lesson 2) gives you `BaseSettings`. It is a model that fills itself from environment variables, validating as it goes. With `env_prefix="ROBOT_"`, the variable `ROBOT_NAME` fills the `name` field.
 
-### Step 1: Prepare Your Application
+```python
+import os
 
-Make sure your application structure is ready for deployment. This includes organizing your application files, including a `Procfile`, which tells Heroku how to run your application.
+from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
----
 
-#### Procfile
+class Waypoint(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
 
-```plaintext
-web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}
+    label: str
+    x_cm: float
+    y_cm: float
+
+
+wp = Waypoint(label="  dock ", x_cm=0, y_cm=0)
+print(wp)
+
+try:
+    wp.x_cm = 10
+except ValidationError as err:
+    print(err.errors()[0]["type"])
+
+try:
+    Waypoint(label="a", x_cm=1, y_cm=2, z_cm=3)
+except ValidationError as err:
+    print(err.errors()[0]["type"], err.errors()[0]["msg"])
+
+
+class RobotSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="ROBOT_")
+
+    name: str = "unnamed"
+    max_speed: float = 0.5
+    broker_host: str = "localhost"
+    broker_port: int = 1883
+
+
+os.environ["ROBOT_NAME"] = "Hexa"
+os.environ["ROBOT_MAX_SPEED"] = "0.8"
+print(RobotSettings())
+
+os.environ["ROBOT_BROKER_PORT"] = "mqtt"
+try:
+    RobotSettings()
+except ValidationError as err:
+    print(err.errors()[0]["loc"], err.errors()[0]["msg"])
 ```
 
-This `Procfile` instructs Heroku to start your FastAPI application with Uvicorn, binding to the port assigned by Heroku.
+Output:
 
----
-
-### Step 2: Set Up Heroku
-
-If you haven't already, install the Heroku CLI and create a new Heroku app:
-
-```bash
-heroku login
-heroku create your-app-name
+```
+label='dock' x_cm=0.0 y_cm=0.0
+frozen_instance
+extra_forbidden Extra inputs are not permitted
+name='Hexa' max_speed=0.8 broker_host='localhost' broker_port=1883
+('broker_port',) Input should be a valid integer, unable to parse string as an integer
 ```
 
----
-
-### Step 3: Deploy Your Application
-
-Commit your code to a Git repository if you haven't done so. Then, deploy your application to Heroku using Git:
-
-```bash
-git init
-heroku git:remote -a your-app-name
-git add .
-git commit -am "Initial deploy"
-git push heroku master
+```mermaid
+flowchart LR
+    A["Shell export ROBOT_NAME=Hexa"] --> B["BaseSettings with env_prefix ROBOT_"]
+    C[".env file"] --> B
+    B --> D["Validated RobotSettings"]
+    B -.->|bad value| E["ValidationError at startup"]
 ```
 
----
+## What happened
 
-### Step 4: Verify the Deployment
+**Strict models.** Trying `wp.x_cm = 10` raised a `frozen_instance` error, and the unknown `z_cm` raised `extra_forbidden`. In a robot, that means a typo in a config file fails loudly at startup instead of silently using a default.
 
-Once deployed, Heroku will provide a URL to access your application. Visit this URL to ensure your FastAPI application is running correctly.
+**Settings.** In real use you would set the variables in your shell (`export ROBOT_NAME=Hexa`) or put them in a `.env` file and add `env_file=".env"` to `SettingsConfigDict`. We used `os.environ` here so the example runs anywhere. A bad value, like a port of `"mqtt"`, fails at startup with a clear message.
 
----
+**More habits worth having:**
 
-## Post-Deployment Considerations
+- Use separate models for input and output (lesson 8).
+- Keep validation in the model, not scattered through your code.
+- Validate once, at the edge, then pass the typed object around.
+- Use `Field(description=...)` so generated API docs explain each field.
+- Never commit a `.env` file with real keys. Add it to `.gitignore`.
 
-After deploying, monitor your application's performance and be prepared to scale your Heroku dynos according to the load. Additionally, consider setting up a continuous deployment pipeline for easier updates.
+**Why this matters:** a robot with a typo in its config that silently falls back to defaults is the sort of bug that costs an afternoon.
 
----
+**Common mistakes:**
 
-## Lesson Assignment
+- Using `class Config:` from old tutorials. v2 shows a deprecation warning, so use `model_config`.
+- Putting secrets in source code instead of the environment.
 
-Deploy a simple FastAPI application that includes Pydantic models for data validation to Heroku. Ensure your application is accessible via a public URL and test its endpoints to confirm they are functioning as expected in the production environment.
+> **Teachers**: Settings and API keys are a good moment to talk about secrets. Make sure learners never commit a `.env` file or a real key to a shared repository or a school GitHub account, and use fake keys in class.
 
----
+## Try it Yourself
 
-## Additional Resources
+1. Add `validate_assignment=True` to a non-frozen model and see what happens when you assign a bad value.
+2. Add a `speed_limit` setting and set it from your shell with `export`, or `set` on Windows.
+3. Create a `.env` file and load it with `env_file=".env"`. Which wins, the file or a real environment variable?
+4. Challenge: write a model for a whole robot config with `extra="forbid"` at every level.
 
-- [Heroku Documentation](https://devcenter.heroku.com/)
-- [FastAPI Deployment](https://fastapi.tiangolo.com/deployment/)
-- [Uvicorn Deployment](https://www.uvicorn.org/deployment/)
+## Common Issues
 
----
+- **Problem**: `ModuleNotFoundError: No module named 'pydantic_settings'`.
+- **Solution**: Run `python -m pip install pydantic-settings`.
+- **Why**: In v2, `BaseSettings` moved out of the core `pydantic` package into its own.
+
+- **Problem**: Your settings ignore the environment variable.
+- **Solution**: Check the variable name and prefix. With `env_prefix="ROBOT_"`, the name is `ROBOT_MAX_SPEED`.
+- **Why**: The prefix and field name are joined, and matching is case-insensitive by default.
+
+- **Problem**: A `ValidationError` of type `frozen_instance` when changing a model field.
+- **Solution**: Either remove `frozen=True` or create a changed copy with `model_copy(update={...})`.
+- **Why**: Frozen models are read-only on purpose.
+
+## Check your understanding
+
+{% quiz %}
+? What does `extra="forbid"` do?
+- [ ] Makes every field optional
+- [x] Rejects fields that were not declared on the model
+- [ ] Forbids default values
+> It catches typos in field names by raising an `extra_forbidden` error.
+
+? Which v2 feature replaces the old `class Config:`?
+- [ ] `@validator`
+- [x] `model_config = ConfigDict(...)`
+- [ ] `parse_obj`
+> v2 uses a `model_config` attribute set to a `ConfigDict`.
+
+? Where does `BaseSettings` read its values from by default?
+- [ ] A database
+- [x] Environment variables
+- [ ] The Pico
+> With a prefix such as ROBOT_, the variable ROBOT_NAME fills the name field.
+{% endquiz %}
