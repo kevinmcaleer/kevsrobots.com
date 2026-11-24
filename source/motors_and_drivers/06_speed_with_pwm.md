@@ -4,12 +4,14 @@ description: Control DC motor speed with pulse width modulation, choose a sensib
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/06_speed_with_pwm.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to set motor speed with PWM duty cycle, and measure your own motor's dead zone.
 
 So far the motor has two speeds: off and flat out. To control speed, we cannot lower the battery voltage from code, but we *can* switch the driver on and off so quickly that the motor feels an average. That trick is **pulse width modulation**, or PWM, and the Pico has 16 PWM channels ready to go.
 
@@ -90,6 +92,16 @@ On a typical TT motor running from 4xAA through an L298N, the wheel starts somew
 
 ## Mapping speed past the dead zone
 
+The pipeline from a speed number to a pin looks like this:
+
+```mermaid
+flowchart LR
+    S["speed 0 to 100"] --> M["skip the dead zone"]
+    M --> P["duty in percent"]
+    P --> U["duty_u16, 0 to 65535"]
+    U --> E["PWM pin, for example ENA"]
+```
+
 We want a "speed" of 1 to feel like the *slowest useful* speed, and 100 to be flat out. So we map the speed range onto duty values *above* the dead zone:
 
 ```python
@@ -117,14 +129,36 @@ Walk through the middle line: speed 50 is half way between the dead zone (30) an
 
 ## Common Issues
 
-**Problem**: A `ValueError` about the duty value, or the motor behaves oddly at high values.
-**Solution**: Keep duty between 0 and 65535. Clamp speeds before you convert them.
-**Why**: Pico PWM duty is a 16-bit value, and out-of-range numbers are not accepted.
+- **Problem**: A `ValueError` about the duty value, or the motor behaves oddly at high values.
+- **Solution**: Keep duty between 0 and 65535. Clamp speeds before you convert them.
+- **Why**: Pico PWM duty is a 16-bit value, and out-of-range numbers are not accepted.
 
-**Problem**: Two pins in the same PWM slice ignore my second frequency.
-**Solution**: Set the same frequency for any pins in a slice, for example GP0 and GP1 together.
-**Why**: Each Pico PWM slice has one counter shared by its two output channels, so the last frequency you set wins for both.
+- **Problem**: Two pins in the same PWM slice ignore my second frequency.
+- **Solution**: Set the same frequency for any pins in a slice, for example GP0 and GP1 together.
+- **Why**: Each Pico PWM slice has one counter shared by its two output channels, so the last frequency you set wins for both.
 
-**Problem**: The motor whines but will not turn at low speed.
-**Solution**: That is the dead zone. Raise the minimum duty with the `deadzone` value.
-**Why**: Friction needs a minimum torque to overcome before the shaft turns.
+- **Problem**: The motor whines but will not turn at low speed.
+- **Solution**: That is the dead zone. Raise the minimum duty with the `deadzone` value.
+- **Why**: Friction needs a minimum torque to overcome before the shaft turns.
+
+## Check your understanding
+
+{% quiz %}
+? What range of numbers does duty_u16() accept on the Pico?
+- [x] 0 to 65535
+- [ ] 0 to 100
+- [ ] 0 to 1023
+> Pico PWM duty is a 16-bit value, so 65535 means always on.
+
+? What is the dead zone?
+- [x] The minimum duty a motor needs before it actually turns
+- [ ] The highest safe duty
+- [ ] The time between PWM pulses
+> Friction and gearbox drag need a minimum push, so below the dead zone you only hear a whine.
+
+? With a dead zone of 30 percent, what duty percent does speed 50 give?
+- [x] 65 percent
+- [ ] 50 percent
+- [ ] 30 percent
+> Half way between 30 and 100 is 30 + 70 x 0.5 = 65 percent.
+{% endquiz %}

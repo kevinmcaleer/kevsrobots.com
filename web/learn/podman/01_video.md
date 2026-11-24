@@ -5,20 +5,22 @@ author: Kevin McAleer
 type: video
 cover: /learn/podman/assets/banners/01_video.jpg
 date: 2025-05-24
-previous: 01_intro_to_podman.html
+previous: 00_intro.html
 next: 02_docker_vs_podman_architecture.html
 description: Learn what Podman is, why it's a powerful alternative to Docker, and
   how it's changing the container landscape.
 percent: 14
 duration: 1
+quiz_total: 47
 video_id: zwn2mXlYwis
+date_updated: 2026-11-24
 navigation:
 - name: From Docker to Podman
 - content:
   - section: Getting Started
     content:
     - name: Introduction to Podman
-      link: 01_intro_to_podman.html
+      link: 00_intro.html
     - name: 'Video: Podman vs Docker'
       link: 01_video.html
     - name: Docker vs Podman Architecture
@@ -29,7 +31,7 @@ navigation:
     content:
     - name: CLI Compatibility and Basic Commands
       link: 04_cli_compatibility_and_commands.html
-    - name: "Podman Features Docker Doesn\u2019t Have"
+    - name: Podman Features Docker Doesn't Have
       link: 05_podman_unique_features.html
     - name: Managing Containers and Images
       link: 06_managing_containers_and_images.html

@@ -1,64 +1,148 @@
 ---
 title: Error Handling in Rust
-description: Explore Rust's approach to error handling through the Option and Result types, and learn about error propagation.
+description: Handle failures with Option and Result, propagate errors with the question mark operator, and know when unwrap will crash your program.
 layout: lesson
-cover: /learn/scrawly_wally/assets/6.png
+type: page
+cover: /learn/rust/assets/banners/06_error_handling.jpg
+date_updated: 2026-11-24
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-Error handling is a critical part of programming. Rust handles errors through its type system, specifically with the `Option` and `Result` types, rather than exceptions. This lesson explains how these types work and how they are used in Rust for error handling and propagation.
-
----
-
-## Learning Objectives
-
-- Understand the `Option` and `Result` types and their purposes in Rust.
-- Learn how to use these types for handling potential errors.
-- Explore error propagation in Rust to create robust and safe applications.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-### Option and Result
+By the end of this lesson you will be able to use `Option` and `Result` to handle missing or bad values, and use `?` to pass errors up to the caller.
 
-The `Option` type is used in Rust when a value could be something or nothing (`None`). This type is used as a safer alternative to null references in other languages.
+---
+
+## When a sensor sends rubbish
+
+Sensors fail. A cable is loose and the reading is empty, or a serial line sends garbage text. Python raises an exception, which can surprise you at runtime. Rust makes the possible failure part of the function's type, so you cannot forget it. Here is a complete program that reads distance values from text:
 
 ```rust
-let some_number = Some(5);
-let no_number: Option<i32> = None;
-```
+use std::num::ParseFloatError;
 
-The `Result` type is used when operations could fail. It returns `Ok(value)` if the operation is successful, or `Err(e)` if it fails. This approach makes you explicitly handle errors, leading to more robust code.
+fn parse_distance(text: &str) -> Result<f32, ParseFloatError> {
+    text.trim().parse::<f32>()
+}
 
-```rust
-fn divide(numerator: f64, denominator: f64) -> Result<f64, &'static str> {
-    if denominator == 0.0 {
-        Err("Cannot divide by zero")
-    } else {
-        Ok(numerator / denominator)
+fn safe_to_drive(text: &str) -> Result<bool, ParseFloatError> {
+    let distance = parse_distance(text)?; // on Err, return it straight away
+    Ok(distance > 20.0)
+}
+
+fn first_reading(readings: &[f32]) -> Option<f32> {
+    readings.first().copied()
+}
+
+fn main() {
+    for text in ["45.5", "12", "oops"] {
+        match safe_to_drive(text) {
+            Ok(true) => println!("{:>5}: clear ahead", text),
+            Ok(false) => println!("{:>5}: obstacle, stop", text),
+            Err(e) => println!("{:>5}: bad reading ({})", text, e),
+        }
     }
+
+    let empty: [f32; 0] = [];
+    println!("{:?}", first_reading(&[30.0, 31.0]));
+    println!("{:?}", first_reading(&empty));
+
+    if let Some(distance) = first_reading(&[18.5]) {
+        println!("first distance {}", distance);
+    }
+
+    let fallback = first_reading(&empty).unwrap_or(0.0);
+    println!("fallback {}", fallback);
 }
 ```
 
-### Error Propagation
+Output:
 
-Instead of handling errors immediately, sometimes it's more appropriate to propagate them to the calling code. Rust makes error propagation concise and safe with the `?` operator.
+```text
+ 45.5: clear ahead
+   12: obstacle, stop
+ oops: bad reading (invalid float literal)
+Some(30.0)
+None
+first distance 18.5
+fallback 0
+```
 
+## Option: something or nothing
+
+`Option<T>` is either `Some(value)` or `None`. It replaces the null values of other languages. `first_reading` returns `None` for an empty list, so the caller must decide what to do. You can unpack it with `match`, with `if let Some(x) = ...`, or give a default with `unwrap_or`.
+
+## Result: worked or failed
+
+`Result<T, E>` is either `Ok(value)` or `Err(error)`. `parse::<f32>()` returns a `Result`, because the text might not be a number. `match` on it, as `main` does, to handle each case.
+
+```mermaid
+flowchart LR
+    A["text from sensor"] --> B["parse"]
+    B -->|"Ok(45.5)"| C["compare with 20.0"]
+    B -->|"Err"| D["report bad reading"]
+```
+
+## The question mark
+
+Writing `match` after every call gets long. The `?` operator means: if this is `Ok`, give me the value; if it is `Err`, return that error from my function right now. `safe_to_drive` uses it in one short line. Note that `?` only works inside a function that itself returns a `Result` or `Option`.
+
+## unwrap: use with care
+
+`.unwrap()` means "give me the value, or crash". It is fine in quick experiments, but not in robot firmware:
+
+<!-- code-check: skip -->
 ```rust
-fn get_divided_result(numerator: f64, denominator: f64) -> Result<f64, &'static str> {
-    let result = divide(numerator, denominator)?;
-    Ok(result)
-}
+let reading: f32 = "oops".parse().unwrap();
 ```
 
-The `?` operator automatically propagates the error if the operation fails, simplifying error handling especially when multiple operations could fail.
+```text
+thread 'main' panicked at src/main.rs:2:39:
+called `Result::unwrap()` on an `Err` value: ParseFloatError { kind: Invalid }
+```
 
----
+A panic stops your program. On a robot that could mean motors stuck on. Prefer `match`, `?` or `unwrap_or`.
 
-## Summary
+## Try it Yourself
 
-In this lesson, you've learned about Rust's approach to error handling using the `Option` and `Result` types and explored how these can be used to handle and propagate errors in a safe, explicit manner. Understanding and utilizing these concepts are fundamental in writing robust Rust applications.
+1. Add a fourth test string to the loop, such as `"-3.2"` or an empty string, and predict the output before running.
+2. Write `fn battery_level(text: &str) -> Result<u8, std::num::ParseIntError>` that parses a number like `"87"`.
+3. Make `safe_to_drive` return `Err` for a negative distance using your own `String` error message.
+4. Challenge: make `main` return `Result<(), Box<dyn std::error::Error>>` and use `?` on `parse_distance` there.
 
----
+## Common Issues
+
+- **Problem**: `the ? operator can only be used in a function that returns Result or Option`.
+- **Solution**: Change the function's return type to a `Result`, or `match` inside it instead.
+- **Why**: `?` returns early with the error, so the function needs a return type that can hold one.
+
+- **Problem**: Your program panics with `called Result::unwrap() on an Err value`.
+- **Solution**: Replace `unwrap()` with `match`, `if let`, `?` or `unwrap_or`.
+- **Why**: `unwrap` turns every error into a crash.
+
+- **Problem**: Mixed error types stop `?` from compiling.
+- **Solution**: Return `Box<dyn std::error::Error>` as the error type for quick programs.
+- **Why**: `?` needs the error to convert into the function's declared error type.
+
+## Check your understanding
+
+{% quiz %}
+? What does `Option<f32>` represent?
+- [ ] A float that may be large
+- [x] Either `Some(a float)` or `None`
+- [ ] A float that is always valid
+> `Option` replaces null with an explicit "nothing" case.
+
+? What does `?` do when it meets an `Err`?
+- [x] Returns that error from the current function
+- [ ] Ignores it
+- [ ] Prints it and carries on
+> `?` returns early with the error.
+
+? Why is `unwrap()` risky in robot code?
+- [ ] It is slow
+- [x] It panics and stops the program if the value is an error or `None`
+- [ ] It changes the type
+> A panic halts the program, possibly leaving motors running.
+{% endquiz %}

@@ -4,12 +4,14 @@ description: Add one part or many, meet the ObjectId, learn MongoDB's data types
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/05_inserting_documents.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to insert one or many documents, read the creation time out of an ObjectId, and load the full Parts Bin data set.
 
 Last lesson we put two parts in the drawer by hand. Now let's learn inserting properly: adding several documents at once, what that mysterious `_id` really is, and which kinds of values MongoDB can store. At the end of the lesson we will load the full Parts Bin, which every later lesson relies on.
 
@@ -68,6 +70,20 @@ db.parts.countDocuments()
 Two from last lesson plus three just now. If you added an extra part in the last Try it Yourself, you will see 6.
 
 Use `insertMany` whenever you have more than one document. It sends them all to the server in one trip, which is much quicker than lots of separate `insertOne` calls.
+
+---
+
+## The big picture
+
+An ObjectId is 12 bytes, split into three jobs. That is why IDs created together look so alike.
+
+```mermaid
+flowchart LR
+    subgraph OID["ObjectId: 12 bytes"]
+      direction LR
+      T["First 4 bytes<br/>time created, in seconds"] --> R["Next 5 bytes<br/>random value for this program"] --> C["Last 3 bytes<br/>counter, goes up by one"]
+    end
+```
 
 ---
 
@@ -442,21 +458,51 @@ db.scratch.drop()
 
 ## Common Issues
 
-**Problem:** `MongoBulkWriteError: E11000 duplicate key error` when loading the Parts Bin.  
-**Solution:** Run `db.parts.drop()` first, then paste the block again.  
-**Why:** If you pasted it twice, or something went wrong halfway, the collection may already hold some of the documents.
+- **Problem**: `MongoBulkWriteError: E11000 duplicate key error` when loading the Parts Bin.
+- **Solution**: Run `db.parts.drop()` first, then paste the block again.
+- **Why**: If you pasted it twice, or something went wrong halfway, the collection may already hold some of the documents.
 
-**Problem:** Your count is 26, not 13.  
-**Solution:** Drop and reload as above.  
-**Why:** Without our own `_id`s, every paste creates 13 new documents with new ObjectIds, so pasting twice gives you two of everything.
+- **Problem**: Your count is 26, not 13.
+- **Solution**: Drop and reload as above.
+- **Why**: Without our own `_id`s, every paste creates 13 new documents with new ObjectIds, so pasting twice gives you two of everything.
 
-**Problem:** After pasting, the shell sits at a `|` prompt and never runs the command.  
-**Solution:** A bracket isn't closed. Press **Ctrl+C** to cancel, then copy the whole block again, right down to the final `])`.  
-**Why:** `mongosh` waits for more lines until every `(`, `[` and `{` has its partner.
+- **Problem**: After pasting, the shell sits at a `|` prompt and never runs the command.
+- **Solution**: A bracket isn't closed. Press **Ctrl+C** to cancel, then copy the whole block again, right down to the final `])`.
+- **Why**: `mongosh` waits for more lines until every `(`, `[` and `{` has its partner.
 
-**Problem:** Dates sort or compare strangely.  
-**Solution:** Store them with `new Date("2026-01-12")`, not as the string `"2026-01-12"`.  
-**Why:** Strings are just text. Only real dates can be compared as dates.
+- **Problem**: Dates sort or compare strangely.
+- **Solution**: Store them with `new Date("2026-01-12")`, not as the string `"2026-01-12"`.
+- **Why**: Strings are just text. Only real dates can be compared as dates.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does insertMany take as its argument?
+- [ ] A single document
+- [x] A list of documents in square brackets
+- [ ] A collection name
+> insertMany takes a list, wrapped in [ ] and separated by commas, and sends them to the server in one trip.
+
+? What do the first four bytes of an ObjectId hold?
+- [ ] A random number
+- [x] The time it was created
+- [ ] The collection name
+> That is why getTimestamp() works. You get a free date added on every document.
+
+? You insert a part with the field quantty instead of quantity. What happens?
+- [ ] MongoDB rejects it
+- [x] MongoDB creates a new field called quantty
+- [ ] MongoDB fixes the spelling
+> A flexible schema will not stop typos. Validation, in lesson 11, is the guard rail.
+
+? How do you make insertMany carry on past a failing document?
+- [x] Pass { ordered: false }
+- [ ] Insert one at a time
+- [ ] Call it twice
+> By default inserts stop at the first error. ordered: false keeps going and reports the failures.
+{% endquiz %}
 
 ---
 

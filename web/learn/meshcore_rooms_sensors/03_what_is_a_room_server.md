@@ -10,7 +10,9 @@ next: 04_flashing_the_room_server.html
 description: How store-and-forward messaging works, and what a room server does that
   a channel cannot
 percent: 20
-duration: 6
+duration: 7
+quiz_total: 53
+date_updated: 2026-11-24
 navigation:
 - name: MeshCore Room Servers and Sensors
 - content:
@@ -63,6 +65,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain how a room server stores and forwards posts, and what its limits are.
+
 A room server is the closest thing MeshCore has to an inbox. It is a node that keeps recent posts and hands them over to people who were not around when they were made.
 
 ---
@@ -86,9 +90,9 @@ Step 4 is the whole point. That is the difference between a broadcast and a noti
 
 ## What is actually stored
 
-The room server keeps a **fixed-size cyclic buffer of recent posts** - 32 by default. When the buffer is full, each new post overwrites the oldest one.
+The room server keeps a **fixed-size cyclic buffer of recent posts**. The official FAQ says a client logging in receives the previous 32 unseen messages, so plan around that figure. When the buffer is full, each new post overwrites the oldest one.
 
-**Why this matters:** a room server is not an archive. It is a rolling window of recent conversation. On a quiet village mesh, 32 posts might be a fortnight of history. On a busy group during an event, it might be an afternoon. Nobody gets to scroll back to last month.
+**Why this matters:** a room server is not an archive. It is a rolling window of recent conversation. On a quiet village mesh, a few dozen posts might be a fortnight of history. On a busy group during an event, it might be an afternoon. Nobody gets to scroll back to last month.
 
 Alongside the buffer, the server tracks a **sync point per user**. When you log in, it works out which posts are newer than the last time you synced and sends you those - and it skips your own posts, so you do not get an echo of things you wrote yourself.
 
@@ -136,22 +140,26 @@ A room server has three tiers of access, and you will set them up in lesson 5:
 
 | Tier | Gets in with | Can do |
 |---|---|---|
-| **Read-only guest** | No password, if enabled | Read posts |
+| **Read-only guest** | No password, if `allow.read.only` is on | Read posts |
 | **Guest** | The guest password | Read and post |
 | **Admin** | The admin password | Everything, plus reconfigure the node |
 {:class="table table-single"}
 
-The defaults out of the box are **`password`** for admin and **`hello`** for guest. Both are published in the official documentation, which means both are effectively public. Changing them is lesson 5's first job.
+The official FAQ says the default admin password is **`password`** and the default room guest password is **`hello`**. Both are published, which means both are effectively public. (The CLI reference lists the guest password default as blank, so defaults can differ between builds.) Changing them is lesson 5's first job.
 
 ---
 
 ## Can it repeat as well?
 
-Yes, technically. A room server implements selective packet forwarding, and `set repeat on` enables it.
+On some firmware versions, yes: the official FAQ says a room server can also repeat with `set repeat on`, but that this is not recommended or encouraged, and that a repeater and a room server work best on separate devices. The room server source sets forwarding off by default, and recent builds may reject `set repeat` entirely.
 
-**Room server firmware ships with forwarding off**, which is the sensible default. The official guidance is to leave it that way: a room server with repeat on lacks the full set of repeater and remote administration features, and it puts two jobs on one point of failure. If you want a room and a repeater at the same site, use two boards - they are £15 each, which is cheap compared to the debugging.
+If you want a room and a repeater at the same site, use two boards. It is cheaper than debugging one board doing two jobs.
 
 We cover the trade-off properly in lesson 8.
+
+---
+
+> **Teachers**: A room server is a shared noticeboard, so treat it like any group chat. Decide who gets the guest password, do not post personal details such as pupils' names with locations, and remember that posts are stored in the board's memory and vanish on reboot, so the room is not a record you can rely on.
 
 ---
 
@@ -165,16 +173,41 @@ We cover the trade-off properly in lesson 8.
 
 ## Common Issues
 
-**Problem**: I posted to the room and my friend never saw it, even after coming back into range.
+- **Problem**: I posted to the room and my friend never saw it, even after coming back into range.
+- **Solution**: Check they are actually logged into the room, not just in range of it.
+- **Why**: Sync happens on login. A node that is nearby but has never authenticated has no sync point, so there is nothing for the server to catch it up on.
 
-**Solution**: Check they are actually logged into the room, not just in range of it.
-
-**Why**: Sync happens on login. A node that is nearby but has never authenticated has no sync point, so there is nothing for the server to catch it up on.
-
-**Problem**: Older posts have vanished from the room.
-
-**Solution**: Nothing is broken - that is the cyclic buffer doing its job.
-
-**Why**: The server holds a fixed number of recent posts and overwrites the oldest as new ones arrive. It is a rolling window, not an archive.
+- **Problem**: Older posts have vanished from the room.
+- **Solution**: Nothing is broken - that is the cyclic buffer doing its job.
+- **Why**: The server holds a fixed number of recent posts and overwrites the oldest as new ones arrive. It is a rolling window, not an archive.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? What happens to the posts in a room server when it loses power?
+- [x] They are lost, because they live in RAM
+- [ ] They are saved to your phone
+- [ ] They are kept for a year
+> The room server source stores posts in a memory array and only saves its access list.
+
+? Why is a post to a room usually cheaper in airtime than a channel message?
+- [x] It is addressed to one node, so it need not flood the mesh
+- [ ] It is shorter
+- [ ] It skips encryption
+> Channel messages flood because they have no single destination.
+
+? Which tier lets someone post to the room?
+- [x] Guest password (read-write)
+- [ ] No password at all
+- [ ] Nothing, posting is always allowed
+> The guest password grants read-write; no password grants read-only if enabled.
+
+? Why change the default passwords straight away?
+- [x] They are published in the documentation
+- [ ] They stop the radio working
+- [ ] They expire after a week
+> Anyone who has read the FAQ knows them.
+
+{% endquiz %}

@@ -4,12 +4,15 @@ description: Skip notes that have not changed, replace the ones that have, and c
 layout: lesson
 type: page
 cover: /learn/obsidian_rag/assets/banners/09_incremental_indexing.jpg
-date_updated: 2026-08-23
+date_updated: 2026-11-24
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to re-index only the notes that changed, replace a changed note's chunks cleanly, and remove chunks for notes that were deleted.
 
 The indexer we have works, but it re-embeds every note on every run. On a big vault that is thirty seconds of your life you get back, every time, for no reason - you probably edited three notes since yesterday.
 
@@ -33,6 +36,18 @@ Plus a fourth case that lives outside the loop: a note in the index whose file n
 We already have the fingerprint - `Note.content_hash` from lesson 5, stored as `note_hash` on every chunk in lesson 7. Everything we need is in the index already.
 
 ---
+
+```mermaid
+flowchart TD
+    A["Walk every note on disk"] --> B{"Path already<br/>in the index?"}
+    B -- no --> N["New:<br/>chunk it and write it"]
+    B -- yes --> H{"Stored hash equals<br/>content_hash?"}
+    H -- yes --> U["Unchanged:<br/>skip it"]
+    H -- no --> C["Changed:<br/>delete its old chunks,<br/>then write new ones"]
+    A --> G["After the walk"]
+    G --> R{"Indexed path<br/>never seen on disk?"}
+    R -- yes --> D["Removed:<br/>delete its chunks"]
+```
 
 ## Reading back what we know
 
@@ -131,7 +146,7 @@ The `seen` set gives us the stale-note cleanup for free. Anything we knew about 
 
 ## Watching it work
 
-Index the test vault, then run it again with nothing changed:
+Index the test vault, then run it again with nothing changed. (The counts below will match yours exactly; the times will not.)
 
 ```
 Indexing testvault
@@ -161,7 +176,7 @@ Indexing testvault
 Done in 0.0s: 0 new, 0 changed, 3 unchanged, 1 removed (0 chunks written)
 ```
 
-That is the whole feature. On a real vault the second run drops from thirty seconds to well under one.
+That is the whole feature. On a real vault the second run drops from however long a full index took to a fraction of a second.
 
 ---
 
@@ -191,3 +206,33 @@ That is the whole feature. On a real vault the second run drops from thirty seco
 - **Problem**: You changed `CHUNK_SIZE` and results got weirder rather than better.
 - **Solution**: Run with `full=True`.
 - **Why**: Unchanged notes are skipped, so they keep their *old* chunk boundaries. Your index ends up a mix of two chunking strategies, which is worse than either.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why compare content hashes rather than modification times?
+- [ ] Hashing is faster than reading the file
+- [x] Sync tools and `git checkout` rewrite mtimes without changing the text, which would force a full re-index every time
+- [ ] Chroma cannot store timestamps
+> A hash of the body is correct by construction: same text, same hash, no work.
+
+? A note shrinks from five chunks to two. Why do we delete its old chunks before writing the new ones?
+- [x] `upsert` only overwrites ids that still exist, so chunks `::2` to `::4` would be left behind, still searchable
+- [ ] Chroma refuses to upsert over existing ids
+- [ ] Deleting makes the embedding faster
+> Deleting by `where={"path": ...}` clears them all first.
+
+? When should you run an index with `full=True`?
+- [x] After changing the chunk size, the chunk text format or the embedding model
+- [ ] Every time you add a note
+- [ ] Only the very first time
+> Unchanged notes are skipped, so they would keep their old chunk boundaries and give you a mix of two strategies.
+
+? You rename `robots/SMARS.md` to `robots/SMARS Quad.md`. What does the next run report?
+- [ ] One changed note
+- [x] One removal and one addition, because the path is the identity
+- [ ] Nothing, because the text is identical
+> The old path is gone from disk, so it is removed, and the new path is new.
+{% endquiz %}

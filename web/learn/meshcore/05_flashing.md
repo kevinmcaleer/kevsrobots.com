@@ -11,6 +11,8 @@ description: Use the MeshCore web flasher to load repeater firmware on one board
   companion firmware on the other
 percent: 36
 duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Off-Grid Messaging with MeshCore
 - content:
@@ -32,7 +34,7 @@ navigation:
     content:
     - name: Flashing the Firmware
       link: 05_flashing.html
-    - name: Radio Settings for the UK
+    - name: Radio Settings for Your Region
       link: 06_radio_settings.html
   - section: Build the Repeater
     content:
@@ -67,59 +69,63 @@ navigation:
 
 ---
 
-This is the moment the two identical boards become two different things. Node 1 gets **repeater** firmware; node 2 gets **companion** firmware. Everything else in the course follows from this choice.
+By the end of this lesson you will be able to flash one board as a repeater and one as a Bluetooth companion, and check the flash worked.
+
+This is the moment two identical boards become two different things. Node 1 gets **repeater** firmware; node 2 gets **companion** firmware.
 
 ---
 
 ## Before you start
 
-- Fit the antennas to **both** boards (see the last lesson - this is not optional)
-- Use **Google Chrome** or **Microsoft Edge**. The web flasher uses WebUSB, which Firefox and Safari do not support
+- Fit the antennas to **both** boards (lesson 4, not optional)
+- Use **Google Chrome or Microsoft Edge** on a computer. The flasher uses WebUSB, which Firefox and Safari do not support
 - Have your **USB-C data cable** ready
-- Label the boards. A strip of masking tape marked "REPEATER" and "CLIENT" will save you a lot of confusion in twenty minutes' time
+- Label the boards with masking tape, "REPEATER" and "CLIENT"
 
 ---
 
 ## The firmware variants
 
-At [flasher.meshcore.io](https://flasher.meshcore.io) you will be offered several builds for the Heltec V3. The ones that matter to us:
+At [flasher.meshcore.io](https://flasher.meshcore.io) you choose your device, then a firmware type. The names below follow the MeshCore FAQ and may be worded a little differently in the current version of the flasher, for example "Companion Bluetooth".
 
 | Variant | What it is for |
 |---|---|
-| **Repeater** | Node 1. Forwards packets, no phone attached, full CLI |
-| **Companion (BLE)** | Node 2. Pairs to a phone over Bluetooth |
-| **Companion (USB Serial)** | Node 2 alternative. Talks to a computer over USB instead |
-| **Room Server** | A message store - not used in this course |
-| **Sensor** | Telemetry node - not used in this course |
+| **Repeater** | Node 1. Forwards packets, no phone attached, has a command line |
+| **Companion (Bluetooth / BLE)** | Node 2. Pairs to a phone over Bluetooth |
+| **Companion (USB Serial)** | Node 2 alternative. Talks to a computer over USB |
+| **Room Server** | A message store, not used in this course |
 {:class="table table-single"}
 
-**Which companion build?** Choose **Companion (BLE)** if you want to use your phone, which is what most people want. Choose **Companion (USB Serial)** if you plan to drive it from a laptop with the web client at [app.meshcore.nz](https://app.meshcore.nz). You can always reflash later.
+**Which companion?** Choose the BLE build for the phone app. Choose USB Serial if you want to use the web client at [app.meshcore.nz](https://app.meshcore.nz) from a laptop. You can reflash later.
+
+```mermaid
+flowchart LR
+    A["Fit antenna"] --> B["Plug in USB data cable"]
+    B --> C["Open flasher in Chrome or Edge"]
+    C --> D["Pick board: Heltec V3"]
+    D --> E["Pick firmware: Repeater or Companion"]
+    E --> F["Flash, pick the serial port"]
+    F --> G["Board reboots: check OLED"]
+```
 
 ---
 
-## Flashing node 1 - the repeater
+## Flashing node 1, the repeater
 
-1. Fit the antenna, then plug the board into your computer with the USB-C data cable
-2. Open [flasher.meshcore.io](https://flasher.meshcore.io) in Chrome or Edge
-3. Select your board: **Heltec V3** (sometimes listed as *Heltec WiFi LoRa 32 V3*)
-4. Select the firmware variant: **Repeater**
-5. Select the region preset: **EU/UK (Narrow)** - more on this in the next lesson
-6. Click **Flash** and pick your board's serial port from the browser dialog. On Windows it appears as a COM port; on macOS it looks like `/dev/cu.usbserial-xxxx` or `/dev/cu.SLAB_USBtoUART`
-7. Wait. The board reboots when it is done
+1. Fit the antenna, then plug the board in with the data cable
+2. Open the flasher in Chrome or Edge
+3. Select **Heltec V3** (it may be listed as Heltec WiFi LoRa 32 V3)
+4. Select **Repeater**
+5. Click flash and pick your board's serial port from the browser dialog
+6. Wait until it finishes and the board restarts
 
-If nothing appears in the port list, jump to the Common Issues at the bottom of this lesson.
+Do **not** assume the flasher has set your region's radio settings. In lesson 6 we set and check them explicitly. The MeshCore FAQ says the flasher's repeater setup feature can set RF settings by region, and the console lets you check them either way.
 
 ---
 
-## Flashing node 2 - the client
+## Flashing node 2, the client
 
-Exactly the same process, with one change:
-
-1. Unplug node 1, plug in node 2
-2. Same board type: **Heltec V3**
-3. Firmware variant: **Companion (BLE)**
-4. Same region preset: **EU/UK (Narrow)** - both nodes *must* match
-5. Flash
+The same process with one change: choose **Companion (Bluetooth)**. Unplug node 1 first so you cannot flash the wrong board.
 
 ---
 
@@ -127,58 +133,76 @@ Exactly the same process, with one change:
 
 Look at the OLED screen.
 
-- The **repeater** will show its name (something generic like `MeshCore-a1b2` to begin with), plus uptime and packet counters
-- The **companion** will show a Bluetooth pairing prompt or its node name, waiting for a phone to connect
+- The **repeater** shows its name and some status
+- The **companion** shows its name or a Bluetooth pairing prompt
 
-If the screen is blank but the board is warm, the flash probably failed part way - just flash it again.
+If the screen stays blank, flash again.
 
 ---
 
 ## About the serial console
 
-The flasher page has a built in **console** feature. This is how we will configure the repeater in lesson 7, so it is worth finding it now: flash the repeater, then look for the console or terminal option on the same page and connect to the board.
+The flasher page has a built in **console**. Flash the repeater, then look for the console option on the same page and connect to the board. Type:
 
-Type `ver` and press enter. If you get a firmware version back, you have a working console and the hard part is over.
+```text
+ver
+```
 
-There are two other ways to reach the same commands, and you may prefer them:
+If a firmware version comes back, your console works. Other ways to reach the same commands:
 
-- [config.meshcore.io](https://config.meshcore.io) - a friendlier web UI for repeater settings
-- Any serial terminal at 115200 baud - `screen`, `minicom`, PuTTY, or the Arduino IDE serial monitor
+- [config.meshcore.io](https://config.meshcore.io), a form-based UI for repeater settings over USB
+- A serial terminal at 115200 baud such as `screen`, `minicom` or PuTTY
 
 ---
 
 ## Try it Yourself
 
-1. Flash both boards, then swap the labels around and see if you can tell which is which from the OLED alone.
-2. Connect the console to the repeater and run `ver`, `board` and `stats-core`. What is the board reporting for uptime?
-3. Challenge: reflash node 2 as **Companion (USB Serial)**, connect it to [app.meshcore.nz](https://app.meshcore.nz), then put it back to BLE. Reflashing is cheap - get comfortable with it.
+1. Flash both boards, then swap the labels and see whether you can tell which is which from the OLED alone.
+2. Connect the console to the repeater and run `ver`, `board` and `get role`. What do they report?
+3. Challenge: reflash node 2 as Companion (USB Serial), connect it to the web client, then put it back to Bluetooth.
 
 ---
 
 ## Common Issues
 
-**Problem**: The browser shows no serial ports at all.
+- **Problem**: The browser shows no serial ports at all.
+- **Solution**: Try a different USB-C cable first, then a different USB port.
+- **Why**: Charge-only cables have no data lines.
 
-**Solution**: Try a different USB-C cable first, then a different USB port.
+- **Problem**: The Flash button does nothing, or says WebUSB is not supported.
+- **Solution**: Use Chrome or Edge on a desktop computer.
+- **Why**: Firefox, Safari and phone browsers do not implement WebUSB.
 
-**Why**: Charge-only cables have no data lines. This is by far the most common cause.
+- **Problem**: The flash fails part way, or the board keeps rebooting.
+- **Solution**: Put the board into bootloader mode using the board's BOOT or PRG button as the flasher page describes (the exact button sequence can vary by board and flasher version), then flash again.
+- **Why**: Bootloader mode stops the half-written firmware running while you rewrite it.
 
-**Problem**: "WebUSB is not supported" or the Flash button does nothing.
+- **Problem**: On Linux the flasher fails to open the port.
+- **Solution**: Give your user permission to use the serial port, as the MeshCore FAQ describes.
+- **Why**: The browser cannot open a serial device that your account does not own.
 
-**Solution**: Use Chrome or Edge on a desktop.
+> **Teachers**: school computers often block WebUSB, serial access or browser installs. Test the flasher on one classroom machine before the lesson, and flash all the boards yourself in advance if it fails. Keep the labelled boards together so repeaters and clients never get mixed up.
 
-**Why**: Firefox, Safari, and mobile browsers do not implement WebUSB.
+## Check your understanding
 
-**Problem**: The flash fails partway through or the board keeps rebooting.
+{% quiz %}
+? Which browsers can run the web flasher?
+- [ ] Firefox and Safari
+- [x] Chrome and Edge
+- [ ] Any browser on a phone
+> The flasher uses WebUSB, which only Chromium-based browsers provide.
 
-**Solution**: Hold the **BOOT** button (marked PRG on some V3 boards) while plugging the USB cable in, then release it and flash again.
+? You flashed both boards with Companion firmware. What do you have?
+- [ ] A repeater and a client
+- [x] Two clients and no repeater
+- [ ] Two repeaters
+> Companions never forward other nodes' packets, so one board must be flashed as a repeater.
 
-**Why**: This forces the ESP32-S3 into its bootloader instead of running whatever half-written firmware is on it.
-
-**Problem**: I flashed the wrong variant.
-
-**Solution**: Just flash it again with the right one.
-
-**Why**: Nothing is permanent here. The only cost is a minute of your time.
+? What does the `ver` command check?
+- [x] That the console works and which firmware version is running
+- [ ] The antenna gain
+- [ ] The phone's Bluetooth pairing
+> It prints the firmware version, proving the console works.
+{% endquiz %}
 
 ---

@@ -2,117 +2,149 @@
 layout: lesson
 title: Redis Lists
 type: page
-description: Learn about Redis lists and how to use them with Python.
+description: Use Redis lists as a job queue for a robot and as a short history of the latest sensor readings.
 cover: /learn/redis/assets/banners/05_redis_lists.jpg
+code_target: cpython
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-### Overview
-
-In this lesson, we will cover Redis lists and how to use them with Python. Redis lists are a data type that can be used to store an ordered collection of strings. We will cover how to add, retrieve, and manipulate list elements in Redis, and how to use lists in Python.
+By the end of this lesson you will be able to build a job queue with a Redis list, keep only the latest few readings with `ltrim`, and explain why a list is a better queue than pub/sub.
 
 ---
 
-## Lesson Content
+## Overview
 
-In this lesson, we will cover:
+A Redis list is an ordered collection of strings. You can add to either end and take from either end, and both are very fast even with millions of items, because Redis lists are built for working at the ends. Reaching into the middle of a long list is slower, so lists shine as **queues** and **recent history**, not as something you search.
 
-* [Redis lists](#redis-lists)
-* [Adding and retrieving list elements](#adding-and-retrieving-list-elements)
-* [Manipulating list elements](#manipulating-list-elements)
-* [Using Redis lists with Python](#using-redis-lists-with-python)
+Two jobs a maker will meet constantly:
 
----
+- **A queue of commands**: a web page or a script adds jobs ("forward", "left", "stop") and the robot takes them one at a time
+- **The last N readings**: a rolling window of the newest values for a graph
 
-### Redis Lists
+```mermaid
+flowchart LR
+    P["Producer<br/>(web page, script)"] -->|"RPUSH"| L[("robot:1:jobs<br/>forward, left, stop")]
+    L -->|"LPOP / BLPOP"| W["Worker<br/>(drives the robot)"]
+```
 
-Redis lists are a data type that can be used to store an ordered collection of strings. Lists in Redis behave like linked lists, which means that adding or removing elements from the beginning or end of a list is very fast, even with millions of elements, but accessing elements in the middle of a long list is slower. That makes lists great for queues and for keeping the latest few items.
+Pushing on the right and popping from the left means the first job in is the first job out, just like a queue at the shop.
 
----
+## Adding, reading and removing
 
-### Adding and Retrieving List Elements
-
-To add an element to the end of a list in Redis, you can use the `rpush` command. To add an element to the beginning of a list, you can use the `lpush` command. Here are some examples of adding elements to a Redis list:
-
-```redis
-rpush mylist "element1"
-(integer) 1
-rpush mylist "element2"
-(integer) 2
-lpush mylist "element0"
+```
+127.0.0.1:6379> rpush robot:1:jobs forward left stop
 (integer) 3
+127.0.0.1:6379> llen robot:1:jobs
+(integer) 3
+127.0.0.1:6379> lpop robot:1:jobs
+"forward"
+127.0.0.1:6379> lrange robot:1:jobs 0 -1
+1) "left"
+2) "stop"
 ```
 
-To retrieve elements from a list, you can use the `lrange` command. The `lrange` command returns a range of elements from the list, starting at the specified index and ending at the specified index. Here's an example of retrieving elements from a Redis list:
+- `rpush` adds to the end (right) and replies with the new length. `lpush` adds to the start (left)
+- `lpop` removes and returns the first item, and `rpop` the last
+- `llen` gives the length
+- `lrange key 0 -1` shows everything: `0` is the first item and `-1` means the last one
 
-```redis
-lrange mylist 0 -1
+If the list is empty, `lpop` returns `(nil)` straight away. A worker that loops on `lpop` would spin the processor. The fix is `blpop`, which waits for you.
 
-"element0"
-"element1"
-"element2"
-```
+## A job queue in Python
 
----
-
-### Manipulating List Elements
-
-In addition to adding and retrieving list elements, Redis provides several commands for manipulating list elements. Here are some examples of manipulating list elements in Redis:
-
-* `lpop`: Remove and return the first element of a list
-* `rpop`: Remove and return the last element of a list
-* `ltrim`: Trim a list to the specified range of elements
-* `llen`: Get the length of a list
-
----
-
-### Using Redis Lists with Python
-
-To use Redis lists in Python, you can use the `list` methods of the Redis Python library. Here's an example of how to use Redis lists in Python:
+`blpop` means blocking pop: it sleeps until something arrives or a timeout runs out. Save this as `queue_demo.py`:
 
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r.delete('robot:1:jobs')
 
-# Add elements to the end of a list
-redis_client.rpush('mylist', 'element1', 'element2')
+# Producer: queue some jobs
+r.rpush('robot:1:jobs', 'forward', 'left', 'forward', 'stop')
+print('Queued', r.llen('robot:1:jobs'), 'jobs')
 
-# Add elements to the beginning of a list
-redis_client.lpush('mylist', 'element0')
-
-# Get a range of elements from a list
-elements = redis_client.lrange('mylist', 0, -1)
-
-# Remove and return the first element of a list
-first_element = redis_client.lpop('mylist')
-
-# Remove and return the last element of a list
-last_element = redis_client.rpop('mylist')
+# Worker: take jobs until none arrive for 1 second
+while True:
+    item = r.blpop('robot:1:jobs', timeout=1)
+    if item is None:
+        print('No more jobs')
+        break
+    key, job = item
+    print('Doing:', job)
 ```
 
-In this example, we use the Redis Python library to add elements to a list using the rpush and lpush methods, retrieve a range of elements from the list using the lrange method, and remove and return elements from the list using the lpop and rpop methods.
+It prints:
 
----
+```
+Queued 4 jobs
+Doing: forward
+Doing: left
+Doing: forward
+Doing: stop
+No more jobs
+```
 
-### Example: keep the last 10 sensor readings
+`blpop` returns a pair, the key name and the value, because it can watch several lists at once. When the timeout passes with nothing to take it returns `None`. In a real robot you would run the producer and the worker as two separate programs, and the worker would wait forever with `timeout=0`.
+
+> ## Why not use pub/sub for jobs?
+>
+> Pub/sub (lesson 9) throws a message away if nobody is listening. A list keeps jobs safely until a worker takes them, so a robot that is switched off for a minute still gets its jobs when it wakes up.
+
+## Keep the last 10 readings
+
+`ltrim` cuts a list down to a range. Combine it with `lpush` and the list never grows beyond the size you choose:
 
 ```python
+import redis
+
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r.delete('readings')
+
 def log_reading(value):
-    redis_client.lpush('readings', value)   # newest first
-    redis_client.ltrim('readings', 0, 9)     # keep only 10
+    r.lpush('readings', value)   # newest first
+    r.ltrim('readings', 0, 9)    # keep only 10
 
 for v in range(15):
     log_reading(v)
 
-print(redis_client.lrange('readings', 0, -1))
-# ['14', '13', '12', '11', '10', '9', '8', '7', '6', '5']
+print(r.lrange('readings', 0, -1))
 ```
 
----
+This prints:
+
+```
+['14', '13', '12', '11', '10', '9', '8', '7', '6', '5']
+```
+
+The newest reading is at the front, and readings 0 to 4 have been dropped. This is the same trick used to keep a rolling log without a cleanup job.
+
+## Try it Yourself
+
+1. In `redis-cli`, `lpush` the numbers 40, 42 and 39 onto `recent:distance`. In which order does `lrange` show them?
+2. Change `log_reading` to keep only the last 5 readings
+3. Make the queue demo add two more jobs while the worker is running (use a second terminal and `redis-cli rpush`) and watch the worker pick them up
+4. Challenge: write a worker that treats the job `stop` as the signal to exit the loop
+
+## Common Issues
+
+- **Problem**: The worker loop uses 100% of the processor.
+- **Solution**: Use `blpop` with a timeout instead of calling `lpop` in a tight loop.
+- **Why**: `lpop` returns immediately when the list is empty, so the loop never rests.
+
+- **Problem**: Jobs come out in the wrong order.
+- **Solution**: Use `rpush` to add and `lpop` to take (or `lpush` and `rpop`). Mixing `lpush` with `lpop` gives you a stack.
+- **Why**: The first job in only comes out first if you add and remove at opposite ends.
+
+- **Problem**: The list keeps growing forever.
+- **Solution**: Add `ltrim` after each push, as in the `log_reading` example.
+- **Why**: Redis keeps everything in memory until you remove it.
+
+## Check your understanding
 
 {% quiz %}
 ? What does `lrange mylist 0 -1` return?
@@ -120,23 +152,18 @@ print(redis_client.lrange('readings', 0, -1))
 - [x] Every element in the list
 - [ ] The last element
 > `-1` means the last element, so 0 to -1 is the whole list.
+
+? Which pair makes a first-in, first-out queue?
+- [x] `rpush` to add, `lpop` to take
+- [ ] `lpush` to add, `lpop` to take
+- [ ] `ltrim` to add, `llen` to take
+> Adding at one end and taking from the other keeps the order of arrival.
+
+? Why use `blpop` instead of `lpop` in a worker?
+- [ ] It deletes the whole list
+- [x] It waits for a job instead of returning immediately when the list is empty
+- [ ] It returns the job faster
+> Blocking lets the worker sleep until work arrives, instead of spinning.
 {% endquiz %}
 
----
-
-### Key Takeaways
-
-After completing this lesson, you should be able to:
-
-* Describe Redis lists and their implementation in Redis
-* Add and retrieve elements from Redis lists
-* Manipulate elements in Redis lists
-* Use Redis lists in Python
-
----
-
-### Conclusion
-
-In this lesson, we covered Redis lists and how to use them with Python. We described Redis lists and their implementation in Redis, and demonstrated how to add, retrieve, and manipulate list elements in Redis, and how to use Redis lists in Python using the Redis Python library. In the next lesson, we will cover Redis sets.
-
----
+> **Teachers**: queues are a lovely way to show how a web page and a robot cooperate, but a shared server means a shared queue. If two groups use the same `robot:1:jobs` key, they will steal each other's jobs. Give every group its own key prefix, such as `team3:jobs`, and agree it before the first run.

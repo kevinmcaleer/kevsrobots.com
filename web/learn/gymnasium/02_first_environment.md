@@ -10,8 +10,10 @@ next: 03_terminated_vs_truncated.html
 description: Install Gymnasium in a virtual environment, run CartPole-v1 with a random
   agent, and learn how render_mode works.
 percent: 18
-duration: 5
-date_updated: 2026-06-14
+duration: 7
+quiz_total: 56
+snakie: false
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning with Gymnasium
 - content:
@@ -53,7 +55,7 @@ navigation:
       link: 12_meet_stable_baselines3.html
     - name: Train, Evaluate, and Export
       link: 13_train_evaluate_export.html
-    - name: "What You Have Built \u2014 and Where to Go Next"
+    - name: What You Have Built, and Where to Go Next
       link: 14_summary.html
 ---
 
@@ -62,124 +64,53 @@ navigation:
 
 ---
 
-## Setting Up
+By the end of this lesson you will be able to install Gymnasium, create an environment with `gym.make`, and run a random agent through full episodes.
 
-Let's get Gymnasium installed and run something. Open a terminal and create a fresh virtual environment — keeping project dependencies isolated is good practice.
+---
+
+## Setting up
+
+Let's get Gymnasium installed and run something. Open a terminal and make a fresh virtual environment, which keeps this project's packages separate from everything else on your machine.
 
 ```bash
 python3 -m venv rl-gym
-source rl-gym/bin/activate          # macOS / Linux
+source rl-gym/bin/activate          # macOS and Linux
 # rl-gym\Scripts\activate           # Windows
 
-pip install gymnasium stable-baselines3
+pip install "gymnasium[classic-control]" stable-baselines3
 ```
 
-The second command also installs PyTorch (CPU version), NumPy, and a handful of other dependencies. This may take a couple of minutes and download several hundred megabytes.
+The `[classic-control]` part installs pygame, which CartPole needs to draw itself. Stable-Baselines3 brings PyTorch with it, which is a big download, so you can stop after `gymnasium[classic-control]` for now and add SB3 when you reach lesson 12.
 
-Verify the install:
+> **Teachers**: Do the PyTorch install before the lesson, on a good connection, or have learners install only `"gymnasium[classic-control]"` today (a small download). On school machines where learners cannot install packages, ask IT to prepare a shared virtual environment in advance.
+
+Check the install with a short script:
 
 ```python
 import gymnasium
-print(gymnasium.__version__)   # should print 1.x.x
+
+print(gymnasium.__version__)
 ```
 
-## CartPole: The Standard Hello World
+You should see `1.4.0` or a newer 1.x number. This course was tested on 1.4.0.
 
-CartPole is a classic control problem. A pole is balanced on a cart that slides left and right. Your agent chooses to push the cart left or right at each step. The goal is to keep the pole upright for as long as possible.
+## CartPole: the Hello World of RL
 
-It is the RL equivalent of "Hello, World" — simple enough to understand immediately, rich enough to show meaningful learning.
+CartPole balances a pole on a cart that slides left and right. At each step the agent pushes the cart left or right, and gets +1 reward for every step the pole stays up. It is simple enough to understand at a glance and rich enough to show real learning.
 
-Let's run it with a random agent first, so we can see the API before we worry about intelligence:
+Let's run it with a random agent first, so we can see the API before worrying about intelligence.
 
 ```python
 import gymnasium as gym
 
-# Create the environment.
-# render_mode="human" opens a window so you can watch.
-# render_mode="ansi" prints text. Omit it entirely for training.
-env = gym.make("CartPole-v1", render_mode="human")
-
-# Reset returns (observation, info).
-# This is different from the old done-based API — more on that shortly.
-obs, info = env.reset(seed=42)
-
-total_reward = 0
-
-for step in range(500):
-    # Sample a random action from the action space.
-    action = env.action_space.sample()
-
-    # Step returns five values in Gymnasium 1.x.
-    obs, reward, terminated, truncated, info = env.step(action)
-    total_reward += reward
-
-    # End the episode if it is over.
-    if terminated or truncated:
-        print(f"Episode ended at step {step + 1}. Total reward: {total_reward}")
-        obs, info = env.reset()
-        total_reward = 0
-
-env.close()
-```
-
-When you run this you will see a window with the pole wobbling and falling almost immediately — a random agent is very bad at CartPole. That is expected. We are just checking that the plumbing works.
-
-> **Note:** If you are running on a headless server (no display), use `render_mode="rgb_array"` and skip calling `env.render()`, or just omit `render_mode` entirely. You will still get all the numbers; you just will not see the animation.
-
-## What gym.make Does
-
-```python
-env = gym.make("CartPole-v1", render_mode="human")
-```
-
-`gym.make` looks up the environment by its registered ID string, instantiates it, and returns an environment object. The `render_mode` is set here at construction time — you cannot change it later. This is a deliberate design choice in Gymnasium 1.x: the rendering infrastructure is built once, at the start, rather than being toggled mid-episode.
-
-The registered IDs follow a naming convention: `EnvName-v0`, `EnvName-v1`, and so on. The version number lets the community publish updated environments without breaking code that depends on the old behaviour.
-
-## What env.reset Returns
-
-```python
-obs, info = env.reset(seed=42)
-```
-
-`reset()` always returns a two-tuple: the first observation and an info dictionary. The info dictionary is environment-specific — CartPole returns an empty dict, but some environments return diagnostic information like the starting position.
-
-Passing `seed=42` makes the episode reproducible. We will cover seeding in depth in lesson 6.
-
-## What env.step Returns
-
-```python
-obs, reward, terminated, truncated, info = env.step(action)
-```
-
-Five values. The previous course collapsed `terminated` and `truncated` into a single `done` flag. Gymnasium separates them. We will go deep on why in the next lesson, but for now: the episode ends if either is `True`.
-
-## Watching Without a Window: render_mode="ansi"
-
-Some environments support text rendering. For environments that do, you can get a string representation:
-
-```python
-env = gym.make("CartPole-v1", render_mode="ansi")
-obs, info = env.reset()
-text = env.render()   # returns a string when render_mode="ansi"
-print(text)
-env.close()
-```
-
-CartPole's ANSI renderer just prints some numbers. The BurgerBot environment we build later will render a proper ASCII grid.
-
-## A Random-Agent Loop Without a Window
-
-Here is a clean version that runs 3 full episodes silently — good for confirming things work on a server or inside a script:
-
-```python
-import gymnasium as gym
+print("Gymnasium version:", gym.__version__)
 
 env = gym.make("CartPole-v1")
+env.action_space.seed(0)          # makes the random actions repeatable
 
 for episode in range(3):
     obs, info = env.reset(seed=episode)
-    episode_reward = 0
+    episode_reward = 0.0
     done = False
 
     while not done:
@@ -193,32 +124,130 @@ for episode in range(3):
 env.close()
 ```
 
-You should see output like:
+Output from our test run:
 
 ```
-Episode 1: reward = 12.0
-Episode 2: reward = 9.0
-Episode 3: reward = 15.0
+Gymnasium version: 1.4.0
+Episode 1: reward = 18.0
+Episode 2: reward = 14.0
+Episode 3: reward = 12.0
 ```
 
-The exact numbers will vary (random actions), but each episode should last somewhere between 8 and 20 steps because the pole falls quickly without guidance.
+A random agent drops the pole within a couple of dozen steps. That is exactly what we expect. The point is that the plumbing works: we created an environment, reset it, stepped it and read the results.
 
-## Try It Yourself
+```mermaid
+sequenceDiagram
+    participant A as Your code
+    participant E as CartPole env
+    A->>E: gym.make("CartPole-v1")
+    A->>E: reset(seed=0)
+    E-->>A: observation, info
+    loop until terminated or truncated
+        A->>E: step(action)
+        E-->>A: observation, reward, terminated, truncated, info
+    end
+    A->>E: close()
+```
 
-1. Change `render_mode="human"` to `render_mode="rgb_array"` and call `frame = env.render()`. Print `frame.shape`. What does the shape tell you about the image?
-2. Try `gym.make("MountainCar-v0")` instead of CartPole. What does the observation look like? (Print `obs` after `reset()`.)
-3. Run the 3-episode loop 10 times with different seed values. Does the range of episode lengths change much?
+## What gym.make does
+
+`gym.make("CartPole-v1")` looks up the string in Gymnasium's registry, builds the environment and wraps it in a few safety wrappers. The name follows the pattern `Name-vN`. The version number lets the community fix an environment without changing how old code behaves, which is why CartPole has both `v0` and `v1`. Always use the version you meant: the ids in this course all exist in Gymnasium 1.4.0.
+
+## What reset and step return
+
+```python
+obs, info = env.reset(seed=42)
+obs, reward, terminated, truncated, info = env.step(action)
+```
+
+{: .no-snakie }
+
+`reset()` returns two things: the first observation and an `info` dictionary. `step()` returns five. The old `done` flag has become two flags, `terminated` and `truncated`; the next lesson explains why. For now, the episode is over when either one is `True`.
+
+## Choosing how to render
+
+You choose the render mode when you create the environment, and it cannot be changed afterwards:
+
+| render_mode | What `env.render()` gives you |
+| --- | --- |
+| `None` (default) | Nothing. Fastest, so use it for training |
+| `"human"` | A pygame window you can watch. `render()` returns nothing |
+| `"rgb_array"` | A NumPy image array |
+| `"ansi"` | A text string, for environments that support it |
+{:class="table table-single"}
+
+Not every environment supports every mode. CartPole offers `human` and `rgb_array`; it has no text mode. Text mode is common in grid-style environments, so let's try it on FrozenLake, plus an image frame from CartPole.
+
+```python
+import gymnasium as gym
+
+env = gym.make("CartPole-v1", render_mode="rgb_array")
+obs, info = env.reset(seed=0)
+frame = env.render()
+print("Frame shape:", frame.shape, "dtype:", frame.dtype)
+env.close()
+
+env = gym.make("FrozenLake-v1", render_mode="ansi", is_slippery=False)
+obs, info = env.reset(seed=0)
+print(env.render())
+for action in (2, 2, 1):  # right, right, down
+    obs, reward, terminated, truncated, info = env.step(action)
+print(env.render())
+print("observation:", obs)
+env.close()
+```
+
+CartPole's frame is `(400, 600, 3)`: 400 pixels high, 600 wide, three colour channels, `uint8`. FrozenLake prints a 4 by 4 grid in text, with your cell highlighted in red (the highlight is an ANSI colour code, so it shows as `S` or `F` with a red background in most terminals). After right, right, down the observation is `6`, which is cell number `row * 4 + col`, row 1 and column 2.
+
+To watch a window, use `render_mode="human"` on a machine with a display. We cannot show a window in this lesson, but the loop is the same: create the environment with that mode and the window updates on every `step()`.
+
+> **Note**: This is a good habit to carry forward. Train with no render mode, and add `"human"` only when you want to watch.
+
+## Try it Yourself
+
+1. In the first program, change `render_mode` to `"rgb_array"` and print `env.render().shape` after each reset. What do the three numbers mean?
+2. Make `MountainCar-v0` instead of CartPole. Print the observation after `reset()`. How many numbers are there, and how many actions does the car have?
+3. Run the three-episode loop with `seed=episode` but without the `env.action_space.seed(0)` line. Run it twice. Which numbers stay the same and which change?
+4. Challenge: write a loop that runs 100 random episodes of CartPole and prints the shortest, longest and average reward.
 
 ## Common Issues
 
-**Problem:** `ModuleNotFoundError: No module named 'gymnasium'`
-**Solution:** Make sure your virtual environment is activated. Run `which python` (Mac/Linux) — it should point inside your venv folder.
-**Why:** Python can have many installs. If you installed gymnasium into one but run another, the import fails.
+- **Problem**: `ModuleNotFoundError: No module named 'gymnasium'`
+- **Solution**: Activate your virtual environment, then check `which python` (macOS and Linux) or `where python` (Windows) points inside it.
+- **Why**: You can have several Pythons. If you installed Gymnasium into one and run another, the import fails.
 
-**Problem:** A window opens and immediately closes.
-**Solution:** The script ends before the window can render. Add `import time; time.sleep(0.1)` inside the loop, or remove `render_mode="human"` for automated scripts.
-**Why:** The rendering window runs in the main thread. Once the script exits, the window closes.
+- **Problem**: `DependencyNotInstalled: pygame is not installed, run pip install "gymnasium[classic-control]"`
+- **Solution**: Run that pip command.
+- **Why**: Plain `pip install gymnasium` leaves out pygame, which CartPole needs for `render_mode="rgb_array"` and `"human"`. Without a render mode, CartPole runs fine.
 
-**Problem:** `gymnasium.error.NameNotFound: Environment CartPole-v1 doesn't exist`
-**Solution:** Check your spelling. IDs are case-sensitive. Try `gym.envs.registry.keys()` to list all available IDs.
-**Why:** `gym.make` looks up the ID in a registry dictionary. An exact string match is required.
+- **Problem**: `NameNotFound: Environment CartPol doesn't exist` (or `VersionNotFound` for a wrong version number).
+- **Solution**: Check the spelling and the `-vN`. Print `list(gym.registry)` to see every available id.
+- **Why**: `gym.make` looks the exact string up in a registry.
+
+## Check your understanding
+
+{% quiz %}
+? How many values does `env.reset()` return in Gymnasium 1.x?
+- [ ] One: the observation
+- [x] Two: the observation and an info dictionary
+- [ ] Five
+> `reset()` returns `(observation, info)`. Five values belong to `step()`.
+
+? When do you choose the render mode?
+- [ ] On every call to `env.render()`
+- [x] When you create the environment with `gym.make`
+- [ ] After the first `reset()`
+> `render_mode` is fixed at construction time.
+
+? Which render mode gives you a NumPy image array?
+- [ ] `"ansi"`
+- [ ] `"human"`
+- [x] `"rgb_array"`
+> `"rgb_array"` returns a frame such as the `(400, 600, 3)` CartPole image.
+
+? Why does the loop test `terminated or truncated`?
+- [x] The episode is over when either flag is True
+- [ ] Only one of them can ever be True
+- [ ] To count the steps
+> An episode can end because the task ended or because a limit was reached, and the loop must stop for either.
+{% endquiz %}

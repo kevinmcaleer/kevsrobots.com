@@ -10,8 +10,10 @@ next: 19_summary.html
 description: A diagnostic order for RAG problems, and fixes for the things that actually
   go wrong
 percent: 95
-duration: 8
-date_updated: 2026-08-23
+duration: 11
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to work backwards through the six stages of the pipeline to find where a bad answer went wrong, and recognise the Chroma and API errors you are most likely to meet.
+
 RAG has an unusual failure mode: it almost never crashes. It just gives you a slightly wrong answer, confidently, and you have to work out which of six stages let you down.
 
 This lesson is a diagnostic order and a catalogue of the specific things that go wrong.
@@ -87,6 +91,21 @@ This lesson is a diagnostic order and a catalogue of the specific things that go
 ## Work backwards through the pipeline
 
 When an answer is bad, check in this order. Each step is quick and each one eliminates a stage.
+
+```mermaid
+flowchart TD
+    S["Bad answer"] --> A{"1. Is the note<br/>in the index?"}
+    A -- no --> A1["Reading problem:<br/>SKIP_DIRS, empty note, path"]
+    A -- yes --> B{"2. Is the answer inside<br/>one of its chunks?"}
+    B -- no --> B1["Chunking problem:<br/>size, overlap, breadcrumb"]
+    B -- yes --> C{"3. Does amv search<br/>find it in the top 20?"}
+    C -- no --> C1["Embedding or query problem"]
+    C -- yes --> D{"4. Is it in the top 6?"}
+    D -- no --> D1["Ranking problem:<br/>breadcrumb, per-note cap"]
+    D -- yes --> E{"5. Was it in the prompt?"}
+    E -- no --> E1["Plumbing problem"]
+    E -- yes --> F["6. Prompt problem:<br/>tighten the system prompt"]
+```
 
 **1. Is the note indexed at all?**
 
@@ -195,7 +214,8 @@ We hash `note.body`, a plain string, precisely to avoid all three.
 
 | Error | Cause | Fix |
 |---|---|---|
-| `Expected metadata value to be a str, int, float, bool, or list of str` | A `datetime` from YAML frontmatter | Wrap in `str()` |
+| `Expected metadata value to be a str, int, float, bool, SparseVector, list, or None, got ... which is a date` | A `datetime` or `date` from YAML frontmatter | Wrap in `str()` |
+| `Expected metadata list value for key 'tags' to be non-empty` | An empty list in metadata | Use a placeholder such as `["untagged"]` |
 | `Expected metadata to be a non-empty dict` | An empty `{}` in your metadatas list | Always write at least one key |
 | `Number of requested results 0, cannot be negative, or zero` | `n_results` computed as 0 on an empty collection | Guard with `if collection.count() == 0` |
 | `Expected where to have exactly one operator, got {}` | Passed `{}` instead of `None` for no filter | Return `None` |
@@ -205,18 +225,18 @@ We hash `note.body`, a plain string, precisely to avoid all three.
 
 ---
 
-## Metadata comes back as None
+## Metadata is missing or comes back as None
 
-You wrote metadata and `collection.get()` hands back `None` for that chunk.
+You wrote metadata and `collection.get()` hands back `None` for that chunk, or a field you wrote is simply not there.
 
-The cause is a `None` **value** somewhere in the dict. Chroma does not reject it and does not warn - it stores the entire metadata entry as `None`, so you lose every other field too.
+The cause is a `None` **value** somewhere in the dict. Chroma does not reject it and does not warn. It silently drops that key, and if every value in the dict was `None` the whole entry comes back as `None`.
 
 ```python
 # Guarantees no None values ever reach Chroma
 metadata = {k: v for k, v in metadata.items() if v is not None}
 ```
 
-This is why `chunk_note` writes `note.tags or ["untagged"]` rather than letting an empty list through, and why `collection_stats` guards with `if m`.
+This is why `chunk_note` writes `note.tags or ["untagged"]` rather than letting an empty list through, why `collection_stats` guards with `if m`, and why optional fields are read with `metadata.get(...)` instead of `metadata[...]`.
 
 ---
 
@@ -228,15 +248,14 @@ This is why `chunk_note` writes `note.tags or ["untagged"]` rather than letting 
 | `RateLimitError` | Too many requests | The SDK retries automatically; if it persists, slow down |
 | `APIConnectionError` | Network | Check connectivity; the SDK already retries twice |
 | `BadRequestError` about `max_tokens` | Asked for more than the model allows | Lower `MAX_ANSWER_TOKENS` |
+| `TypeError: Could not resolve authentication method` | `ANTHROPIC_API_KEY` is not set at all | Export it; `amv ask` checks for it first |
 {:class="table table-single"}
-
-A note on the "CORS-shaped" confusion if you ever wrap this in a web API: a 500 from your own handler often shows up in the browser as a CORS error, because the error response never gets the CORS headers added. Always read your server logs rather than trusting the browser's diagnosis.
 
 ---
 
 ## It is slow
 
-**Indexing is slow.** Expected on the first run - the model is downloading. After that, roughly 100 chunks per second is normal. If it is much worse, check you are batching (lesson 8) and not calling `upsert` once per chunk.
+**Indexing is slow.** Expected on the first run - the model is downloading. After that, time your own machine with the `time_it.py` script from lesson 8 and treat that figure as normal for you. If it is much worse, check you are batching (lesson 8) and not calling `upsert` once per chunk.
 
 **Every query is slow to start.** The embedding model loads once per process, and a CLI is a new process every time. Interactive mode fixes it.
 
@@ -254,6 +273,8 @@ Retrieval is fine, generation is fine, and the answer still does not help. Usual
 - **Too formal for your own notes**: "Match the user's own vocabulary" is already in there; strengthen it.
 
 ---
+
+> **Teachers**: This lesson works well as a find-the-fault session. Have each learner break the practice vault in one way from this page (add `robots` to `SKIP_DIRS`, point `--db` at the wrong folder, put a `date` in the metadata), swap with a neighbour, and make them walk the six steps to find the fault, noting which step caught it. Steps 1 to 4 need no API key, so the whole exercise works without one.
 
 ## Try it Yourself
 
@@ -277,3 +298,33 @@ Retrieval is fine, generation is fine, and the answer still does not help. Usual
 - **Problem**: The tool works on your test vault and fails on the real one.
 - **Solution**: Run `amv stats` on both and compare chunk counts per note.
 - **Why**: Real vaults have daily notes, MOCs, attachments and templates. Those shapes do not appear in a four-note test vault, and they are exactly what breaks things.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? An answer is wrong. What should you check first?
+- [ ] The system prompt
+- [x] Whether the note is in the index, then whether the right chunk exists
+- [ ] The API key
+> Most people start at step 6 (the prompt), but almost every real problem is at step 2 or 3.
+
+? Results got worse after you changed `CHUNK_SIZE`. What is the first thing to try?
+- [x] `amv index --full`
+- [ ] Reinstall ChromaDB
+- [ ] Lower `TOP_K`
+> Unchanged notes keep their old chunk boundaries, so your index is a mix of two strategies until you rebuild.
+
+? You wrote metadata containing `{"title": None, "path": "a.md"}`. What does Chroma do?
+- [ ] Raises an error straight away
+- [x] Silently drops the `title` key
+- [ ] Stores the string "None"
+> If every value had been `None` the whole entry would read back as `None`.
+
+? `amv search "x" --top-k 20` shows the right chunk at rank 15 but it is missing at the default of 6. What kind of problem is it?
+- [x] A ranking problem: the retriever knows about it but ranks it low
+- [ ] A prompt problem
+- [ ] An indexing problem
+> The breadcrumb prefix and `MAX_CHUNKS_PER_NOTE` are the levers.
+{% endquiz %}

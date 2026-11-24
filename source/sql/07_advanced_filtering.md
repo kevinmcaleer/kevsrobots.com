@@ -1,227 +1,205 @@
 ---
 title: Advanced Filtering and Conditional Logic
-description: >-
-    Use SQL's AND, OR, and CASE statements for more control over queries
+description: Combine conditions with AND, OR and NOT, use IN and BETWEEN, and label rows with CASE, using the robot workshop data.
 layout: lesson
+type: page
 cover: /learn/sql/assets/banners/07_advanced_filtering.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, we’ll explore advanced filtering techniques and conditional logic with SQL. You’ll learn how to refine your queries using multiple conditions and implement conditional expressions with the `CASE` statement.
+By the end of this lesson you will be able to combine several conditions correctly, use `IN` and `BETWEEN` as shortcuts, and use `CASE` to turn numbers into labels.
 
 ---
 
-## 1. Combining Conditions with `AND` and `OR`
+One `WHERE` condition answers simple questions. Real questions have more parts: "rovers with a big battery", "walkers or arms", "built during 2024". Let's build up to them.
 
-In SQL, you can combine multiple conditions in a `WHERE` clause to narrow down results. The `AND` and `OR` operators are used to create more complex filters.
+## AND, OR and NOT
 
-- **`AND`**: All conditions must be true for the row to be included in the results.
-- **`OR`**: At least one condition must be true for the row to be included in the results.
-
-### Example: Using `AND` to Refine Results
-
-- **Example**: Retrieve users over the age of 25 who have an email ending with "example.com".
-
-    ```sql
-    SELECT * FROM users
-    WHERE age > 25 AND email LIKE '%example.com';
-    ```
-
-### Example: Using `OR` to Broaden Results
-
-- **Example**: Retrieve users who are either named "Alice" or have an age of 30.
-
-    ```sql
-    SELECT * FROM users
-    WHERE name = 'Alice' OR age = 30;
-    ```
-
-### Combining `AND` and `OR`
-
-You can combine `AND` and `OR` in the same query, but use parentheses to control the logic and ensure accurate results.
-
-- **Example**: Retrieve users named "Alice" who are older than 25, or users whose age is exactly 30.
-
-    ```sql
-    SELECT * FROM users
-    WHERE (name = 'Alice' AND age > 25) OR age = 30;
-    ```
-
----
-
-## 2. Using `IN` for List Filtering
-
-The `IN` operator allows you to specify a list of values for SQL to search for in a column, simplifying queries with multiple OR conditions.
-
-### Example: Using `IN`
-
-- **Example**: Retrieve users aged 25, 30, or 35.
-
-    ```sql
-    SELECT * FROM users
-    WHERE age IN (25, 30, 35);
-    ```
-
-This query is equivalent to using `OR` conditions but is more concise.
-
----
-
-## 3. Filtering with `BETWEEN`
-
-The `BETWEEN` operator is used to filter data within a specific range. It’s often used with numeric or date values.
-
-### Example: Using `BETWEEN`
-
-- **Example**: Retrieve users aged between 20 and 30 (inclusive).
-
-    ```sql
-    SELECT * FROM users
-    WHERE age BETWEEN 20 AND 30;
-    ```
-
-> **Tip**: `BETWEEN` includes the boundary values, so this query retrieves users who are exactly 20 or 30 years old as well as those in between.
-
----
-
-## 4. Pattern Matching with `LIKE`
-
-The `LIKE` operator enables pattern matching with the `%` and `_` wildcards:
-
-- `%`: Matches any sequence of characters.
-- `_`: Matches a single character.
-
-### Example: Using `LIKE` with Wildcards
-
-- **Example**: Retrieve users whose names start with "A".
-
-    ```sql
-    SELECT * FROM users
-    WHERE name LIKE 'A%';
-    ```
-
-- **Example**: Retrieve users with a 3-letter name where the second letter is "o".
-
-    ```sql
-    SELECT * FROM users
-    WHERE name LIKE '_o_';
-    ```
-
----
-
-## 5. Conditional Logic with `CASE`
-
-The `CASE` statement in SQL allows you to add conditional logic to your queries. It’s often used to create calculated fields based on certain conditions, similar to `IF` statements in other languages.
-
-### Basic `CASE` Syntax
+`AND` needs both conditions to be true:
 
 ```sql
-SELECT column1,
-    CASE
-        WHEN condition1 THEN result1
-        WHEN condition2 THEN result2
-        ELSE result
-    END AS new_column
-FROM table_name;
+SELECT name, kind, battery_mah
+FROM robots
+WHERE kind = 'rover' AND battery_mah >= 1500;
 ```
 
-### Example: Categorizing Data with `CASE`
+```text
+name   kind   battery_mah
+-----  -----  -----------
+Smars  rover  2000
+```
 
-Let’s say you want to categorize users based on their age group.
+`OR` needs at least one:
 
-- **Example**: Create an age category for each user.
+```sql
+SELECT name, kind FROM robots WHERE kind = 'walker' OR kind = 'arm';
+```
 
-    ```sql
-    SELECT name, age,
-        CASE
-            WHEN age < 18 THEN 'Minor'
-            WHEN age BETWEEN 18 AND 65 THEN 'Adult'
-            ELSE 'Senior'
-        END AS age_category
-    FROM users;
-    ```
+```text
+name         kind
+-----------  ------
+Pico Walker  walker
+Arm Buddy    arm
+```
 
-In this example:
+`NOT` flips a condition, so `WHERE NOT battery_mah > 1500` keeps robots at 1500 mAh or below. Robots with a `NULL` battery are left out, because `NULL > 1500` is unknown, not false.
 
-- Users under 18 are labeled "Minor".
-- Users between 18 and 65 are labeled "Adult".
-- Users over 65 are labeled "Senior".
+## The precedence trap
 
-### Example: Using `CASE` with Conditions in `WHERE`
+`AND` is done **before** `OR`, exactly like multiplication before addition. That surprises people. What did we mean here?
 
-The `CASE` statement can also be used to dynamically choose values based on conditions.
+```sql
+SELECT name, kind FROM robots
+WHERE kind = 'rover' OR kind = 'arm' AND battery_mah IS NULL;
+```
 
-- **Example**: Mark users who don’t have an email with "No Email".
+```text
+name         kind
+-----------  -----
+Smars        rover
+Arm Buddy    arm
+Line Chaser  rover
+Mystery Bot  rover
+```
 
-    ```sql
-    SELECT name,
-        CASE
-            WHEN email IS NULL THEN 'No Email'
-            ELSE email
-        END AS contact_info
-    FROM users;
-    ```
+SQL read that as "any rover, **or** (an arm with no battery figure)". Every rover came back, which is probably not what we wanted. Parentheses say what you mean:
 
-In this example, users without an email will display "No Email" in the `contact_info` column.
+```sql
+SELECT name, kind FROM robots
+WHERE (kind = 'rover' OR kind = 'arm') AND battery_mah IS NULL;
+```
 
----
+```text
+name         kind
+-----------  -----
+Arm Buddy    arm
+Mystery Bot  rover
+```
 
-## 6. Practice Exercise: Advanced Filtering and Conditional Logic
+Now it means "rovers or arms, that also have no battery figure". When you mix `AND` and `OR`, always add parentheses, even when you think you don't need them.
 
-1. Retrieve all users whose age is either 20, 25, or 30 using the `IN` operator.
+## IN: a tidy list of options
 
-    ```sql
-    SELECT * FROM users
-    WHERE age IN (20, 25, 30);
-    ```
+`kind = 'walker' OR kind = 'arm'` gets long fast. `IN` does the same job:
 
-2. Retrieve users with an age between 18 and 30 who also have a name starting with "B".
+```sql
+SELECT name, kind FROM robots WHERE kind IN ('walker', 'arm');
+SELECT name, kind FROM robots WHERE kind NOT IN ('walker', 'arm');
+```
 
-    ```sql
-    SELECT * FROM users
-    WHERE age BETWEEN 18 AND 30 AND name LIKE 'B%';
-    ```
+The second returns the three rovers: Smars, Line Chaser and Mystery Bot.
 
-3. Categorize users into "Young Adult" if they are under 25, "Adult" if between 25 and 40, and "Middle-aged" if over 40 using `CASE`.
+## BETWEEN: a range
 
-    ```sql
-    SELECT name, age,
-        CASE
-            WHEN age < 25 THEN 'Young Adult'
-            WHEN age BETWEEN 25 AND 40 THEN 'Adult'
-            ELSE 'Middle-aged'
-        END AS age_group
-    FROM users;
-    ```
+`BETWEEN` includes both ends:
 
-4. Display all users, but show "Unknown Email" for any user who does not have an email address.
+```sql
+SELECT name, battery_mah FROM robots WHERE battery_mah BETWEEN 1200 AND 1500;
+```
 
-    ```sql
-    SELECT name,
-        CASE
-            WHEN email IS NULL THEN 'Unknown Email'
-            ELSE email
-        END AS contact_info
-    FROM users;
-    ```
+```text
+name         battery_mah
+-----------  -----------
+Pico Walker  1500
+Line Chaser  1200
+```
 
----
+It works for text dates too, because `YYYY-MM-DD` sorts in date order. For a date range, comparison operators avoid fuss about the end point:
 
-## Summary of Advanced Filtering and Conditional Logic
+```sql
+SELECT name, built_on FROM robots
+WHERE built_on >= '2024-06-01' AND built_on < '2025-01-01';
+```
 
-Here’s a recap of the advanced filtering techniques and conditional logic covered in this lesson:
+```text
+name         built_on
+-----------  ----------
+Pico Walker  2024-06-21
+Arm Buddy    2024-09-02
+```
 
-Operator / Function  | Description                                         | Example
----------------------|-----------------------------------------------------|-------------------------------------
-`AND` / `OR`         | Combines multiple conditions                        | `WHERE age > 25 AND name LIKE 'A%'`
-`IN`                 | Filters for values within a specified list          | `WHERE age IN (20, 25, 30)`
-`BETWEEN`            | Filters for values within a range                   | `WHERE age BETWEEN 20 AND 30`
-`LIKE`               | Matches patterns with wildcards                     | `WHERE name LIKE 'A%'`
-`CASE`               | Adds conditional logic in queries                   | `CASE WHEN age < 18 THEN 'Minor' END`
-{:class="table table-striped"}
+## CASE: turn numbers into labels
 
-By mastering these advanced filtering techniques and conditional logic, you can create more precise and flexible SQL queries. In the next lesson, we’ll move on to working with joins to retrieve data from multiple tables.
+`CASE` is SQL's if/else. It checks each `WHEN` from the top and uses the first that is true:
 
----
+```mermaid
+flowchart TD
+    A["battery_mah"] --> B{"Is it NULL?"}
+    B -->|yes| C["unknown"]
+    B -->|no| D{">= 1800?"}
+    D -->|yes| E["long run"]
+    D -->|no| F{">= 1300?"}
+    F -->|yes| G["medium run"]
+    F -->|no| H["short run"]
+```
+
+```sql
+SELECT name, battery_mah,
+    CASE
+        WHEN battery_mah IS NULL THEN 'unknown'
+        WHEN battery_mah >= 1800 THEN 'long run'
+        WHEN battery_mah >= 1300 THEN 'medium run'
+        ELSE 'short run'
+    END AS runtime
+FROM robots;
+```
+
+```text
+name         battery_mah  runtime
+-----------  -----------  ----------
+Smars        2000         long run
+Pico Walker  1500         medium run
+Arm Buddy                 unknown
+Line Chaser  1200         short run
+Mystery Bot               unknown
+```
+
+The `NULL` check comes first on purpose. Because `CASE` stops at the first match, order matters.
+
+## Try it Yourself
+
+1. List robots that are not rovers and were built in 2024.
+2. Use `IN` to find sensors whose `kind` is `line` or `motion`.
+3. Challenge: write a `CASE` on the `sensors` table that labels each sensor `cheap` (under 2), `mid` (2 to under 5) or `pricey` (5 or more). Which sensor is `pricey`?
+
+## Common Issues
+
+- **Problem**: My `OR` query returns far more rows than I expected.
+- **Solution**: Put parentheses around the `OR` part, as in `(a OR b) AND c`.
+- **Why**: `AND` binds more tightly than `OR`, so without brackets SQL groups your conditions differently from how you read them.
+
+- **Problem**: Rows with a `NULL` disappear from a `NOT` or `NOT IN` query.
+- **Solution**: Add `OR column IS NULL` if you want the unknowns too.
+- **Why**: Any comparison with `NULL` is unknown, and `WHERE` only keeps rows that are true.
+
+- **Problem**: My `CASE` gives the wrong label.
+- **Solution**: Reorder the `WHEN` lines so the most specific test comes first.
+- **Why**: `CASE` stops at the first `WHEN` that is true, so a broad test placed early hides the later ones.
+
+## Check your understanding
+
+{% quiz %}
+? In `WHERE a OR b AND c`, which part is evaluated first?
+- [ ] `a OR b`
+- [x] `b AND c`
+- [ ] The conditions are evaluated left to right with no priority
+> `AND` has higher priority than `OR`. Use parentheses to be explicit.
+
+? Is 1500 included by `battery_mah BETWEEN 1200 AND 1500`?
+- [x] Yes, both ends are included
+- [ ] No, the upper end is excluded
+- [ ] Only if you write `<=`
+> `BETWEEN` is inclusive at both ends.
+
+? What does a `CASE` expression do when more than one `WHEN` is true?
+- [ ] It returns an error
+- [ ] It combines the results
+- [x] It uses the first one that is true
+> This is why the order of the `WHEN` lines matters.
+{% endquiz %}
+
+Now let's stop looking at one table at a time and connect robots to their sensors.

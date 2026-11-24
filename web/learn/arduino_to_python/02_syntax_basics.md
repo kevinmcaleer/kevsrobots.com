@@ -8,9 +8,11 @@ date: 2025-11-20
 previous: 01_why_micropython.html
 next: 03_control_flow.html
 description: Learn the fundamental syntax differences between Arduino C++ and MicroPython
-  including variables, types, comments, and indentation
+  including variables, types, comments, f-strings and indentation
 percent: 24
-duration: 7
+duration: 6
+quiz_total: 43
+date_updated: 2026-11-24
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:
@@ -53,428 +55,219 @@ navigation:
 
 ---
 
-## The Big Syntax Changes
+By the end of this lesson you will be able to write simple Python statements, variables and formatted print lines, and spot the C++ habits that break them.
 
-Moving from Arduino C++ to MicroPython means unlearning a few habits and learning new ones. The good news? Python syntax is generally simpler and more readable.
+## Three big changes
 
-**The three biggest changes:**
+Moving from C++ to MicroPython means unlearning a few habits:
+
 1. No semicolons at the end of lines
-2. Indentation defines code blocks (no curly braces)
-3. No need to declare variable types
+2. Indentation defines code blocks, not curly braces
+3. You do not declare variable types
 
-Let's dive into each difference with side-by-side examples.
+## Semicolons and variables
 
-## Semicolons: Gone!
-
-In Arduino C++, every statement ends with a semicolon. Forget one, and your code won't compile. Python doesn't use semicolons at all.
+In C++ every statement ends with `;` and every variable has a type. In Python a line break ends the statement and the type comes from the value.
 
 **Arduino C++:**
 ```cpp
-int ledPin = 13;
-int brightness = 128;
-digitalWrite(ledPin, HIGH);
-```
-
-**MicroPython:**
-```python
-led_pin = 13
-brightness = 128
-led.value(1)
-```
-{: .no-snakie }
-
-Notice how much cleaner Python looks? Each line is a statement - no semicolons needed. Python uses line breaks to separate statements.
-
-**Common mistake:** Adding semicolons in Python (they're technically allowed but unnecessary and considered bad style).
-
-## Variables and Types
-
-In C++, you must declare the type of every variable. In Python, the type is inferred automatically.
-
-**Arduino C++:**
-```cpp
-// Must declare types explicitly
 int counter = 0;
 float temperature = 23.5;
 bool isRunning = true;
 String message = "Hello";
-char letter = 'A';
 ```
-
-**MicroPython:**
-```python
-# Types are inferred automatically
-counter = 0              # int
-temperature = 23.5       # float
-is_running = True        # bool (note: capital T!)
-message = "Hello"        # str
-letter = 'A'             # str (single chars are also strings)
-```
-
-Key differences:
-- No type declarations in Python
-- Boolean values are `True` and `False` (capitalized!)
-- Both single and double quotes work for strings
-- Variables use `snake_case` in Python (convention), not `camelCase`
-
-## Dynamic Typing
-
-Python variables can change type during runtime. This is powerful but requires care:
 
 **MicroPython:**
 
 {% capture snakie_code %}
-value = 42           # int
-print(value)         # 42
-
-value = "Hello"      # Now it's a string!
-print(value)         # Hello
-
-value = 3.14         # Now it's a float!
-print(value)         # 3.14
+counter = 0              # int
+temperature = 23.5       # float
+is_running = True        # bool: capital T!
+message = "Hello"        # str
+print(counter, temperature, is_running, message)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="syntax_basics_1.py" %}
 
-You can't do this in C++ - once an int, always an int. Python's flexibility is useful but can cause bugs if you're not careful.
+Things to remember:
 
-## Comments
+- `True` and `False` start with a capital letter
+- Single and double quotes both make strings, and there is no separate `char` type
+- Python style is `snake_case` for variables and functions, not `camelCase`
 
-Comments work similarly, with one syntax change:
+A Python variable can change type: `value = 42` and then `value = "Hello"` is allowed. That flexibility is handy, and it is also a way to hide bugs, so keep each variable to one job.
 
-**Arduino C++:**
-```cpp
-// Single-line comment
-int x = 10;  // End-of-line comment
-
-/* Multi-line comment
-   can span many lines
-   like this */
-```
-
-**MicroPython:**
-```python
-# Single-line comment
-x = 10  # End-of-line comment
-
-"""Multi-line comment
-can span many lines
-like this"""
-
-# Or use multiple single-line comments
-# which is also common
-# in Python code
-```
-
-Most Python programmers use `#` for everything, even multi-line comments. The triple-quote style (`"""text"""`) is technically a string literal, not a comment, but it works the same way.
-
-## Indentation: This Changes Everything
-
-In C++, curly braces `{}` define code blocks. Indentation is just for readability. In Python, **indentation IS the syntax**. No braces needed.
+## Comments and constants
 
 **Arduino C++:**
 ```cpp
-void setup() {
-    pinMode(13, OUTPUT);
-    if (temperature > 25) {
-        digitalWrite(13, HIGH);
-        Serial.println("Hot!");
-    }
-}
-
-// Bad indentation, but still works:
-void loop(){
-if(temperature>25){
-digitalWrite(13,HIGH);
-}}
-```
-
-**MicroPython:**
-<!-- code-check: skip -->
-```python
-# Indentation defines the block
-from machine import Pin
-led = Pin(13, Pin.OUT)
-
-if temperature > 25:
-    led.on()
-    print("Hot!")
-
-# Bad indentation = syntax error!
-if temperature > 25:
-led.on()  # ERROR: IndentationError
-```
-{: .no-snakie }
-
-**Indentation rules:**
-- Use 4 spaces per indentation level (Python standard)
-- Never mix tabs and spaces (causes errors)
-- Consistent indentation is required, not optional
-- Colons `:` start indented blocks
-
-## String Operations
-
-Strings are much easier in Python:
-
-**Arduino C++:**
-```cpp
-String name = "Arduino";
-String greeting = "Hello, " + name + "!";
-int length = greeting.length();
-String upper = greeting;
-upper.toUpperCase();
-```
-
-**MicroPython:**
-```python
-name = "Arduino"
-greeting = f"Hello, {name}!"  # f-string (formatted string)
-# or: greeting = "Hello, " + name + "!"
-length = len(greeting)
-upper = greeting.upper()
-```
-
-Python's f-strings (formatted strings) are incredibly powerful:
-
-```python
-temperature = 23.5
-humidity = 67
-
-# Arduino way
-message = "Temp: " + str(temperature) + "C, Humidity: " + str(humidity) + "%"
-
-# Python way
-message = f"Temp: {temperature}C, Humidity: {humidity}%"
-```
-
-Much cleaner!
-
-## Type Conversion
-
-Converting between types is straightforward in both languages:
-
-**Arduino C++:**
-```cpp
-int number = 42;
-String text = String(number);
-float decimal = float(number);
-
-String numText = "123";
-int parsed = numText.toInt();
-```
-
-**MicroPython:**
-```python
-number = 42
-text = str(number)
-decimal = float(number)
-
-num_text = "123"
-parsed = int(num_text)
-```
-
-Python's conversion functions are simpler: `int()`, `float()`, `str()`, `bool()`.
-
-## Printing and Debugging
-
-Serial output is much simpler in Python:
-
-**Arduino C++:**
-```cpp
-Serial.begin(9600);
-int value = 42;
-Serial.print("Value: ");
-Serial.println(value);
-```
-
-**MicroPython:**
-
-{% capture snakie_code %}
-value = 42
-print(f"Value: {value}")
-# No setup needed - print() just works!
-{% endcapture %}
-{% include snakie.html code=snakie_code name="syntax_basics_2.py" %}
-
-## Constants
-
-Arduino uses `const` or `#define`. Python uses naming convention:
-
-**Arduino C++:**
-```cpp
+// single line
+/* multi
+   line */
 const int LED_PIN = 13;
 #define MAX_TEMP 30
 ```
 
 **MicroPython:**
-```python
-# Use ALL_CAPS for constants (convention, not enforced)
-LED_PIN = 13
+
+{% capture snakie_code %}
+# Single-line comment
+LED_PIN = 13     # ALL_CAPS by convention means "constant"
 MAX_TEMP = 30
+print(LED_PIN, MAX_TEMP)
+{% endcapture %}
+{% include snakie.html code=snakie_code name="syntax_basics_2.py" %}
 
-# These can technically be changed (Python doesn't enforce const)
-# but ALL_CAPS signals "don't change this"
-```
+Python has no `/* */` comment. Most people just put `#` at the start of each line. Python also does not enforce constants: `MAX_TEMP = 99` later would work, so the capital letters are a promise to yourself.
 
-## Side-by-Side Example
+## Indentation is the syntax
 
-Let's convert a complete Arduino snippet:
+In C++, braces define a block and indentation is only for readability. In Python the indentation *is* the block, and a colon `:` opens it.
 
 **Arduino C++:**
 ```cpp
-// Sensor reading
+if (temperature > 25) {
+    digitalWrite(13, HIGH);
+    Serial.println("Hot!");
+}
+```
+
+**MicroPython:**
+
+{% capture snakie_code %}
+temperature = 30
+
+if temperature > 25:
+    print("Fan on")
+    print("Hot!")
+print("This line runs either way")
+{% endcapture %}
+{% include snakie.html code=snakie_code name="syntax_basics_3.py" %}
+
+Rules: use four spaces per level, never mix tabs and spaces, and every line in a block must line up. Thonny indents for you after a colon when you press Enter.
+
+## F-strings replace string gymnastics
+
+Arduino C++ makes you glue strings and numbers together with `String()` or several `Serial.print()` calls. Python's f-strings drop values straight into text.
+
+**Arduino C++:**
+```cpp
+Serial.print("Temp: ");
+Serial.print(temperature, 1);
+Serial.println("C");
+```
+
+**MicroPython:**
+
+{% capture snakie_code %}
+temperature = 23.456
+humidity = 67
+print(f"Temp: {temperature:.1f}C, Humidity: {humidity}%")
+{% endcapture %}
+{% include snakie.html code=snakie_code name="syntax_basics_4.py" %}
+
+`:.1f` means one decimal place, just like the second argument to `Serial.print()`. Type conversion is simple too: `int("123")`, `float("3.5")`, `str(42)`.
+
+## Putting it together
+
+Here is a sensor sketch and its MicroPython twin. The Pico's ADC returns 0 to 65535 (we cover why in lesson 6), so the threshold changes.
+
+**Arduino C++:**
+```cpp
 int sensorPin = A0;
 int ledPin = 13;
 int threshold = 500;
 
 void setup() {
-    Serial.begin(9600);
-    pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
 }
 
 void loop() {
-    int sensorValue = analogRead(sensorPin);
-    Serial.print("Sensor: ");
-    Serial.println(sensorValue);
-
-    if (sensorValue > threshold) {
-        digitalWrite(ledPin, HIGH);
-    } else {
-        digitalWrite(ledPin, LOW);
-    }
-    delay(1000);
+  int sensorValue = analogRead(sensorPin);
+  Serial.println(sensorValue);
+  digitalWrite(ledPin, sensorValue > threshold);
+  delay(1000);
 }
 ```
 
 **MicroPython:**
 ```python
-# Sensor reading
 from machine import Pin, ADC
 import time
 
-sensor_pin = ADC(Pin(26))  # ADC0 on Pico
-led_pin = Pin(25, Pin.OUT)
-threshold = 32000  # 16-bit ADC value
+sensor = ADC(Pin(26))        # ADC0 on a Pico
+led = Pin("LED", Pin.OUT)
+threshold = 32000            # about half of 65535
 
 while True:
-    sensor_value = sensor_pin.read_u16()
+    sensor_value = sensor.read_u16()
     print(f"Sensor: {sensor_value}")
-
-    if sensor_value > threshold:
-        led_pin.on()
-    else:
-        led_pin.off()
-
+    led.value(sensor_value > threshold)
     time.sleep(1)
 ```
 
-Key changes:
-- No `setup()` and `loop()` - just regular code
-- No semicolons
-- Indentation instead of braces
-- `print()` instead of `Serial.print()`
-- Variable names use `snake_case`
+## Try it Yourself
 
-## Try It Yourself
-
-**Exercise 1: Spot the Syntax Errors**
-
-This MicroPython code has syntax errors from C++ habits. Find them:
+1. Declare a variable `speed = 50` and print `Speed: 50 percent` with an f-string.
+2. Convert `float temperature = 21.37;` to Python and print it with one decimal place.
+3. The program below has C++ habits in it. Find the C++ habits, then fix it.
+4. Challenge: write a program that reads the ADC on GP26 and prints both the raw value and the voltage (raw divided by 65535, times 3.3) to two decimal places.
 
 <!-- code-check: skip -->
 ```python
 from machine import Pin;
-import time;
+import time
 
-led_pin = Pin(25, Pin.OUT);
+led = Pin("LED", Pin.OUT);
 
 while True
-    led_pin.on();
+    led.on();
     time.sleep(1);
-    led_pin.off();
+    led.off();
     time.sleep(1);
 ```
 {: .no-snakie }
 
-**Answer:**
+The mistakes are the semicolons, and the missing colon after `while True`. Remove all the semicolons and add the colon.
 
-Errors:
-1. Semicolons after imports (remove them)
-2. Semicolon after Pin assignment (remove it)
-3. Missing colon after `while True`
-4. Semicolons in the loop (remove all of them)
+## Common Issues
 
-Corrected:
-```python
-from machine import Pin
-import time
+- **Problem**: `SyntaxError: invalid syntax` on a `while` or `if` line.
+- **Solution**: Check for a missing colon at the end of the line.
+- **Why**: C++ uses braces to open a block, Python uses the colon, and it is easy to forget when your fingers expect `{`.
 
-led_pin = Pin(25, Pin.OUT)
+- **Problem**: `IndentationError: unexpected indent` or `unindent does not match`.
+- **Solution**: Make every line in a block use the same number of spaces, and never mix tabs and spaces.
+- **Why**: Indentation is how Python knows where a block starts and ends.
 
-while True:
-    led_pin.on()
-    time.sleep(1)
-    led_pin.off()
-    time.sleep(1)
-```
+- **Problem**: `NameError: name 'true' isn't defined`.
+- **Solution**: Write `True` with a capital T (and `False`, `None`).
+- **Why**: Python's built-in constants are capitalised.
 
-**Exercise 2: Convert Arduino to Python**
+## Check your understanding
 
-Convert this Arduino code to MicroPython:
+{% quiz %}
+? What marks the start of a code block in Python?
+- [ ] An opening curly brace
+- [x] A colon at the end of the line, followed by indented lines
+- [ ] A semicolon
+> Python uses a colon and indentation instead of braces.
 
-```cpp
-int buttonPin = 2;
-int ledPin = 13;
-bool buttonPressed = false;
+? Which is the correct way to write a boolean in MicroPython?
+- [ ] `true`
+- [ ] `TRUE`
+- [x] `True`
+> The built-in values are `True` and `False`.
 
-void setup() {
-    pinMode(buttonPin, INPUT);
-    pinMode(ledPin, OUTPUT);
-}
+? What does `print(f"Temp: {t:.1f}C")` do when `t = 23.456`?
+- [ ] Prints `Temp: 23.456C`
+- [x] Prints `Temp: 23.5C`
+- [ ] Raises an error
+> `.1f` formats the number with one decimal place.
 
-void loop() {
-    buttonPressed = digitalRead(buttonPin);
-    if (buttonPressed) {
-        digitalWrite(ledPin, HIGH);
-    }
-}
-```
-
-**Answer:**
-
-```python
-from machine import Pin
-
-button_pin = Pin(2, Pin.IN)
-led_pin = Pin(13, Pin.OUT)
-
-while True:
-    button_pressed = button_pin.value()
-    if button_pressed:
-        led_pin.on()
-```
-
-**Exercise 3: Practice F-Strings**
-
-Create a MicroPython program that reads a sensor value and prints:
-- The raw value
-- The value converted to voltage (assuming 3.3V reference, 16-bit ADC)
-- A formatted message like "Sensor: 25000 (1.27V)"
-
-Try using an f-string!
-
-**Answer:**
-
-```python
-from machine import Pin, ADC
-import time
-
-sensor = ADC(Pin(26))
-
-while True:
-    value = sensor.read_u16()
-    voltage = (value / 65535) * 3.3
-    print(f"Sensor: {value} ({voltage:.2f}V)")
-    time.sleep(1)
-```
-
----
+? How do you declare `int counter = 0;` in Python?
+- [ ] `int counter = 0`
+- [x] `counter = 0`
+- [ ] `var counter = 0;`
+> Python infers the type from the value, so there is no type keyword.
+{% endquiz %}

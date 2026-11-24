@@ -10,8 +10,9 @@ next: 11_a_servo_class_and_calibration.html
 description: Control a hobby servo with 50 Hz pulses of 1 to 2 milliseconds and learn
   the duty_u16 maths on the Raspberry Pi Pico.
 percent: 55
-duration: 4
-date_updated: 2026-11-21
+duration: 5
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -68,6 +69,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain the 50 Hz servo pulse and convert a pulse width in microseconds into a Pico duty_u16 value.
+
 Scout's wheels are sorted. Now for the head. A hobby servo like the SG90 needs no motor driver, since its control circuit is built in. All it wants is power, ground and a very particular pulse on its signal wire.
 
 ## Wiring
@@ -95,6 +98,16 @@ A servo listens for a pulse repeated **50 times a second**, which is one every 2
 {:class="table table-single"}
 
 The pulse is short, and most of the 20 ms period is silence. The duty cycle is tiny: 1.5 ms out of 20 ms is only 7.5%.
+
+From the angle you want to the signal on the wire, there are a few small steps:
+
+```mermaid
+flowchart LR
+    A["angle in degrees"] --> P["pulse width in microseconds"]
+    P --> D["duty_u16 at 50 Hz"]
+    D --> W["PWM on GP10"]
+    W --> S["servo moves"]
+```
 
 ## Pulse width to duty_u16
 
@@ -171,14 +184,36 @@ Here is the secret that makes servos fiddly: those 1 to 2 ms numbers are a *conv
 
 ## Common Issues
 
-**Problem**: The servo jitters or buzzes at rest.
-**Solution**: Check the power supply first. If that is fine, set `duty_u16(0)` when you are not moving.
-**Why**: A weak supply makes the position loop hunt, and constant pulses make the servo fight any force on the horn.
+- **Problem**: The servo jitters or buzzes at rest.
+- **Solution**: Check the power supply first. If that is fine, set `duty_u16(0)` when you are not moving.
+- **Why**: A weak supply makes the position loop hunt, and constant pulses make the servo fight any force on the horn.
 
-**Problem**: The servo goes to one end and stays there, whatever I send.
-**Solution**: Check the frequency is 50 and your pulse is between roughly 500 and 2500 us.
-**Why**: A default frequency of 1 kHz sends pulses the servo cannot read.
+- **Problem**: The servo goes to one end and stays there, whatever I send.
+- **Solution**: Check the frequency is 50 and your pulse is between roughly 500 and 2500 us.
+- **Why**: A default frequency of 1 kHz sends pulses the servo cannot read.
 
-**Problem**: The Pico resets when the servo moves.
-**Solution**: Power the servo from the battery and join the grounds.
-**Why**: Servo movements cause a current surge that makes the Pico's supply dip.
+- **Problem**: The Pico resets when the servo moves.
+- **Solution**: Power the servo from the battery and join the grounds.
+- **Why**: Servo movements cause a current surge that makes the Pico's supply dip.
+
+## Check your understanding
+
+{% quiz %}
+? How often does a hobby servo expect a pulse?
+- [x] 50 times a second, one every 20 ms
+- [ ] 1000 times a second
+- [ ] Once a second
+> The pulse width, not the repeat rate, tells it the angle.
+
+? What duty_u16 value gives a 1500 us pulse at 50 Hz?
+- [x] 4915
+- [ ] 7500
+- [ ] 1500
+> 1500 / 20000 = 0.075 of the period, times 65535 gives 4915.
+
+? Why power the servo from the battery rather than the Pico's 3V3 pin?
+- [x] A servo can pull several hundred milliamps when it moves
+- [ ] Servos need exactly 3.3 V
+- [ ] The battery is quieter
+> Surges from the servo can make the Pico's supply dip and reset it. Always share a ground.
+{% endquiz %}

@@ -10,8 +10,10 @@ next: 08_building_the_index.html
 description: Split notes into retrieval sized pieces along heading boundaries, and
   keep the context that makes each piece make sense
 percent: 40
-duration: 9
-date_updated: 2026-08-23
+duration: 12
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,7 +80,25 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to split a note into heading-aware chunks, window long sections with overlap, and prepend a breadcrumb so each chunk carries its own context.
+
 Chunking is the single highest leverage decision in a RAG pipeline. Get it right and mediocre everything else still works. Get it wrong and no amount of clever prompting rescues it.
+
+Here is the journey one note takes through the chunker:
+
+```mermaid
+flowchart TD
+    N["SMARS.md"] --> S1["Section: SMARS"]
+    N --> S2["Section: SMARS > Motor wiring"]
+    N --> S3["Section: SMARS > Motor driver"]
+    S2 --> L{"Longer than<br/>1200 characters?"}
+    L -- no --> K["One piece"]
+    L -- yes --> W["Window on paragraphs,<br/>200 characters of overlap"]
+    K --> F{"Under 60 characters?"}
+    W --> F
+    F -- yes --> X["Drop the scrap"]
+    F -- no --> B["Prefix the breadcrumb,<br/>attach metadata, make a Chunk"]
+```
 
 ## Why not just embed whole notes
 
@@ -304,9 +324,32 @@ The chunk id is `robots/smars.md::0`, `robots/smars.md::1` and so on. Determinis
 
 `MIN_CHUNK_SIZE` throws away the scraps: a heading with one line under it, a stray "TODO", the two words left over after a split. They match everything weakly and nothing well.
 
-The `or ["untagged"]` and `or ["none"]` matter more than they look. Chroma rejects an empty metadata dict, and a `None` value silently nulls the *entire* metadata entry for that chunk. A placeholder is ugly but keeps every chunk filterable.
+The `or ["untagged"]` and `or ["none"]` matter more than they look. Chroma rejects an empty list as a metadata value (`Expected metadata list value for key 'tags' to be non-empty`), so one untagged note would stop the whole indexing run. A placeholder is ugly but keeps every chunk writable and filterable.
 
 ---
+
+## Seeing real chunks
+
+Here is `chunk_note` run on the SMARS note from the practice vault:
+
+```python
+# show_chunks.py - a scratch script in the project root
+from vault_rag.chunker import chunk_note
+from vault_rag.vault import iter_notes
+
+for note in iter_notes("testvault"):
+    if note.relative_path == "robots/SMARS.md":
+        for chunk in chunk_note(note):
+            print(chunk.id, "|", chunk.metadata["section"], "|", len(chunk.text), "chars")
+```
+
+```
+robots/SMARS.md::0 | SMARS Robot > SMARS | 99 chars
+robots/SMARS.md::1 | SMARS Robot > SMARS > Motor wiring | 154 chars
+robots/SMARS.md::2 | SMARS Robot > SMARS > Motor driver | 148 chars
+```
+
+Three headings, three chunks, and each one knows which note and section it came from. Notice the breadcrumb collapsed `SMARS Robot` (the title) and `SMARS` (the H1) into a sensible trail rather than repeating itself.
 
 ## Try it Yourself
 
@@ -351,3 +394,33 @@ print(f"median {sizes[len(sizes) // 2]} chars, largest {sizes[-1]}")
 - **Problem**: Code blocks get split down the middle.
 - **Solution**: Accept it, or add a guard that treats a fenced block as an unsplittable unit.
 - **Why**: `split_long_text` breaks on blank lines, and code often contains them. For a notes vault the damage is usually small; for a vault full of long code samples it is worth fixing.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why does the chunker prepend a breadcrumb like `SMARS Robot > SMARS > Motor wiring` to the chunk text?
+- [ ] It makes the chunk shorter
+- [x] The word SMARS then appears in the embedded text, so the chunk can be found by a question about SMARS
+- [ ] Chroma requires every chunk to start with a heading
+> A chunk gets one vector, and that vector only encodes words that are in the text.
+
+? What is the overlap for?
+- [x] If an answer straddles a chunk boundary, at least one chunk holds both halves
+- [ ] It lets two notes share one chunk
+- [ ] It speeds up embedding
+> Each new piece starts with the last 200 characters of the previous one.
+
+? Why split on headings before splitting on size?
+- [ ] Headings are always shorter than 1200 characters
+- [x] The author already marked where the topic changes, so each chunk is about one thing
+- [ ] ChromaDB only accepts one heading per document
+> Notes already have structure. Use it.
+
+? Why does `chunk_note` write `note.tags or ["untagged"]`?
+- [x] Chroma raises an error for an empty list in metadata, so an untagged note would stop indexing
+- [ ] It makes tag filters case insensitive
+- [ ] Untagged notes are not allowed in a vault
+> An empty list is rejected, so a placeholder keeps every chunk writable.
+{% endquiz %}

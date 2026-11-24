@@ -8,9 +8,11 @@ date: 2026-08-05
 previous: 03_the_hardware.html
 next: 05_flashing.html
 description: Antenna basics, the golden rule of never transmitting without one, and
-  what Ofcom allows on 868MHz
+  the radio rules that differ by country
 percent: 30
-duration: 5
+duration: 6
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Off-Grid Messaging with MeshCore
 - content:
@@ -32,7 +34,7 @@ navigation:
     content:
     - name: Flashing the Firmware
       link: 05_flashing.html
-    - name: Radio Settings for the UK
+    - name: Radio Settings for Your Region
       link: 06_radio_settings.html
   - section: Build the Repeater
     content:
@@ -67,7 +69,9 @@ navigation:
 
 ---
 
-Your antenna matters more than your transmit power. A £5 antenna change can do more for your range than any setting in the firmware. This lesson covers what to buy, what not to do, and what the rules are in the UK.
+By the end of this lesson you will be able to choose and fit an antenna safely, and explain the power and duty cycle limits that apply where you live.
+
+Your antenna matters more than your transmit power. A better antenna in a better position can do more for your range than any firmware setting.
 
 ---
 
@@ -75,88 +79,104 @@ Your antenna matters more than your transmit power. A £5 antenna change can do 
 
 > **Never power on a LoRa board without an antenna connected.**
 
-**Why this matters:** With no antenna, the RF energy the SX1262 generates has nowhere to go. It reflects straight back into the power amplifier. Do this repeatedly and you will damage the radio - permanently, and in a way that looks exactly like "my board mysteriously has terrible range now".
+**Why this matters:** with no antenna, the radio's output has nowhere to go and reflects back into the power amplifier. Transmitting like that can damage the radio permanently, and it looks like "my board mysteriously has terrible range now".
 
-Fit the antenna *before* you plug in the USB cable. Every time. It is a two second habit that saves £15 boards.
-
----
-
-## What makes a good 868MHz antenna
-
-**Tuned for the band.** An antenna cut for 433MHz or 2.4GHz will radiate badly at 868MHz. Buy one explicitly sold as 868MHz or 863-870MHz.
-
-**Vertical.** LoRa nodes almost universally use vertical polarisation. If your repeater's antenna is vertical and your client's is lying flat on a desk, you throw away up to 20dB. That is most of your range, gone, for free.
-
-**Gain, honestly stated.** A cheap "stubby" is typically 1-2dBi. A half-wave whip is around 2-3dBi. A collinear on a mast might be 5-6dBi. Higher gain squashes the radiation pattern flatter - which is *ideal* for a rooftop repeater covering a town, and *bad* for a handheld you carry up a hill.
-
-**Height beats everything.** Seriously. Getting an antenna 5 metres higher will usually beat any upgrade you can buy, because LoRa at these ranges is dominated by line of sight and Fresnel zone clearance.
+Fit the antenna *before* you plug in the USB cable, every time. It is a two second habit that saves a board.
 
 ---
 
-## The upgrade order
+## What makes a good antenna
 
-If you have limited budget, spend it in this order:
+**Tuned for your band.** An antenna cut for 433MHz or 2.4GHz radiates badly at 868MHz. Buy one sold for 868MHz (or 915MHz in the US).
 
-1. **Get the repeater antenna higher** - free, or the cost of a bracket
-2. **Mount it outside rather than inside** - a single brick wall can cost you 10dB
-3. **Buy a proper half-wave 868MHz whip** instead of the stubby
-4. **Only then** think about high gain collinears and low loss coax
+**Vertical.** LoRa nodes normally use vertical polarisation. If your repeater's antenna is vertical and your client's lies flat on a desk, you can lose a great deal of signal.
 
----
+**Gain, honestly stated.** A stubby antenna is typically a dBi or two. A half-wave whip is a little better. High-gain collinears squash the pattern flatter, which suits a rooftop repeater covering a town and is bad for a handheld on a hill.
 
-## Coax matters at 868MHz
+**Height beats everything.** A few metres more height often beats any upgrade you can buy, because LoRa at these frequencies is dominated by line of sight.
 
-If you mount the antenna on a pole and run cable to the board, remember that thin coax is lossy. Cheap RG174 loses roughly 1dB per metre at 868MHz. Five metres of it throws away over half your transmit power *and* half your receive sensitivity.
-
-**Better plan:** put the whole board in a small weatherproof box right at the antenna, and run the *USB power* up the pole instead. Power over a long cable is much more forgiving than RF over a long cable.
-
----
-
-## The legal bit - UK and 868MHz
-
-The 868MHz band is a licence-exempt Short Range Device band. You do not need an amateur radio licence, but you do have to stay inside the rules, which Ofcom publishes in **Interface Requirement IR 2030**.
-
-The sub-band MeshCore uses in the UK and EU is **869.4 - 869.65MHz**, and in that slice you are allowed:
-
-- Up to **500mW ERP** (Effective Radiated Power)
-- A maximum **10% duty cycle** - no more than 6 minutes of transmitting in any hour
-
-**How does that compare to your board?** The Heltec V3 puts out around **+21dBm** - Heltec quote 21 &plusmn;1dBm - which is roughly 125 to 160mW. With a typical 2-3dBi antenna your ERP lands comfortably under the 500mW ceiling, so a stock board on stock settings is fine.
-
-**The duty cycle is the one to respect.** It is not usually a problem for text messaging, but it is exactly why the community keeps settings narrow and fast - and why a badly configured node that adverts every few minutes is genuinely antisocial.
+```mermaid
+flowchart TD
+    A["1. Get the antenna higher"] --> B["2. Mount outside, not inside"]
+    B --> C["3. Swap the stubby for a tuned whip"]
+    C --> D["4. Only then: high gain and low-loss coax"]
+```
 
 ---
 
-## A note on other bands
+## Coax matters
 
-You may see MeshCore nodes on 433MHz. In the UK, 433MHz is a licence-exempt SRD band too, but with a much lower power allowance (typically 10mW ERP) and it shares space with car key fobs and weather stations. Stick to 868MHz unless you know exactly why you are not.
+Thin coax is lossy at these frequencies. Cheap RG174 loses roughly a dB per metre or so, so five metres of it throws away more than half your transmit power and the same again on receive. Better to put the board in a small weatherproof box beside the antenna and run *power* up the pole instead.
+
+---
+
+## The legal bit: it depends on your country
+
+LoRa uses licence-exempt bands, so you normally do not need an amateur licence, but you must stay inside your country's rules. They are not the same everywhere:
+
+| Region | Typical band | What to check |
+|---|---|---|
+| UK | 868MHz | Ofcom Interface Requirement IR 2030, power and duty cycle by sub-band |
+| EU | 868MHz | ETSI limits and your national regulator, including duty cycle |
+| US | 915MHz | FCC rules for the 902-928MHz ISM band |
+{:class="table table-single"}
+
+For the UK and EU, the 869.4 to 869.65MHz sub-band that the MeshCore EU/UK preset sits in is commonly cited as allowing up to **500mW ERP** with a **10% duty cycle**, meaning no more than 6 minutes of transmitting in any hour. Your Heltec V3 transmits at around 21dBm (roughly 125 to 160mW), so with a typical small antenna you are normally under the ceiling.
+
+The duty cycle is the limit to respect. Text messaging rarely hits it, but a repeater that adverts constantly can. Newer MeshCore firmware (v1.15 and later, per its docs) has `set dutycycle <percent>`, which we use in lesson 6.
+
+433MHz is a different band with a much lower power allowance in the UK, and it is shared with other devices. Stick to your region's main preset unless you have a reason not to.
 
 > ## Not legal advice
 >
-> Rules change and this is a summary, not a substitute for the actual document. If you are building anything beyond a hobby node - especially anything on a mast or with an amplifier - read the current version of Ofcom IR 2030 yourself.
+> Rules change, and this is a summary. Read the current rules from Ofcom, your national regulator, or the FCC yourself, especially before putting a node on a mast or adding an amplifier.
 
 ---
 
 ## Try it Yourself
 
-1. Look at the antenna that came with your board. Is 868MHz printed on it anywhere?
-2. Stand your client node's antenna vertically, walk to the edge of your range, then tip it horizontal. Watch the signal collapse.
-3. Challenge: find the highest point in your house or garden that has power. Measure how much higher it is than your desk. That is your free range upgrade.
+1. Look at the antenna that came with your board. Is its band printed on it?
+2. Stand your client's antenna vertically, move to the edge of your range, then tip it horizontal. Watch the signal drop.
+3. Challenge: find the regulator's page for your country and write down the power and duty cycle limit for your band.
 
 ---
 
 ## Common Issues
 
-**Problem**: My range is terrible even though both nodes are outside.
+- **Problem**: My range is poor even though both nodes are outside.
+- **Solution**: Check antenna polarisation, and get at least one node higher.
+- **Why**: Mismatched polarisation and blocked line of sight cost far more than any firmware setting.
 
-**Solution**: Check antenna polarisation and get at least one node higher.
+- **Problem**: I powered the board without an antenna once. Is it dead?
+- **Solution**: Probably not if it was brief, but compare its range against a known good board.
+- **Why**: Damage comes from transmitting into an open circuit, and it can build up. Do not make it a habit.
 
-**Why**: Mismatched polarisation and obstructed Fresnel zones cost far more than any firmware setting.
+- **Problem**: My neighbour says my node causes interference.
+- **Solution**: Lower the transmit power with `set tx`, reduce advert frequency, and check your regulator's rules.
+- **Why**: Licence-exempt does not mean rule-free, and your country's limits apply to you.
 
-**Problem**: I powered the board up without an antenna once - is it dead?
+> **Teachers**: radio rules are national, so use your own country's page, not the UK figures here. Fit antennas before connecting USB and make that a classroom rule. A bare board left powered on a bench is the usual way boards get damaged.
 
-**Solution**: Probably not, if it was only briefly and it had not transmitted. Test the range against a known good board.
+## Check your understanding
 
-**Why**: Damage is cumulative and comes from transmitting into an open circuit. Booting and immediately powering down is usually survivable - just do not make a habit of it.
+{% quiz %}
+? What must you do before powering a LoRa board?
+- [ ] Set the duty cycle
+- [x] Connect the antenna
+- [ ] Update the app
+> Transmitting without an antenna can reflect power back into the amplifier and damage the radio.
+
+? Why does transmit power limit differ between users in different countries?
+- [x] Each country's regulator sets its own limits for each band
+- [ ] LoRa boards change power by themselves
+- [ ] Only the antenna decides it
+> The lesson lists Ofcom, ETSI and FCC rules separately because limits differ by region.
+
+? Where should you spend your first range-upgrade effort?
+- [ ] A very high-gain antenna
+- [x] Getting the antenna higher
+- [ ] Longer thin coax
+> Height is the free, biggest upgrade, and thin coax wastes power.
+{% endquiz %}
 
 ---

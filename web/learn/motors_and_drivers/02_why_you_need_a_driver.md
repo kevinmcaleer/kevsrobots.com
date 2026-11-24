@@ -10,8 +10,9 @@ next: 03_powering_motors.html
 description: Understand motor current, back-EMF and flyback diodes, and why a Pico
   GPIO pin must never drive a motor directly.
 percent: 15
-duration: 4
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -68,6 +69,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain why a Pico GPIO pin can never drive a motor directly, and what a flyback diode and a motor driver protect against.
+
 It is tempting to plug a motor wire into a GPIO pin and call `pin.value(1)`. At best nothing happens. At worst you damage the Pico. Let's see why, because understanding this is the difference between copying wiring and *designing* it.
 
 ## Problem one: current
@@ -118,10 +121,22 @@ A **flyback diode** is wired across the motor, backwards, so it does nothing dur
 
 You usually do not add these yourself:
 
-- An **L298N module** has a ring of diodes built in (look for the row of small black parts marked 1N4007).
-- A **DRV8833** has diodes built into the chip.
+- An **L298N module** usually has a ring of diodes built in (look for the row of small black parts, often marked 1N4007).
+- A **DRV8833** is a chip with MOSFET output switches, and those carry internal body diodes that give the spike a similar path. Check the datasheet if you design your own board.
 
 If you ever drive a bare motor with a single transistor, add the diode. It costs pennies and saves a Pico.
+
+Here is how the pieces connect. Notice that only a small signal goes from the Pico, while the big current comes from the battery:
+
+```mermaid
+flowchart LR
+    P["Pico GPIO, a few milliamps of signal"] -->|"IN1, IN2, EN"| D["Motor driver"]
+    B["Motor battery, amps of power"] --> D
+    D -->|"OUT1, OUT2"| M["DC motor"]
+    P --- G["Common ground"]
+    B --- G
+    D --- G
+```
 
 ## What a driver gives you
 
@@ -138,10 +153,34 @@ If you ever drive a bare motor with a single transistor, add the diode. It costs
 
 ## Common Issues
 
-**Problem**: The Pico resets or freezes whenever the motors start.
-**Solution**: Keep the motor supply separate from the Pico's, join only the grounds, and check your flyback diodes.
-**Why**: Motor spikes and current surges travel down shared wires and disturb the Pico's supply.
+- **Problem**: The Pico resets or freezes whenever the motors start.
+- **Solution**: Keep the motor supply separate from the Pico's, join only the grounds, and check your flyback diodes.
+- **Why**: Motor spikes and current surges travel down shared wires and disturb the Pico's supply.
 
-**Problem**: The motor gets very hot while the wheel is held.
-**Solution**: Do not hold a motor stalled for more than a moment.
-**Why**: In a stall there is no back-EMF to limit current, so all the power turns into heat.
+- **Problem**: The motor gets very hot while the wheel is held.
+- **Solution**: Do not hold a motor stalled for more than a moment.
+- **Why**: In a stall there is no back-EMF to limit current, so all the power turns into heat.
+
+> **Teachers**: a stalled TT motor can draw an amp or more and turn that into heat quickly, and the driver chip heats up with it. Tell learners not to hold a wheel still on purpose, and to let a hot board cool after switching off. Spinning a motor by hand to make a voltage (exercise 3) is a safe, low-voltage activity that suits groups with no batteries or soldering.
+
+## Check your understanding
+
+{% quiz %}
+? About how much current should a single Pico GPIO pin supply at most?
+- [x] 12 mA
+- [ ] 200 mA
+- [ ] 1 A
+> A Pico pin drives 4 mA by default and 12 mA at most. A TT motor needs far more, even when running freely.
+
+? What causes the voltage spike when a motor is switched off?
+- [x] The coil resists the sudden change in current
+- [ ] The battery gets hotter
+- [ ] The Pico sends a bigger signal
+> A coil resists changes in current, so cutting the power makes it push back with a sharp spike. A flyback diode gives that current a safe path.
+
+? Why does a stalled motor draw more current than a running one?
+- [x] A stalled motor produces no back-EMF to oppose the supply
+- [ ] The battery voltage rises
+- [ ] The driver adds extra current
+> A spinning motor generates back-EMF, which limits current. Held still, there is nothing to oppose the supply, so current and heat shoot up.
+{% endquiz %}

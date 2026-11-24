@@ -4,12 +4,14 @@ description: Remove documents safely with deleteOne and deleteMany, drop collect
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/09_deleting_documents.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to delete documents safely by checking the filter first, and choose between deleteOne, deleteMany, drop and a soft delete.
 
 Sooner or later something leaves the workshop for good. A servo gets its gears stripped, a sensor gets let out of its magic smoke, or you just added a part by mistake. Time to **delete** it.
 
@@ -18,6 +20,21 @@ Deleting is the easiest thing in MongoDB to do, and the easiest to get wrong. Th
 So this lesson is as much about good habits as it is about commands.
 
 This lesson carries on from [lesson 08](08_updating_documents), where we added a 14th part, the TT Gear Motor. If you've reset your data since then, that's fine - just skip the first example.
+
+---
+
+## The big picture
+
+Deleting has no undo. This habit costs two seconds and has saved plenty of parts lists.
+
+```mermaid
+flowchart TD
+    A["Write the filter"] --> B["find or countDocuments with the same filter"]
+    B --> C{"Are those the documents you expected?"}
+    C -->|"No"| A
+    C -->|"Yes"| D["deleteOne or deleteMany with the same filter"]
+    C -->|"Not sure"| E["Soft delete instead<br/>set archived: true"]
+```
 
 ---
 
@@ -245,6 +262,8 @@ After this lesson your Parts Bin is back to 13 parts, still carrying the changes
 
 ---
 
+> **Teachers**: if the whole class shares one MongoDB server, one learner's `drop()` or `deleteMany({})` wipes everyone's `workshop` database. Give each learner their own server (Docker on their own machine), or their own database name and user, and keep a copy of the starter data (see lesson 16 for backups) so anyone can reset in a minute.
+
 ## Try it Yourself
 
 1. Insert a part called "Broken Servo", then delete it using the find-first habit.
@@ -263,17 +282,41 @@ After this lesson your Parts Bin is back to 13 parts, still carrying the changes
 
 ## Common Issues
 
-**Problem:** I deleted more than I meant to.  
-**Solution:** Restore from a backup, or re-run the `insertMany` from lesson 05 to get the starter data back.  
-**Why:** MongoDB has no undo. This is exactly why we check with `find()` or `countDocuments()` first, and why backups matter.
+- **Problem**: I deleted more than I meant to.
+- **Solution**: Restore from a backup, or re-run the `insertMany` from lesson 05 to get the starter data back.
+- **Why**: MongoDB has no undo. This is exactly why we check with `find()` or `countDocuments()` first, and why backups matter.
 
-**Problem:** `deleteMany` returned `deletedCount: 0` but the parts are definitely there.  
-**Solution:** Check your filter for typos - including in the field name. `{ categroy: "test" }` matches nothing.  
-**Why:** A misspelt field name is just a field no document has, so nothing matches.
+- **Problem**: `deleteMany` returned `deletedCount: 0` but the parts are definitely there.
+- **Solution**: Check your filter for typos - including in the field name. `{ categroy: "test" }` matches nothing.
+- **Why**: A misspelt field name is just a field no document has, so nothing matches.
 
-**Problem:** I ran `dropDatabase()` and lost the wrong database.  
-**Solution:** Check the prompt (or type `db`) before running it.  
-**Why:** `dropDatabase()` always drops the database you're currently in.
+- **Problem**: I ran `dropDatabase()` and lost the wrong database.
+- **Solution**: Check the prompt (or type `db`) before running it.
+- **Why**: `dropDatabase()` always drops the database you're currently in.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What should you run before a deleteMany?
+- [ ] drop()
+- [x] find or countDocuments with the same filter
+- [ ] Nothing, it is safe
+> Looking at what the filter matches first stops you deleting the wrong parts.
+
+? What does db.parts.deleteMany({}) do?
+- [ ] Nothing
+- [x] Empties the whole collection with no undo
+- [ ] Deletes one part
+> An empty filter matches every document.
+
+? What is a soft delete?
+- [x] Marking a document as archived instead of removing it
+- [ ] Deleting very slowly
+- [ ] Deleting only the _id
+> A soft delete keeps the history and is easy to undo.
+{% endquiz %}
 
 ---
 

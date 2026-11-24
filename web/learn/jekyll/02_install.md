@@ -5,19 +5,21 @@ author: Kevin McAleer
 type: page
 cover: /learn/jekyll/assets/banners/02_install.jpg
 date: 2024-01-24
-previous: 01_intro.html
+previous: 00_intro.html
 next: 03_content.html
-description: A step-by-step guide to installing Jekyll and setting up your first static
-  site, with practical insights.
+description: Install Ruby, Bundler and Jekyll, create the Maker's Log site and preview
+  it in your browser.
 percent: 24
-duration: 3
+duration: 6
+quiz_total: 24
+date_updated: 2026-11-24
 navigation:
 - name: Building Websites with Jekyll
 - content:
   - section: Introduction to Jekyll and Static Sites
     content:
     - name: Overview
-      link: 01_intro.html
+      link: 00_intro.html
     - name: Installation and Setup
       link: 02_install.html
     - name: Content Management in Jekyll
@@ -32,10 +34,10 @@ navigation:
       link: 06_deploy.html
     - name: Real-World Applications of Jekyll
       link: 07_realworld.html
-  - section: Bonus
+  - section: Summary
     content:
-    - name: Advanced Tips and Productivity Hacks for Jekyll
-      link: 08_bonus.html
+    - name: Summary, Tips and Where Next
+      link: 08_summary.html
 ---
 
 
@@ -43,129 +45,138 @@ navigation:
 
 ---
 
-## Introduction
-
-Welcome to the second lesson in our Jekyll course. In this lesson, we will walk you through the installation process of Jekyll, a popular static site generator. By the end of this lesson, you'll have Jekyll installed and running on your computer, ready to create your first static website.
+By the end of this lesson you will be able to install Jekyll, create a new site, and preview it in your browser with `bundle exec jekyll serve`.
 
 ---
 
-## What You'll Need
+## The big picture
 
-Before we begin, make sure you have the following:
+Jekyll is written in **Ruby**, so we need Ruby first. Ruby programs are shared as **gems**, and **Bundler** keeps track of exactly which gems your site uses in a file called the `Gemfile`. Think of the Gemfile as the parts list for your website.
 
-- A computer running Windows, macOS, or Linux.
-- Internet connection for downloading necessary software.
-- Basic familiarity with using command line interfaces.
+```mermaid
+flowchart LR
+    R["Install Ruby"] --> G["gem install jekyll bundler"]
+    G --> N["jekyll new makers-log"]
+    N --> S["bundle exec jekyll serve"]
+    S --> B["Open localhost:4000"]
+```
 
----
+The official requirement is Ruby 2.7.0 or higher, plus RubyGems, GCC and Make. Check what you already have with `ruby -v`.
 
-## Step 1: System Requirements and Preparations
+## Step 1: Install Ruby and Jekyll
 
-Jekyll is built on Ruby, so we need to ensure that your system has Ruby installed along with a few other tools.
+Pick your operating system. These follow the official guides at [jekyllrb.com/docs/installation](https://jekyllrb.com/docs/installation/).
 
-### Checking for Ruby
+**Ubuntu** (the official guide covers Ubuntu; other Debian-based systems such as Raspberry Pi OS use the same `apt` tool, but check the Jekyll docs if a package name differs):
 
-- **Windows**: Ruby might not be installed by default. We'll use RubyInstaller in the next steps.
-- **macOS/Linux**: Ruby usually comes pre-installed. You can check by typing `ruby -v` in your terminal.
+```bash
+sudo apt-get install ruby-full build-essential zlib1g-dev
+echo '# Install Ruby Gems to ~/gems' >> ~/.bashrc
+echo 'export GEM_HOME="$HOME/gems"' >> ~/.bashrc
+echo 'export PATH="$HOME/gems/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+gem install jekyll bundler
+```
 
----
+The three `echo` lines tell Ruby to keep your gems in your own `~/gems` folder, so you never need `sudo` to install them. The Jekyll docs specifically advise against installing gems as the root user.
 
-### Installing Ruby (If Necessary)
+**macOS:** the official guide uses Homebrew, then `brew install chruby ruby-install` and `ruby-install ruby 3.4.1` to get a current Ruby (the system Ruby is not recommended), adds chruby to your shell profile, and then you run `gem install jekyll`. Follow the steps on the [macOS page](https://jekyllrb.com/docs/installation/macos/), as the versions move on.
 
-- **Windows**: Download RubyInstaller from [rubyinstaller.org](https://rubyinstaller.org/). Follow the installation instructions provided on the website.
-- **macOS**: Use Homebrew to install Ruby by running `brew install ruby` in the terminal.
-- **Linux**: Use your distribution’s package manager. For example, on Ubuntu, you can run `sudo apt-get install ruby-full`.
+**Windows:** download a **Ruby+Devkit** build from [rubyinstaller.org](https://rubyinstaller.org/), install it with the defaults, and run `ridk install` at the end, choosing the "MSYS2 and MINGW development toolchain" option. Then open a **new** Command Prompt and run `gem install jekyll bundler`. The Jekyll docs note that Windows is not officially supported, and suggest Windows Subsystem for Linux (WSL) with the Ubuntu steps above as an alternative.
 
----
+Verify it worked:
 
-## Step 2: Installing Jekyll
+```bash
+jekyll -v
+```
 
-With Ruby installed, we can now install Jekyll.
+You should see something like `jekyll 4.4.1`.
 
----
+## Step 2: Create the site
 
-### Installing Jekyll and Bundler
+Choose a folder for your projects, then run:
 
-- Open your terminal or command prompt.
-- Run the command `gem install jekyll bundler`.
-- This command installs both Jekyll and Bundler, a dependency manager for Ruby.
+```bash
+jekyll new makers-log
+cd makers-log
+```
 
----
+Jekyll creates the folder and, unless you add `--skip-bundle`, runs `bundle install` for you. Here is what you get:
 
-### Verifying the Installation
+| File or folder | What it is |
+| --- | --- |
+| `_config.yml` | Site-wide settings such as the title and plugins |
+| `Gemfile` | The list of gems the site needs, including the `minima` theme |
+| `index.markdown` | The home page |
+| `about.markdown` | An About page, served at `/about/` |
+| `_posts/` | Blog posts live here (it holds a welcome post) |
+| `404.html` | The page shown when a link is broken |
+| `.gitignore` | Keeps generated folders such as `_site` out of Git |
+{:class="table table-single"}
 
-- After installation, verify by typing `jekyll -v`. You should see the Jekyll version number.
+## Step 3: Preview it
 
----
+```bash
+bundle exec jekyll serve
+```
 
-## Step 3: Creating Your First Jekyll Site
+Jekyll builds your site into a new `_site` folder, then starts a small web server. Look for these lines:
 
-Now, let's create your first static site with Jekyll.
+```text
+ Auto-regeneration: enabled for '/home/you/makers-log'
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+```
 
----
+Open `http://localhost:4000` in your browser. Now edit `index.markdown` and save: Jekyll rebuilds in a moment and you refresh the page. Press Ctrl+C in the terminal to stop the server.
 
-### Creating a New Site
+**One catch:** the generated `_config.yml` warns that it is not reloaded automatically. If you change it, stop the server and start it again.
 
-- Choose a directory where you want your site to be.
-- Run `jekyll new my-awesome-site`. Replace `my-awesome-site` with your desired site name.
-- Jekyll will create a new directory with the necessary files.
+> **Teachers**: installing Ruby needs administrator rights on most computers and often fails on locked-down school machines. Test the install on one machine first, or have learners work on their own laptops or Raspberry Pis. Allow about an hour. If a class cannot install anything, demonstrate the install and preview on the teacher's computer.
 
----
+## Try it Yourself
 
-### Exploring the Site Structure
+1. Change `title:` in `_config.yml` to `Maker's Log`, restart the server and find the new title in the page header.
+2. Delete the welcome post in `_posts/` and add a line of your own to `index.markdown`. Watch the page update.
+3. Run `bundle exec jekyll build` instead of `serve`, then look inside `_site/`. Which files did Jekyll create from `about.markdown`?
+4. Challenge: run `bundle exec jekyll serve --port 4001` and open that address. What does `--port` change?
 
-- Navigate to your new site's directory.
-- You'll find several files and folders. The key ones are:
-  - `_posts`: Where your blog posts will be stored.
-  - `_config.yml`: The configuration file for your site.
-  - `index.md`: The main page of your site.
+## Common Issues
 
----
+- **Problem**: `jekyll: command not found` after installing.
+- **Solution**: Open a new terminal, or run `source ~/.bashrc`. Check `echo $PATH` includes `~/gems/bin` on Linux.
+- **Why**: The shell only picks up PATH changes when it starts, so an old terminal does not know where your gems are.
 
-## Step 4: Running Your Site Locally
+- **Problem**: A long stream of `DEPRECATION WARNING` lines about Sass `@import` appears when you build with the minima theme.
+- **Solution**: Ignore them. The site still builds and the page still works.
+- **Why**: The default theme uses an older Sass style that newer Sass tools warn about. It is a message for theme authors, not an error in your site.
 
-It's time to see your site in action.
+- **Problem**: You can't build because of a missing gem, or `bundle exec` says it can't find a gem.
+- **Solution**: Run `bundle install` in the site folder.
+- **Why**: The Gemfile lists the gems the site needs, and Bundler has to download them once.
 
----
+- **Problem**: The server won't start because the port is already in use.
+- **Solution**: Stop the other Jekyll window, or start on a new port with `--port 4001`.
+- **Why**: Only one program can listen on a port at a time.
 
-### Starting Jekyll Server
+## Check your understanding
 
-- In your site's directory, run `jekyll serve`.
-- This command builds your site and starts a local server.
+{% quiz %}
+? What is the Gemfile for?
+- [ ] It holds your blog posts
+- [x] It lists the Ruby gems your site needs, and Bundler installs them
+- [ ] It stores your site's colours
+> The Gemfile is the parts list for your site, and `bundle install` fetches everything on it.
 
----
+? Which command builds the site and starts a local preview server?
+- [ ] `jekyll new`
+- [ ] `gem install jekyll`
+- [x] `bundle exec jekyll serve`
+> `serve` builds into `_site` and serves it, rebuilding when files change.
 
-### Viewing Your Site
-
-- Open your browser and go to `http://localhost:4000`.
-- You should see your new Jekyll site. Any changes you make to the files will automatically update the site.
-
----
-
-## Troubleshooting
-
-If you encounter any issues:
-
-- Check for error messages in the terminal. They usually provide insights into what's wrong.
-- Ensure that you're using compatible versions of Ruby and Jekyll.
-
----
-
-## Conclusion
-
-Congratulations on setting up Jekyll and creating your first site! Experiment with editing the markdown files and watch how your site updates. In our next lesson, we will dive into customizing your Jekyll site.
-
----
-
-## Additional Resources
-
-- [Jekyll’s Documentation](https://jekyllrb.com/docs/)
-- [RubyInstaller for Windows](https://rubyinstaller.org/)
-
----
-
-## Assignment
-
-Try adding a new post to your site. Create a markdown file in the `_posts` directory and see how it appears on your local site.
-
----
+? You edit `_config.yml` while the server is running. What should you do?
+- [x] Stop the server and start it again
+- [ ] Nothing, it reloads on its own
+- [ ] Delete the `_site` folder only
+> The generated config warns that it is not reloaded automatically.
+{% endquiz %}

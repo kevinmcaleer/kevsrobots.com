@@ -1,10 +1,27 @@
 - author: Kevin McAleer
+  cover: /learn/ai_hat_2/assets/cover.jpg
+  date_published: 2026-11-24
+  description: Give a robot eyes and a brain with the Raspberry Pi AI HAT+ 2. Fit
+    the HAT, run object detection and pose estimation from the camera, turn detections
+    into robot behaviour, then run a language model and a vision-language model on
+    the HAT itself.
+  duration: 0h 47m
+  groups:
+  - ai
+  - raspberrypi
+  - robots
+  lessons: 14
+  level: intermediate
+  link: /learn/ai_hat_2/00_intro.html
+  name: Raspberry Pi AI HAT+ 2 - Vision and Generative AI
+  video: lT1NJfkuiU8
+- author: Kevin McAleer
   cover: /learn/arduino_to_python/assets/cover.jpg
   date_published: 2025-11-20
   description: Transition from Arduino C++ to MicroPython quickly and easily. Learn
     Python syntax with side-by-side comparisons, control hardware, and build IoT and
     robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.
-  duration: 1h 38m
+  duration: 1h 15m
   groups:
   - micropython
   - arduino
@@ -100,11 +117,10 @@
     no-code motion tool for animating servos and creating interactive scenes.  This
     course walks you through installing Bottango, wiring servos, programming boards,
     and creating expressive motion sequences.
-  duration: 0h 33m
+  duration: 0h 54m
   groups:
-  - animation
-  - robotics
   - arduino
+  - robots
   lessons: 11
   level: beginner
   link: /learn/bottango/00_intro.html
@@ -112,15 +128,14 @@
 - author: Kevin McAleer
   cover: /learn/brachiograph/assets/cover.png
   date_published: 2024-07-26
-  description: Learn how to build your own BrachioGraph, a simple drawing robot that
-    uses two stepper motors to create beautiful drawings.  This course covers the
-    essential steps from assembling the robot, installing the software, and creating
-    your first drawing.
-  duration: 0h 30m
+  description: Build your own BrachioGraph, a cheap pen plotter made from three hobby
+    servos, lolly sticks and a Raspberry Pi. Wire it up, install the software, calibrate
+    it, and draw shapes and vectorised images from Python.
+  duration: 0h 43m
   groups:
-  - robot arm
+  - robotarms
   - python
-  - raspberry pi
+  - raspberrypi
   lessons: 8
   level: beginner
   link: /learn/brachiograph/00_intro.html
@@ -164,29 +179,28 @@
   cover: /learn/c_pico/assets/cover.jpg
   date_published: 2025-06-16
   description: Learn how to program the Raspberry Pi Pico using the C programming
-    language.  This beginner-friendly course covers the fundamentals of C, how to
-    set up your development environment,  and how to write simple programs that run
-    on real hardware. By the end of the course, you'll have a  solid grasp of programming
+    language. This beginner-friendly course covers the fundamentals of C, how to set
+    up your development environment, and how to write simple programs that run on
+    real hardware. By the end of the course, you'll have a solid grasp of programming
     basics and will create your first hardware project; a blinking LED.
-  duration: 0h 25m
+  duration: 0h 50m
   groups:
-  - raspberry pi
+  - raspberrypi
   - pico
-  - c-programming
   lessons: 10
   level: beginner
-  link: /learn/c_pico/01_intro.html
+  link: /learn/c_pico/00_intro.html
   name: Getting Started with C on the Raspberry Pi Pico
 - author: Kevin McAleer
   cover: /learn/cvzone/assets/computer_vision.jpg
   date_published: 2023-10-07
   description: Detect faces, hands and body poses in real time on a Raspberry Pi with
     Python, OpenCV and CVZone
-  duration: 1h 19m
+  duration: 1h 29m
   groups:
-  - computer vision
+  - raspberrypi
+  - ai
   - python
-  - cvzone
   lessons: 6
   level: intermediate
   link: /learn/cvzone/00_intro.html
@@ -209,13 +223,12 @@
 - author: Kevin McAleer
   cover: /learn/docker_swarm/assets/docker_swarm.jpg
   date_published: 2024-02-03
-  description: This course guides beginners through the process of setting up a Raspberry
-    Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
-    and scale a mini-computing cluster for various projects.
-  duration: 0h 50m
+  description: Build a Raspberry Pi 5 cluster and turn it into a Docker Swarm. Deploy
+    stacks, scale and update services, rebalance after a node failure, then monitor,
+    maintain and back up your cluster.
+  duration: 1h 23m
   groups:
-  - docker
-  - raspberry pi
+  - raspberrypi
   lessons: 16
   level: intermediate
   link: /learn/docker_swarm/00_intro.html
@@ -225,12 +238,12 @@
   cover: /learn/duckdb/assets/cover.jpg
   date_published: 2025-09-04
   description: Learn how to use DuckDB, the fast, free, and embeddable database designed
-    for analytics.
-  duration: 0h 48m
+    for analytics. Query robot sensor logs, parts lists and print histories with SQL,
+    from the shell and from Python, then save them as Parquet and tune the speed.
+  duration: 1h 32m
   groups:
-  - databases
   - python
-  - raspberry pi
+  - raspberrypi
   lessons: 14
   level: beginner
   link: /learn/duckdb/00_intro.html
@@ -242,7 +255,7 @@
     resistance, Ohm''s law, breadboards, multimeters, voltage dividers and transistors.
     You will build a light-sensing night light on a breadboard, then hand it over
     to a Raspberry Pi Pico running MicroPython.'
-  duration: 1h 12m
+  duration: 1h 37m
   groups:
   - electronics
   - pico
@@ -256,10 +269,11 @@
   date_published: 2023-01-29
   description: Design a 3D-printable robot eye mechanism in Fusion 360, with upper
     and lower eyelids that open and close around a central eyeball on a single servo.
-  duration: 0h 25m
+  duration: 0h 39m
   groups:
-  - robotics
-  - fusion 360
+  - 3ddesign
+  - robots
+  - 3dprinting
   lessons: 10
   level: intermediate
   link: /learn/eye_mechanism/00_intro.html
@@ -268,17 +282,17 @@
 - author: Kevin McAleer
   cover: /learn/fastapi/assets/cover.png
   date_published: 2024-03-28
-  description: This course teaches you how to build a user authentication system using
-    Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll
-    learn to implement features like registration, login, and user management, integrating
-    these with a frontend built with Jekyll.
-  duration: 0h 24m
+  description: 'Build a robot telemetry API with Python and FastAPI: a Pico or any
+    robot posts sensor readings, a static Jekyll dashboard shows them, and only logged-in
+    users can switch the robot''s LEDs. You will use Pydantic v2 models, SQLite, hashed
+    passwords, signed tokens, CORS and a safe deployment.'
+  duration: 1h 5m
   groups:
-  - fastapi
   - python
-  lessons: 9
+  - raspberrypi
+  lessons: 10
   level: intermediate
-  link: /learn/fastapi/01_course_overview.html
+  link: /learn/fastapi/00_intro.html
   name: Building User Authentication for Static Sites with FastAPI
 - author: Kevin McAleer
   cover: /learn/freecad/assets/cover.png
@@ -287,13 +301,13 @@
     modeling with this powerful, open-source tool. From basic shapes to more complex
     designs, learn the fundamentals of CAD software and how to apply them in your
     own projects.
-  duration: 0h 22m
+  duration: 0h 43m
   groups:
-  - freecad
-  - 3d modeling
+  - 3ddesign
+  - 3dprinting
   lessons: 11
   level: beginner
-  link: /learn/freecad/01_introduction_to_freecad.html
+  link: /learn/freecad/00_intro.html
   name: Introduction to FreeCAD for Beginners
   video: S7EoZHd03FY
 - author: Kevin McAleer
@@ -319,11 +333,10 @@
   date_published: 2026-11-04
   description: 'Learn to track your code and projects with Git: commits, history,
     undoing mistakes, branches, merging, and sharing your work on GitHub.'
-  duration: 1h 15m
+  duration: 1h 18m
   groups:
-  - git
-  - github
   - productivity
+  - micropython
   lessons: 14
   level: beginner
   link: /learn/git/00_intro.html
@@ -335,11 +348,11 @@
     and Stable-Baselines3. You will wrap the BurgerBot grid-world as a proper Gymnasium
     environment, discretize CartPole with your own binning code, and train neural-network
     agents that export a policy table you can drop straight onto a Pico.
-  duration: 1h 23m
+  duration: 1h 44m
   groups:
   - ai
   - python
-  - robotics
+  - robots
   lessons: 15
   level: intermediate
   link: /learn/gymnasium/00_intro.html
@@ -376,46 +389,47 @@
 - author: Kevin McAleer
   cover: /learn/intermediate_micropython/assets/cover.png
   date_published: 2024-07-07
-  description: This course is designed to take you from a beginner to an intermediate
-    level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules
-    and Packages, DocStrings, Interrupts and Timers, and MP Remote.
-  duration: 0h 49m
+  description: Take your MicroPython further. Build robot code with classes, inheritance
+    and decorators, organise it into modules and packages, respond to the world with
+    interrupts and timers, and manage your Pico from the command line with mpremote.
+    Every example is checked on MicroPython, not just standard Python.
+  duration: 1h 24m
   groups:
   - micropython
   - python
   - pico
   lessons: 16
   level: intermediate
-  link: /learn/intermediate_micropython/01_intro.html
+  link: /learn/intermediate_micropython/00_intro.html
   name: Intermediate level MicroPython
 - author: Kevin McAleer
   cover: /learn/jekyll/assets/jekyll.jpg
   date_published: 2024-01-24
   description: Learn how to build static websites using Jekyll, from basic setup to
-    advanced features.
-  duration: 0h 19m
+    advanced features. Along the way you build Maker's Log, a robot build-log site
+    with posts, a parts list, your own layouts, plugins and a projects portfolio,
+    then publish it on GitHub Pages.
+  duration: 0h 46m
   groups:
-  - jekyll
-  - website development
+  - productivity
   lessons: 8
   level: beginner
-  link: /learn/jekyll/01_intro.html
+  link: /learn/jekyll/00_intro.html
   name: Building Websites with Jekyll
 - author: Kevin McAleer
   cover: /learn/k3s/assets/cover.jpg
   date_published: 2025-06-01
-  description: "Learn how to build your own lightweight Kubernetes cluster using K3s\
-    \ and Raspberry Pi. This hands-on course will guide you through setup, configuration,\
-    \ networking, persistent storage, and deploying real workloads \u2014 all on affordable\
-    \ single-board computers. Ideal for homelabbers, IoT developers, and anyone curious\
-    \ about Kubernetes at the edge."
-  duration: 0h 41m
+  description: Learn how to build your own lightweight Kubernetes cluster using K3s
+    and Raspberry Pi. This hands-on course will guide you through setup, configuration,
+    networking, persistent storage, and deploying real workloads, all on affordable
+    single-board computers. Ideal for homelabbers, IoT developers, and anyone curious
+    about Kubernetes at the edge.
+  duration: 1h 40m
   groups:
-  - docker
-  - raspberry pi
+  - raspberrypi
   lessons: 18
-  level: advanced
-  link: /learn/k3s/01_intro.html
+  level: intermediate
+  link: /learn/k3s/00_intro.html
   name: Running K3s on Raspberry Pi
 - author: Kevin McAleer
   cover: /learn/learn_ros/assets/learn_ros.jpg
@@ -423,11 +437,10 @@
   description: 'Learn ROS 2, the Robot Operating System, on a Raspberry Pi: run it
     in Docker, write Python nodes that publish and subscribe to topics, and visualise
     LiDAR scans in RViz2.'
-  duration: 0h 46m
+  duration: 1h 21m
   groups:
-  - ros
-  - raspberry pi
-  - robotics
+  - raspberrypi
+  - robots
   lessons: 20
   level: intermediate
   link: /learn/learn_ros/00_intro.html
@@ -436,11 +449,13 @@
 - author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
   date_published: 2022-12-04
-  description: Learn how to use the new Learning Platform
-  duration: 0h 4m
+  description: 'A short, friendly guide to the Learn section of KevsRobots.com: find
+    a course, follow a learning pathway, run code in your browser, download files,
+    track your progress with quizzes, and use it all in a classroom.'
+  duration: 0h 29m
   groups:
-  - learning platform
-  lessons: 4
+  - productivity
+  lessons: 6
   level: beginner
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
@@ -450,12 +465,12 @@
   description: Learn the fundamentals of using the Linux command line on Raspberry
     Pi OS. This course covers essential topics including navigation, file management,
     software installation, system monitoring, networking, and basic scripting.
-  duration: 0h 55m
+  duration: 2h 10m
   groups:
-  - linux
-  lessons: 21
+  - raspberrypi
+  lessons: 22
   level: beginner
-  link: /learn/linux_intro/01_intro_terminal.html
+  link: /learn/linux_intro/00_intro.html
   name: Introduction to the Linux Command Line on Raspberry Pi OS
   video: UDo6tvoOQHg
 - author: Kevin McAleer
@@ -465,14 +480,12 @@
     use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll.
     From the basics of Markdown to deploying your site, you'll learn everything you
     need to get started.
-  duration: 0h 20m
+  duration: 1h 0m
   groups:
-  - markdown
-  - jekyll
-  - documentation
-  lessons: 10
+  - productivity
+  lessons: 11
   level: beginner
-  link: /learn/markdown/01_overview.html
+  link: /learn/markdown/00_intro.html
   name: Mastering Markdown for Documentation with Jekyll
 - author: Kevin McAleer
   cover: /learn/mermaid/assets/cover.jpg
@@ -480,11 +493,8 @@
   description: Learn to draw flowcharts, sequence diagrams, state machines, database
     diagrams and more by writing simple text with Mermaid, then put them in your READMEs,
     notes and project docs.
-  duration: 1h 20m
+  duration: 1h 23m
   groups:
-  - mermaid
-  - markdown
-  - documentation
   - productivity
   lessons: 15
   level: beginner
@@ -493,14 +503,12 @@
 - author: Kevin McAleer
   cover: /learn/meshcore/assets/cover.png
   date_published: 2026-08-05
-  description: Build your own off-grid LoRa mesh network with MeshCore and two cheap
-    Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal,
+  description: Build your own off-grid LoRa mesh network with MeshCore and two Heltec
+    V3 boards, one as a repeater and one as a client. No internet, no phone signal,
     no subscription.
-  duration: 1h 19m
+  duration: 1h 29m
   groups:
   - electronics
-  - lora
-  - meshcore
   lessons: 16
   level: beginner
   link: /learn/meshcore/00_intro.html
@@ -511,11 +519,9 @@
   description: Part 2 of the MeshCore series. Build the other two node types - a room
     server that stores messages for people who were out of range, and a sensor node
     that reports temperature, battery and tank levels across kilometres.
-  duration: 1h 37m
+  duration: 2h 11m
   groups:
   - electronics
-  - lora
-  - meshcore
   lessons: 17
   level: intermediate
   link: /learn/meshcore_rooms_sensors/00_intro.html
@@ -541,7 +547,7 @@
   description: Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython.
     Learn about various types of pins, their functions, and how to work with them
     in real-world projects.
-  duration: 0h 46m
+  duration: 1h 6m
   groups:
   - micropython
   - gpio
@@ -576,26 +582,28 @@
     reading sensors, and combining hardware to create autonomous and remotely controlled
     robots.  Perfect for makers ready to go beyond GPIO and start building real-world
     robotics projects.
-  duration: 0h 27m
+  duration: 1h 14m
   groups:
-  - robotics
+  - robots
   - micropython
-  - raspberry pi
+  - raspberrypi
+  - pico
   lessons: 12
   level: intermediate
-  link: /learn/micropython_robotics/01_intro.html
+  link: /learn/micropython_robotics/00_intro.html
   name: MicroPython Robotics Projects with the Raspberry Pi Pico
-  video: ZuX45_rid68
+  video: 6YqzOQ7OZkQ
 - author: Kevin McAleer
   cover: /learn/mini_rack/assets/cover.jpg
   date_published: 2025-02-16
   description: Design a 3D printable 10" mini-rack for your Raspberry Pi home lab.
-  duration: 0h 13m
+  duration: 0h 46m
   groups:
-  - raspberry pi
-  - 3d modeling
+  - raspberrypi
+  - 3ddesign
   - stands_and_cases
-  lessons: 10
+  - lasercutting
+  lessons: 11
   level: beginner
   link: /learn/mini_rack/00_intro.html
   name: Mini-Rack 3D Design Tutorial
@@ -606,7 +614,7 @@
   description: Never made a database before? Start here. Learn what a database is,
     install MongoDB, and store, find, update and organise your data - then build Parts
     Bin, a Python app that keeps track of every servo, sensor and screw in your workshop.
-  duration: 2h 42m
+  duration: 3h 12m
   groups:
   - python
   - raspberrypi
@@ -621,7 +629,7 @@
     a motor driver, and how to control all three from a Raspberry Pi Pico with MicroPython.
     Along the way you will build Scout, a two-wheeled drive base with a servo-mounted
     head that drives a square, spins on the spot and looks left and right.
-  duration: 1h 16m
+  duration: 1h 38m
   groups:
   - robots
   - micropython
@@ -656,12 +664,11 @@
     Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment,
     and run real-time detection on Raspberry Pi hardware. Complete hands-on course
     from dataset creation to production deployment.
-  duration: 1h 1m
+  duration: 0h 55m
   groups:
   - python
   - ai
-  - raspberry pi
-  - computer vision
+  - raspberrypi
   lessons: 9
   level: intermediate
   link: /learn/object_model/00_intro.html
@@ -670,11 +677,13 @@
 - author: Kevin McAleer
   cover: /learn/obsidian/assets/cover.jpg
   date_published: 2025-08-24
-  description: Learn how to use Obsidian for note-taking and knowledge management.
-  duration: 0h 31m
+  description: Learn how to use Obsidian for note-taking and knowledge management,
+    by building a robot build log vault with linked notes, tags, properties, tasks,
+    a canvas and a Base.
+  duration: 0h 57m
   groups:
-  - obsidian
-  - raspberry pi
+  - productivity
+  - raspberrypi
   lessons: 13
   level: beginner
   link: /learn/obsidian/00_intro.html
@@ -687,7 +696,7 @@
     into ChromaDB and answers questions about them, with citations back to the original
     note. Learn embeddings, chunking, vector search and grounded generation by building
     the whole pipeline yourself.
-  duration: 2h 17m
+  duration: 3h 6m
   groups:
   - ai
   - python
@@ -699,17 +708,38 @@
 - author: Kevin McAleer
   cover: /learn/octapi/assets/octapi.jpg
   date_published: 2024-02-18
-  description: Learn how to use Crack the Enigma code using a Cluster of Raspberry
-    Pis and Python.
-  duration: 0h 21m
+  description: Build a cluster of Raspberry Pis and use Python and dispy to share
+    out the work of cracking an Enigma message. Start with py-enigma on one computer,
+    then scale up.
+  duration: 0h 40m
   groups:
-  - octapi
   - python
-  - clusters
+  - raspberrypi
   lessons: 7
   level: intermediate
   link: /learn/octapi/00_intro.html
   name: OctaPi
+  video: cIq2AEbYotA
+- author: Kevin McAleer
+  cover: /learn/open_duck_mini/assets/cover.jpg
+  date_published: 2026-11-24
+  description: Build an Open Duck Mini, the open-source walking robot inspired by
+    Disney's BDX droid. Print and assemble it, wire up a Raspberry Pi Zero 2W, 14
+    serial bus servos and an IMU, get it walking with the pretrained policy, then
+    learn how its reinforcement learning brain was trained and train your own.
+  duration: 1h 17m
+  groups:
+  - robots
+  - ai
+  - raspberrypi
+  - 3dprinting
+  lessons: 16
+  level: intermediate
+  link: /learn/open_duck_mini/00_intro.html
+  name: Build an Open Duck Mini Walking Robot
+  projects:
+  - /projects/kev/open-duck-mini
+  video: _YHOQFOzjKg
 - author: Kevin McAleer
   cover: /learn/openclaw_raspberry_pi/assets/openclaw.jpg
   date_published: 2026-01-31
@@ -741,20 +771,18 @@
 - author: Kevin McAleer
   cover: /learn/pca9685/assets/cover.png
   date_published: 2024-04-06
-  description: Dive into the exciting world of robotics by learning how to control
-    a robot arm using a Raspberry Pi, Python, and the PCA9685 board. This course covers
-    everything from setting up your Raspberry Pi, understanding the PCA9685 board,
-    programming with Python, to constructing and controlling a 4-servo robot arm.
-    Perfect for beginners and enthusiasts alike, this course will guide you through
-    each step with practical examples and hands-on projects.
-  duration: 0h 34m
+  description: Build Buddy Jr, a small 3D printed robot arm with four servos, and
+    bring it to life with a Raspberry Pi, Python and a PCA9685 servo driver. You'll
+    set up the Pi, wire the board safely with a separate servo supply, learn the maths
+    from angle to pulse, assemble the arm and program smooth, repeatable movements.
+  duration: 1h 10m
   groups:
-  - robotics
-  - raspberry pi
-  - pca9685
+  - robotarms
+  - raspberrypi
+  - electronics
   lessons: 12
   level: beginner
-  link: /learn/pca9685/01_course_introduction.html
+  link: /learn/pca9685/00_intro.html
   name: Building a Robot Arm with Raspberry Pi and PCA9685
   video: _JJAV97Mm98
 - author: Kevin McAleer
@@ -766,13 +794,13 @@
     the Pico's ADC, and creating your first temperature monitoring project.  Through
     step-by-step tutorials and practical examples, you'll gain the skills to confidently
     use the Pico for sensor-based projects.
-  duration: 0h 33m
+  duration: 1h 10m
   groups:
   - pico
   - micropython
-  lessons: 12
+  lessons: 13
   level: beginner
-  link: /learn/pico_temp_sensor/01_course_introduction.html
+  link: /learn/pico_temp_sensor/00_intro.html
   name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - author: Kevin McAleer
   cover: /learn/podman/assets/cover.jpg
@@ -782,13 +810,13 @@
     everything from  architectural differences and CLI compatibility to unique Podman
     features like systemd integration  and Kubernetes support. Perfect for developers
     and DevOps professionals looking to modernize  their container workflows.
-  duration: 0h 32m
+  duration: 1h 9m
   groups:
-  - raspberry pi
-  - docker
+  - raspberrypi
+  - python
   lessons: 14
   level: intermediate
-  link: /learn/podman/01_intro_to_podman.html
+  link: /learn/podman/00_intro.html
   name: From Docker to Podman
 - author: Kevin McAleer
   cover: /learn/pydantic/assets/pydantic.png
@@ -797,14 +825,12 @@
     for data validation and settings management in Python applications. From understanding
     Pydantic's basics to integrating it with FastAPI for web development, you'll master
     everything needed to use Pydantic effectively.
-  duration: 0h 25m
+  duration: 1h 0m
   groups:
-  - pydantic
-  - data validation
-  - fastapi
+  - python
   lessons: 12
   level: intermediate
-  link: /learn/pydantic/01_overview_of_pydantic.html
+  link: /learn/pydantic/00_intro.html
   name: Mastering Pydantic for Robust Data Validation
 - author: Kevin McAleer
   cover: /learn/python/assets/python.png
@@ -825,15 +851,16 @@
 - author: Kevin McAleer
   cover: /learn/redis/assets/redis-cover.jpg
   date_published: 2023-04-12
-  description: Learn how to use Redis with Python to build fast, scalable applications.
-  duration: 0h 37m
+  description: Learn how to use Redis with Python to share robot sensor readings,
+    queue jobs, count visitors, rank scores and send live messages, then build a robot
+    telemetry hub with a live dashboard.
+  duration: 1h 9m
   groups:
-  - redis
   - python
-  - databases
-  lessons: 10
+  - raspberrypi
+  lessons: 12
   level: intermediate
-  link: /learn/redis/01_introduction.html
+  link: /learn/redis/00_intro.html
   name: Using Redis with Python
 - author: Kevin McAleer
   cover: /learn/reinforcement_learning/assets/cover.jpg
@@ -843,7 +870,7 @@
     \ obstacles on its own. Train a policy in a pure-Python grid-world simulation\
     \ on your laptop, then export the frozen Q-table as JSON and deploy it to a Pico-powered\
     \ differential-drive robot running MicroPython."
-  duration: 1h 45m
+  duration: 1h 57m
   groups:
   - robotics
   - micropython
@@ -854,50 +881,66 @@
   name: Reinforcement Learning for Beginners
   video: epuO7xpz6i4
 - author: Kevin McAleer
+  cover: /learn/robot_senses/assets/cover.jpg
+  date_published: 2026-11-24
+  description: 'Give one small tracked robot a sense at a time. Learn what each sensor
+    measures, how to read it in MicroPython, and how to turn the readings into behaviour.
+    Then move up to navigation: wall following, and the ideas behind mapping and SLAM.'
+  duration: 1h 21m
+  groups:
+  - robots
+  - arduino
+  - electronics
+  lessons: 17
+  level: beginner
+  link: /learn/robot_senses/00_intro.html
+  name: Give Your Robot Senses
+  video: 1K1A1YGcOEE
+- author: Kevin McAleer
   cover: /learn/robotics_101/assets/basics_101.jpg
   date_published: 2023-01-17
   description: 'A friendly first look at robots: what a robot is, a quick history
     from ancient automata to today, the skills you need to build one, and the parts
     that make a robot work.'
-  duration: 0h 15m
+  duration: 0h 27m
   groups:
-  - robotics
-  - raspberry pi
-  - ros
+  - robots
+  - arduino
+  - micropython
   lessons: 6
   level: beginner
-  link: /learn/robotics_101/00_overview.html
+  link: /learn/robotics_101/00_intro.html
   name: Robotics 101
   video: bHOi_JGL0QE
 - author: Kevin McAleer
   cover: /learn/rust/assets/cover.png
   date_published: 2024-03-09
-  description: Learning Rust with me, is a course that will teach you how to use Rust
-    on Raspberry Pi.
-  duration: 0h 33m
+  description: Learn the Rust programming language from scratch, with a Python and
+    MicroPython maker in mind. Write and run real programs on your computer, build
+    a small web server, then set up Rust to blink an LED on the Raspberry Pi Pico.
+  duration: 1h 7m
   groups:
-  - rust
   - pico
-  lessons: 13
+  lessons: 14
   level: intermediate
-  link: /learn/rust/01_intro.html
+  link: /learn/rust/00_intro.html
   name: Introduction to Rust
   video: M9LekkoQyf0
 - author: Kevin McAleer
   cover: /learn/scrawly_wally//assets/cover.png
   date_published: 2024-08-02
   description: Learn how to build your own wall drawing robot using a Raspberry Pi
-    Zero 2 W, stepper motors, and a gondola with a marker.  This course covers the
+    Zero 2 W, stepper motors, and a gondola with a marker. This course covers the
     essential steps from assembling the robot, installing the software, and creating
     your first drawing.
-  duration: 0h 14m
+  duration: 1h 8m
   groups:
-  - raspberry pi
-  - robotics
-  - robot arm
+  - raspberrypi
+  - robots
+  - python
   lessons: 11
-  level: beginner
-  link: /learn/scrawly_wally/01_intro.html
+  level: intermediate
+  link: /learn/scrawly_wally/00_intro.html
   name: Wall Drawing Robot Tutorial
   video: JB4rPNBCL3Q
 - author: Kevin McAleer
@@ -936,11 +979,11 @@
   description: Design the SMARS robot chassis in Fusion 360, step by step. In Part
     1 you sketch and extrude the base, shell it, shape the classic SMARS sides and
     cut the wheel holes and Arduino slots.
-  duration: 0h 20m
+  duration: 0h 57m
   groups:
-  - smars
-  - robotics
-  - fusion 360
+  - 3ddesign
+  - 3dprinting
+  - robots
   lessons: 17
   level: beginner
   link: /learn/smars_fusion360/00_intro.html
@@ -952,11 +995,11 @@
   description: Finish the SMARS robot chassis in Fusion 360. In Part 2 you add the
     motor holders and nubs, the front cut, the unpowered stub wheels and the motor
     holder slots, ready to export and 3D print.
-  duration: 0h 20m
+  duration: 0h 56m
   groups:
-  - smars
-  - robotics
-  - fusion 360
+  - 3ddesign
+  - 3dprinting
+  - robots
   lessons: 18
   level: beginner
   link: /learn/smars_fusion360_part2/00_intro.html
@@ -968,11 +1011,10 @@
   description: 3D print, assemble and wire up the SMARS Quad, a four-legged walking
     robot with eight SG90 servos, a PCA9685 servo board and a Raspberry Pi Zero, then
     make it walk with Python.
-  duration: 0h 17m
+  duration: 0h 57m
   groups:
-  - smars
-  - robotics
-  - raspberry pi
+  - robots
+  - raspberrypi
   - python
   lessons: 15
   level: intermediate
@@ -1132,13 +1174,13 @@
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
   description: Learn the fundamentals of SQL, relational database theory, and essential
-    skills for database management.
-  duration: 1h 22m
+    skills for database management, by building a Robot Workshop database in SQLite.
+  duration: 1h 37m
   groups:
-  - databases
+  - python
   lessons: 16
   level: beginner
-  link: /learn/sql/00_course_overview.html
+  link: /learn/sql/00_intro.html
   name: Getting Started with SQL
 - author: Kevin McAleer
   cover: /learn/sqlite3/assets/database.png

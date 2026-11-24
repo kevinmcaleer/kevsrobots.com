@@ -10,6 +10,8 @@ cover: /learn/micropython_gpio/assets/banners/07_motors.jpg
 
 ---
 
+By the end of this lesson you will be able to drive a small DC motor in both directions, at different speeds, through a motor driver.
+
 ## Overview
 
 A motor needs far more current than a GPIO pin can supply, so we use a motor driver chip between the Pico and the motor. In this lesson you'll wire up an L293D driver and control a DC motor's direction and speed.
@@ -20,7 +22,7 @@ A motor needs far more current than a GPIO pin can supply, so we use a motor dri
 
 * A Raspberry Pi Pico
 * A small DC motor (3V to 6V)
-* An L293D motor driver chip (a DRV8833 board works the same way)
+* An L293D motor driver chip (other drivers, such as the DRV8833, use different pins, so follow their own wiring guide)
 * A battery pack for the motor, such as 4 x AA
 * A [breadboard](/resources/how_it_works/breadboards.html) and jumper wires
 
@@ -83,9 +85,43 @@ stop()
 
 ---
 
-## Try it yourself
+---
 
-Write a `ramp_up()` function that takes the motor from 0% to 100% over two seconds.
+## Wiring at a glance
+
+```mermaid
+flowchart LR
+    GP0["Pico GP0"] --> IN1["L293D IN1 (pin 2)"]
+    GP1["Pico GP1"] --> IN2["L293D IN2 (pin 7)"]
+    GP2["Pico GP2 (PWM)"] --> EN["L293D EN1 (pin 1)"]
+    IN1 --> M["Motor on OUT1 (pin 3) and OUT2 (pin 6)"]
+    IN2 --> M
+    BAT["Battery pack +"] --> VCC2["L293D VCC2 (pin 8)"]
+    VCC2 --> M
+```
+
+---
+
+## Try it Yourself
+
+1. Run the program and confirm the motor goes forward, then backward, then stops.
+2. Change `forward(50)` to `forward(30)` and then `forward(20)`. At what speed does your motor stall?
+3. Write a `ramp_up()` function that takes the motor from 0% to 100% over two seconds.
+4. Challenge: add a button on GP14 (lesson 4) that reverses the motor each press.
+
+## Common Issues
+
+- **Problem**: The motor does not turn, but the driver chip gets warm.
+- **Solution**: Check both `VCC1` and `VCC2` are powered and that the grounds are shared.
+- **Why**: The L293D needs logic power and motor power, and a missing ground means the Pico's signals have no reference.
+
+- **Problem**: The motor only works one way.
+- **Solution**: Check `IN1` and `IN2` are on separate GPIO pins and wired to chip pins 2 and 7.
+- **Why**: Direction depends on one input being high and the other low.
+
+> **Teachers**: Batteries and motors are the main classroom hazard in this course. Remove batteries at the end of each lesson, check polarity before connecting, and never run a stalled motor for long because the driver chip gets hot. Each group needs its own battery pack, so budget for AA cells.
+
+## Check your understanding
 
 {% quiz %}
 ? Which pins set the motor's direction on the L293D?
@@ -99,6 +135,12 @@ Write a `ramp_up()` function that takes the motor from 0% to 100% over two secon
 - [x] The signals from the Pico need a shared reference to be understood
 - [ ] It charges the battery
 > Voltages are always measured relative to ground. Without a common ground, the driver can't read the Pico's signals reliably.
+
+? What does the PWM signal on EN1 control?
+- [ ] The direction
+- [x] The speed
+- [ ] The battery voltage
+> IN1 and IN2 set the direction, and the duty cycle on EN1 sets the speed.
 {% endquiz %}
 
 ---

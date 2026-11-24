@@ -7,9 +7,13 @@ cover: /learn/brachiograph/assets/banners/06_vectorize.jpg
 date: 2024-07-26
 previous: 05_draw.html
 next: 07_summary.html
-description: Calibrate the BrachioGraph
+description: Turn a bitmap picture into lines the BrachioGraph can draw, using the
+  linedraw module and image_to_json.
 percent: 84
-duration: 3
+duration: 5
+quiz_total: 21
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: BrachioGraph Tutorial
 - content:
@@ -44,103 +48,150 @@ navigation:
 
 ---
 
-## Using the linedraw.py Module to Vectorize Images
+By the end of this lesson you will be able to convert a bitmap image into a JSON line file with `image_to_json()`, preview it, and plot it with `bg.plot_file()`.
 
-The `linedraw.py` module allows you to convert bitmap images into vector format. This can be useful for creating images that your BrachioGraph can draw. The module helps you convert a bitmap image file into an SVG file for visual verification and a JSON file for use with the BrachioGraph.
+## Pictures are not plottable, lines are
+
+A photo is a grid of coloured pixels. A pen plotter can only follow lines, so it needs a different kind of data: a list of lines, where each line is a list of points. Turning pixels into lines is called vectorising. The `linedraw.py` module in the BrachioGraph repository does it for you, finding the contours (outlines) of the image and filling areas with hatching.
+
+```mermaid
+flowchart LR
+    A["Bitmap: images/africa.jpg"] --> B["linedraw: contours and hatching"]
+    B --> C["africa.svg: check it looks right"]
+    B --> D["africa.json: lines for the plotter"]
+    D --> E["bg.plot_file()"]
+```
 
 ---
 
-### Installation
+## Install OpenCV
 
-First, you'll need to install the `opencv-python-headless` package, as it is not included in the standard `requirements.txt`. You can install it using the following command:
+`linedraw` needs OpenCV, which is not in `requirements.txt`. With your virtual environment active, install it:
 
 ```bash
 pip install opencv-python-headless
 ```
 
----
-
-### Using Key Functions
-
-Launch a Python shell and import the necessary functions from `linedraw`:
-
-```python
-from linedraw import *
-```
+> **Teachers**: This download is large and slow on a busy school network, so install it once on a prepared SD card image. Photos of people used in class should be ones students have permission to use.
 
 ---
 
-### Convert an Image to JSON Using `image_to_json()`
+## Convert an image to JSON
 
-To convert an image to a JSON file, you can use the `image_to_json` function. For instance, to convert an image named `africa.jpg` located in the `images` directory, you can use the following command:
+Run Python in the `BrachioGraph` folder and write a short program. Save this as `vectorise_africa.py`. The repository's `images` folder holds example images, so use one of those, or put your own image there:
 
 ```python
+from linedraw import image_to_json
+
 image_to_json("images/africa", draw_contours=2, draw_hatch=16)
 ```
 
-This command performs the following tasks:
+This finds `africa` (as `.jpg`, `.png` or `.tif`) in the `images` folder, draws its contours and hatch lines, and writes two files: `africa.json` for the plotter and `africa.svg` for you to look at. Open the SVG in a browser to check it before you spend ten minutes plotting.
 
-- Finds the file named `africa` (or `africa.jpg`, `africa.png`, `africa.tif`) in the `images` directory.
-- Draws its contours and hatch lines.
-- Creates a JSON file named `africa.json` (or `africa.jpg.json`, etc.).
-- Creates an SVG file named `africa.svg` (or `africa.jpg.svg`, etc.).
+The two numbers set the detail. A value of 0 switches that feature off, and lower values give more detail. The official suggestions:
 
-A `draw_contours` or `draw_hatch` value of 0 will disable those features. Lower values provide more detail, while higher values provide less. Experiment with these values to find the best settings:
-
-- Start with a `draw_contours` value of 2, then try values between 0.5 and 4.
-- Start with a `draw_hatch` value of 16, then try values between 8 and 16.
+- `draw_contours`: start at 2, then try values from 0.5 to 4.
+- `draw_hatch`: start at 16, then try values from 8 to 16.
 
 ---
 
-### Emphasize the Edges
+## Emphasise the edges
 
-You can emphasize the edges of your image by using the `repeat_contours` parameter. For example:
+To make outlines stand out, repeat the contours in the file:
 
 ```python
+from linedraw import image_to_json
+
 image_to_json("images/africa", draw_contours=2, draw_hatch=16, repeat_contours=3)
 ```
 
-Setting `repeat_contours=3` means that the contour data will be added to the JSON file three times, making the edges stand out more prominently. This is particularly effective with pencil drawings.
+With `repeat_contours=3` the contour data is added three times, so the pen goes over the edges three times. That works especially well with pencil drawings.
 
 ---
 
-### Check the Results with SVG
+## Plot it
 
-To verify the results, open the generated SVG file. You can draw the JSON file with the BrachioGraph using the following command:
+Start the plotter as in the earlier lessons, then plot the JSON file with your plotter object:
 
 ```python
-BrachioGraph.plot_file("images/africa.json")
+from custom import bg
+
+bg.plot_file("images/africa.json")
 ```
 
+If you don't have a `custom.py` yet, create a plain `BrachioGraph()` instead. Wait for the whole drawing to finish before you move the paper.
+
 ---
 
-### Convert an Image to Lines Using `vectorise()`
+## Work with the lines directly
 
-If you want to get the lines in a format that you can process in a shell or script, use the `vectorise` function:
+If you want to process the lines in your own code, use `vectorise()`, which returns the list of lines and also writes an SVG:
 
 ```python
+from linedraw import vectorise
+
 lines = vectorise("images/africa.jpg", draw_hatch=16, draw_contours=2)
+print(len(lines), "lines")
 ```
 
-This command generates:
-
-- A list of lines, each of which is a list of points.
-- An SVG file to give you a visual idea of the vectorized representation.
-
-Refer to the `vectorise` function documentation for full details on the parameters it accepts.
-
----
-
-### Visualize the Plotter's Drawing Sequence with `draw()`
-
-The `draw` function allows you to visualize how the plotter will draw the lines using Python's turtle graphics module:
+Preview how the plotter will draw them with Python's turtle graphics. It is slower than the real plotter, but it needs no servos:
 
 ```python
+from linedraw import vectorise, draw
+
+lines = vectorise("images/africa.jpg", draw_hatch=16, draw_contours=2)
 draw(lines)
 ```
 
-This function sequentially draws the lines generated by `vectorise()`. Although it is slower than the actual plotter, it provides a useful preview of the drawing process.
+---
 
-With these tools and techniques, you can effectively convert and optimize images for your BrachioGraph, ensuring that your drawings are accurate and detailed.
+## Try it Yourself
+
+1. Vectorise `africa` with `draw_hatch=0`, then again with `draw_contours=0`. What does each setting contribute?
+2. Put your own photo in the `images` folder, vectorise it, and compare its SVG to the original.
+3. Try `repeat_contours=3` and plot a small area of the file to see the difference.
+4. Challenge: use `vectorise()` and `len(lines)` to compare how many lines three different settings produce, and guess which plot takes longest.
 
 ---
+
+## Common Issues
+
+- **Problem**: `ModuleNotFoundError: No module named 'cv2'`.
+- **Solution**: Run `pip install opencv-python-headless` with the virtual environment active.
+- **Why**: OpenCV is not in the standard requirements file.
+
+- **Problem**: The plot takes ages or the SVG looks messy.
+- **Solution**: Raise `draw_hatch` and `draw_contours`, or turn hatching off with 0.
+- **Why**: Lower values mean more detail, which means many more lines to draw.
+
+- **Problem**: The image file isn't found.
+- **Solution**: Check it is in the `images` folder and that you called it from the `BrachioGraph` folder.
+- **Why**: The path is relative to where Python runs.
+
+- **Problem**: The drawing is too big or off the paper.
+- **Solution**: Check the plotter bounds with `bg.status()`, and preview with the SVG and `draw()` first.
+- **Why**: The plotter can only draw within its calibrated area.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does vectorising an image mean?
+- [ ] Making the image bigger
+- [x] Turning pixels into lines the plotter can follow
+- [ ] Changing the colours
+> A pen plotter follows lines, so the image has to become a list of lines made of points.
+
+? Which setting makes edges stand out more by drawing them several times?
+- [ ] draw_hatch
+- [x] repeat_contours
+- [ ] draw_contours=0
+> `repeat_contours=3` repeats the contour data three times in the JSON.
+
+? Which output file is for checking the result before plotting?
+- [ ] africa.json
+- [x] africa.svg
+- [ ] custom.py
+> The SVG shows you what the vectorised drawing looks like. The JSON is what the plotter reads.
+{% endquiz %}

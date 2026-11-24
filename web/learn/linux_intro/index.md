@@ -8,17 +8,31 @@ description: Learn the fundamentals of using the Linux command line on Raspberry
   OS. This course covers essential topics including navigation, file management, software
   installation, system monitoring, networking, and basic scripting.
 level: beginner
-course_duration: 0h 55m
-lesson_count: 21
-first_lesson: 01_intro_terminal.html
+course_duration: 2h 10m
+lesson_count: 22
+first_lesson: 00_intro.html
+quiz_total: 85
 video: UDo6tvoOQHg
+outcomes:
+- Move around the Raspberry Pi OS filesystem and manage files and folders confidently
+- Read and change file permissions, users and groups
+- Install, update and remove software with apt
+- Check disk, memory, temperature, processes and services with systemctl
+- Log in over SSH and copy files between your computer and the Pi
+- Write a shell script and schedule it with cron, tracked with Git
+prerequisites:
+- None. This is the first course in the Homelab learning pathway
+you_need:
+- A Raspberry Pi 4 or 5 running Raspberry Pi OS (64-bit), with power, a microSD card
+  and a network connection
+- A keyboard and screen, or a second computer to log in from over SSH
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
 - content:
   - section: Getting Started with the Command Line
     content:
-    - name: Introduction to the Terminal
-      link: 01_intro_terminal.html
+    - name: Course Overview
+      link: 00_intro.html
     - name: Getting Help with `man`
       link: 01a_man.html
     - name: Basic Command Line Navigation
@@ -45,6 +59,8 @@ navigation:
       link: 08_monitoring_performance.html
     - name: Managing Processes
       link: 09_managing_processes.html
+    - name: Services and systemctl
+      link: 09a_services.html
   - section: Networking Basics
     content:
     - name: Networking Commands
@@ -69,9 +85,9 @@ navigation:
       link: 16_final_project_overview.html
     - name: Final Project Steps
       link: 17_final_project_steps.html
-  - section: Resources and Next Steps
+  - section: Summary and Next Steps
     content:
-    - name: Resources and Next Steps
+    - name: Summary and Next Steps
       link: 18_resources_next_steps.html
     - name: Linux Command Line Cheatsheet
       link: 19_cheatsheet.html

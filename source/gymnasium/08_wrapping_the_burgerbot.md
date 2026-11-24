@@ -2,18 +2,23 @@
 title: Wrapping the BurgerBot
 description: Port the BurgerBot GridWorld from the previous course into a proper Gymnasium environment, validate it with check_env, and run a random-agent rollout.
 layout: lesson
+snakie: false
 type: page
 cover: /learn/gymnasium/assets/banners/08_wrapping_the_burgerbot.jpg
-date_updated: 2026-06-14
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## What We Are Porting
+By the end of this lesson you will be able to turn a hand-built simulator into a Gymnasium environment that passes `check_env`, and run a random agent on it.
 
-In the Reinforcement Learning for Beginners course, lesson 10, you built a `GridWorld` class that simulated the BurgerBot navigating a 7x7 grid. The grid looked like this:
+---
+
+## What we are porting
+
+In the [previous course](/learn/reinforcement_learning/) you built a `GridWorld` for the BurgerBot: a 7 by 7 grid with seven obstacles, a start at the top left and a goal at the bottom right.
 
 ```
 . . . O . . .
@@ -25,81 +30,72 @@ O . . O . . .
 . . . . . . G
 ```
 
-The robot started at `(0, 0)` facing east and had to reach the goal at `(6, 6)` without hitting any of the 7 obstacles marked `O`. Its state at every step was a four-element tuple: `(row, col, heading, sensor)`. The sensor read the number of clear cells directly ahead, binned into three levels: near (0), medium (1), or far (2).
+The robot starts at row 0, column 0, facing east, and must reach `G` without driving into an `O` or off the grid. Its state is `(row, col, heading, sensor)`, where the sensor reports how many clear cells lie straight ahead, binned into near, medium and far.
 
-The GridWorld had three methods — `reset()`, `step()`, and (optionally) a display helper — and returned a three-tuple `(state, reward, done)`.
+The physics, the obstacles, the sensor and the rewards stay identical. Only the interface changes: spaces, the five-value `step()`, and a `reset()` that returns `(obs, info)`.
 
-Now we are going to wrap that same world as a proper Gymnasium environment. The physics, the obstacles, the sensor, and the reward function stay identical. What changes is the interface.
+```mermaid
+flowchart TD
+    A["step(action)"] --> B{"action is forward?"}
+    B -- "yes" --> C{"cell ahead is free?"}
+    C -- "yes" --> D["move, reward +1"]
+    C -- "no" --> E["crash, reward -10<br/>terminated = True"]
+    B -- "turn or stop" --> F["change heading or wait<br/>reward -0.1"]
+    D --> G{"on the goal?"}
+    G -- "yes" --> H["reward +50<br/>terminated = True"]
+    G -- "no" --> I{"steps >= max_steps?"}
+    F --> I
+    I -- "yes" --> J["truncated = True"]
+    I -- "no" --> K["return next observation"]
+```
 
-## Design Decisions
+## Design decisions
 
-Before writing the code, let's think through the design explicitly.
+**Observation space.** Four integers: `row` 0 to 6, `col` 0 to 6, `heading` 0 to 3 (north, east, south, west) and `sensor` 0 to 2 (near, medium, far). That is `MultiDiscrete([7, 7, 4, 3])`, with 588 possible observations, the same count the Q-table had.
 
-### Observation space
+**Action space.** Four actions, `Discrete(4)`: 0 forward, 1 turn left, 2 turn right, 3 stop.
 
-The state tuple has four components:
+**Terminated or truncated.** A crash and reaching the goal are real endings, so `terminated`. Running out of steps is a time limit, so `truncated`. This is lesson 3 put into practice.
 
-- `row`: 0 to 6, so 7 possible values
-- `col`: 0 to 6, so 7 possible values
-- `heading`: one of 4 directions (north, east, south, west), so 4 values
-- `sensor`: near, medium, or far, so 3 values
+**The sensor.** It counts the clear cells ahead, up to 5. Zero or one clear cell is "near" (0), two or three is "medium" (1), and four or more is "far" (2).
 
-`MultiDiscrete([7, 7, 4, 3])` describes this exactly. The total state space is `7 * 7 * 4 * 3 = 588` possible observations — small enough for a Q-table, which is why the previous course's tabular approach worked.
+## The complete environment
 
-### Action space
-
-Four actions — forward, turn_left, turn_right, stop — map naturally to `Discrete(4)`.
-
-### terminated vs truncated
-
-Looking at the original reward function:
-- Hit an obstacle: reward `-10.0` and episode ends. This is a genuine terminal state: the robot has crashed. **`terminated = True`**
-- Reached the goal: reward `+50.0` and episode ends. Also a genuine terminal state. **`terminated = True`**
-- Hit the step limit: episode ends, no penalty. This is a time limit, not a failure. **`truncated = True`**
-
-### The sensor
-
-The sensor reads the number of clear cells directly ahead (up to 5) before hitting an obstacle or the grid boundary. It returns:
-- 0 (near) if there are 0 or 1 clear cells
-- 1 (medium) if there are 2 or 3 clear cells
-- 2 (far) if there are 4 or more clear cells
-
-This matches the `NEAR = 1`, `MEDIUM = 3` thresholds from the original GridWorld.
-
-## The Complete BurgerBotEnv
+Save this whole listing as `burgerbot_env.py`. Every later lesson imports from it, so keep it in your course folder.
 
 ```python
-import numpy as np
+"""BurgerBot 7x7 grid world as a Gymnasium environment.
+
+Save this file as burgerbot_env.py. Later lessons import it with
+    from burgerbot_env import BurgerBotEnv
+"""
+
 import gymnasium as gym
+import numpy as np
 from gymnasium import spaces
 
-# ── World constants — identical to the RL course's GridWorld ─────────────────
+# World constants, identical to the GridWorld in the Reinforcement Learning course
 GRID_ROWS, GRID_COLS = 7, 7
-OBSTACLES = {(0,3),(1,1),(1,5),(3,0),(3,3),(4,5),(5,1)}
-START, GOAL = (0,0), (6,6)
-ACTIONS   = ["forward","turn_left","turn_right","stop"]
-HEADINGS  = ["north","east","south","west"]
-HEADING_DELTA = {"north":(-1,0),"east":(0,1),"south":(1,0),"west":(0,-1)}
+OBSTACLES = {(0, 3), (1, 1), (1, 5), (3, 0), (3, 3), (4, 5), (5, 1)}
+START, GOAL = (0, 0), (6, 6)
+ACTIONS = ["forward", "turn_left", "turn_right", "stop"]
+HEADINGS = ["north", "east", "south", "west"]
+HEADING_DELTA = {"north": (-1, 0), "east": (0, 1), "south": (1, 0), "west": (0, -1)}
 NEAR, MEDIUM = 1, 3
 
+
 class BurgerBotEnv(gym.Env):
-    """
-    The BurgerBot 7x7 grid-world as a Gymnasium environment.
+    """The BurgerBot grid world.
 
     Observation: np.array([row, col, heading_index, sensor_level], dtype=int64)
-        heading_index: 0=north, 1=east, 2=south, 3=west
-        sensor_level:  0=near (<=1 clear cell ahead),
-                       1=medium (2-3 clear cells),
-                       2=far (>=4 clear cells)
+        heading_index: 0 north, 1 east, 2 south, 3 west
+        sensor_level:  0 near (0 or 1 clear cells ahead)
+                       1 medium (2 or 3 clear cells)
+                       2 far (4 or more clear cells)
 
-    Actions: 0=forward, 1=turn_left, 2=turn_right, 3=stop
+    Actions: 0 forward, 1 turn_left, 2 turn_right, 3 stop
 
-    Rewards:
-        Hit obstacle:  -10.0  (terminated=True)
-        Reach goal:    +50.0  (terminated=True)
-        Move forward:   +1.0
-        Turn or stop:   -0.1
-        Time limit:      0.0  (truncated=True)
+    Rewards: crash -10, goal +50, forward move +1, turn or stop -0.1
     """
 
     metadata = {"render_modes": ["ansi"]}
@@ -108,15 +104,14 @@ class BurgerBotEnv(gym.Env):
         super().__init__()
         self.max_steps = max_steps
         self.render_mode = render_mode
-
-        # MultiDiscrete([7, 7, 4, 3]) matches (row, col, heading, sensor)
         self.observation_space = spaces.MultiDiscrete([GRID_ROWS, GRID_COLS, 4, 3])
         self.action_space = spaces.Discrete(4)
-
-    # ── Private helpers ───────────────────────────────────────────────────────
+        self.row, self.col = START
+        self.heading = "east"
+        self.steps = 0
 
     def _sensor(self):
-        """Count clear cells directly ahead, capped at 5. Return binned level."""
+        """Count clear cells straight ahead (up to 5) and bin the count."""
         dr, dc = HEADING_DELTA[self.heading]
         r, c = self.row + dr, self.col + dc
         n = 0
@@ -126,19 +121,19 @@ class BurgerBotEnv(gym.Env):
             n += 1
             if n >= 5:
                 break
-            r += dr; c += dc
-        if n <= NEAR:   return 0   # near
-        if n <= MEDIUM: return 1   # medium
-        return 2                   # far
+            r += dr
+            c += dc
+        if n <= NEAR:
+            return 0
+        if n <= MEDIUM:
+            return 1
+        return 2
 
     def _obs(self):
-        """Return the current observation as a numpy array."""
         return np.array(
             [self.row, self.col, HEADINGS.index(self.heading), self._sensor()],
-            dtype=np.int64
+            dtype=np.int64,
         )
-
-    # ── Gymnasium contract ────────────────────────────────────────────────────
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
@@ -149,24 +144,23 @@ class BurgerBotEnv(gym.Env):
 
     def step(self, action):
         self.steps += 1
-        a = ACTIONS[action]
+        name = ACTIONS[int(action)]
         hit = False
         moved = False
 
-        if a == "forward":
+        if name == "forward":
             dr, dc = HEADING_DELTA[self.heading]
             nr, nc = self.row + dr, self.col + dc
-            if (0 <= nr < GRID_ROWS and 0 <= nc < GRID_COLS
-                    and (nr, nc) not in OBSTACLES):
+            if 0 <= nr < GRID_ROWS and 0 <= nc < GRID_COLS and (nr, nc) not in OBSTACLES:
                 self.row, self.col = nr, nc
                 moved = True
             else:
                 hit = True
-        elif a == "turn_left":
+        elif name == "turn_left":
             self.heading = HEADINGS[(HEADINGS.index(self.heading) - 1) % 4]
-        elif a == "turn_right":
+        elif name == "turn_right":
             self.heading = HEADINGS[(HEADINGS.index(self.heading) + 1) % 4]
-        # "stop" does nothing
+        # "stop" changes nothing
 
         reached = (self.row, self.col) == GOAL
 
@@ -180,104 +174,151 @@ class BurgerBotEnv(gym.Env):
             reward = -0.1
 
         terminated = reached or hit
-        truncated  = self.steps >= self.max_steps
-
+        truncated = self.steps >= self.max_steps
         return self._obs(), reward, terminated, truncated, {}
 
     def render(self):
         if self.render_mode != "ansi":
-            return
-        heading_char = {"north":"^","east":">","south":"v","west":"<"}
-        out = ""
+            return None
+        arrow = {"north": "^", "east": ">", "south": "v", "west": "<"}
+        lines = []
         for r in range(GRID_ROWS):
+            cells = []
             for c in range(GRID_COLS):
                 if (r, c) == (self.row, self.col):
-                    out += heading_char[self.heading] + " "
+                    cells.append(arrow[self.heading])
                 elif (r, c) in OBSTACLES:
-                    out += "O "
+                    cells.append("O")
                 elif (r, c) == GOAL:
-                    out += "G "
+                    cells.append("G")
                 else:
-                    out += ". "
-            out += "\n"
-        return out
+                    cells.append(".")
+            lines.append(" ".join(cells))
+        return "\n".join(lines)
 ```
 
-## Validating with check_env
+A few details are worth a second look. `_obs()` builds the array with `dtype=np.int64` to match the `MultiDiscrete` space. `step()` calls `int(action)` because libraries sometimes hand you a NumPy integer. And `reset()` begins with `super().reset(seed=seed)`, as you learned last lesson.
 
-Always run `check_env` before you train on a custom environment:
+## Validate it, then watch a random agent
+
+Save this as `try_burgerbot.py` in the same folder and run it:
 
 ```python
 from gymnasium.utils.env_checker import check_env
 
+from burgerbot_env import BurgerBotEnv
+
 env = BurgerBotEnv()
 check_env(env)
-print("BurgerBotEnv passed check_env!")
+print("BurgerBotEnv passed check_env")
 env.close()
-```
 
-If this prints the success message without raising an exception, the environment is Gymnasium-compliant. If it raises, read the error — it will tell you exactly which part of the contract is violated.
-
-## A Random-Agent Rollout
-
-Let's watch the agent do something before we train it:
-
-```python
 env = BurgerBotEnv(render_mode="ansi")
 obs, info = env.reset(seed=7)
-print("Initial state:")
+env.action_space.seed(7)
+print("Observation:", obs)
 print(env.render())
 
-total_reward = 0
-done = False
-
-for step in range(30):
+total_reward = 0.0
+for step in range(1, 101):
     action = env.action_space.sample()
     obs, reward, terminated, truncated, info = env.step(action)
     total_reward += reward
-    done = terminated or truncated
-
-    if done:
-        print(f"Episode ended at step {step + 1}.")
-        print(f"Terminated: {terminated}, Truncated: {truncated}")
+    if terminated or truncated:
+        print(f"Episode ended at step {step}.")
+        print(f"terminated={terminated}, truncated={truncated}")
         break
 
 print(f"Total reward from random agent: {total_reward:.1f}")
-print("\nFinal grid state:")
 print(env.render())
 env.close()
 ```
 
-A random agent on BurgerBot usually hits an obstacle within the first 20 steps. That is fine — it shows the environment is working and the penalty is being applied.
+In our run `check_env` printed one harmless `WARN` about render modes and then:
 
-## Comparing to the Original GridWorld
+```
+BurgerBotEnv passed check_env
+Observation: [0 0 1 1]
+> . . O . . .
+. O . . . O .
+. . . . . . .
+O . . O . . .
+. . . . . O .
+. O . . . . .
+. . . . . . G
+Episode ended at step 8.
+terminated=True, truncated=False
+Total reward from random agent: -10.7
+^ . . O . . .
+. O . . . O .
+. . . . . . .
+O . . O . . .
+. . . . . O .
+. O . . . . .
+. . . . . . G
+```
 
-Here is a side-by-side of the key differences between the hand-rolled GridWorld and BurgerBotEnv:
+The first observation `[0 0 1 1]` reads: row 0, column 0, heading 1 (east), sensor 1 (medium). Medium, because two clear cells lie ahead before the obstacle at column 3. The random agent spent seven steps turning and waiting at the start (seven steps at -0.1 each, which is where the -0.7 in the total comes from), ended up facing north, and then drove forward off the top edge of the grid for the -10 crash penalty. That gives `terminated=True` and `truncated=False`, exactly as designed.
+
+How bad is a random agent? We ran 200 random episodes. Every one of them ended in a crash, none reached the goal, and the average length was about 10 steps. That is the baseline a trained agent has to beat.
+
+## Old versus new
 
 | Aspect | Original GridWorld | BurgerBotEnv |
-|--------|-------------------|--------------|
-| Return from reset | `state` tuple | `(np.array, {})` |
-| Return from step | `(state, reward, done)` | `(np.array, reward, terminated, truncated, {})` |
-| State representation | Python tuple | NumPy int64 array |
-| Episode end signal | Single `done` bool | Two separate flags |
-| Space declaration | None (implicit) | `observation_space`, `action_space` |
-| Interchangeable? | No | Yes — works with any Gymnasium-compatible library |
+| --- | --- | --- |
+| `reset()` returns | `state` | `(observation, info)` |
+| `step()` returns | `(state, reward, done)` | `(obs, reward, terminated, truncated, info)` |
+| State type | Python tuple with strings | NumPy `int64` array |
+| Ending | One `done` flag | `terminated` and `truncated` |
+| Spaces | Implicit | `observation_space`, `action_space` |
+| Works with SB3 and wrappers | No | Yes |
 {:class="table table-single"}
 
-The underlying physics — the grid, the obstacles, the sensor, the rewards — are exactly the same. Only the interface changed.
+## Try it Yourself
 
-## Try It Yourself
-
-1. Run `check_env(BurgerBotEnv())` and then deliberately break the environment by returning a Python `int` from `_obs()` instead of a NumPy array. What error does `check_env` produce?
-2. Change `max_steps` to 10 and run the rollout. How often does the episode end due to truncation vs termination with a random agent?
-3. Add a method `state_count(num_episodes=100)` that runs `num_episodes` random-agent episodes and counts how many unique observations were seen. How does this compare to the theoretical maximum of 588?
+1. In `_obs()`, return a plain list instead of an array and run `check_env`. Read the error. Put it back.
+2. Set `max_steps=10` and run an agent that always chooses action 3 (stop). Which flag ends the episode, and at which step?
+3. Write a function that runs 100 random episodes with different seeds and counts how many different observations the agent sees. Compare it to 588.
+4. Challenge: write a hand-coded policy (no learning) that gets the robot to the goal. It needs to avoid the obstacles at row 0 column 3 and row 1 column 1. How many steps does your route take?
 
 ## Common Issues
 
-**Problem:** `check_env` warns "The observation returned by the `reset()` method is not within the observation space"
-**Solution:** Make sure `_obs()` returns `dtype=np.int64`. Some systems default NumPy to `int32`.
-**Why:** `MultiDiscrete` declares `int64` dtype. NumPy's `np.array([...])` defaults to `int64` on most platforms but `int32` on some (especially 32-bit Python builds).
+- **Problem**: `check_env` says the observation is not within the observation space.
+- **Solution**: Make `_obs()` return `dtype=np.int64`, and check every value is inside its range (row 0 to 6, heading 0 to 3, sensor 0 to 2).
+- **Why**: `MultiDiscrete` validates the array's type and every element.
 
-**Problem:** The sensor always returns 0 (near) even when the path is clear.
-**Solution:** Check the HEADING_DELTA dictionary. "north" should be `(-1, 0)` (row decreases going north). If row 0 is the top of the grid, this is correct.
-**Why:** In grid coordinates with row 0 at the top, moving north decreases the row index.
+- **Problem**: The robot seems to move the wrong way when facing north.
+- **Solution**: Check `HEADING_DELTA`: north must be `(-1, 0)`.
+- **Why**: Row 0 is the top of the grid, so moving north means the row number goes down.
+
+- **Problem**: `IndexError: list index out of range` inside `step()`.
+- **Solution**: Only pass actions 0 to 3, which `env.action_space.sample()` guarantees.
+- **Why**: `ACTIONS[action]` has exactly four entries.
+
+## Check your understanding
+
+{% quiz %}
+? Which space describes the BurgerBot observation `[row, col, heading, sensor]`?
+- [ ] `Discrete(588)`
+- [x] `MultiDiscrete([7, 7, 4, 3])`
+- [ ] `Box(0, 6, (4,))`
+> Four independent integers, each with its own range.
+
+? A BurgerBot drives forward into an obstacle. Which flags does `step()` return?
+- [x] `terminated=True`, `truncated=False` (unless the step limit coincides)
+- [ ] `terminated=False`, `truncated=True`
+- [ ] Both always True
+> A crash is a real ending. Truncation only reflects the step limit.
+
+? At the start state `[0 0 1 1]`, what does the last 1 mean?
+- [ ] The robot is facing east
+- [x] The sensor reads medium: two or three clear cells ahead
+- [ ] One obstacle is nearby
+> The last number is the sensor level. Heading is the third number.
+
+? What is `check_env` for?
+- [ ] Training the agent
+- [x] Testing that the environment follows the Gymnasium contract
+- [ ] Rendering the grid
+> It runs the contract's tests and tells you what is broken.
+{% endquiz %}

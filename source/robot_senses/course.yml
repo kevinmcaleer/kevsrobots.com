@@ -1,0 +1,70 @@
+- name: Give Your Robot Senses
+  author: Kevin McAleer
+  date_created: 2026-11-24
+  date_published: 2026-11-24
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  video: 1K1A1YGcOEE
+  code_target: micropython
+  groups:
+      - robots
+      - arduino
+      - electronics
+  description: >-
+    Give one small tracked robot a sense at a time. Learn what each sensor measures, how to read it
+    in MicroPython, and how to turn the readings into behaviour. Then move up to navigation: wall
+    following, and the ideas behind mapping and SLAM.
+  outcomes:
+    - Explain the sense, think, act loop and say which part of a robot does each job
+    - Connect Modulino sensors over Qwiic and find them with an I2C scan
+    - Read a distance sensor and a movement sensor in MicroPython, and handle a missing reading safely
+    - Turn sensor readings into behaviour with thresholds, hysteresis and priorities
+    - Build a reactive robot that stops, backs off, pulls faces and reacts when picked up
+    - Describe how wall following works, and how mapping and SLAM go further
+  prerequisites:
+    - Robotics 101
+    - Build a SMARS Robot
+  you_need:
+    - A SMARS robot, or any small robot with two motors
+    - An UnexpectedMaker FeatherS2 Neo running MicroPython, or another board with I2C and Qwiic
+    - Arduino Modulino Distance, Buzzer, Motors, LED Matrix and Movement, with Qwiic cables
+    - A 9V battery for the motors, and a LiPo battery for the board
+    - A computer with a MicroPython editor such as Thonny or Snakie
+    - Optional, an Arduino Alvik and some cardboard walls for lessons 13 and 14
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 00_intro.md
+    - section:
+        name: How robots sense
+        content:
+          - 01_how_robots_sense.md
+          - 02_meet_modulino_smars.md
+          - 03_qwiic_and_i2c.md
+          - 04_first_connection.md
+    - section:
+        name: One sense at a time
+        content:
+          - 05_see_distance.md
+          - 06_feel_movement.md
+          - 07_speak_the_buzzer.md
+          - 08_show_the_led_matrix.md
+          - 09_move_the_motors.md
+    - section:
+        name: From readings to behaviour
+        content:
+          - 10_readings_to_decisions.md
+          - 11_combining_senses.md
+          - 12_project_reactive_robot.md
+    - section:
+        name: Navigation
+        content:
+          - 13_wall_following.md
+          - 14_mapping_and_slam.md
+    - section:
+        name: Wrapping up
+        content:
+          - 15_troubleshooting.md
+          - 16_summary.md

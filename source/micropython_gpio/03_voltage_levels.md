@@ -10,6 +10,8 @@ cover: /learn/micropython_gpio/assets/banners/03_voltage_levels.jpg
 
 ---
 
+By the end of this lesson you will be able to say what voltages a Pico pin accepts and how to bring a 5V signal down to 3.3V.
+
 ## Overview
 
 The Pico is a 3.3V device. Getting this wrong is the easiest way to damage one, so this short lesson is worth reading before you wire anything up.
@@ -50,6 +52,36 @@ Many 5V modules will happily read a 3.3V signal from the Pico as "high", so sign
 
 ---
 
+---
+
+## Worked example: the 1kΩ and 2kΩ divider
+
+The two resistors share the 5V in proportion to their values. The Pico pin sits between them, across the 2kΩ:
+
+```
+V(pin) = 5V x 2kΩ / (1kΩ + 2kΩ) = 5 x 0.667 = 3.33V
+```
+
+The current through the pair is 5V / 3kΩ, about 1.7mA, which is tiny. A higher-value pair, such as 10kΩ and 20kΩ, gives the same voltage but responds more slowly to fast signals.
+
+---
+
+## Try it Yourself
+
+1. Work out the voltage at the middle of a divider made from 2kΩ on top and 1kΩ on the bottom. Is it safe for a Pico pin?
+2. Using the formula above, what voltage do you get from a 4.5V battery pack with 1kΩ and 2kΩ?
+3. Challenge: list three parts in your kit and write down the voltage of each signal wire. Which would need protecting?
+
+## Common Issues
+
+- **Problem**: A 5V sensor works for a while, then the Pico stops responding.
+- **Solution**: Add a divider or level shifter on the sensor's output, and replace the Pico if it no longer works.
+- **Why**: GPIO pins are not 5V tolerant, so 5V can slowly or suddenly damage the RP2040 input circuits.
+
+> **Teachers**: Never connect 5V signals to a Pico in front of a class without checking first. Have a spare Pico in the box, and pre-build the 1kΩ and 2kΩ divider on a breadboard for groups that use an HC-SR04. A cheap multimeter lets students measure the voltage themselves before connecting anything.
+
+## Check your understanding
+
 {% quiz %}
 ? A sensor module runs on 5V and its output pin goes to 5V. What should you do before connecting it to a Pico GPIO pin?
 - [ ] Nothing, the Pico pins are 5V tolerant
@@ -62,6 +94,12 @@ Many 5V modules will happily read a 3.3V signal from the Pico as "high", so sign
 - [x] A GPIO pin can only supply a few milliamps
 - [ ] GPIO pins only output 1.8V
 > Motors need far more current than a pin can safely give. Use a motor driver and a separate supply.
+
+? What voltage does a 1kΩ and 2kΩ divider give from a 5V input?
+- [ ] 1.65V
+- [x] About 3.3V
+- [ ] 5V
+> 5V x 2 / 3 is about 3.3V, which is safe for a Pico input.
 {% endquiz %}
 
 ---

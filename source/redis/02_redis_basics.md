@@ -2,41 +2,37 @@
 layout: lesson
 title: Redis Basics
 type: page
-description: Learn the basics of Redis and how to use it with Python.
+description: Install Redis, try it out with redis-cli, then connect to it from Python and store a robot sensor reading.
 cover: /learn/redis/assets/banners/02_redis_basics.jpg
+code_target: cpython
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-### Overview
-
-In this lesson, we will cover the basics of `Redis` and how to use it with Python. Redis is an in-memory key-value store that can be used for caching, real-time analytics, message queues, and more. We will cover how to install and configure Redis, and how to use it with Python.
+By the end of this lesson you will be able to install Redis, store and read back a value with `redis-cli`, and do the same from a Python program.
 
 ---
 
-### Lesson Content
+## Overview
 
-In this lesson, we will cover:
+Redis stores **keys** and **values**. The key is a name, like `robot:1:distance`, and the value is whatever you want to remember under that name. Because Redis lives in memory it is fast, but it also means you are limited by how much RAM the machine has.
 
-* [Redis basics](#redis-basics)
-* [Installing and configuring Redis](#installing-and-configuring-redis)
-* [Using Redis with Python](#using-redis-with-python)
+Let's get a server running, poke it by hand, then talk to it from Python.
 
----
+```mermaid
+flowchart LR
+    A["redis-cli<br/>(type commands)"] -->|"port 6379"| S[("Redis server")]
+    B["Python program<br/>(redis library)"] -->|"port 6379"| S
+```
 
-### Redis Basics
+Both tools are just clients. They connect to the server on port `6379`, send a command and print the reply.
 
-Redis is an in-memory key-value store that can be used for caching, real-time analytics, message queues, and more. Redis stores data in memory, which makes it very fast, but also means that it is limited by the amount of available memory.
+## Installing Redis
 
-Redis data is organized into key-value pairs, where the key is a string and the value can be any Redis data type, such as a string, hash, list, set, or sorted set. Redis provides a rich set of commands for working with data, including commands for manipulating strings, hashes, lists, sets, and sorted sets, as well as more advanced commands for working with data structures such as bitmaps and hyperloglogs.
-
----
-
-### Installing and Configuring Redis
-
-Pick whichever option suits your computer:
+Pick whichever option suits your computer.
 
 **Raspberry Pi OS, Debian or Ubuntu**
 
@@ -45,7 +41,7 @@ sudo apt update
 sudo apt install redis-server
 ```
 
-The server starts automatically and runs in the background.
+The server starts automatically and runs in the background. By default it only accepts connections from the same machine, which is exactly what we want for learning.
 
 **macOS** (with [Homebrew](https://brew.sh))
 
@@ -57,24 +53,44 @@ brew services start redis
 **Any computer with Docker** (including Windows)
 
 ```bash
-docker run -d --name redis -p 6379:6379 redis
+docker run -d --name redis -p 127.0.0.1:6379:6379 redis
 ```
 
-See the [Docker course](/learn/docker/) if you're new to Docker.
+The `127.0.0.1:` part keeps the port private to your own computer. See the [Docker course](/learn/docker/) if you're new to Docker.
 
-To check Redis is running, use the `redis-cli` command-line tool (inside Docker, use `docker exec -it redis redis-cli`):
+## Say hello with redis-cli
 
-```bash
-redis-cli ping
+`redis-cli` is a command-line client that comes with Redis. (With Docker, run `docker exec -it redis redis-cli` to open it inside the container.) Type a command and press Enter:
+
+```
+127.0.0.1:6379> ping
+PONG
+127.0.0.1:6379> set robot:1:distance 42.5
+OK
+127.0.0.1:6379> get robot:1:distance
+"42.5"
+127.0.0.1:6379> incr robot:1:boots
+(integer) 1
+127.0.0.1:6379> incr robot:1:boots
+(integer) 2
+127.0.0.1:6379> get nothing
+(nil)
 ```
 
-If you see `PONG`, you're ready. You can type any Redis command into `redis-cli` to try it out, which is handy for the command examples in later lessons.
+A few things to notice:
 
-By default, Redis listens on port `6379`, but you can change this in the Redis configuration file.
+- `PONG` means the server is alive
+- `set` stores a value and `get` reads it back. The quotes in `"42.5"` are just how `redis-cli` prints text
+- `incr` adds one to a number, creating it at 1 if it does not exist yet. It is great for counting boots, laps and button presses
+- A key that does not exist gives `(nil)`
 
----
+> ## Redis stores text
+>
+> The value `42.5` went in as text and came back as text. Redis does not know it is a number until you ask it to `incr` it. When you read values in Python you convert them yourself, for example with `float()`.
 
-### Install the Python library
+## Connect from Python
+
+Install the library, ideally in a virtual environment:
 
 ```bash
 pip install redis
@@ -82,46 +98,57 @@ pip install redis
 
 On Raspberry Pi OS, create and activate a virtual environment first (`python3 -m venv ~/redis-env` then `source ~/redis-env/bin/activate`).
 
----
-
-### Using Redis with Python
-
-To use Redis with Python, you can use the Redis Python library, which provides a Pythonic interface to Redis. Here's an example of how to use Redis with Python:
+Save this as `hello_redis.py`:
 
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
-# Set a string value
-redis_client.set('mykey', 'myvalue')
+r.set('robot:1:distance', 42.5)
+print(r.get('robot:1:distance'))
 
-# Get a string value
-value = redis_client.get('mykey')
-print(value)   # myvalue
+distance = float(r.get('robot:1:distance'))
+print(distance + 10)
 
-# Delete a key
-redis_client.delete('mykey')
+print(r.get('nothing'))
 ```
 
-In this example, we create a Redis client with `redis.Redis()`, which connects to the Redis server on localhost at port 6379. We then use `set()` to store a string value for the key `mykey`, and `get()` to retrieve it. Finally, `delete()` removes the key and its value.
+Run it and you will see:
+
+```
+42.5
+52.5
+None
+```
+
+`redis.Redis(...)` creates a client. `set()` and `get()` have the same names as the commands. A missing key gives `None` in Python, where `redis-cli` printed `(nil)`.
 
 > ## Bytes or strings?
 >
-> Redis stores everything as bytes. Without `decode_responses=True`, `get()` returns `b'myvalue'` instead of `'myvalue'`. We use `decode_responses=True` throughout this course so you get normal Python strings back.
+> Redis stores bytes. Without `decode_responses=True`, `get()` returns `b'42.5'` instead of `'42.5'`. We use `decode_responses=True` throughout this course so you get normal Python strings back.
 
----
+## Try it Yourself
 
-### Keys that expire
+1. In `redis-cli`, store your robot's name under `robot:1:name` and read it back
+2. Use `incr` three times on a counter called `laps`, then `get` it. What type does Python give you if you `r.get('laps')`?
+3. Challenge: write a program that stores a pretend battery voltage, reads it back, converts it to a `float` and prints "Battery low" if it is below 6.5
 
-One of Redis's handiest tricks is that keys can delete themselves after a set time. That's perfect for caching:
+## Common Issues
 
-```python
-redis_client.set('weather', 'sunny', ex=60)   # expires in 60 seconds
-print(redis_client.ttl('weather'))            # seconds left to live
-```
+- **Problem**: `redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.`
+- **Solution**: Start the server (`sudo systemctl start redis-server` on Debian, `brew services start redis` on macOS, or `docker start redis`).
+- **Why**: Nothing is listening on port 6379, so the connection is refused.
 
----
+- **Problem**: `get()` returns `b'42.5'` with a `b` in front.
+- **Solution**: Add `decode_responses=True` when you create the client.
+- **Why**: Without it, the library hands you raw bytes.
+
+- **Problem**: `TypeError` when adding to a value you read.
+- **Solution**: Convert it first, e.g. `float(r.get('robot:1:distance'))`.
+- **Why**: Redis returns text, and Python will not add a number to a string.
+
+## Check your understanding
 
 {% quiz %}
 ? Which port does Redis listen on by default?
@@ -134,23 +161,13 @@ print(redis_client.ttl('weather'))            # seconds left to live
 - [ ] It makes Redis faster
 - [x] So results come back as Python strings instead of bytes
 - [ ] It's required to connect to localhost
-> Redis returns bytes by default, like `b'myvalue'`.
+> Redis returns bytes by default, like `b'42.5'`.
+
+? What does `get` return for a key that does not exist?
+- [ ] An empty string
+- [ ] An error
+- [x] `(nil)` in redis-cli, and `None` in Python
+> A missing key is not an error, it is simply empty.
 {% endquiz %}
 
----
-
-### Key Takeaways
-
-After completing this lesson, you should be able to:
-
-* Describe the basics of Redis and its data model
-* Install and configure Redis
-* Use Redis with Python
-
----
-
-### Conclusion
-
-In this lesson, we covered the basics of Redis and how to use it with Python. We described Redis and its data model, and demonstrated how to install and configure Redis, and how to use Redis with Python using the Redis Python library. In the next lesson, we will cover Redis data types.
-
----
+> **Teachers**: installing software needs admin rights, which locked-down school computers often deny. A shared Redis on one Pi, or Docker on a teacher machine, avoids this. If you share one server, ask each learner to prefix their keys with their own name (for example `sam:robot:1:distance`) so they don't overwrite each other, and never publish port 6379 beyond the classroom network, because a default Redis has no password.

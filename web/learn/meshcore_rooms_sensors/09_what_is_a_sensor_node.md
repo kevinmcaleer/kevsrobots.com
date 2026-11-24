@@ -9,7 +9,9 @@ previous: 08_room_operations.html
 next: 10_flashing_the_sensor.html
 description: Pull-based telemetry, leaf nodes, and why MeshCore sensors sip power
 percent: 50
-duration: 6
+duration: 8
+quiz_total: 53
+date_updated: 2026-11-24
 navigation:
 - name: MeshCore Room Servers and Sensors
 - content:
@@ -62,6 +64,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain why MeshCore sensors are pull-based leaf nodes, and list what a sensor can and cannot report.
+
 Half way. The room server is built; now we turn to the role that lets your mesh measure things rather than just carry conversation.
 
 ---
@@ -76,7 +80,7 @@ MeshCore sensors are **pull** devices. They read their sensors locally on a shor
 
 **Why this matters, and it is worth dwelling on:**
 
-- **Airtime.** A push sensor transmits on its own schedule regardless of whether anyone is listening. On a shared LoRa mesh with a legal duty cycle, that is expensive. Ten push sensors on a small mesh would be genuinely antisocial
+- **Airtime.** A push sensor transmits on its own schedule regardless of whether anyone is listening. On a shared LoRa mesh, where regulations limit how much of the time you may transmit (the duty cycle, which varies by country), that is expensive. Ten push sensors on a small mesh would be genuinely antisocial
 - **Power.** Transmitting is the most expensive thing a LoRa node does. A sensor that only transmits when asked spends most of its life drawing almost nothing
 - **Relevance.** You get the reading when you want it, not a log of readings you never looked at
 
@@ -90,7 +94,7 @@ Sensor firmware ships with **forwarding disabled**. The node sits at the edge of
 
 **Why this matters:** sensors are usually the most power-constrained things on the network - on a battery, at the bottom of a field, maybe on a small solar panel. Making them carry other nodes' packets would be the fastest possible way to flatten them.
 
-You *can* enable forwarding with `set repeat on`, since the setting exists on every role. On a battery-powered sensor, don't.
+The CLI has a `set repeat` setting, but on a battery-powered sensor, don't turn it on.
 
 If you need range *to* a sensor, that is a repeater's job, not the sensor's.
 
@@ -126,14 +130,9 @@ You do not need to work with it directly; the app decodes it for you. It matters
 
 ## Permissions apply here too
 
-Sensor data is not automatically public. The firmware checks permission flags before it puts a reading into the response.
+Sensor data is not automatically open to everyone. The sensor firmware can filter readings by permission flags, so some readings (the source mentions GPS position as one) are held back unless the requester is allowed to see them. In the sensor source, battery voltage is always added to a telemetry reply.
 
-The general shape:
-
-- **Public** - basic health like battery and uptime
-- **Guest / admin** - the actual telemetry, and GPS position if fitted
-
-**Why this matters:** GPS position in particular is not something you want handing out to anyone in radio range. The permission model is the same three-tier system you set up on the room server, which is one less thing to learn.
+**Why this matters:** a node's location is not something you want handing out to anyone in radio range. Exactly which readings need which permission depends on the firmware build, so test what a second node can see rather than assuming. The access list works like the one on the room server, which is one less thing to learn.
 
 ---
 
@@ -145,9 +144,9 @@ Being clear about this saves disappointment:
 
 **They are not fast.** Requests travel at LoRa speeds, so expect seconds to answer, not milliseconds - and more if the reply crosses repeaters.
 
-**They mostly do not alert you unprompted.** Sensor builds do include threshold alerts, but the thresholds are written into the firmware source rather than set from the CLI - so using them means building your own image. Do not design a safety system around it either way.
+**They mostly do not alert you unprompted.** The sensor example in the repository does include threshold alerts (it alerts when the battery drops below 3.4V or 3.6V), but the thresholds are written in the firmware source rather than set from the CLI, so changing them means building your own image. Do not design a safety system around it either way.
 
-**They do not store much history.** There is a rolling time-series buffer supporting min / max / average over a window - the shipped example keeps about a day of battery readings in five-minute slots - not a database.
+**They do not store much history.** There is a rolling time-series buffer supporting min / max / average over a window - the shipped example keeps 24 hours of battery readings in five-minute slots - not a database.
 
 ---
 
@@ -168,6 +167,10 @@ Genuinely, use the right tool:
 
 ---
 
+> **Teachers**: Remote sensors are a good classroom project but cost class time in waiting for answers over LoRa, so set expectations that a request takes seconds. If you place a sensor outdoors or off the school site, get permission, keep the antenna fitted, and never leave a LiPo-powered board unattended in direct sun or a sealed box.
+
+---
+
 ## Try it Yourself
 
 1. List every measurement you would like to have. Cross off everything with WiFi coverage. What is left is your real sensor list.
@@ -178,16 +181,35 @@ Genuinely, use the right tool:
 
 ## Common Issues
 
-**Problem**: My sensor does not report anything on its own.
+- **Problem**: My sensor does not report anything on its own.
+- **Solution**: That is the design. Request telemetry from the app - lesson 14.
+- **Why**: MeshCore sensors are pull-based. Silence is the normal, correct, power-saving state.
 
-**Solution**: That is the design. Request telemetry from the app - lesson 14.
-
-**Why**: MeshCore sensors are pull-based. Silence is the normal, correct, power-saving state.
-
-**Problem**: I want the sensor to also extend my range.
-
-**Solution**: Use a separate repeater.
-
-**Why**: Sensors are leaf nodes by design and do not forward traffic, precisely so they can stay asleep and keep their batteries.
+- **Problem**: I want the sensor to also extend my range.
+- **Solution**: Use a separate repeater.
+- **Why**: Sensors are leaf nodes by design and do not forward traffic, precisely so they can stay asleep and keep their batteries.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why does a MeshCore sensor not transmit on a timer?
+- [x] Transmitting costs airtime and power, so it only sends when asked
+- [ ] It has no radio
+- [ ] The firmware cannot read sensors
+> Measuring locally is cheap; transmitting is not.
+
+? What does a bare sensor board with no extra hardware still report?
+- [x] Battery voltage and uptime
+- [ ] Temperature and humidity
+- [ ] Tank level
+> Device health needs no extra parts.
+
+? Which format are telemetry readings packed in?
+- [x] CayenneLPP
+- [ ] JSON text
+- [ ] CSV
+> It is a compact format designed for LoRa, which also tools like Home Assistant understand.
+
+{% endquiz %}

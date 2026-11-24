@@ -5,12 +5,26 @@
   level: beginner
   layout: course
   cover: assets/cover.png
+  outcomes:
+    - Explain what MeshCore is and what the repeater and companion roles do
+    - Describe how spreading factor, bandwidth and coding rate affect range and airtime
+    - Flash and configure a MeshCore repeater and a Bluetooth companion with matching radio settings
+    - Place and power a repeater sensibly, handling antennas and batteries safely
+    - Send messages, use channels, and read RSSI, SNR and paths to diagnose a weak link
+    - Administer a repeater over the air and troubleshoot a mesh that will not talk
+  prerequisites:
+    - No programming or soldering needed, and no earlier course required
+    - Helpful but not required, typing commands as in Introduction to Linux
+  you_need:
+    - Two Heltec WiFi LoRa 32 V3 boards in the frequency variant for your region
+    - Two antennas for that band, and a U.FL to SMA pigtail if needed
+    - A USB-C data cable and a computer with Chrome or Edge
+    - A phone with the MeshCore app, or a laptop to use the web client
+    - Optional, a LiPo battery and a weatherproof box for an outdoor repeater
   groups:
       - electronics
-      - lora
-      - meshcore
   description: >-
-     Build your own off-grid LoRa mesh network with MeshCore and two cheap Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal, no subscription.
+     Build your own off-grid LoRa mesh network with MeshCore and two Heltec V3 boards, one as a repeater and one as a client. No internet, no phone signal, no subscription.
   content:
   - section:
       name: Overview

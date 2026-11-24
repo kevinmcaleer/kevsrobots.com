@@ -10,8 +10,9 @@ next: 14_python_and_pymongo.html
 description: Learn what an index is, how to see whether MongoDB uses one with explain(),
   and how to create single, compound, unique and text indexes for your Parts Bin.
 percent: 70
-duration: 9
-date_updated: 2026-10-18
+duration: 11
+quiz_total: 64
+date_updated: 2026-11-24
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -72,6 +73,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to use explain to tell a collection scan from an index scan, and create single, compound, unique and text indexes.
+
 Every query we've run so far has been instant. That's because our Parts Bin holds 13 documents. Point the same queries at a million sensor readings and things get sluggish - unless you've built an **index**.
 
 In this lesson we'll see how MongoDB finds documents, measure how much work it's doing, and make it do far less.
@@ -97,6 +100,22 @@ db.parts.getIndexes()
 ```
 
 That's why looking up a document by `_id` is always fast.
+
+---
+
+## The big picture
+
+Without an index MongoDB must read every document. With one it jumps straight to the answer.
+
+```mermaid
+flowchart LR
+    subgraph NO["No index: COLLSCAN"]
+      Q1["find sensor-42"] --> S1["Read all 100000 readings"] --> R1["200 matches"]
+    end
+    subgraph YES["With an index on sensor: IXSCAN"]
+      Q2["find sensor-42"] --> I["Look up in the sorted index"] --> S2["Fetch 200 documents"] --> R2["200 matches"]
+    end
+```
 
 ---
 
@@ -426,17 +445,47 @@ db.parts.find({ $text: { $search: "lithium" } }, { _id: 0, name: 1 })
 
 ## Common Issues
 
-**Problem:** `MongoServerError: E11000 duplicate key error` when creating a unique index.  
-**Solution:** Find and fix the duplicates first, then create the index again.  
-**Why:** MongoDB won't build a unique index over data that already breaks the rule.
+- **Problem**: `MongoServerError: E11000 duplicate key error` when creating a unique index.
+- **Solution**: Find and fix the duplicates first, then create the index again.
+- **Why**: MongoDB won't build a unique index over data that already breaks the rule.
 
-**Problem:** `MongoServerError[IndexOptionsConflict]: An equivalent index already exists with a different name and options` when creating a text index.  
-**Solution:** Drop the existing text index, then create one that lists all the fields you want.  
-**Why:** A collection can have only one text index.
+- **Problem**: `MongoServerError[IndexOptionsConflict]: An equivalent index already exists with a different name and options` when creating a text index.
+- **Solution**: Drop the existing text index, then create one that lists all the fields you want.
+- **Why**: A collection can have only one text index.
 
-**Problem:** `explain()` still shows `COLLSCAN` after creating an index.  
-**Solution:** Check the field name in your query matches the index exactly, and that a compound index's first field is in your filter.  
-**Why:** MongoDB only uses an index that can actually narrow down the search.
+- **Problem**: `explain()` still shows `COLLSCAN` after creating an index.
+- **Solution**: Check the field name in your query matches the index exactly, and that a compound index's first field is in your filter.
+- **Why**: MongoDB only uses an index that can actually narrow down the search.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which explain stage means MongoDB used an index?
+- [ ] COLLSCAN
+- [x] IXSCAN
+- [ ] FETCH only
+> IXSCAN is an index scan. COLLSCAN reads the whole collection.
+
+? What does a unique index on name give you?
+- [ ] Faster sorting only
+- [x] A refusal to store two parts with the same name
+- [ ] A copy of the data
+> A unique index blocks duplicates for free, and our Parts Bin app relies on that.
+
+? Why not index every field?
+- [ ] Indexes are illegal
+- [x] Every index slows writes and uses space
+- [ ] MongoDB only allows one index
+> Only index what you query often.
+
+? A compound index on category then quantity helps which query?
+- [x] One filtering on category
+- [ ] One filtering only on quantity
+- [ ] Neither
+> A compound index works for queries on its first field, and for both fields together.
+{% endquiz %}
 
 ---
 

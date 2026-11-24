@@ -7,10 +7,12 @@ cover: /learn/duckdb/assets/banners/02_basic_queries.jpg
 date: 2025-09-04
 previous: 01_installing.html
 next: 03_advanced_features.html
-description: Learn SELECT, WHERE, GROUP BY, JOIN, and ordering in DuckDB with practical,
-  file-based examples.
+description: Learn SELECT, WHERE, ORDER BY, GROUP BY, HAVING and JOIN by asking questions
+  of a robot sensor log and a 3D print history.
 percent: 35
-duration: 4
+duration: 7
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: DuckDB - Fast, free analytics
 - content:
@@ -38,7 +40,7 @@ navigation:
       link: 05_data_analysis.html
   - section: Datalakes, Parquet, and Performance
     content:
-    - name: Querying data lakes (HTTP/S3)
+    - name: Data lakes - many files, one query
       link: 06_datalakes.html
     - name: 'Parquet: fast columnar files'
       link: 07_parquet.html
@@ -46,12 +48,12 @@ navigation:
       link: 08_performance_tuning.html
   - section: Conclusion and Next Steps
     content:
-    - name: Conclusion and Next Steps
-      link: 09_conclusion.html
     - name: Additional Resources
       link: 10_additional_resources.html
-    - name: 'Mini capstone: local analytics project'
+    - name: 'Mini capstone: the workshop report'
       link: 11_mini_capstone.html
+    - name: Conclusion and Next Steps
+      link: 09_conclusion.html
 ---
 
 
@@ -59,135 +61,212 @@ navigation:
 
 ---
 
-## Basic Queries
+By the end of this lesson you will be able to filter, sort, summarise and join tables in DuckDB to answer questions about your robots and your 3D printers.
 
-Let’s practice core SQL with a small public dataset. We’ll use the Seaborn `tips` dataset via HTTP.
-
-> New to terms like GROUP BY, JOIN, or predicate pushdown? See the [Beginner glossary](09_conclusion#beginner-glossary-the-language-of-data).
-
-## Mental model (2 minutes)
-- A table is like a spreadsheet: columns (fields) and rows (records).
-- **SELECT** chooses which columns you want to see (projection).
-- **WHERE** chooses which rows you want (filtering).
-- **ORDER BY** sorts the result.
-- **GROUP BY** summarizes rows into aggregates (SUM, COUNT, AVG…).
-- **JOIN** combines tables that share a key.
-
-Why this is useful: these five ideas cover 80% of everyday analytics.
-
-## Load sample data
-
-In the CLI:
+Let's put the sample data to work. Everything here runs in the shell. Start it in your project folder with `duckdb robots.duckdb` (you made `readings` in lesson 1), then load the other two files:
 
 ```sql
-CREATE OR REPLACE TABLE tips AS
-SELECT * FROM read_csv_auto('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv');
-
--- Peek at the data
-SELECT * FROM tips LIMIT 5;
+CREATE OR REPLACE TABLE readings AS SELECT * FROM read_csv('data/readings.csv');
+CREATE OR REPLACE TABLE print_jobs AS SELECT * FROM read_csv('data/print_jobs.csv');
+CREATE OR REPLACE TABLE parts AS SELECT * FROM read_csv('data/parts.csv');
 ```
 
-What’s happening:
-- `read_csv_auto` downloads the CSV and infers column types for you.
-- We save it as a local table `tips` so queries are fast and reproducible.
-- `LIMIT 5` is a safe way to preview without dumping everything to the screen.
+`read_csv` samples the file and infers the column types for you (older tutorials call it `read_csv_auto`, which still works). Saving into a table means later queries do not re-read the CSV.
+
+## The five ideas
+
+- A table is like a spreadsheet: columns (fields) and rows (records).
+- `SELECT` chooses columns, `WHERE` chooses rows, `ORDER BY` sorts.
+- `GROUP BY` collapses many rows into one summary row per group.
+- `JOIN` stitches two tables together on a shared key.
+
+These five cover most everyday analysis. Let's use each on a real question.
 
 ## Selecting and filtering
 
-Purpose: pick the columns (features) and rows (cases) you care about.
+**Question: when did the rover run hottest while driving?**
 
 ```sql
--- Select specific columns
-SELECT day, time, total_bill, tip FROM tips LIMIT 10;
-
--- Filter rows
-SELECT * FROM tips WHERE day = 'Sun' AND total_bill > 20 ORDER BY total_bill DESC LIMIT 10;
-
--- Derived columns (create a new metric on the fly)
-SELECT total_bill, tip, ROUND(tip / total_bill * 100, 2) AS tip_pct FROM tips LIMIT 10;
-```
-
-> You try it (3–5 min)
-> - Show top 5 `total_bill` rows for Saturdays only, with `day`, `time`, `total_bill`, and `tip_pct`
-> - Add a filter `tip_pct >= 18` and see how results change
-
-Notes:
-- Filtering first, then ordering, then limiting keeps results clear and small.
-- Derived columns let you compute useful business metrics without changing the table.
-- Be careful dividing by zero; you can wrap with `NULLIF(total_bill,0)` to avoid errors.
-
-## Aggregations (summaries)
-
-Purpose: turn many rows into a concise summary for trends and comparisons.
-
-![GROUP BY buckets mental model](assets/group_by_buckets.svg)
-
-```sql
--- Group and aggregate (dimension: day; measures: count and average)
-SELECT day, COUNT(*) AS orders, ROUND(AVG(total_bill), 2) AS avg_bill
-FROM tips
-GROUP BY day
-ORDER BY orders DESC;
-
--- Multiple dimensions (day + time)
-SELECT day, time, ROUND(SUM(total_bill), 2) AS revenue
-FROM tips
-GROUP BY day, time
-ORDER BY revenue DESC;
-```
-
-> You try it (3–5 min)
-> - Which `day, time` pair has the highest `avg_bill`?
-> - Add `COUNT(*) AS orders` and sort by `orders` instead
-
-Notes:
-- Dimensions (e.g., `day`, `time`) define “buckets”. Measures (SUM/COUNT/AVG) summarize each bucket.
-- `COUNT(*)` counts rows; `AVG` and `SUM` ignore NULLs by default.
-- Sorting by a measure surfaces the most important groups first.
-
-## Joins (enrich your data)
-
-Purpose: attach helpful context from another table using a shared key.
-
-```sql
--- Tiny dimension table adds a weekend flag by day
-CREATE OR REPLACE TABLE day_names(day TEXT, weekend BOOLEAN);
-INSERT INTO day_names VALUES
-  ('Thur', FALSE), ('Fri', FALSE), ('Sat', TRUE), ('Sun', TRUE);
-
-SELECT t.day, dn.weekend, COUNT(*) AS orders
-FROM tips t
-JOIN day_names dn ON dn.day = t.day
-GROUP BY t.day, dn.weekend
-ORDER BY orders DESC;
-```
-
-Notes:
-- `JOIN` matches rows where the key columns are equal.
-- This is common in analytics: a “fact” table (events) plus small “dimension” tables (attributes).
-- Start with `JOIN` (inner) for intersecting values; later explore `LEFT JOIN` when you need to keep all rows from the left side.
-
-## Nulls and types
-
-- `COALESCE(x, 0)` replaces NULLs with a default (handy for sums/ratios).
-- Cast types with `CAST(x AS INTEGER)` or shorthand `x::INTEGER` when needed.
-- Safe ratio example:
-
-```sql
-SELECT ROUND(tip / NULLIF(total_bill,0) * 100, 2) AS tip_pct
-FROM tips
+SELECT robot, ts, temp_c, battery_v
+FROM readings
+WHERE state = 'driving' AND temp_c > 31
+ORDER BY temp_c DESC
 LIMIT 5;
 ```
 
-## Try it yourself
-- Largest 5 orders by `total_bill`, showing `day`, `time`, and `tip_pct`.
-- Which combination of `day` and `time` has the highest average `tip_pct`?
-- Add a small `party_size_band` table (e.g., size 1–2 = small, 3–4 = medium, 5+ = large) and join to compare revenue by band.
+```
+┌─────────┬─────────────────────┬────────┬───────────┐
+│  robot  │         ts          │ temp_c │ battery_v │
+│ varchar │      timestamp      │ double │  double   │
+├─────────┼─────────────────────┼────────┼───────────┤
+│ rover-3 │ 2025-03-05 13:15:00 │  33.58 │      6.58 │
+│ rover-3 │ 2025-03-05 19:30:00 │  33.56 │      7.49 │
+│ rover-3 │ 2025-03-06 05:05:00 │  33.56 │      7.74 │
+│ rover-3 │ 2025-03-04 18:05:00 │  33.32 │       8.2 │
+│ rover-3 │ 2025-03-06 04:15:00 │  33.24 │      7.92 │
+└─────────┴─────────────────────┴────────┴───────────┘
+```
 
-## Recap
+Text values use **single quotes** (`'driving'`). You can also compute new columns on the fly, such as the distance in metres:
 
-- SELECT/WHERE/ORDER BY/GROUP BY/JOIN are your core analytics toolkit.
-- DuckDB lets you do all of this directly on files or on a local table for speed.
-- Next: advanced features like CTEs, views, persistence, and extensions.
+```sql
+SELECT ts, robot, distance_cm, ROUND(distance_cm / 100, 2) AS distance_m
+FROM readings
+WHERE state = 'driving'
+LIMIT 5;
+```
 
----
+When the robot is idle, our log stores `400.0` as "nothing in range", which is why we filter to driving rows.
+
+## Grouping and summarising
+
+![GROUP BY buckets mental model](assets/group_by_buckets.svg)
+
+`GROUP BY` drops each row into a bucket, then an aggregate function (`COUNT`, `AVG`, `MIN`, `MAX`, `SUM`) summarises every bucket.
+
+```sql
+SELECT robot,
+       ROUND(AVG(temp_c), 1) AS avg_temp,
+       MIN(battery_v) AS lowest_battery,
+       COUNT(*) AS samples
+FROM readings
+GROUP BY robot
+ORDER BY robot;
+```
+
+```
+┌─────────┬──────────┬────────────────┬─────────┐
+│  robot  │ avg_temp │ lowest_battery │ samples │
+│ varchar │  double  │     double     │  int64  │
+├─────────┼──────────┼────────────────┼─────────┤
+│ rover-3 │     29.1 │           6.57 │    1152 │
+│ smars-1 │     25.2 │          6.585 │    1152 │
+│ smars-2 │     27.2 │           6.58 │    1152 │
+└─────────┴──────────┴────────────────┴─────────┘
+```
+
+Group by two columns to see how each robot spends its time:
+
+```sql
+SELECT robot, state, COUNT(*) AS samples
+FROM readings
+GROUP BY robot, state
+ORDER BY robot, samples DESC;
+```
+
+To filter *after* grouping, use `HAVING`. Here we keep only robots whose average driving distance reading is above 59 cm:
+
+```sql
+SELECT robot, ROUND(AVG(distance_cm), 1) AS avg_distance
+FROM readings
+WHERE state = 'driving'
+GROUP BY robot
+HAVING AVG(distance_cm) > 59
+ORDER BY robot;
+```
+
+`WHERE` filters rows *before* grouping; `HAVING` filters groups *after*.
+
+## Joining tables
+
+Our print history has a `printer` column but no running costs. Let's add a tiny lookup table of electricity cost per hour (invented numbers, swap in yours) and join it:
+
+```sql
+CREATE OR REPLACE TABLE printers(printer TEXT, cost_per_hour_gbp DOUBLE);
+INSERT INTO printers VALUES
+  ('ender-3', 0.08), ('prusa-mini', 0.10), ('bambu-a1', 0.12);
+
+SELECT j.printer,
+       COUNT(*) AS jobs,
+       ROUND(SUM(j.hours), 1) AS hours,
+       ROUND(SUM(j.hours * p.cost_per_hour_gbp), 2) AS power_cost_gbp
+FROM print_jobs j
+JOIN printers p ON p.printer = j.printer
+GROUP BY j.printer
+ORDER BY power_cost_gbp DESC;
+```
+
+```
+┌────────────┬───────┬────────┬────────────────┐
+│  printer   │ jobs  │ hours  │ power_cost_gbp │
+│  varchar   │ int64 │ double │     double     │
+├────────────┼───────┼────────┼────────────────┤
+│ bambu-a1   │    24 │   69.4 │           8.33 │
+│ prusa-mini │    18 │   48.9 │           4.89 │
+│ ender-3    │    18 │   57.5 │            4.6 │
+└────────────┴───────┴────────┴────────────────┘
+```
+
+`j` and `p` are short aliases so we can say which table a column comes from. A plain `JOIN` (an inner join) keeps only rows with a match on both sides. If a printer were missing from `printers`, its jobs would silently vanish. A `LEFT JOIN` keeps every row from the left table and fills the gaps with `NULL`:
+
+```sql
+SELECT j.printer, COUNT(*) AS jobs,
+       ROUND(SUM(j.hours * p.cost_per_hour_gbp), 2) AS power_cost
+FROM print_jobs j
+LEFT JOIN (SELECT * FROM printers WHERE printer <> 'prusa-mini') p USING (printer)
+GROUP BY j.printer
+ORDER BY j.printer;
+```
+
+The `prusa-mini` row still appears, with a `NULL` cost, which is a loud hint that your lookup table is incomplete.
+
+## NULLs and types
+
+- `COALESCE(x, 0)` swaps a `NULL` for a default.
+- `CAST('12' AS INTEGER)` or the shorthand `'12'::INTEGER` converts a type.
+- `COUNT(column)` skips `NULL`s, while `COUNT(*)` counts every row.
+- Aggregates such as `AVG` and `SUM` ignore `NULL`s.
+
+```mermaid
+flowchart LR
+    A[FROM / JOIN: pick the tables] --> B[WHERE: keep rows]
+    B --> C[GROUP BY: make buckets]
+    C --> D[HAVING: keep buckets]
+    D --> E[SELECT: choose columns]
+    E --> F[ORDER BY and LIMIT]
+```
+
+SQL is written with `SELECT` first, but the engine works through the steps in the order above. That is why a plain aggregate cannot sit in `WHERE`: the groups do not exist yet.
+
+## Try it Yourself
+
+1. Show the five most valuable stock lines in `parts`, using `qty * unit_price_gbp AS stock_value` and `ORDER BY`.
+2. Which robot spent the most samples in the `charging` state? Use `GROUP BY robot` with `WHERE state = 'charging'`.
+3. List the parts with fewer than 4 in stock, lowest first (`WHERE qty < 4`), and add `WHERE part LIKE '%sensor%'` to a second query to find the sensors.
+4. Challenge: join `print_jobs` to `printers` and compute the failure rate per printer. Hint: `AVG(CASE WHEN j.status = 'failed' THEN 1 ELSE 0 END)`.
+
+## Common Issues
+
+- **Problem**: `Binder Error: column "robot" must appear in the GROUP BY clause or must be part of an aggregate function.`
+- **Solution**: Add `GROUP BY robot`, or wrap the column in an aggregate such as `MAX(robot)`.
+- **Why**: Once you summarise, every selected column must be either a bucket label or a summary.
+
+- **Problem**: `Binder Error: Referenced column "driving" not found in FROM clause!`
+- **Solution**: Use single quotes for text: `state = 'driving'`.
+- **Why**: Double quotes mean a column or table name in SQL, so `"driving"` looks like a column.
+
+- **Problem**: `Binder Error: WHERE clause cannot contain aggregates!`
+- **Solution**: Move the test to `HAVING`.
+- **Why**: Aggregates only exist after grouping, and `WHERE` runs before it.
+
+## Check your understanding
+
+{% quiz %}
+? Which clause filters groups after `GROUP BY` has run?
+- [ ] WHERE
+- [x] HAVING
+- [ ] ORDER BY
+> `HAVING` is applied to the grouped results, so it can use `AVG`, `COUNT` and friends.
+
+? You inner `JOIN` jobs to a printers table that lacks one printer. What happens to that printer's jobs?
+- [ ] They appear with NULL values
+- [x] They disappear from the result
+- [ ] DuckDB raises an error
+> An inner join keeps only matches. Use `LEFT JOIN` to keep the unmatched rows.
+
+? Which is the correct way to compare a text column to a value?
+- [ ] `state = "driving"`
+- [x] `state = 'driving'`
+- [ ] `state == driving`
+> Single quotes make a text value. Double quotes name columns.
+{% endquiz %}

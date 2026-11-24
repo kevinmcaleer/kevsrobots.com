@@ -7,17 +7,19 @@ cover: assets/8.png
 date: 2024-03-21
 previous: 07_using_liquid_templating.html
 next: 09_building_and_testing_locally.html
-description: Discover how to personalize your Jekyll site by customizing themes and
-  extending functionality with plugins, making your site uniquely yours.
-percent: 80
-duration: 2
+description: Override a Jekyll theme's layouts and styles, and add a plugin such as
+  jekyll-seo-tag without breaking GitHub Pages.
+percent: 72
+duration: 5
+quiz_total: 35
+date_updated: 2026-11-24
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:
   - section: Introduction to Markdown and Jekyll
     content:
-    - name: Overview of Jekyll and Static Sites
-      link: 01_overview.html
+    - name: Course Overview
+      link: 00_intro.html
     - name: Introduction to Markdown
       link: 02_markdown_basics.html
     - name: Setting Up Your Environment
@@ -42,60 +44,134 @@ navigation:
       link: 09_building_and_testing_locally.html
     - name: Deploying to GitHub Pages
       link: 10_deploying_to_github_pages.html
+    - name: Summary and Next Steps
+      link: 11_summary.html
 ---
 
 
 ![Customizing Themes and Plugins cover image]({{ page.cover }}){:class="cover"}
 
-## Introduction
+By the end of this lesson you will be able to override one file from a Jekyll theme, add your own styles, and install a plugin, knowing which plugins work on GitHub Pages.
 
-One of Jekyll's strengths is its flexibility, allowing for extensive customization of themes and the use of plugins to extend site functionality. This lesson explores how to tailor your site's appearance and add new features through customization and plugins.
+## Themes: a site you did not have to build
 
-## Customizing Themes
+A **theme** bundles layouts, includes and styles into a gem. A site made with `jekyll new` uses the default theme, `minima`, which is why your starter site already looked finished even though your folder had hardly any layouts in it. Check `_config.yml`:
 
-Themes in Jekyll determine the look and feel of your site. While Jekyll provides a variety of themes, you might want to customize a theme to better suit your personal or brand style.
+```yaml
+theme: minima
+```
 
-### Overriding Theme Defaults
+The theme's files are hidden inside the installed gem. Jekyll finds them, but you do not see them in your folder.
 
-1. **Layouts and Includes:** You can override any theme layout or include by creating a file with the same name in your `_layouts` or `_includes` directory.
-2. **CSS and JavaScript:** To customize styles or scripts, copy the theme's stylesheets or JavaScript files to your `assets` directory and modify them as needed.
+## Overriding: your files win
 
-### Adding Custom Styles
+Here is the key rule: **Jekyll looks in your site first, then in the theme.** If your `_layouts/` or `_includes/` contains a file with the same name as one in the theme, yours is used. So you only need to copy the files you want to change, not the whole theme.
 
-For minor changes or additional styles, consider adding a custom stylesheet:
+```mermaid
+flowchart TD
+    A["Page asks for<br/>_includes/footer.html"] --> B{"File in your<br/>site's _includes?"}
+    B -->|Yes| C["Use your file"]
+    B -->|No| D["Use the theme's file"]
+```
 
-1. Create a new CSS file in your `assets/css` directory.
-2. Include the custom stylesheet in your site's head section, after the theme's stylesheets to ensure your rules take precedence.
+To find where the theme lives, run this in your site folder:
 
-## Using Plugins
+```bash
+bundle info --path minima
+```
 
-Plugins extend Jekyll's functionality, allowing you to add features such as SEO tags, site search, and more.
+It prints a folder path. Copy the file you want, for instance `_includes/footer.html`, into the matching folder in your own site, and edit your copy. Restart the server if the change does not show.
 
-### Installing Plugins
+## Adding your own styles
 
-1. Add the plugin to your site's `_config.yml` under the `plugins` section:
-   ```yaml
-   plugins:
-     - jekyll-seo-tag
-   ```
-2. Install the plugin gem if required, and add it to your `Gemfile`:
-   ```ruby
-   gem 'jekyll-seo-tag'
-   ```
+To add colours or fonts without touching theme internals, create your own stylesheet at `assets/css/robot.css`, then link it after the theme's styles so your rules win when they conflict. For the default theme, the usual way is to copy the theme's `_includes/head.html` into your site (as above) and add one line at the bottom of the `<head>`:
 
-### Configuring Plugins
+{% raw %}
+```html
+<link rel="stylesheet" href="{{ '/assets/css/robot.css' | relative_url }}">
+```
+{% endraw %}
 
-Some plugins require additional configuration in `_config.yml`. Refer to the plugin's documentation for specific setup instructions.
+In `robot.css`, a first rule might be:
 
-## Practice Exercise
+```css
+a { color: #0b7285; }
+```
 
-1. Choose a theme for your Jekyll site and customize its layout by overriding the default layout with your version.
-2. Add a custom stylesheet to change the theme's color scheme.
-3. Install and configure a plugin to add a new feature to your site, such as social media sharing buttons.
+If you built your own layout in lesson 5, you already control the `<head>`, so just add the link there.
 
-## Additional Resources
+## Plugins: extra abilities
 
-- [Jekyll Themes Documentation](https://jekyllrb.com/docs/themes/)
-- [Jekyll Plugins Directory](https://jekyllrb.com/docs/plugins/)
+**Plugins** are Ruby gems that add features, such as a sitemap, an RSS feed or search-engine metadata. There are two steps. First, add the gem to your `Gemfile` inside the `jekyll_plugins` group:
 
----
+```ruby
+group :jekyll_plugins do
+  gem "jekyll-seo-tag"
+end
+```
+
+Then run `bundle install`. Second, list it in `_config.yml`:
+
+```yaml
+plugins:
+  - jekyll-seo-tag
+```
+
+Restart Jekyll. Many plugins also need a tag in a layout to do their work. For `jekyll-seo-tag`, put this in your layout's `<head>`:
+
+{% raw %}
+```liquid
+{% seo %}
+```
+{% endraw %}
+
+It adds a page title, description and social sharing tags based on your front matter and `_config.yml` (`title`, `description` and `url`).
+
+## Will it work on GitHub Pages?
+
+This catch trips up many people. When you publish by choosing a branch (lesson 10), GitHub builds your site for you, and for safety it allows only an approved list of plugins. Common ones such as `jekyll-seo-tag`, `jekyll-feed` and `jekyll-sitemap` are on the list. Other gems, and your own scripts in a `_plugins` folder, will work on your computer but be ignored when GitHub builds the site. The current list is on GitHub's "Dependency versions" page at [pages.github.com/versions](https://pages.github.com/versions/).
+
+There is a way around it: build the site yourself with a GitHub Actions workflow, which allows any plugin. That is beyond this course, but it is good to know it exists.
+
+## Try it Yourself
+
+1. Run `bundle info --path minima`, find the theme's `footer.html`, and copy it into your own `_includes/`.
+2. Edit your copy to add "Built by" and your name, and check the footer changes on every page.
+3. Create `assets/css/robot.css`, change the link colour, and link it after the theme's styles.
+4. Challenge: install `jekyll-seo-tag`, add `{% raw %}{% seo %}{% endraw %}` to your layout, then use the browser's "View page source" to find the tags it added.
+
+## Common Issues
+
+- **Problem**: `Could not find gem 'jekyll-seo-tag'` after editing the Gemfile.
+- **Solution**: Run `bundle install` in your site folder, then start the server again.
+- **Why**: Editing the Gemfile only lists the gem. `bundle install` is what downloads it.
+
+- **Problem**: A plugin works on my computer but does nothing on GitHub Pages.
+- **Solution**: Check it is on the supported list, or build the site with GitHub Actions instead.
+- **Why**: GitHub's automatic build only runs approved plugins, and ignores the rest.
+
+- **Problem**: My override file is ignored.
+- **Solution**: Check the folder and file name match the theme's exactly, such as `_includes/footer.html`, and restart the server.
+- **Why**: Jekyll only prefers your file when the path inside the site matches the theme's path.
+
+## Check your understanding
+
+{% quiz %}
+? A file with the same name exists in both your site and the theme. Which does Jekyll use?
+- [x] Yours
+- [ ] The theme's
+- [ ] Both, merged together
+> Jekyll looks in your site first, so you only copy the files you want to change.
+
+? Where do you add a plugin gem so Jekyll can load it?
+- [ ] Only in `_config.yml`
+- [x] In the `Gemfile` and in the `plugins` list in `_config.yml`
+- [ ] In `_site/`
+> The Gemfile installs the gem and the `plugins` list switches it on.
+
+? Why might a plugin not work when you publish to GitHub Pages by choosing a branch?
+- [x] Only an approved list of plugins is allowed
+- [ ] Plugins only work on Windows
+- [ ] GitHub does not support Ruby
+> The lesson explains that GitHub's automatic build allows only supported plugins.
+{% endquiz %}

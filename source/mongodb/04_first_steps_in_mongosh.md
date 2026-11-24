@@ -4,12 +4,14 @@ description: Find your way around the MongoDB shell, create the workshop databas
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/04_first_steps_in_mongosh.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to move around mongosh with show dbs, use and show collections, and store and read back your first document.
 
 You have a server running and a prompt blinking at you. In this lesson we will look around, create the `workshop` database, and store our first part in it. By the end you will have used the handful of commands you will type every single time you open `mongosh`.
 
@@ -35,6 +37,28 @@ The word before the `>` is the database you are currently using. `mongosh` alway
 - The round brackets `()` at the end mean "do it now". Leave them off and nothing useful happens
 - Anything inside `{ }` is a document, written just like the ones in [lesson 02](02_documents_and_collections)
 - Text goes in quotes: `"servo"`. Numbers don't: `12`
+
+---
+
+## The big picture
+
+A database only appears once you put something in it. This is the order things happen in, and why `show dbs` can look like it is hiding your work.
+
+```mermaid
+sequenceDiagram
+    participant You
+    participant Shell as mongosh
+    participant Server as MongoDB server
+    You->>Shell: use workshop
+    Shell-->>You: switched to db workshop
+    You->>Shell: show dbs
+    Shell-->>You: admin, config, local (no workshop yet)
+    You->>Shell: db.parts.insertOne(...)
+    Shell->>Server: create parts and workshop, store document
+    Server-->>You: acknowledged: true, insertedId
+    You->>Shell: show dbs
+    Shell-->>You: workshop now listed
+```
 
 ---
 
@@ -234,21 +258,45 @@ Don't worry about tidying up these test parts. Next lesson starts by clearing th
 
 ## Common Issues
 
-**Problem:** You type `use workshop` but `show dbs` doesn't list it.  
-**Solution:** Insert a document first.  
-**Why:** Databases and collections are only created when the first document is written.
+- **Problem**: You type `use workshop` but `show dbs` doesn't list it.
+- **Solution**: Insert a document first.
+- **Why**: Databases and collections are only created when the first document is written.
 
-**Problem:** `db.Parts.find()` returns nothing, even though you just added parts.  
-**Solution:** Use the exact name, `db.parts.find()`.  
-**Why:** Collection names are case sensitive. `Parts` and `parts` are two different collections.
+- **Problem**: `db.Parts.find()` returns nothing, even though you just added parts.
+- **Solution**: Use the exact name, `db.parts.find()`.
+- **Why**: Collection names are case sensitive. `Parts` and `parts` are two different collections.
 
-**Problem:** `TypeError: db.parts.countDocument is not a function`  
-**Solution:** Check the spelling (it is `countDocuments`, with an "s") or use **Tab** to auto-complete.  
-**Why:** The shell only knows the exact names of its functions.
+- **Problem**: `TypeError: db.parts.countDocument is not a function`
+- **Solution**: Check the spelling (it is `countDocuments`, with an "s") or use **Tab** to auto-complete.
+- **Why**: The shell only knows the exact names of its functions.
 
-**Problem:** Typing `db.parts.find` prints a wall of text about a `Function`.  
-**Solution:** Add the brackets: `db.parts.find()`.  
-**Why:** Without brackets you are asking the shell to describe the function rather than run it.
+- **Problem**: Typing `db.parts.find` prints a wall of text about a `Function`.
+- **Solution**: Add the brackets: `db.parts.find()`.
+- **Why**: Without brackets you are asking the shell to describe the function rather than run it.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? You typed use workshop but show dbs does not list it. Why?
+- [ ] The shell is broken
+- [x] Databases are only created when the first document is written
+- [ ] You need to restart the server
+> MongoDB creates databases lazily. use only says which database you want to work in.
+
+? Which command counts the documents in the parts collection?
+- [ ] db.parts.countDocument()
+- [x] db.parts.countDocuments()
+- [ ] db.parts.size
+> It is countDocuments with an s. The shell only knows exact function names, and Tab will complete it for you.
+
+? db.Parts.find() returns nothing but db.parts.find() returns your servo. Why?
+- [x] Collection names are case sensitive
+- [ ] Parts is a reserved word
+- [ ] find needs a filter
+> Parts and parts are two different collections.
+{% endquiz %}
 
 ---
 

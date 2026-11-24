@@ -6,10 +6,12 @@ type: page
 cover: /learn/meshcore/assets/banners/00_intro.jpg
 date: 2026-08-05
 next: 01_what_is_meshcore.html
-description: Build an off-grid LoRa mesh network with MeshCore and two cheap Heltec
-  V3 boards
+description: Build an off-grid LoRa mesh network with MeshCore and two Heltec V3 boards,
+  one repeater and one phone-connected client
 percent: 6
-duration: 4
+duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Off-Grid Messaging with MeshCore
 - content:
@@ -31,7 +33,7 @@ navigation:
     content:
     - name: Flashing the Firmware
       link: 05_flashing.html
-    - name: Radio Settings for the UK
+    - name: Radio Settings for Your Region
       link: 06_radio_settings.html
   - section: Build the Repeater
     content:
@@ -66,40 +68,47 @@ navigation:
 
 ---
 
-Ahoy there makers! Imagine sending a text message to a friend three miles away with no mobile signal, no WiFi, no internet, and no monthly bill. That is exactly what we are going to build in this course - and the whole thing costs about £30.
+By the end of this lesson you will be able to describe what you will build in this course, what kit you need, and how the lessons work.
+
+Ahoy there makers! Imagine sending a text message to a friend a few kilometres away with no mobile signal, no WiFi, no internet, and no monthly bill. That is what we are going to build in this course.
 
 ---
 
 ## Overview
 
-[MeshCore](https://meshcore.io) is a free, open source mesh networking system for cheap LoRa radios. You flash it onto a small ESP32 board, pair it with your phone over Bluetooth, and you have an encrypted messaging network that runs entirely on its own.
+[MeshCore](https://meshcore.io) is a free, open source mesh networking system for LoRa radios. You flash it onto a small LoRa board, pair the board with your phone over Bluetooth, and you have an encrypted messaging network that runs entirely on its own.
 
-In this course we will build a **two node mesh**:
+In this course we build a **two node mesh**:
 
-- **Node 1 - the repeater.** A board that sits high up, listens for packets and forwards them on. It has no screen you interact with and no phone attached. It just quietly extends the range of the network.
-- **Node 2 - the client.** A board that pairs to your phone over Bluetooth and lets you send and receive messages.
+- **Node 1, the repeater.** A board that sits high up, listens for packets and forwards the ones that need forwarding. It has no phone attached. It quietly extends the range of the network.
+- **Node 2, the client.** A board that pairs to your phone over Bluetooth and lets you send and receive messages.
 
-Both nodes are the same hardware - a **Heltec WiFi LoRa 32 V3** board, which you can pick up for around **£15** each. The only difference is the firmware you flash and how you configure it.
+Both nodes use the same hardware, a **Heltec WiFi LoRa 32 V3** board. The only difference is the firmware you flash and how you configure it.
+
+```mermaid
+flowchart LR
+    P["Your phone<br/>MeshCore app"] -- "Bluetooth" --> C["Node 2<br/>Companion (client)"]
+    C -- "LoRa radio" --> R["Node 1<br/>Repeater, up high"]
+    R -- "LoRa radio" --> O["Other MeshCore<br/>nodes nearby"]
+```
 
 ---
 
 ## Course Content
 
 - What MeshCore is, and how it differs from Meshtastic
-- How LoRa radio actually works - spreading factor, bandwidth and coding rate
-- Choosing and buying the right hardware (and the one mistake that will cost you £15)
-- Antennas, ERP and what Ofcom lets you do on the 868MHz band
+- How LoRa works: spreading factor, bandwidth and coding rate
+- Choosing the right board and the right frequency variant
+- Antennas, battery safety, and the rules in the UK, EU and US
 - Flashing MeshCore firmware with the web flasher
-- Picking the correct radio settings for the UK
+- Picking the correct radio settings for your region
 - Setting up node 1 as a repeater over the serial console
-- Where to physically put a repeater, and how to power it
-- Setting up node 2 as a BLE companion client
+- Where to put a repeater, and how to power it
+- Setting up node 2 as a Bluetooth companion client
 - Pairing the phone app and sending your first message
-- Channels, group chat and the public channel key
-- Flood routing versus path routing, and why MeshCore is quiet
-- Administering your repeater remotely from your phone
+- Channels, flood routing versus path routing
+- Administering your repeater remotely
 - Troubleshooting a mesh that will not talk
-- Where to go next - room servers, sensors, solar repeaters and the global map
 
 ---
 
@@ -107,12 +116,12 @@ Both nodes are the same hardware - a **Heltec WiFi LoRa 32 V3** board, which you
 
 After completing this course, you will:
 
-- Understand the difference between LoRa, LoRaWAN and a LoRa mesh
-- Be able to flash and configure any MeshCore supported board from scratch
-- Have a working repeater that extends the range of your network
-- Have a working phone-connected client and be able to message over it
-- Know how to read RSSI, SNR and hop counts to diagnose a weak link
-- Be able to join and contribute to your local MeshCore community network
+- Explain the difference between LoRa, LoRaWAN and a LoRa mesh
+- Flash and configure a MeshCore repeater and a companion client
+- Set radio settings that match your region and stay inside the local rules
+- Read RSSI, SNR and hop counts to diagnose a weak link
+- Place and power a repeater sensibly
+- Handle antennas and LiPo batteries safely
 
 ---
 
@@ -120,36 +129,38 @@ After completing this course, you will:
 
 **Hardware**
 
-- 2 x Heltec WiFi LoRa 32 V3 boards, **868MHz version** (around £15 each - the DollaTek listings on Amazon UK are the usual cheap source)
-- 2 x 868MHz antennas with an IPEX / U.FL connector or a U.FL to SMA pigtail
+- 2 x Heltec WiFi LoRa 32 V3 boards, in the frequency variant for your region (863-928MHz, sold as 868MHz or 915MHz, not the 433MHz one). MeshCore supports the Heltec V3 according to its FAQ, but check the official flasher for the current device list
+- 2 x antennas that match your band, with the connector your board uses (the V3 has a small U.FL / IPEX socket, so a U.FL to SMA pigtail is often needed)
 - 1 x USB-C **data** cable (not a charge-only cable)
-- Optional: a 3.7V LiPo battery with an SH1.25 2-pin connector for the repeater
-- Optional: a small weatherproof box if the repeater is going outside
+- Optional: a 3.7V LiPo battery with the right connector for your board, and a weatherproof box for an outdoor repeater
 
 **Software**
 
-- Google Chrome or Microsoft Edge (the web flasher needs WebUSB - Firefox and Safari will not work)
-- The MeshCore app for Android or iOS, or the web client
+- Google Chrome or Microsoft Edge on a computer (the web flasher needs WebUSB, which Firefox and Safari do not have)
+- The MeshCore app for Android or iOS, or the MeshCore web client
 
 **Skills**
 
-- No soldering required
-- No programming required
+- No soldering and no programming
 - If you can plug in a USB cable and type a command, you can do this
 
 ---
 
 ## How the course works
 
-Each lesson introduces one idea, then puts it to work. Commands you type into the repeater console look like this:
+Each lesson teaches one idea, then puts it to work. Commands you type into the repeater console look like this:
 
 ```text
 set name Kev-Repeater-01
 ```
 
-Anything in `code style` is typed exactly as written. Values you should change for your own setup are shown in angle brackets, like `set lat <your-latitude>`.
+Values you should change for your own setup are shown in angle brackets, like `set lat <your-latitude>`. Every lesson ends with **Try it Yourself** exercises, **Common Issues**, and a short quiz.
 
-Most lessons end with a **Try it Yourself** section, and the fiddly ones have a **Common Issues** section. Do not skip those - the troubleshooting notes are where the real learning happens.
+MeshCore is a fast-moving project. Menu names in the flasher and the apps, and a few commands, change between versions. Where I am not certain something is current I say so, and the official documentation at [docs.meshcore.io](https://docs.meshcore.io) always wins.
+
+Prerequisites: none, but the [Linux command line course](/learn/linux_intro/) helps if typing commands is new to you. When you finish, carry on with [MeshCore Room Servers and Sensors](/learn/meshcore_rooms_sensors/).
+
+> **Teachers**: this course suits learners aged about 12 and up, working in pairs. Allow 30 to 45 minutes per lesson; lessons 5 to 10 need the boards and take longest. Each pair needs two boards, two antennas and a data cable, plus one phone with the app (or a laptop using the web client over USB). Lessons 1 to 4 and 12 to 14 need no hardware. Radio rules differ by country, so check your own regulator before running a repeater outdoors. Never power a board without its antenna fitted, and keep LiPo batteries off the table unless a teacher supervises. Flashing needs Chrome or Edge, which locked-down school laptops sometimes block.
 
 Right then. Let's build a radio network.
 

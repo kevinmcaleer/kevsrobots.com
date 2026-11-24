@@ -6,16 +6,31 @@
   layout: course
   cover: assets/redis-cover.jpg
   groups:
-      - redis
       - python
-      - databases
-  description: >- 
-     Learn how to use Redis with Python to build fast, scalable applications.
+      - raspberrypi
+  description: >-
+    Learn how to use Redis with Python to share robot sensor readings, queue jobs, count visitors,
+    rank scores and send live messages, then build a robot telemetry hub with a live dashboard.
+  outcomes:
+    - Install Redis and talk to it from redis-cli and from Python
+    - Choose the right data type for latest readings, job queues, unique counts and leaderboards
+    - Group commands with pipelines and transactions, and handle Redis errors
+    - Send live messages between programs with pub/sub
+    - Make keys expire, and explain what RDB snapshots and the append-only file protect
+    - Build a small robot telemetry hub with a publisher, a job queue and a dashboard
+  prerequisites:
+    - Comfortable writing simple Python programs, such as Python for beginners
+    - Helpful but not required, the Docker course
+  you_need:
+    - A computer with Python 3 (a Raspberry Pi 4 or 5 works well)
+    - Redis installed on Linux or macOS, or Docker for Windows
+    - An internet connection to install Redis and the redis Python library
+    - No robot is required, the lessons use simulated sensor readings
   content:
   - section:
       name: Introduction to Redis
       content:
-      - 01_introduction.md
+      - 00_intro.md
       - 02_redis_basics.md
   - section:
       name: Working with data
@@ -32,8 +47,13 @@
   - section:
       name: Publish and Subscribe
       content:
-      - 09_redis_pub_sub.md      
+      - 09_redis_pub_sub.md
   - section:
-      name: Conclusion
+      name: Keeping data
       content:
-      - 10_summary.md
+      - 10_expiry_and_persistence.md
+  - section:
+      name: Project and Conclusion
+      content:
+      - 11_robot_telemetry_hub.md
+      - 12_summary.md

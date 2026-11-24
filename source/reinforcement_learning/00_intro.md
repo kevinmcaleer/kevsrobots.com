@@ -1,119 +1,113 @@
 ---
 title: Introduction to Reinforcement Learning for Beginners
-description: Discover how to teach a Pico-powered robot to learn obstacle avoidance through trial and error — no machine-learning PhD required.
+description: Discover how to teach a Pico-powered robot to learn obstacle avoidance through trial and error, with no machine-learning PhD required.
 layout: lesson
 type: page
-cover: assets/cover.jpg
-date_updated: 2026-06-13
+cover: /learn/reinforcement_learning/assets/banners/00_intro.jpg
+date_updated: 2026-11-24
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
-
-Want to see where this leads? In this video a computer learns to balance a pendulum from nothing but a score. It's the first step towards a robot duck that taught itself to walk.
 
 {% include youtubeplayer.html id="epuO7xpz6i4" %}
 
----
-
 Ahoy there makers! What if your robot could figure things out on its own?
 
-Most robots we build follow instructions we wrote: "go forward, if distance < 20 cm then turn right". That works brilliantly when we know exactly what the environment looks like. But real floors are messy — furniture shifts, a dog wanders through, someone leaves a bag in the hallway. Hardcoded routines break down fast.
+Most robots we build follow instructions we wrote: "go forward, and if the distance is under 20 cm, turn right". That works brilliantly when we know exactly what the room looks like. Real floors are messy, though. Furniture shifts, a dog wanders through, someone leaves a bag in the hallway. Hardcoded routines break down fast.
 
-Reinforcement Learning (RL) is a completely different approach. Instead of telling the robot what to do, we set up a **reward signal** and let the robot work out the best strategy through **trial and error**. The same idea that trains game-playing AIs to beat world champions also works beautifully at the maker scale — using nothing more exotic than a Python dictionary.
-
-In this course you'll build a differential-drive robot (BurgerBot-style: two DC motors and an HC-SR04 ultrasonic sensor on a Raspberry Pi Pico) and teach it to navigate an obstacle field without a single hardcoded rule. You'll train the policy in a pure-Python simulation on your laptop, then drop the learned "brain" onto the Pico as a JSON file.
-
----
+Reinforcement learning (RL) takes a different approach. Instead of telling the robot what to do, we set up a **reward signal** and let it work out a strategy through **trial and error**. The same idea sits behind game-playing AIs, and at maker scale it needs nothing more exotic than a Python dictionary.
 
 ## Overview
 
-This course teaches **tabular Q-learning** — the clearest and most approachable form of reinforcement learning. You'll understand exactly what happens at every step because there are no black-box layers: just a table of numbers, a handful of Python functions, and a robot that genuinely gets better with practice.
+This course teaches **tabular Q-learning**, the clearest form of reinforcement learning. There are no black-box layers: just a table of numbers, a handful of Python functions and a simulated robot that genuinely gets better with practice.
 
-The mathematics is deliberately kept accessible. Any formula that appears is first written as a commented Python expression so you can read it line by line.
+The path is:
 
----
+```mermaid
+flowchart LR
+    A["Learn the<br/>vocabulary"] --> B["Design<br/>rewards"]
+    B --> C["Build Q-learning<br/>from scratch"]
+    C --> D["Train in a<br/>grid simulation"]
+    D --> E["Stress-test<br/>with noise"]
+    E --> F["Run the table<br/>on a Pico"]
+```
+
+We will be honest throughout about what this does and does not show. A Q-table on a toy grid is **not** how a real robot learns to walk, and by the end you will know exactly which parts of the idea carry over to real hardware and which do not.
+
+The maths is kept gentle. Every formula appears first as a commented line of Python, and every symbol is explained the first time it appears.
 
 ## Course Content
 
-- Why hardcoded robot behaviours fail in dynamic environments
-- The core RL vocabulary: agent, environment, state, action, reward
-- How to design a reward function that actually teaches what you want
-- Turning continuous sensor readings into discrete states the algorithm can use
-- The Markov Decision Process — just enough theory to be useful
-- Discount factors and why future rewards matter less than immediate ones
-- Building a Q-table from scratch using a Python dictionary
-- Exploration vs exploitation and the ε-greedy strategy
-- Coding the complete Q-learning update rule
-- Training in a grid-world simulation (runs on any laptop, no GPU needed)
-- The sim-to-real gap and practical strategies to bridge it
-- Reading and filtering HC-SR04 data in MicroPython
-- Exporting a trained Q-table and running it on the Pico
-- Where tabular Q-learning runs out of road and what comes next (Deep RL)
-
----
+- Why hardcoded behaviours struggle in messy environments
+- The core vocabulary: agent, environment, state, action, reward
+- Designing a reward function, and the loopholes agents find in bad ones
+- Turning continuous sensor readings into discrete states
+- Markov decision processes, just enough to be useful
+- Discount factors and the Bellman idea
+- Building a Q-table with a Python dictionary
+- Exploration versus exploitation with epsilon-greedy
+- The Q-learning update rule and the training loop
+- Training in a grid-world simulation, then reading the learning curve
+- The sim-to-real gap, and testing a policy with sensor noise
+- Reading and filtering an HC-SR04 in MicroPython
+- Running a trained Q-table on a Raspberry Pi Pico
+- Where tabular learning runs out of road, and what deep RL does instead
 
 ## Key Results
 
 After completing this course, you will:
 
 - Understand the difference between programmed behaviour and learned behaviour
-- Be able to design and implement tabular Q-learning for a simple robot task
-- Know how to represent a robot's world as states and actions
+- Be able to write tabular Q-learning for a simple task
+- Know how to represent a robot's world as states, actions and rewards
 - Have trained a Q-table in simulation and watched it improve over hundreds of episodes
-- Have deployed a frozen policy to a Raspberry Pi Pico running MicroPython
-- Understand where to go next when the problem outgrows a lookup table
+- Have run a trained policy on a Raspberry Pi Pico, if you build the robot
+- Know where the idea stops being enough, and where to go next
 
----
+## What you'll need
 
-## What You'll Need
+**For lessons 1 to 11 (simulation, runs on your computer):**
 
-**For lessons 1–10 (simulation, runs on your laptop):**
+- A computer with a recent Python 3
+- Nothing to install: everything uses the Python standard library
+- A text editor, Thonny or VS Code. Short programs also run in the Run boxes on the page
 
-- A computer running Python 3.8 or newer
-- No external libraries required — everything uses the Python standard library
-- A text editor or IDE (VS Code, Thonny, or similar)
+**For lessons 12 and 13 (the real robot, optional):**
 
-**For lessons 11–13 (Pico deployment):**
-
-- Raspberry Pi Pico (standard or Pico W)
+- Raspberry Pi Pico or Pico W with MicroPython installed
 - L298N or similar H-bridge motor driver
-- 2x DC gear motors with wheels
-- HC-SR04 ultrasonic distance sensor (3.3 V version, or voltage-divided 5 V version)
-- Suitable battery pack (4×AA or a LiPo with a regulator)
-- Jumper wires and a breadboard or chassis with connectors
-- Thonny IDE with MicroPython firmware on the Pico
+- Two DC gear motors with wheels, and a chassis to hold them
+- HC-SR04 ultrasonic sensor, plus a 1k and a 2k resistor for a voltage divider
+- A battery pack for the motors (4 x AA is common)
+- Jumper wires, and Thonny to copy files to the Pico
 
-> If you've already built a robot for the [MicroPython Robotics Projects](/learn/micropython_robotics/) course, that hardware is perfect for this course too.
-
----
+> If you have built a robot for the [MicroPython Robotics Projects](/learn/micropython_robotics/) course, that hardware is exactly what lessons 12 and 13 use, with the same pin numbers.
 
 ## Prerequisites
 
-This course assumes you're comfortable writing Python functions and using loops and dictionaries. If you'd like a refresher:
+You should be comfortable with Python functions, loops and dictionaries:
 
-- [Introduction to Python](/learn/python/) — covers the Python fundamentals we rely on throughout
-- [MicroPython Robotics Projects](/learn/micropython_robotics/) — covers the exact hardware wiring and MicroPython motor/sensor code we build on in the final module
+- [Introduction to Python](/learn/python/) covers the Python we rely on
+- [MicroPython Robotics Projects](/learn/micropython_robotics/) covers the motor and ultrasonic wiring used in the last two lessons
 
-You do **not** need any prior machine-learning experience. We build everything from first principles.
+You do **not** need any machine-learning experience.
 
----
+## How the course works
 
-## How the Course Works
+Each lesson teaches one idea and ends with exercises, common problems and a short quiz. Code blocks are complete programs unless they say otherwise, and the printed output you see is what you will get, because the examples fix their random seeds. Anything that varies from run to run is flagged.
 
-Each lesson focuses on **one new concept** and connects it to the running project. Code blocks are complete and runnable. Where a mathematical idea appears (like the Q-learning update rule), it is shown first as a commented Python expression — read the comments and the code together and the maths will make sense.
+Lessons 1 to 11 run on your computer as plain Python. Only lessons 12 and 13 are MicroPython for the Pico, and each of those says so at the top.
 
-Lessons in the final module include full MicroPython files you can copy directly to your Pico. The simulation lessons (1–10) run with a plain `python3 filename.py` command — no installation steps needed.
+Look out for these callouts:
 
-Look for these callout styles throughout:
+> **Note:** background or a reminder of something covered earlier.
 
-> **Note:** background context or a reminder about something covered earlier.
+> **Tip:** a practical suggestion.
 
-> **Tip:** a practical suggestion for making things work better.
+> **Teachers**: classroom notes on timing, kit and things to watch for.
 
-> **Warning:** something that commonly goes wrong and how to avoid it.
+> **Teachers**: the course suits ages 14 and up, or any beginner who can write a Python function. Allow about 30 to 45 minutes per lesson. Lessons 1 to 11 need only a computer with Python (or a browser with the Run boxes), so a whole class can work with no hardware. The real-robot lessons 12 and 13 suit one robot per group of two to four learners, and can be skipped or run as a teacher demonstration.
 
 Let's build a robot that can learn!
-
----

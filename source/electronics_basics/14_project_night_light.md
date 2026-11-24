@@ -4,12 +4,14 @@ description: "Build the finished light-sensing night light with an LDR divider r
 layout: lesson
 type: page
 cover: /learn/electronics_basics/assets/banners/14_project_night_light.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build and tune a complete night light that senses light, switches an LED through a transistor, and has a button override.
 
 ## Overview
 
@@ -62,6 +64,24 @@ These pins keep clear of GP0 to GP7, so you can add the motor driver from the ro
 5. Check everything with your multimeter before plugging in: no continuity between the red and blue rails.
 
 Test each stage in turn. Use the lesson 13 program to check the LDR, and the lesson 11 blink program to check the LED. Only then load the full program.
+
+The main loop in `main.py` follows this flow every 20 milliseconds:
+
+```mermaid
+flowchart TD
+    A["Read LDR volts, averaged"] --> B{"Below 0.90 V?"}
+    B -->|"yes"| C["light_wanted = True"]
+    B -->|"no"| D{"Above 1.40 V?"}
+    D -->|"yes"| E["light_wanted = False"]
+    D -->|"no"| F["Keep the last state"]
+    C --> G["Check button, toggle override"]
+    E --> G
+    F --> G
+    G --> H["Fade duty towards the target"]
+    H --> A
+```
+
+> **Teachers**: allow a full session for this build, ideally 60 minutes, and let learners test each stage on its own before loading the full program. Keep a known-good working circuit or a photo to compare against, and have learners swap boards with a neighbour to debug someone else's wiring. Nothing here runs from a battery, so it is safe on a USB port.
 
 ## Why hysteresis?
 
@@ -201,22 +221,44 @@ Run the lesson 13 program first and note the LDR voltage in your room with the l
 
 ## Common Issues
 
-**Problem**: The LED never turns on.
-**Solution**: Test the LED stage alone with the lesson 11 blink program, then print `volts` in the main loop to see whether the sensor reads low enough.
-**Why**: It splits the problem in half, so you know whether the sensor or the driver is at fault.
+- **Problem**: The LED never turns on.
+- **Solution**: Test the LED stage alone with the lesson 11 blink program, then print `volts` in the main loop to see whether the sensor reads low enough.
+- **Why**: It splits the problem in half, so you know whether the sensor or the driver is at fault.
 
-**Problem**: The LED is on in the light and off in the dark.
-**Solution**: Swap the LDR and the 10k resistor, or invert the logic in the code.
-**Why**: With the LDR on the bottom, the voltage rises in the dark.
+- **Problem**: The LED is on in the light and off in the dark.
+- **Solution**: Swap the LDR and the 10k resistor, or invert the logic in the code.
+- **Why**: With the LDR on the bottom, the voltage rises in the dark.
 
-**Problem**: The LED flickers at dusk.
-**Solution**: Widen the gap between the two thresholds, and check you have kept the averaging.
-**Why**: The noise is larger than the gap.
+- **Problem**: The LED flickers at dusk.
+- **Solution**: Widen the gap between the two thresholds, and check you have kept the averaging.
+- **Why**: The noise is larger than the gap.
 
-**Problem**: The button does nothing.
-**Solution**: Confirm that one leg is on GP14 and the diagonal leg is on GND.
-**Why**: Legs on the same side of the button are always joined.
+- **Problem**: The button does nothing.
+- **Solution**: Confirm that one leg is on GP14 and the diagonal leg is on GND.
+- **Why**: Legs on the same side of the button are always joined.
 
 ## Where to go from here
 
 You have built a real sensing and control system: a sensor (voltage divider), a decision (hysteresis), and an actuator (transistor and LED). That is the same loop every robot runs. Swap the LDR for a different sensor, or swap the LED for a motor driver, and it is the same idea at a bigger scale.
+
+## Check your understanding
+
+{% quiz %}
+? Why does the program use two thresholds, 0.90 V and 1.40 V?
+- [ ] To make the LED brighter
+- [ ] Because the ADC has two ranges
+- [x] So noise near dusk does not make the LED flicker
+> Hysteresis leaves a gap in which nothing changes, so the light does not strobe at dusk.
+
+? Which pin does the LED driver use, and what does it switch?
+- [x] GP15, through a 1k resistor into the transistor base
+- [ ] GP26, directly into the LED
+- [ ] GP14, which also drives the button
+> GP15 drives the base via the 1k resistor, and the transistor switches the LED current.
+
+? The LED is on in the light and off in the dark. What is the likely cause?
+- [x] The LDR and the 10k are swapped
+- [ ] The button is stuck
+- [ ] The base resistor is too large
+> With the LDR at the bottom, the voltage rises in the dark, so the behaviour flips.
+{% endquiz %}

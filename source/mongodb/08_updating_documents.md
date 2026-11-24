@@ -4,18 +4,36 @@ description: Change data in place with updateOne and updateMany - $set, $unset, 
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/08_updating_documents.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to change documents with updateOne and updateMany, using $set, $unset, $inc and the array operators, and check the result counts.
+
 A parts database that never changes isn't much use. Every time we pull a servo out of a bin, buy a new reel of LEDs or decide a part belongs in another project, the Parts Bin needs to know.
 
 In this lesson we'll **update** documents - change them in place, without deleting and re-adding them.
 
 > **Starting fresh:** the outputs below assume the original 13 parts. If yours have drifted, run `db.parts.drop()` and re-run the `insertMany` from [lesson 05](05_inserting_documents).
+
+---
+
+## The big picture
+
+Every update has the same two halves: which documents, and what to do to them. The result tells you whether either half worked.
+
+```mermaid
+flowchart TD
+    A["updateOne filter, update"] --> B{"Does any document match the filter?"}
+    B -->|"No"| C{"upsert: true?"}
+    C -->|"No"| D["matchedCount 0<br/>no error, nothing changed"]
+    C -->|"Yes"| E["Create a new document"]
+    B -->|"Yes"| F["Apply $set, $inc, $push and friends"]
+    F --> G["matchedCount 1<br/>modifiedCount 1"]
+```
 
 ---
 
@@ -325,21 +343,51 @@ That's fine for the next lesson, where we'll delete the TT motor again.
 
 ## Common Issues
 
-**Problem:** `MongoInvalidArgumentError: Update document requires atomic operators`  
-**Solution:** You forgot `$set`. Write `{ $set: { quantity: 6 } }`, not `{ quantity: 6 }`.  
-**Why:** `updateOne` needs an operator so it knows what to do with the value. mongosh stops you here because the operator-free version means "replace", which is what `replaceOne` is for.
+- **Problem**: `MongoInvalidArgumentError: Update document requires atomic operators`
+- **Solution**: You forgot `$set`. Write `{ $set: { quantity: 6 } }`, not `{ quantity: 6 }`.
+- **Why**: `updateOne` needs an operator so it knows what to do with the value. mongosh stops you here because the operator-free version means "replace", which is what `replaceOne` is for.
 
-**Problem:** `Cannot apply $inc to a value of non-numeric type ... has the field 'quantity' of non-numeric type string`  
-**Solution:** Fix the value with `$set: { quantity: 8 }` (no quotes), then `$inc` will work.  
-**Why:** Somewhere a quantity was saved as the text `"8"` instead of the number `8`. You can't add 1 to text.
+- **Problem**: `Cannot apply $inc to a value of non-numeric type ... has the field 'quantity' of non-numeric type string`
+- **Solution**: Fix the value with `$set: { quantity: 8 }` (no quotes), then `$inc` will work.
+- **Why**: Somewhere a quantity was saved as the text `"8"` instead of the number `8`. You can't add 1 to text.
 
-**Problem:** `matchedCount: 0` when you're sure the part exists.  
-**Solution:** Run the same filter with `find()` first to check it.  
-**Why:** The filter is an exact match - a missing capital letter or extra space means no match.
+- **Problem**: `matchedCount: 0` when you're sure the part exists.
+- **Solution**: Run the same filter with `find()` first to check it.
+- **Why**: The filter is an exact match - a missing capital letter or extra space means no match.
 
-**Problem:** Duplicate items keep appearing in `tags` or `used_in`.  
-**Solution:** Use `$addToSet` instead of `$push`, and `$pull` to clean up the copies.  
-**Why:** `$push` always adds, even if the item is already in the list.
+- **Problem**: Duplicate items keep appearing in `tags` or `used_in`.
+- **Solution**: Use `$addToSet` instead of `$push`, and `$pull` to clean up the copies.
+- **Why**: `$push` always adds, even if the item is already in the list.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? An updateOne reports matchedCount: 0. What happened?
+- [ ] It crashed
+- [x] Nothing matched the filter, but there was no error
+- [ ] It updated every document
+> MongoDB does not complain when nothing matches. Your program has to check the counts.
+
+? Which operator takes one off the stock count?
+- [ ] $set: { quantity: -1 }
+- [x] $inc: { quantity: -1 }
+- [ ] $unset: { quantity: 1 }
+> $inc adds a number to the field, and a negative number subtracts.
+
+? What is the difference between $push and $addToSet?
+- [x] $addToSet will not add a duplicate
+- [ ] $push will not add a duplicate
+- [ ] They are identical
+> $addToSet keeps lists tidy. $push allows duplicates.
+
+? What does replaceOne do to fields you leave out of the new document?
+- [ ] Keeps them
+- [x] Throws them away
+- [ ] Sets them to null
+> replaceOne swaps the whole document (apart from _id), so anything you do not include is gone.
+{% endquiz %}
 
 ---
 

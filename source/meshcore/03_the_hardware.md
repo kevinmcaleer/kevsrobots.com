@@ -1,16 +1,19 @@
 ---
 title: The Hardware
-description: Choosing and buying two Heltec WiFi LoRa 32 V3 boards for around £15 each
+description: Choose two Heltec WiFi LoRa 32 V3 boards in the right frequency variant, plus antennas, cable and optional battery
 type: page
 layout: lesson
 cover: /learn/meshcore/assets/banners/03_the_hardware.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Time to spend some money. The good news is that this is one of the cheapest useful radio projects you can build.
+By the end of this lesson you will be able to choose the right board variant for your country and list everything else you need before you flash.
+
+LoRa mesh is one of the cheapest useful radio projects you can build, but one wrong order, the wrong frequency variant, is the classic expensive mistake.
 
 ---
 
@@ -18,111 +21,109 @@ Time to spend some money. The good news is that this is one of the cheapest usef
 
 ![Repeater and client](/learn/meshcore/assets/setup_layout.svg){:class="img-fluid w-100"}
 
-The **Heltec WiFi LoRa 32 V3** is the board this course is built around. It is the most widely used MeshCore board in the world, it is well supported, and it is cheap.
+The **Heltec WiFi LoRa 32 V3** is the board this course is built around. The MeshCore FAQ lists the Heltec V3 among its supported devices, and it is widely used. Always check the official flasher at [flasher.meshcore.io](https://flasher.meshcore.io) for the current supported list before you buy.
 
-**Where to buy:** The **DollaTek** listings on Amazon UK are the usual budget source, and typically land at around **£15 per board**. They also turn up on AliExpress for a pound or two less if you are happy to wait. Buying two is about £30 all in.
-
-**What you get for your £15:**
-
-| Part | Spec |
+| Part | Spec (from Heltec's published details) |
 |---|---|
-| MCU | ESP32-S3FN8, dual core Xtensa LX7 at up to 240MHz |
-| LoRa radio | Semtech SX1262, around +21dBm transmit (Heltec quote 21 &plusmn;1dBm) |
-| Display | 0.96 inch, 128x64 white OLED, built in |
-| USB | USB-C, with a CP2102 serial converter on board |
+| MCU | ESP32-S3, dual core, up to 240MHz |
+| LoRa radio | Semtech SX1262, around +21dBm transmit |
+| Display | 0.96 inch, 128x64 OLED, built in |
+| USB | USB-C, with a serial converter on board |
 | LoRa antenna | IPEX / U.FL connector |
-| Battery | SH1.25 2-pin connector with onboard charging |
-| Size | 50.2 x 25.5 x 10.2 mm |
+| Battery | 2-pin SH1.25 connector with onboard charging |
 {:class="table table-single"}
 
-The onboard OLED is genuinely useful - a repeater with a screen will show you its name, uptime and packet counts without you having to plug anything in.
+The onboard OLED is useful: a repeater with a screen shows its name and status without plugging anything in.
 
 ---
 
-## The £15 mistake: buy the right frequency
+## Buy the right frequency
 
-**This is the one thing to get right.** The Heltec V3 is sold in different frequency variants, and they are **not** interchangeable:
+**This is the one thing to get right.** The Heltec V3 is sold in frequency variants, and they are not interchangeable.
 
-- **863-928MHz** - this is the one you want in the UK and Europe
-- **470-510MHz** - China
-- **433MHz** - amateur / other regions
+- **868MHz / 915MHz (863-928MHz class)** is the one for the UK, Europe, and the Americas, Australia and New Zealand. Choose 868 in the UK and EU, and 915 in the US, Canada, Australia and New Zealand
+- **433MHz** is a different variant for a different band, and MeshCore also supports it, but this course assumes 868 or 915
 
-The SX1262 front end and the matching network are tuned per variant. A 433MHz board will not usefully transmit on 868MHz, and you cannot fix it in software.
+The radio front end is tuned for its band. A board built for 433MHz will not transmit well at 868MHz, and you cannot fix it in software. Read the listing's variant selector and the sticker on the board before you flash, and match your region's preset in lesson 6.
 
-When you are on the Amazon listing, look for **868MHz** or **915MHz** in the variant selector - the 863-928MHz boards are usually sold as "868MHz" or "915MHz" and are the same hardware. If the listing only says "433MHz", that is the wrong board.
+```mermaid
+flowchart TD
+    Q["Where will the nodes run?"] --> UK["UK or EU"]
+    Q --> US["US, Canada, Australia, NZ"]
+    UK --> V1["Buy the 868MHz variant"]
+    US --> V2["Buy the 915MHz variant"]
+    V1 --> OK["Fit an antenna for the same band"]
+    V2 --> OK
+```
 
 ---
 
 ## The rest of the shopping list
 
-### Antennas (2x)
+### Antennas (2 needed)
 
-Your board almost certainly ships with a short stubby antenna. It will work, but it is the weakest part of the system. See the next lesson for what to look for.
-
-**Check the connector.** Heltec V3 boards have an **IPEX / U.FL** socket - a tiny snap-on connector, not a screw-on SMA. Many cheap listings include a U.FL to SMA pigtail; if yours does not, buy a pair for a couple of pounds.
+Your board may ship with a short stubby antenna. It works, but it is the weakest part of the system. Lesson 4 covers what to look for. **Check the connector**: the V3's LoRa socket is a tiny snap-on U.FL / IPEX, not a screw-on SMA. A U.FL to SMA pigtail lets you fit a normal SMA antenna.
 
 ### USB-C data cable
 
-**Get a proper data cable.** Cheap USB-C cables bundled with power banks are often charge-only. If your computer does not see the board when you plug it in, this is the first thing to suspect - it catches almost everyone at least once.
+Many cables bundled with power banks are charge-only. If your computer does not see the board, suspect the cable first.
 
-### Optional: a battery for the repeater
+### Optional: a battery
 
-A 3.7V LiPo with an **SH1.25 2-pin** connector plugs straight into the board and charges over USB. A 2000mAh cell will run a repeater for a day or two. Watch the polarity - not all suppliers wire these the same way round, and reversed polarity will kill the board.
+A single-cell 3.7V LiPo with the right 2-pin connector can plug into the board. **Check the polarity before you plug in.** Suppliers wire the same-looking connector in opposite ways, and reversed polarity can destroy the board and cause a hot battery. Only use cells from a reputable supplier, never charge a swollen or damaged cell, and do not leave a charging LiPo unattended.
 
 ### Optional: an enclosure
 
-If the repeater is going outside, it needs a box. A cheap IP65 junction box from a DIY shop, with the antenna mounted through the lid on an SMA bulkhead, does the job nicely.
+If the repeater goes outside, it needs a weatherproof box. We cover that in lesson 8.
 
 ---
 
-## Total cost
+## Other boards worth knowing
 
-| Item | Qty | Approx cost |
-|---|---|---|
-| Heltec WiFi LoRa 32 V3, 868MHz | 2 | £30 |
-| U.FL to SMA pigtail | 2 | £4 |
-| Better 868MHz antenna | 2 | £10 |
-| USB-C data cable | 1 | £4 |
-| **Total** | | **~£48** |
-{:class="table table-single"}
-
-You can start with just the two boards and their supplied antennas for £30 and upgrade later.
-
----
-
-## Alternatives worth knowing about
-
-You are not locked to Heltec. MeshCore also runs on:
-
-- **Heltec T114** - nRF52 based, far lower power, better for solar repeaters
-- **RAK WisBlock** - modular, industrial, more expensive
-- **Lilygo T-Deck** - a complete handheld with a keyboard and screen, no phone needed
-- **Seeed Xiao** variants - tiny, good for sensors
-
-For a first build though, two Heltec V3s at £15 each is very hard to beat.
+MeshCore also runs on other devices, according to its FAQ, including the Heltec T114, RAK WisBlock RAK4631 boards, the Lilygo T-Deck and various Seeed Studio devices. For a first build, two Heltec V3 boards keep things simple, because the course steps match the board.
 
 ---
 
 ## Try it Yourself
 
-1. Find the Heltec V3 on Amazon UK and confirm you can select an 868MHz variant before ordering.
-2. Check what connector your chosen antenna uses - U.FL or SMA - and order a pigtail if needed.
-3. Challenge: work out where in your house you would put a repeater, and whether there is a mains socket within reach of it.
+1. Find the exact frequency variant of a board you plan to buy, or read the sticker on one you already have. Does it match your country?
+2. Check what connector your antenna uses, U.FL or SMA, and work out whether you need a pigtail.
+3. Challenge: work out where in your home a repeater could go, and whether a power socket is within reach.
 
 ---
 
 ## Common Issues
 
-**Problem**: My board arrived and the computer will not see it.
+- **Problem**: My board arrived and the computer will not see it.
+- **Solution**: Try a different USB-C cable and a different port, then check your device list for a serial device.
+- **Why**: Charge-only cables have no data lines, which is the number one cause of "dead" boards.
 
-**Solution**: Try a different USB-C cable, then check Device Manager or `ls /dev/tty.*` for a CP2102 device.
+- **Problem**: I ordered the wrong frequency variant.
+- **Solution**: Return or exchange it if you can. Otherwise keep it for a project in the right band.
+- **Why**: The radio matching network is tuned for one band, so transmitting far outside it wastes power and can damage the output stage.
 
-**Why**: Charge-only cables have no data lines. This is the number one cause of "dead" boards.
+> **Teachers**: order boards for one region only, and write the frequency on each board with a marker so 433MHz and 868MHz units never get mixed in a class set. Keep LiPo batteries out of the first session. USB power is enough for every lesson, and a battery adds a fire and short-circuit risk that needs supervision.
 
-**Problem**: I ordered the 433MHz version by mistake.
+## Check your understanding
 
-**Solution**: Return it if you can. Otherwise keep it for a 433MHz project.
+{% quiz %}
+? Which Heltec V3 variant should you buy for the UK?
+- [ ] 433MHz
+- [x] The 868MHz variant
+- [ ] Any variant, you fix it in software
+> The 868MHz variant matches the UK and EU band. The frequency variant is hardware and cannot be fixed in software.
 
-**Why**: The RF matching network is tuned for the band. Transmitting well outside it wastes power and can damage the output stage.
+? What connector does the Heltec V3's LoRa antenna socket use?
+- [ ] SMA screw-on
+- [x] U.FL / IPEX snap-on
+- [ ] BNC
+> The V3 has a tiny U.FL socket, so you may need a U.FL to SMA pigtail for a normal antenna.
+
+? What should you check before plugging a LiPo into the board?
+- [x] The polarity of the connector
+- [ ] The colour of the cable
+- [ ] The antenna gain
+> Reversed polarity can destroy the board, and supplier wiring varies.
+{% endquiz %}
 
 ---

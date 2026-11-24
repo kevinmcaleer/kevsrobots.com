@@ -7,16 +7,19 @@ cover: /learn/intermediate_micropython/assets/banners/04_inheritance.jpg
 date: 2024-07-07
 previous: 03_abstraction.html
 next: 05_encapsulation.html
-description: Learn about inheritance and composition in object-oriented programming.
+description: Build new classes from existing ones with inheritance and super(), know
+  when composition is better, and avoid multiple inheritance traps on MicroPython
 percent: 30
-duration: 4
+duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Intermediate level MicroPython
 - content:
   - section: Introduction
     content:
     - name: Introduction to Intermediate MicroPython
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Object Oriented Programming
     content:
     - name: Object-Oriented Programming in MicroPython
@@ -37,15 +40,15 @@ navigation:
       link: 06a_decorators.html
   - section: Modules and Packages
     content:
-    - name: Modules & Libraries
+    - name: Modules
       link: 07_modules.html
     - name: Packages
       link: 08_packages.html
-    - name: PyPi & MIP
+    - name: PyPi and MIP
       link: 09_pypi.html
   - section: DocStrings
     content:
-    - name: DocStrings
+    - name: Docstrings
       link: 10_docstrings.html
   - section: Interrupts and Timers
     content:
@@ -55,11 +58,11 @@ navigation:
       link: 12_timers.html
   - section: MP Remote
     content:
-    - name: MP Remote
+    - name: mpremote
       link: 13_mp_remote.html
   - section: Conclusion
     content:
-    - name: MP Remote
+    - name: Summary
       link: 14_summary.html
 ---
 
@@ -68,158 +71,182 @@ navigation:
 
 ---
 
-## Inheritance
+By the end of this lesson you will be able to create a subclass that reuses and overrides its parent, choose between inheritance and composition, and explain why multiple inheritance is risky on a Pico.
 
-In object-oriented programming (OOP), `Inheritance` is a way to create new classes based on existing classes. The new classes, known as `derived classes`, inherit attributes and methods from the existing classes, known as `base classes`.
+## Reusing a class with inheritance
 
-{% capture snakie_code %}
-class Animal:
-    def __init__(self, name):
-        self.name = name
+Your robot has a temperature sensor, a distance sensor and a light sensor. They all need a name, a way to take a reading and a way to print it. Writing that three times is exactly the copy-and-paste trap we want to avoid.
 
-    def speak(self):
-        print("Animal speaking")
-
-class Dog(Animal):
-    def __init__(self, name, breed):
-        super().__init__(name)
-        self.breed = breed
-
-    def speak(self):
-        print("Dog barking")
-
-animal = Animal("Animal")
-dog = Dog("Dog", "Labrador")
-dog.speak()
-{% endcapture %}
-{% include snakie.html code=snakie_code name="inheritance_1.py" %}
-
-First we define the base class, `Animal`, it has a `name` property and a `speak` method.
-Next we define a `Dog` class, that inherits from the Animal class.
-
-Notice that the `Dog` class has a parameter - the Base class it inherits from.
-
-Also notice the use of `super()` to call the base class [`constructor`](02a_classes#constructors); we do this to initialize the base class properties in the derived class.
-
----
-
-## Inheritance and Composition
-
-`Inheritance` is a key feature in object-oriented programming (OOP) that allows ***new*** classes to be created ***from existing ones***. The new classes, known as `derived classes`, inherit attributes and methods from the existing classes, known as `base classes`. This helps in reusing code and creating a hierarchy of classes.
-
-`Composition`, on the other hand, is a way to ***combine*** objects or classes together to represent a ***has-a*** relationship. For example, a car has an engine, and a person has a heart.
-
----
-
-### Why Use Inheritance and Composition?
-
-- **Code Reusability**: Both inheritance and composition promote code reuse.
-- **Better Organization**: They help organize code better by creating a clear structure and relationship between classes.
+**Inheritance** lets a new class (the *subclass*, or child) start with everything an existing class (the *base class*, or parent) has, then add or change what it needs.
 
 ![Inheritance](assets/inheritance.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
-![Composition](assets/inheritance_tree.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
-
----
-
-### Example of Composition
-
-In composition, we create objects that are made up of other objects. This allows us to create complex objects from simpler ones.
-
-```python
-class Robot:
-    def __init__(self, name):
+{% capture snakie_code %}
+class Sensor:
+    def __init__(self, name, unit):
         self.name = name
-        self.sensors = Sensors()       # create a class property for sensors, which are defined elsewhere
-        self.motors = Motors()         # create a class property for motors, which are defined elsewhere
-        self.controller = Controller() # create a class property for controller, which are defined elsewhere
+        self.unit = unit
 
-    def move_forward(self):
-        self.motors.move_forward()
+    def read(self):
+        return 0
 
-    def move_backward(self):
-        self.motors.move_backward()
+    def report(self):
+        print(f"{self.name}: {self.read()} {self.unit}")
 
-    def turn_left(self):
-        self.motors.turn_left()
+class DistanceSensor(Sensor):
+    def __init__(self, name):
+        super().__init__(name, "cm")
 
-    def turn_right(self):
-        self.motors.turn_right()
+    def read(self):
+        return 23          # a real sensor would measure here
 
-    def read_sensor(self):
-        return self.sensors.read_sensor()
+class LightSensor(Sensor):
+    def __init__(self, name, scale=100):
+        super().__init__(name, "%")
+        self.scale = scale
+
+    def read(self):
+        return 61
+
+front = DistanceSensor("front")
+lamp = LightSensor("lamp")
+front.report()
+lamp.report()
+{% endcapture %}
+{% include snakie.html code=snakie_code name="inheritance_1.py" %}
+
+Three things to notice:
+
+- `class DistanceSensor(Sensor)` puts the parent in brackets.
+- `report()` is written once in `Sensor`, yet both children can use it.
+- Each child **overrides** `read()` with its own version. When `report()` calls `self.read()`, Python uses the child's version.
+
+### `super()`
+
+When a subclass defines its own `__init__`, the parent's `__init__` is not called automatically. `super().__init__(...)` calls it explicitly, so `name` and `unit` still get set. Forget it, and `report()` will crash with an `AttributeError`, because `self.name` was never created.
+
+```mermaid
+classDiagram
+    Sensor <|-- DistanceSensor
+    Sensor <|-- LightSensor
+    class Sensor {
+        name
+        unit
+        read()
+        report()
+    }
+    class DistanceSensor {
+        read()
+    }
+    class LightSensor {
+        scale
+        read()
+    }
 ```
 
 ---
 
-## Multiple Inheritance
+## Inheritance or composition?
 
-In MicroPython, classes can inherit from multiple base classes. This is known as multiple inheritance. When a class inherits from multiple classes, it inherits attributes and methods from all the parent classes.
+Inheritance models an **is-a** relationship: a `DistanceSensor` *is a* `Sensor`. **Composition** models **has-a**: a `Robot` *has* motors and sensors. Beginners often reach for inheritance when composition is the better fit. A rule of thumb: if you would not say "is a" out loud, use composition.
 
 {% capture snakie_code %}
-class A:
-    def method_a(self):
-        print("Method A")
+class Sensor:
+    def read(self):
+        return 23
 
-class B:
-    def method_b(self):
-        print("Method B")
+class Motor:
+    def forward(self, speed):
+        print("forward at", speed)
 
-class C(A, B):
-    def method_c(self):
-        print("Method C")
+class Robot:                       # a Robot IS NOT a Motor. It HAS motors.
+    def __init__(self):
+        self.sensor = Sensor()
+        self.motor = Motor()
 
-c = C()
-c.method_a()
-c.method_b()
-c.method_c()
+    def step(self):
+        if self.sensor.read() > 10:
+            self.motor.forward(50)
+        else:
+            print("obstacle!")
+
+Robot().step()
 {% endcapture %}
 {% include snakie.html code=snakie_code name="inheritance_2.py" %}
 
----
+Composition keeps your classes small and independent, which matters on a board with limited RAM and a limited patience budget.
 
-### Pros and Cons of Multiple Inheritance
-
-- **Pros**:
-  - Provides a way to create complex hierarchies and relationships.
-  - Increases code reuse and modularity.
-
-- **Cons**:
-  - Can lead to ambiguity and complexity, especially with the diamond problem.
-  - Increases the memory usage of your program, which is critical in MicroPython due to limited resources.
+![Inheritance tree](assets/inheritance_tree.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
 ---
 
-## How We Use Inheritance in MicroPython
+## Multiple inheritance: handle with care
 
-In MicroPython, inheritance helps create new classes with additional functionalities, building on existing ones.
+A class can have more than one parent: `class C(A, B)`. This works on MicroPython:
 
-> ## Remember the Memory Constraints of Microcontrollers
->
-> When using inheritance in MicroPython, remember that microcontrollers have limited memory. Be cautious when creating new classes that inherit from existing ones, especially with multiple inheritance, as this can increase the memory usage of your program.
+{% capture snakie_code %}
+class Blinker:
+    def blink(self):
+        print("blink")
+
+class Beeper:
+    def beep(self):
+        print("beep")
+
+class Beacon(Blinker, Beeper):
+    pass
+
+b = Beacon()
+b.blink()
+b.beep()
+{% endcapture %}
+{% include snakie.html code=snakie_code name="inheritance_3.py" %}
+
+The danger shows up when two parents share a grandparent and both override the same method (the "diamond"). Desktop Python resolves this with a carefully defined search order (the MRO). On the MicroPython version we tested (1.26.1), the lookup order is simpler and can give a **different answer** to desktop Python for the same code, and the `__mro__` attribute that lets you check the order is not available. If code works on your laptop but not on your Pico, this could be why.
+
+The practical advice: use multiple inheritance only for small, independent "mixins" like `Blinker` and `Beeper` above, which share no parents and never override each other. For anything else, use composition.
+
+---
+
+## Try it Yourself
+
+1. Add an `AngleSensor` subclass of `Sensor` that reports in `"deg"` and returns 90.
+2. Override `report()` in `DistanceSensor` so it prints `"WARNING"` when `read()` is below 10, then calls the parent version with `super().report()`.
+3. Draw (or write as a `classDiagram`) a hierarchy for a `Motor`, `ServoMotor` and `StepperMotor`. What do they share? What differs?
+4. Challenge: write a `Robot` that holds a *list* of `Sensor` objects and prints every report in a loop.
 
 ---
 
-### Real-World Example
+## Common Issues
 
-Imagine you are building a library for controlling different types of sensors. You can create a base class for a generic sensor and then create derived classes for specific sensors like temperature and humidity sensors. This way, you can reuse the common functionality in the base class while adding specific features in the derived classes.
+- **Problem**: `AttributeError: 'DistanceSensor' object has no attribute 'name'`.
+- **Solution**: Call `super().__init__(name, "cm")` inside the subclass's `__init__`.
+- **Why**: Defining `__init__` in a subclass replaces the parent's, so the parent's setup never runs unless you call it.
 
----
-
-### Benefits of Inheritance and Composition
-
-- **Simplicity**: Simplifies complex systems by hiding unnecessary details.
-- **Flexibility**: Allows changing the system's implementation without affecting the interacting code.
-- **Reusability**: Creates interfaces that can be reused in different contexts.
+- **Problem**: A subclass method does not seem to be used and the parent's version runs instead.
+- **Solution**: Check the method name matches exactly, including spelling and capital letters.
+- **Why**: Overriding works by name. `Read` and `read` are different methods.
 
 ---
 
-[Encapsulation](05_encapsulation) and [Inheritance](04_inheritance) also help create abstractions in MicroPython. We will explore these concepts in the following lessons.
+## Check your understanding
 
----
+{% quiz %}
+? Which relationship does inheritance model?
+- [ ] has-a
+- [x] is-a
+- [ ] uses-a
+> A `DistanceSensor` is a `Sensor`. A robot that owns motors is composition (has-a).
 
-### Summary
+? Why do we call `super().__init__(...)` in a subclass?
+- [x] The parent's constructor does not run automatically once the subclass defines its own
+- [ ] It makes the code faster
+- [ ] It is required by the `class` keyword
+> Without it, attributes set by the parent, like `name`, are never created.
 
-Abstraction in OOP allows us to hide complexity and create simple interfaces for interacting with systems. It helps simplify, add flexibility, and reuse code in our programs.
-
----
+? What is the safest way to use multiple inheritance on a Pico?
+- [ ] Always, for every class
+- [x] Only for small independent mixins that share no parents
+- [ ] Never write a class with a base
+> Method lookup order in shared-grandparent cases can differ from desktop Python, so keep mixins independent.
+{% endquiz %}

@@ -1,25 +1,11 @@
-This folder is reserved for tiny sample datasets used by the DuckDB course.
+This folder is intentionally empty of data files.
 
-We keep files small so they load fast and work offline. Prefer Parquet where possible.
+The DuckDB course makes its own sample data. In lesson 1 (`01_installing.md`) learners save a short
+script, `make_data.py`, which writes three CSV files into a `data/` folder in their own project:
 
-Suggested structure:
-- tips.csv — small CSV used in lessons 04–05
-- tips.parquet — same data in Parquet for lesson 07
-- sales/ — optional partitioned example like sales/year=2024/month=06/data.parquet
+- `readings.csv`: a sensor log from three robots (3,456 rows)
+- `parts.csv`: a small parts inventory
+- `print_jobs.csv`: a 3D print job history
 
-You can create these locally using DuckDB:
-
-```sql
-CREATE OR REPLACE TABLE tips AS
-SELECT * FROM read_csv_auto('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv');
-
-COPY (SELECT * FROM tips) TO 'source/duckdb/data/tips.csv' (HEADER, DELIMITER ',');
-COPY (SELECT * FROM tips) TO 'source/duckdb/data/tips.parquet' (FORMAT PARQUET);
-
--- Optional partitioned sample
-CREATE OR REPLACE TABLE sales AS
-SELECT 2024 AS year, 6 AS month, * FROM tips LIMIT 50;
-COPY (SELECT * FROM sales) TO 'source/duckdb/data/sales' (FORMAT PARQUET, PARTITION_BY (year, month));
-```
-
-If you use the above, adjust lesson queries to point at `source/duckdb/data/…` when offline.
+The script uses a fixed random seed, so every learner gets identical files and the numbers printed in
+the lessons match. Nothing needs to be downloaded, and nothing in this folder is used by the lessons.

@@ -1,11 +1,21 @@
 ---
-title: Create the Cluster Panel
-description: Learn how to create the cluster panel for the mini-rack
+title: Create the Laser-Cut Cluster Panel
+description: Design the laser-cut cluster panel frame that carries the Pi trays at the front of the mini-rack
 type: page
 layout: lesson
+date_updated: 2026-11-24
+cover: /learn/mini_rack/assets/banners/09_cluster_panel.jpg
 ---
 
-## How to create the Cluster Panel for the Mini-Rack
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to design a laser-cut frame with rounded corners, and say how it differs from the printed panel in lesson 6.
+
+Ahoy there makers! In lesson 6 we made a plate at `4mm`. Here we make the cluster panel again, this time as a frame with an open window in the middle, so the Pis behind it have room to breathe. It is cut from sheet, so its thickness matches your material.
+
+This is the blue frame at the front of the rack in the components photo.
 
 1. Create a new file named `cluster_panel` in Fusion 360
 
@@ -31,4 +41,46 @@ layout: lesson
 
     ![Fillet](/learn/mini_rack/assets/cluster_panel_06_fillet.png){:class="img-fluid w-100"}
 
----
+## Why a frame?
+
+A solid plate would block the front of the rack. A frame keeps the stiff edges where the holes are, and leaves the middle open. The fillet in the last step rounds the outside edges by `4mm`, which looks neater, and stops sharp corners catching a sleeve or a cable.
+
+Like the top panel, set the extrude thickness to match your material: `2mm`, or whatever the depth of the wood you're looking to use is. If you want to cut it, use the same approach as lesson 8: project the edges into a sketch, and export a DXF.
+
+## Try it Yourself
+
+1. Compare this panel with the one in lesson 6. List two differences you can see.
+2. Change the fillet from `4mm` to `2mm`. Which looks better to you?
+3. Challenge: follow the `dxf` method from lesson 8 and export a DXF of your cluster panel.
+
+## Common Issues
+
+- **Problem**: The fillet will not apply to all the outside corners.
+- **Solution**: Select the four vertical edges at the outside corners, one by one, and keep the radius at `4mm`.
+- **Why**: A fillet only rounds the edges that you choose.
+
+- **Problem**: The holes are too tight on the real bolts.
+- **Solution**: Cut a test piece from offcuts, then adjust the hole diameter slightly.
+- **Why**: The laser burns away a little material along its path, and wood can swell with moisture.
+
+## Check your understanding
+
+{% quiz %}
+? What radius does the last step use for the outside fillet?
+- [ ] 2mm
+- [x] 4mm
+- [ ] 6mm
+> The Fillet tool rounds the outside edges by 4mm.
+
+? How thick is the extrude in this lesson?
+- [x] 2mm, or whatever thickness your wood is
+- [ ] 20mm
+- [ ] 15.875mm
+> The lesson suggests 2mm, or the depth of the wood you plan to use.
+
+? Why is this panel a frame?
+- [ ] It is cheaper to print
+- [x] It keeps the edges with the holes and leaves the middle open
+- [ ] The laser cannot cut solid sheet
+> The frame keeps the stiff edges where the holes are.
+{% endquiz %}

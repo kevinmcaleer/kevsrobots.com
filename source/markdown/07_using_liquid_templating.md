@@ -1,80 +1,150 @@
 ---
 title: Using Liquid Templating for Dynamic Content
-description: Explore how to use the Liquid templating language to add dynamic content and logic to your Jekyll site, enhancing its interactivity and functionality.
+description: Use Liquid objects, tags and filters to list posts, show content conditionally and format dates on your Jekyll site.
 layout: lesson
 type: page
 cover: assets/7.png
+date_updated: 2026-11-24
 ---
 
 ![Using Liquid Templating for Dynamic Content cover image]({{ page.cover }}){:class="cover"}
 
-## Introduction
+By the end of this lesson you will be able to use Liquid to print site data, loop over your posts to build a "latest entries" list, and show a friendly message when there is nothing to list.
 
-Liquid is a templating language used by Jekyll to process templates. It allows you to add dynamic content, use variables, and implement logic in your site's pages and posts. Understanding Liquid is essential for maximizing the power of Jekyll as a static site generator.
+## Static, but not stuck
 
-## Basic Syntax
+A Jekyll site is static once it is built, but while Jekyll is building it can think. **Liquid** is the small template language Jekyll uses to do that. Liquid runs first, filling in values and repeating blocks. Then your Markdown is converted to HTML. That order explains a lot of odd behaviour, including why showing Liquid as an example needs special handling, as you will see below.
 
-Liquid syntax is simple and consists of objects, tags, and filters:
+```mermaid
+flowchart LR
+    A["Your file<br/>(Markdown + Liquid)"] --> B["1. Liquid runs<br/>(fills in values, repeats loops)"]
+    B --> C["2. Markdown converts<br/>to HTML"]
+    C --> D["3. Layout wraps<br/>the page"]
+```
 
-- **Objects** output content into the template and are denoted by double curly braces: {% raw %}`{{ }}`{% endraw %}.
-- **Tags** create logic and control flow in templates and are denoted by curly braces and percent signs: {% raw %}`{% %}`{% endraw %}.
-- **Filters** modify the output of objects and are used within an object tag: {% raw %}`{{ 'data' | filter }}`{% endraw %}.
+## The three building blocks
 
-## Displaying Data with Objects
+| Kind | Looks like | Job |
+| --- | --- | --- |
+| Object | Two curly braces around a name | Prints a value |
+| Tag | A curly brace and a percent sign | Logic, such as `if` and `for` |
+| Filter | A pipe character after a value | Changes a value before it is printed |
+{:class="table table-single"}
 
-You can use objects to display data from your site's configuration file (`_config.yml`), front matter, or page content:
+### Objects
+
+Objects print data. `site` holds what is in `_config.yml` plus things Jekyll works out, such as `site.posts`. `page` holds the current page's front matter. Here is a header that uses both:
 
 {% raw %}
-{{ site.title }}
-{{ page.author }}
+```liquid
+<h1>{{ page.title }}</h1>
+<p>Welcome to {{ site.title }}</p>
+```
 {% endraw %}
 
-## Implementing Logic with Tags
+If `page.title` is "About my robot" and `site.title` is "Robot Log", the output is a heading reading "About my robot" and a paragraph saying "Welcome to Robot Log". Add your own variables to front matter (such as `robot: Wall-E Mk2`) and print them with `page.robot`.
 
-Tags allow you to implement control flow statements like `if`, `else`, `elsif`, and loops using `for`.
+### Tags: if and for
 
-### Conditional Statements
+Use `if` to choose what to show:
 
 {% raw %}
-{% if page.title %}
-  <h1>{{ page.title }}</h1>
+```liquid
+{% if page.robot %}
+  <p>This entry is about {{ page.robot }}.</p>
 {% else %}
-  <h1>Untitled Page</h1>
+  <p>This entry is about a robot we have not named yet.</p>
 {% endif %}
+```
 {% endraw %}
 
-### Loops
-
-To iterate over a list of items, such as posts:
+Use `for` to repeat something for every item. Here is a recent-entries list:
 
 {% raw %}
-{% for post in site.posts %}
-  <article>
-    <h2>{{ post.title }}</h2>
-    <p>{{ post.excerpt }}</p>
-  </article>
+```liquid
+<ul>
+{% for post in site.posts limit: 5 %}
+  <li>
+    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+    <small>{{ post.date | date: "%-d %B %Y" }}</small>
+  </li>
+{% else %}
+  <li>No posts yet. The workbench is quiet.</li>
 {% endfor %}
+</ul>
+```
 {% endraw %}
 
-## Using Filters to Modify Output
+`site.posts` is every post, newest first. `limit: 5` stops after five. The `else` inside a `for` runs only if the list is empty, which is a tidy way to handle "nothing to show". Each loop also gives you `forloop.index`, which counts 1, 2, 3 and so on.
 
-Filters allow you to modify the output of objects for formatting or transforming data:
+### Filters
+
+Filters follow a pipe and can be chained left to right:
 
 {% raw %}
-{{ 'Welcome to Jekyll!' | upcase }}
+```liquid
+{{ "wall-e mk2" | upcase }}
+{{ page.title | downcase | replace: " ", "-" }}
+{{ post.date | date: "%Y-%m-%d" }}
+```
 {% endraw %}
 
-This filter changes the string to uppercase.
+The first prints `WALL-E MK2`. The second turns a title into a slug, so "About My Robot" becomes `about-my-robot`. The third prints a date as year-month-day. Jekyll adds extras to Liquid's standard filters, including `relative_url` (lesson 6), `date_to_string` and `markdownify`, which converts Markdown held in a variable into HTML.
 
-## Practice Exercise
+### Variables with assign
 
-1. Create a new page in your Jekyll site that lists the titles of all posts.
-2. Use conditional logic to display a message if there are no posts.
-3. Apply a filter to the post titles to alter their appearance.
+Save a value to reuse it:
 
-## Additional Resources
+{% raw %}
+```liquid
+{% assign latest = site.posts | first %}
+<p>Latest entry: {{ latest.title }}</p>
+```
+{% endraw %}
 
-- [Liquid Templating Language Documentation](https://shopify.github.io/liquid/)
-- [Jekyll Variables and Liquid Tags](https://jekyllrb.com/docs/variables/)
+## Showing Liquid in your own lessons
 
----
+Jekyll runs Liquid on every Markdown file that has front matter, even inside code blocks. So if you write a Liquid example in your Markdown and do not guard it, Jekyll will run it and print the result, not your example. To show the text literally, wrap it in `raw` and `endraw` tags. Every Liquid example in this lesson is wrapped that way. You only need `raw` when *showing* Liquid, never when using it.
+
+## Try it Yourself
+
+1. On your home page, print the site title with an `h1`, and `page.title` in a paragraph.
+2. Add `robot: Wall-E Mk2` to a post's front matter and show it with an `if` that has an `else`.
+3. Build the recent-entries list and add three posts. Then delete them all and check that the `else` message appears.
+4. Challenge: change the loop to show the post number with `forloop.index`, and use `truncate: 80` on `post.excerpt` to show a short preview.
+
+## Common Issues
+
+- **Problem**: My loop prints nothing.
+- **Solution**: Check there are post files in `_posts/` with the right file names and dates in the past, then restart the server.
+- **Why**: `site.posts` only contains valid, published posts, so a mis-named file is simply left out.
+
+- **Problem**: `Liquid syntax error: Unknown tag`.
+- **Solution**: Check you closed every `if` with `endif` and every `for` with `endfor`, and that tag names are spelled correctly.
+- **Why**: Liquid is strict about matching tags, and the error message names the line.
+
+- **Problem**: My Liquid example in a lesson shows its output instead of my code.
+- **Solution**: Wrap the example in `raw` and `endraw` tags.
+- **Why**: Jekyll runs Liquid before Markdown, so an unguarded example is treated as real code.
+
+## Check your understanding
+
+{% quiz %}
+? Which Liquid element prints a value?
+- [x] An object, in double curly braces
+- [ ] A tag with `for`
+- [ ] A front matter line
+> Objects print values, tags do logic and filters change values.
+
+? What does the `else` inside a `for` loop do?
+- [ ] Runs on every item
+- [x] Runs only when there is nothing to loop over
+- [ ] Stops the loop early
+> It is a neat way to show an empty-state message.
+
+? In what order do Liquid and Markdown run?
+- [ ] Markdown first, then Liquid
+- [x] Liquid first, then Markdown
+- [ ] They run at the same time
+> Liquid fills in the page, then the result is converted from Markdown to HTML.
+{% endquiz %}

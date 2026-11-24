@@ -11,10 +11,12 @@ stages:
   - Computer Vision on Raspberry Pi with CVZone
   build:
   - Building Object Detection Models with Raspberry Pi AI Camera
+  - Raspberry Pi AI HAT+ 2 - Vision and Generative AI
   - Reinforcement Learning for Beginners
   - Arduino Uno Q - Two Brains, One Board
   further:
   - Reinforcement Learning with Gymnasium
+  - Build an Open Duck Mini Walking Robot
   - Build a RAG for Your Obsidian Vault
   - OpenClaw on Raspberry Pi
 ---

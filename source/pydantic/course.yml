@@ -5,17 +5,29 @@
   level: intermediate
   layout: course
   cover: assets/pydantic.png
+  outcomes:
+    - Describe data with Pydantic v2 models and validate it from dicts and JSON
+    - Read a ValidationError and report what was wrong and where
+    - Add constraints and custom checks with Field, field_validator and model_validator
+    - Model nested and recursive robot configurations
+    - Build a FastAPI API where Pydantic validates requests and shapes responses
+    - Load robot settings from environment variables with pydantic-settings
+  prerequisites:
+    - Python basics, such as the Python for beginners course
+    - Helpful but not required, the FastAPI course
+  you_need:
+    - A computer with Python 3.10 or newer and internet access to install packages
+    - A text editor or IDE such as Thonny or VS Code
+    - No robot is required, but a Raspberry Pi Pico sending sensor readings makes a good test source
   groups:
-    - pydantic
-    - data validation
-    - fastapi
+    - python
   description: >-
       This in-depth course is designed to teach you how to leverage Pydantic for data validation and settings management in Python applications. From understanding Pydantic's basics to integrating it with FastAPI for web development, you'll master everything needed to use Pydantic effectively.
   content:
     - section:
         name: Introduction to Pydantic
         content:
-          - 01_overview_of_pydantic.md
+          - 00_intro.md
           - 02_setting_up_your_development_environment.md
           - 03_basic_data_models.md
     - section:
@@ -35,4 +47,4 @@
         content:
           - 10_pydantic_best_practices.md
           - 11_performance_optimization_tips.md
-          - 12_case_studies_and_real_world_applications.md
+          - 12_case_study_and_summary.md

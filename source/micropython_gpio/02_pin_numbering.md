@@ -10,6 +10,8 @@ cover: /learn/micropython_gpio/assets/banners/02_pin_numbering.jpg
 
 ---
 
+By the end of this lesson you will be able to turn a physical pin number into the GP number MicroPython needs.
+
 ## Overview
 
 The Pico has two numbering schemes, and mixing them up is the most common beginner mistake. In this lesson you'll learn the difference and how to find the pin you need.
@@ -46,15 +48,25 @@ The underside of the board is also printed with the GP numbers, which is handy w
 | VSYS | 39 | Main power input, 1.8V to 5.5V |
 | VBUS | 40 | 5V from USB, when USB is plugged in |
 | RUN, 3V3_EN, ADC_VREF | 30, 37, 35 | Reset, regulator enable and ADC reference |
-{:class="table table-striped"}
+{:class="table table-single"}
 
 `GP23`, `GP24`, `GP25` and `GP29` are used inside the board (power supply control, USB sensing, the LED on the original Pico, and measuring VSYS), so they don't appear on the edge pins.
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
-Using the pinout diagram, find the physical pin numbers for `GP0`, `GP15` and `GP28`. Which of these could you use to read a potentiometer?
+1. Using the pinout diagram, find the physical pin numbers for `GP0`, `GP15` and `GP28`.
+2. Which of those three could read a potentiometer? Check the table above.
+3. Challenge: wire an LED to the pin next to a GND pin and write the `Pin(...)` line for it.
+
+## Common Issues
+
+- **Problem**: The LED wired to physical pin 15 never lights when the code says `Pin(15)`.
+- **Solution**: Look up the GP number: `Pin(15)` is GP15, which is physical pin 20.
+- **Why**: MicroPython uses GP numbers, not the position of the pin on the board.
+
+## Check your understanding
 
 {% quiz %}
 ? You wire an LED to physical pin 20. What do you write in MicroPython?
@@ -68,6 +80,12 @@ Using the pinout diagram, find the physical pin numbers for `GP0`, `GP15` and `G
 - [x] VBUS
 - [ ] ADC_VREF
 > VBUS (physical pin 40) is connected to the USB 5V supply.
+
+? Which numbering does MicroPython use?
+- [ ] Physical pin numbers 1 to 40
+- [x] GP numbers such as GP15
+- [ ] Either, they are the same
+> `Pin(15)` means GP15, which is physical pin 20.
 {% endquiz %}
 
 ---

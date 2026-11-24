@@ -7,18 +7,20 @@ cover: /learn/podman/assets/banners/08_docker_compose_vs_podman_compose.jpg
 date: 2025-05-24
 previous: 07_working_with_pods.html
 next: 09_podman_and_kubernetes.html
-description: Learn how to use `podman-compose` to run multi-container apps, and understand
-  the differences and limitations compared to Docker Compose.
+description: Run the robot status stack from a compose.yaml file using podman compose
+  and a compose provider, and learn what to check when a Compose file behaves differently
+  than it did on Docker.
 percent: 63
-duration: 2
-date_updated: 2025-05-24
+duration: 6
+quiz_total: 47
+date_updated: 2026-11-24
 navigation:
 - name: From Docker to Podman
 - content:
   - section: Getting Started
     content:
     - name: Introduction to Podman
-      link: 01_intro_to_podman.html
+      link: 00_intro.html
     - name: 'Video: Podman vs Docker'
       link: 01_video.html
     - name: Docker vs Podman Architecture
@@ -29,7 +31,7 @@ navigation:
     content:
     - name: CLI Compatibility and Basic Commands
       link: 04_cli_compatibility_and_commands.html
-    - name: "Podman Features Docker Doesn\u2019t Have"
+    - name: Podman Features Docker Doesn't Have
       link: 05_podman_unique_features.html
     - name: Managing Containers and Images
       link: 06_managing_containers_and_images.html
@@ -62,119 +64,157 @@ navigation:
 
 ---
 
-If you've built multi-container applications with **Docker Compose**, you'll be pleased to know that **Podman offers a compatible tool**: `podman-compose`.
+By the end of this lesson you will be able to start a multi-container app from a Compose file with Podman, and explain what `podman compose` does and does not do for you.
 
-It parses `docker-compose.yml` files and launches containers using Podman — often with minimal changes.
+If you used `docker compose` in the Docker course, you will want the same convenience here. Podman has no Compose engine of its own, but it works with Compose files in two ways.
 
----
+## Two names, two tools
 
-## What is `podman-compose`?
+- **`podman-compose`** (with a hyphen) is a separate, community-written Python tool that reads a Compose file and runs the services with Podman
+- **`podman compose`** (with a space, Podman 4.7 or newer) is a thin **wrapper**. It does not understand Compose files itself. It looks for a compose *provider* on your machine, such as `podman-compose` or Docker's Compose plugin, and hands the job to it
 
-`podman-compose` is a Python-based CLI tool that:
+So `podman compose` needs a provider installed. Without one it prints an error about not finding a compose provider.
 
-- Uses your existing `docker-compose.yml` files
-- Creates a Podman **pod** and runs each service inside it
-- Tries to maintain CLI and file compatibility with Docker Compose
+```mermaid
+flowchart LR
+    A["podman compose up"] --> B{"Compose provider<br/>installed?"}
+    B -- "podman-compose" --> C["Reads compose.yaml"]
+    B -- "docker-compose" --> C
+    B -- "none" --> E["Error: no provider"]
+    C --> D["Podman runs the containers"]
+```
 
-> It’s great for local development and small deployments — but not a 1:1 drop-in replacement in all cases.
+## Install a provider
 
----
-
-## Installing `podman-compose`
-
-```bash
-pip3 install podman-compose
-````
-
-Verify installation:
+On Raspberry Pi OS and Debian, `podman-compose` is in the package list:
 
 ```bash
+sudo apt install -y podman-compose
 podman-compose version
 ```
 
----
+If your repository does not have it, `pip install podman-compose` from PyPI is the other route.
 
-## Running a Compose File with Podman
+## The Compose file
 
-Assume you have this `docker-compose.yml`:
+Create `~/robot-status/compose.yaml`. It is the same file as in the Docker course, with the Redis image name written in full:
 
 ```yaml
-version: "3"
 services:
   web:
-    image: nginx
+    build: .
     ports:
-      - "8080:80"
+      - "5000:5000"
+    environment:
+      REDIS_HOST: redis
+      ROBOT_NAME: Sparky
+    depends_on:
+      - redis
+
   redis:
-    image: redis
+    image: docker.io/library/redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
 ```
 
-Run it with:
+Compose files no longer need a `version:` line at the top. Older examples that begin with a `version` line still work, but the line is ignored.
+
+## Run it
+
+From the folder with the file:
 
 ```bash
-podman-compose up
-```
-
-Stop it with:
-
-```bash
-podman-compose down
-```
-
-> By default, Podman Compose creates a pod named after your project and places all containers inside it.
-
----
-
-## Checking Pod Status
-
-Check running pods and containers:
-
-```bash
-podman pod ps
+podman compose up -d --build
 podman ps
 ```
 
-Inspect the pod:
+Then open `http://localhost:5000`. Stop and remove everything with:
 
 ```bash
-podman pod inspect <pod-id>
+podman compose down
 ```
 
----
+Use `podman-compose up -d --build` instead if you prefer calling the provider directly. The commands are the same.
 
-## Limitations Compared to Docker Compose
+## Check what was created
 
-| Feature                  | Docker Compose  | Podman Compose         |
-| ------------------------ | --------------- | ---------------------- |
-| Service restart policies | Supported     | Limited/partial     |
-| Health checks            | Supported     | Not yet supported    |
-| Compose v2 syntax        | Supported     | Partially supported |
-| Networking               | Built-in bridge | Pod network/pod-based  |
-| Volumes                  | Supported       | Supported              |
-{:class="table table-striped"}
+Compose behaviour varies between provider versions, so check rather than assume. Depending on your version, services may be placed in a pod or on a project network:
 
-> Podman Compose works best with **basic service definitions** and standard port/volume usage. Advanced features may require tweaking or systemd integration.
+```bash
+podman pod ps
+podman network ls
+podman volume ls
+```
 
----
+The `web` service reaches Redis by the name `redis`. That name lookup works on a user-defined network with the modern network backend. Check which one you have:
 
-## Alternative: Manual Pod + Systemd
+```bash
+podman info --format '{{.Host.NetworkBackend}}'
+```
 
-For production use, many Podman users skip Compose altogether and:
+`netavark` is the modern backend and does name lookup. If you see `cni` and the web app cannot find `redis`, either install `netavark` and `aardvark-dns` or use the pod method from lesson 7, where containers talk over `localhost`.
 
-- Use `podman generate systemd`
-- Or define services as Kubernetes YAML
-- Or use Podman’s native `pod` support for simple service grouping
+## Where Compose and Podman differ
 
----
+| Docker Compose habit | With Podman |
+| --- | --- |
+| `docker compose up` | `podman compose up` (needs a provider) |
+| Ports below 1024 | Not allowed rootless. Use 8080, 5000 and so on |
+| Short image names like `redis` | Write the full name, `docker.io/library/redis` |
+| Mounting `/var/run/docker.sock` | Not available. Podman has its own optional socket |
+| Restart policies | A policy restarts a crashed container, but starting services at boot is systemd's job (lesson 10) |
+{:class="table table-single"}
 
-## Best Practices
+## Try it Yourself
 
-- Use `podman-compose` for local testing and development
-- Prefer systemd or `podman play kube` for production
-- Keep Compose files simple and compatible with the Compose v2 spec
+1. Run `podman compose up -d` and refresh the page a few times. Stop it with `podman compose down` and start it again. Does the visit count survive?
+2. Change `ROBOT_NAME` in `compose.yaml`, then run `podman compose up -d` again. What happened to the running web container?
+3. Challenge: add a `ROBOT_COLOUR` environment variable to the file. Which part of `app.py` would you change to display it?
 
----
+## Common Issues
 
-Next up: [Podman and Kubernetes](09_podman_and_kubernetes)
+- **Problem**: `podman compose` says it cannot find a compose provider.
+- **Solution**: Install one with `sudo apt install -y podman-compose`.
+- **Why**: `podman compose` is only a wrapper that calls another tool.
 
----
+- **Problem**: An image such as `redis` cannot be pulled, or Podman prompts for a registry.
+- **Solution**: Use the full name `docker.io/library/redis:7-alpine` in the file.
+- **Why**: Podman does not guess registries, as we saw in lesson 4.
+
+- **Problem**: The `web` service cannot resolve the name `redis`.
+- **Solution**: Check `podman info --format '{{.Host.NetworkBackend}}'`. If it says `cni`, use the pod method from lesson 7.
+- **Why**: Container-name lookup needs the `netavark` and `aardvark-dns` network stack.
+
+> **Teachers**: Installing a Compose provider needs `sudo` once, so do it before the lesson. Compose files are plain text, which makes them easy to share, but they are also easy to break with a single indent error, so have learners check their files with a neighbour before running them.
+
+## Check your understanding
+
+{% quiz %}
+? What is `podman compose` (with a space)?
+- [ ] A complete Compose engine built into Podman
+- [x] A wrapper that calls an installed compose provider
+- [ ] A replacement for `podman build`
+> It hands the work to a provider such as `podman-compose`.
+
+? Why do we write `docker.io/library/redis:7-alpine` in the Compose file?
+- [ ] Podman cannot pull images from Docker Hub
+- [x] Podman does not assume a default registry
+- [ ] Compose requires version tags
+> Full names avoid prompts and errors.
+
+? With no daemon, what is the recommended way to start containers at boot?
+- [ ] A Compose restart policy alone
+- [x] A systemd service, such as one described by a Quadlet file
+- [ ] Running `podman machine start`
+> systemd starts services at boot, and lesson 10 shows how to describe a container as one.
+
+? Which network backend gives containers name lookup on a user-defined network?
+- [ ] `cni` without any plugins
+- [x] `netavark` with `aardvark-dns`
+- [ ] `localhost`
+> Name lookup comes from `aardvark-dns`, used with `netavark`.
+{% endquiz %}

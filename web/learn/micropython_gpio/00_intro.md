@@ -9,8 +9,8 @@ next: 01_gpio_pin_types.html
 description: Learn how to control the GPIO pins on the Raspberry Pi Pico with MicroPython,
   and connect LEDs, motors, servos and sensors.
 percent: 5
-duration: 3
-quiz_total: 33
+duration: 4
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -73,6 +73,12 @@ navigation:
 
 ---
 
+By the end of this course you will be able to wire up and control LEDs, buttons, motors, servos and sensors from the Pico's GPIO pins.
+
+This course is written for the Raspberry Pi Pico and Pico W (RP2040) running MicroPython. Pins are 3.3V and not 5V tolerant, which comes up throughout.
+
+> **Teachers**: This suits ages 11 and up who can already write a simple Python program. Allow 30 to 45 minutes per lesson. Each learner or pair needs a Pico, a breadboard, jumper wires, an LED with resistor and a button for lessons 1 to 6, and more parts for lessons 7 to 15. Lessons 1 to 3, 8 and 16 can be done on paper with a pinout diagram if hardware is short. Check batteries and any 5V module before powering up.
+
 ## Watch the videos
 
 This course has two companion videos. Part 1 covers pin types, digital I/O and PWM; Part 2 covers analog input, the communication buses, servos and sensors.
@@ -117,13 +123,13 @@ After completing this course, you will be able to:
 * A Raspberry Pi Pico or Pico W with MicroPython installed (see [How to install MicroPython](/learn/how_to_install_micropython/))
 * A computer with [Thonny](https://thonny.org) to edit and run code
 * A breadboard, jumper wires, a few LEDs and 220Ω resistors, and a push button
-* Optional parts for the later lessons: a 10kΩ potentiometer, a small DC motor and motor driver (L293D or DRV8833), an SG90 servo, an HC-SR04 range finder and a DS18B20 or DHT11 temperature sensor
+* Optional parts for the later lessons: a 10kΩ potentiometer, a small DC motor and L293D motor driver chip, an SG90 servo, an HC-SR04 range finder and a DS18B20 or DHT11 temperature sensor
 
 ---
 
 ## Prerequisites
 
-You should be comfortable writing simple Python programs. If you're brand new to MicroPython, take [Learn MicroPython - The basics](/learn/micropython/) first.
+You should be comfortable writing simple Python programs. If you're brand new to MicroPython, take [Learn MicroPython - The basics](/learn/micropython/) first. If resistors, voltage and Ohm's law are new to you, [Electronics Basics](/learn/electronics_basics/) covers them.
 
 ---
 

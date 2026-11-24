@@ -10,8 +10,9 @@ next: 02_documents_and_collections.html
 description: What a database actually is, why it beats a spreadsheet for some jobs,
   and where MongoDB fits in
 percent: 10
-duration: 7
-date_updated: 2026-10-18
+duration: 9
+quiz_total: 64
+date_updated: 2026-11-24
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -72,6 +73,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain what a database and a query are, describe how a client talks to the MongoDB server, and say when a database beats a spreadsheet.
+
 Picture the parts drawer in your workshop. Somewhere in there are three SG90 servos, a motor driver you bought "just in case", and a bag of M3 screws that is definitely nearly empty. You know roughly what is in there, but answering a simple question like "how many servos do I have?" means tipping the whole thing out on the bench.
 
 A database is the cure for that. Let's look at what one actually is before we start typing commands.
@@ -105,6 +108,23 @@ Fair question. Plenty of makers track their parts in a spreadsheet or a text fil
 {:class="table table-single"}
 
 The big one for makers is the fourth row. A robot logging sensor readings, a web page showing your stock, and a Python script reordering parts can all talk to the same database at the same time without tripping over each other.
+
+---
+
+## The big picture
+
+Here is who talks to whom. Several different programs can use the same server at once, and only the server touches the files on disk.
+
+```mermaid
+flowchart LR
+    A["mongosh shell"] -->|"query"| S["MongoDB server<br/>port 27017"]
+    B["Python script on a Pi"] -->|"query"| S
+    C["Web page"] -->|"query"| S
+    S -->|"results"| A
+    S -->|"results"| B
+    S -->|"results"| C
+    S <--> F[("Data files on disk")]
+```
 
 ---
 
@@ -193,13 +213,43 @@ No commands yet, just a bit of thinking.
 
 ## Common Issues
 
-**Problem:** "Do I need to learn SQL first?"  
-**Solution:** No. MongoDB does not use SQL at all. Everything in this course is self-contained.  
-**Why:** MongoDB has its own way of writing queries, using the same document shape as the data itself.
+- **Problem**: "Do I need to learn SQL first?"
+- **Solution**: No. MongoDB does not use SQL at all. Everything in this course is self-contained.
+- **Why**: MongoDB has its own way of writing queries, using the same document shape as the data itself.
 
-**Problem:** "Is the server a separate computer I need to buy?"  
-**Solution:** No. The server is just a program. We will run it on the computer you already have.  
-**Why:** "Server" describes a role (the thing that answers requests), not a type of hardware.
+- **Problem**: "Is the server a separate computer I need to buy?"
+- **Solution**: No. The server is just a program. We will run it on the computer you already have.
+- **Why**: "Server" describes a role (the thing that answers requests), not a type of hardware.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What do we call a question you send to a database?
+- [ ] A schema
+- [x] A query
+- [ ] A collection
+> A question you send to a database is called a query. You will write plenty of them.
+
+? Which network port does MongoDB listen on by default?
+- [ ] 80
+- [ ] 3306
+- [x] 27017
+> MongoDB's port is 27017. The server listens on it and clients connect to it.
+
+? Why does a database suit a robot logging data better than a text file?
+- [x] Several programs can read and write it at the same time safely
+- [ ] It makes the robot move faster
+- [ ] It never needs a computer to run on
+> A database is built for many clients at once, so a logger, a web page and a script can share it without tripping over each other.
+
+? How does MongoDB store one part from the parts drawer?
+- [ ] As a row in a table
+- [x] As one self-contained document
+- [ ] As a line in a CSV file
+> MongoDB is a document database: each item is one document, like an index card with everything about the part on it.
+{% endquiz %}
 
 ---
 

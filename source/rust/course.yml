@@ -7,21 +7,32 @@
   cover: assets/cover.png
   video: M9LekkoQyf0
   groups:
-      - rust
       - pico
-  description: >- 
-     Learning Rust with me, is a course that will teach you how to use Rust on Raspberry Pi.
+  description: >-
+     Learn the Rust programming language from scratch, with a Python and MicroPython maker in mind. Write and run real programs on your computer, build a small web server, then set up Rust to blink an LED on the Raspberry Pi Pico.
+  outcomes:
+    - Install Rust and build, run and test programs with Cargo
+    - Explain ownership and borrowing, and read the compiler errors they produce
+    - Model robot data with structs and enums, and handle failures with Option and Result
+    - Use vectors, strings, hash maps and threads safely
+    - Build a small JSON web server with warp
+    - Set up the Rust toolchain for the Raspberry Pi Pico and flash an LED blinker
+  prerequisites:
+    - Some programming experience, ideally in Python or MicroPython, such as the Learn MicroPython course
+    - Comfort using a terminal or command prompt
+  you_need:
+    - A computer running Windows, macOS or Linux, with an internet connection
+    - A text editor, such as Visual Studio Code with the rust-analyzer extension
+    - For the final lesson only, an original Raspberry Pi Pico (RP2040, not Pico W or Pico 2) and a micro-USB data cable
   content:
   - section:
-      name: Overview
+      name: Getting Started
       content:
-      - 01_intro.md
-  - section:
-      name: Setting Up a Rust Environment
-      content:
+      - 00_intro.md
+      - 01_install-and-hello.md
       - 02_rust_and_python.md
   - section:
-      name: Basics
+      name: The Language
       content:
       - 03_rust_basics.md
       - 04_ownership_and_borrowing.md
@@ -30,7 +41,7 @@
       - 07_common_collections.md
   - section:
       name: Tools and Ecosystem
-      content:  
+      content:
       - 08_concurrency.md
       - 09_ecosystem_and_tools.md
       - 10_example.md
@@ -40,7 +51,3 @@
       - 11_rust_for_pico.md
       - 12_summary_and_resources.md
       - 13_cargo.md
-
-
-
-

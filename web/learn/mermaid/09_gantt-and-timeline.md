@@ -12,6 +12,7 @@ description: Plan a robot build with a Mermaid Gantt chart, and tell the story o
 percent: 60
 duration: 5
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to plan a robot build with a Gantt chart and tell a project's story with a timeline.
 
 ---
 

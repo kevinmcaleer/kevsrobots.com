@@ -9,10 +9,35 @@ description: Take your Q-learning skills to the industry-standard Gymnasium API 
   environment, discretize CartPole with your own binning code, and train neural-network
   agents that export a policy table you can drop straight onto a Pico.
 level: intermediate
-course_duration: 1h 23m
+course_duration: 1h 44m
 lesson_count: 15
 first_lesson: 00_intro.html
+quiz_total: 56
 video: epuO7xpz6i4
+outcomes:
+- Use the current Gymnasium API (reset, step with terminated and truncated, spaces,
+  seeding) with standard environments
+- Explain why terminated and truncated are separate and use each correctly in a Q-learning
+  update
+- Write a custom gym.Env for the BurgerBot grid-world, check it with check_env and
+  register it with gym.make
+- Add behaviour with wrappers and run several environment copies with vector environments
+- Train, evaluate, save and load a Stable-Baselines3 PPO or DQN agent on your own
+  environment
+- Export a trained policy as a JSON lookup table and say honestly what it can and
+  cannot do on a Pico
+prerequisites:
+- The Reinforcement Learning for Beginners course (Q-tables, epsilon-greedy, the BurgerBot
+  grid-world)
+- Python basics such as functions, dictionaries and classes, for example the Introduction
+  to Python course
+you_need:
+- A computer running macOS, Linux or Windows with Python 3.10 or newer and a virtual
+  environment
+- pip install "gymnasium[classic-control]" stable-baselines3 (PyTorch comes with Stable-Baselines3
+  and is a large download)
+- No robot or other hardware, and no GPU. Tested with Gymnasium 1.4.0 and Stable-Baselines3
+  2.9.2
 navigation:
 - name: Reinforcement Learning with Gymnasium
 - content:
@@ -54,6 +79,6 @@ navigation:
       link: 12_meet_stable_baselines3.html
     - name: Train, Evaluate, and Export
       link: 13_train_evaluate_export.html
-    - name: "What You Have Built \u2014 and Where to Go Next"
+    - name: What You Have Built, and Where to Go Next
       link: 14_summary.html
 ---

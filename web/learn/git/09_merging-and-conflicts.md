@@ -11,7 +11,8 @@ description: Bring a branch back into main with git merge, and learn how to fix 
   conflicts calmly
 percent: 70
 duration: 5
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to merge a branch into `main`, tell a fast-forward from a merge commit, and resolve a merge conflict calmly.
 
 ## Merging a branch
 

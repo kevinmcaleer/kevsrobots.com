@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="820" height="260" viewBox="0 0 820 260" role="img" aria-labelledby="title desc">
-  <title id="title">Partitioned folders by year and month</title>
-  <desc id="desc">A visual showing a folder tree year=YYYY/month=MM and how filters prune scans.</desc>
+  <title id="title">Partitioned folders by robot and day</title>
+  <desc id="desc">A folder tree robot=NAME/day=DATE and how a filter on robot and day skips every other folder.</desc>
   <defs>
     <style>
       .label{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;font-size:14px;fill:#1f2937}
@@ -15,31 +15,31 @@
     </marker>
   </defs>
 
-  <text x="20" y="24" class="label">exports/sales_by_year_month/</text>
+  <text x="20" y="24" class="label">lake/readings/</text>
 
   <!-- year=2023 -->
-  <rect x="20" y="40" width="220" height="90" rx="8" class="folder"/>
-  <text x="30" y="62" class="label">year=2023/</text>
-  <text x="40" y="88" class="small">month=11/ data.parquet</text>
-  <text x="40" y="108" class="small">month=12/ data.parquet</text>
+  <rect x="20" y="40" width="220" height="90" rx="8" class="folder skip"/>
+  <text x="30" y="62" class="label">robot=rover-3/</text>
+  <text x="40" y="88" class="small">day=2025-03-03/ data_0.parquet</text>
+  <text x="40" y="108" class="small">day=2025-03-04/ data_0.parquet</text>
 
   <!-- year=2024 -->
   <rect x="260" y="40" width="220" height="90" rx="8" class="folder ok"/>
-  <text x="270" y="62" class="label">year=2024/</text>
-  <text x="280" y="88" class="small">month=08/ data.parquet</text>
-  <text x="280" y="108" class="small">month=09/ data.parquet</text>
+  <text x="270" y="62" class="label">robot=smars-1/</text>
+  <text x="280" y="88" class="small">day=2025-03-03/ data_0.parquet</text>
+  <text x="280" y="108" class="small">day=2025-03-04/ data_0.parquet</text>
 
   <!-- year=2025 -->
   <rect x="500" y="40" width="220" height="90" rx="8" class="folder skip"/>
-  <text x="510" y="62" class="label">year=2025/</text>
-  <text x="520" y="88" class="small">month=01/ data.parquet</text>
-  <text x="520" y="108" class="small">month=02/ data.parquet</text>
+  <text x="510" y="62" class="label">robot=smars-2/</text>
+  <text x="520" y="88" class="small">day=2025-03-03/ data_0.parquet</text>
+  <text x="520" y="108" class="small">day=2025-03-04/ data_0.parquet</text>
 
   <!-- Filter arrow -->
   <line x1="340" y1="150" x2="340" y2="210" class="arrow"/>
-  <text x="250" y="200" class="small">WHERE year = 2024 AND month = 9</text>
+  <text x="200" y="200" class="small">WHERE robot = 'smars-1' AND day = '2025-03-04'</text>
 
   <!-- Result -->
-  <rect x="280" y="210" width="120" height="30" rx="6" class="ok"/>
-  <text x="290" y="230" class="small">scan only 2024/09</text>
+  <rect x="280" y="210" width="170" height="30" rx="6" class="ok"/>
+  <text x="290" y="230" class="small">scan only smars-1 / 03-04</text>
 </svg>

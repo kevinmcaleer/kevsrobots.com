@@ -10,7 +10,8 @@ next: 06_undoing-changes.html
 description: Explore your project's past with git log, git show and git diff
 percent: 42
 duration: 5
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -60,6 +61,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explore your project's past with `git log`, `git show` and `git diff`.
 
 ## Your project's diary
 
@@ -165,6 +168,7 @@ The bottom part is called a **diff**. Lines starting with `+` were added, lines 
 ```python
 right_motor = Pin(15, Pin.OUT)
 ```
+{: .no-snakie }
 
 Then run:
 

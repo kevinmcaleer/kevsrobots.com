@@ -4,12 +4,14 @@ description: See how four switches let a driver spin a DC motor in either direct
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/04_the_h_bridge.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read an H-bridge truth table and choose between forward, reverse, brake and coast.
 
 A DC motor reverses when you swap its two wires. A robot cannot swap wires by hand, so we build a circuit that does it electronically. That circuit is the **H-bridge**, and it lives inside every motor driver you will use.
 
@@ -40,7 +42,18 @@ Real drivers use transistors for the switches, but think of them as little taps.
 | off | off | off | off | Nothing connected: coasts |
 {:class="table table-single"}
 
-Never close S1 and S3 together (or S2 and S4). That connects the supply straight to ground, which is called **shoot-through**, and it destroys the transistors. Driver chips like the L298N and DRV8833 have logic that makes this impossible, which is a big reason we use them.
+Never close S1 and S3 together (or S2 and S4). That connects the supply straight to ground, which is called **shoot-through**, and it destroys the transistors. On the L298N each side of the bridge is driven by a single input, so you cannot command that mistake by accident, and the DRV8833 has built-in protection too. That is a big reason we use driver chips rather than four loose transistors.
+
+Here are the switch states as a little map. Each arrow is one change to the switches:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Coast
+    Coast --> Forward: S1 and S4 on
+    Forward --> Brake: S3 and S4 on
+    Brake --> Reverse: S2 and S3 on
+    Reverse --> Coast: all switches off
+```
 
 ## From four switches to two inputs
 
@@ -94,6 +107,28 @@ Same H-bridge, different front door.
 
 ## Common Issues
 
-**Problem**: My motor does not stop when I set both inputs low.
-**Solution**: Remember that with the L298N, both inputs equal and EN high is a brake, while EN low is a coast. Check what your EN pin is doing.
-**Why**: The enable pin decides whether the bridge is connected at all. The inputs only decide *how* it is connected.
+- **Problem**: My motor does not stop when I set both inputs low.
+- **Solution**: Remember that with the L298N, both inputs equal and EN high is a brake, while EN low is a coast. Check what your EN pin is doing.
+- **Why**: The enable pin decides whether the bridge is connected at all. The inputs only decide *how* it is connected.
+
+## Check your understanding
+
+{% quiz %}
+? What is shoot-through?
+- [x] Both switches on one side of the bridge closing, connecting the supply straight to ground
+- [ ] The motor spinning too fast
+- [ ] A PWM frequency that is too high
+> Closing S1 and S3 together (or S2 and S4) shorts the supply to ground and destroys the transistors.
+
+? What is the difference between brake and coast?
+- [x] Brake shorts the motor terminals so back-EMF stops it quickly, coast disconnects the motor
+- [ ] Brake cuts the battery, coast reverses the motor
+- [ ] There is no difference
+> Coast leaves the motor free to roll on. Brake makes the motor's own back-EMF fight its motion.
+
+? On a DRV8833, how do you run a motor forward at part speed?
+- [x] PWM on IN1 with IN2 low
+- [ ] Both inputs high
+- [ ] PWM on an EN pin
+> The DRV8833 has no EN pin. The speed lives on the input pins: PWM on one input with the other low.
+{% endquiz %}

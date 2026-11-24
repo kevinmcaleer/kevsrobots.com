@@ -11,6 +11,7 @@ description: A quick reference for every Mermaid diagram type in the course, plu
 percent: 100
 duration: 5
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -62,6 +63,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to look up the first line and key syntax of every diagram type in the course, and know where to go next.
 
 ---
 

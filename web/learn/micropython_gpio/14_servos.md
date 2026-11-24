@@ -10,8 +10,8 @@ next: 15_ultrasonic_range_finders.html
 description: Learn about servos and how to control them with the Raspberry Pi Pico
   and MicroPython.
 percent: 75
-duration: 3
-quiz_total: 33
+duration: 4
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -74,6 +74,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to turn a servo to a chosen angle using a 50Hz PWM signal.
+
 ## Overview
 
 A servo is a motor that turns to a position you choose and holds it there, which makes it perfect for robot arms, legs and pan-tilt heads. In this lesson you'll wire one up and control it with PWM.
@@ -134,9 +136,39 @@ servo.deinit()
 
 ---
 
-## Try it yourself
+---
 
-Use a potentiometer (lesson 9) to set the servo angle, so turning the knob turns the servo.
+## Wiring table
+
+| Servo wire | Connects to |
+| --- | --- |
+| Red (power) | VBUS, physical pin 40 |
+| Brown or black (ground) | GND |
+| Orange or yellow (signal) | GP18, physical pin 24 |
+{:class="table table-single"}
+
+---
+
+## Try it Yourself
+
+1. Run the program and watch the servo sweep.
+2. Change the angle sequence to `(0, 45, 90, 135, 180)`.
+3. Narrow the pulse range to 1.0 to 2.0ms if your servo strains at the ends.
+4. Challenge: use a potentiometer to set the angle.
+
+## Common Issues
+
+- **Problem**: The servo buzzes and strains at the ends.
+- **Solution**: Narrow the range, for example 1.0 to 2.0ms.
+- **Why**: Some servos hit their mechanical stop before 0.5 or 2.5ms.
+
+- **Problem**: The Pico resets when the servo moves.
+- **Solution**: Power the servo from its own 5V supply and share the ground.
+- **Why**: The servo draws more current than USB can supply during moves.
+
+> **Teachers**: Servos pull a surge of current when they move. Several on one USB port can reset the Pico or the computer. Give groups one servo each, or use a powered USB hub, and always check for a shared ground.
+
+## Check your understanding
 
 {% quiz %}
 ? What sets a servo's position?
@@ -150,6 +182,12 @@ Use a potentiometer (lesson 9) to set the servo angle, so turning the knob turns
 - [x] 4915
 - [ ] 32768
 > 1.5ms is 7.5% of a 20ms cycle, and 7.5% of 65535 is about 4915.
+
+? What pulse width is the middle position of a typical servo?
+- [ ] 0.5ms
+- [x] 1.5ms
+- [ ] 20ms
+> 1.5ms is the centre, and each pulse repeats every 20ms.
 {% endquiz %}
 
 ---

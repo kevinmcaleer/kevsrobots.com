@@ -11,16 +11,31 @@ description: Learn how to use the Raspberry Pi Pico's built-in temperature senso
   step-by-step tutorials and practical examples, you'll gain the skills to confidently
   use the Pico for sensor-based projects.
 level: beginner
-course_duration: 0h 33m
-lesson_count: 12
-first_lesson: 01_course_introduction.html
+course_duration: 1h 10m
+lesson_count: 13
+first_lesson: 00_intro.html
+quiz_total: 36
+outcomes:
+- Set up a Raspberry Pi Pico with MicroPython and run programs from Thonny
+- Read the Pico's built-in temperature sensor with the ADC
+- Convert a raw ADC reading to voltage and then to degrees Celsius
+- Smooth noisy readings by averaging and calibrate them with an offset
+- Build a temperature alert that lights the on-board LED
+- Diagnose the common reasons a temperature reading looks wrong
+prerequisites:
+- No programming experience needed
+- Helpful but not required, the MicroPython course
+you_need:
+- A Raspberry Pi Pico, Pico W or Pico 2, and a data-capable USB cable
+- A computer with Thonny installed (we do this in lesson 2)
+- Optional, a room thermometer for calibration and an SSD1306 I2C OLED display
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:
   - section: Introduction to the Raspberry Pi Pico and MicroPython
     content:
     - name: Course Introduction
-      link: 01_course_introduction.html
+      link: 00_intro.html
     - name: Setting Up Thonny
       link: 02_setting_up_thonny.html
     - name: Installing MicroPython on the Pico
@@ -51,4 +66,6 @@ navigation:
       link: 11_project_ideas_and_extensions.html
     - name: Troubleshooting Temperature Readings
       link: 12_troubleshooting_temperature_readings.html
+    - name: Summary and Next Steps
+      link: 13_summary_and_next_steps.html
 ---

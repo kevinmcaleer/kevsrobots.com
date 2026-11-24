@@ -55,7 +55,7 @@
   <circle cx="540" cy="272" r="16" fill="#7ee787"/>
   <text class="step" x="535" y="278">2</text>
   <text class="sm" x="566" y="264" fill="#7ee787">Written into the buffer</text>
-  <text class="sm" x="566" y="286">32 recent posts, in RAM</text>
+  <text class="sm" x="566" y="286">Recent posts, in RAM</text>
 
   <!-- buffer visual -->
   <g transform="translate(818,248)">

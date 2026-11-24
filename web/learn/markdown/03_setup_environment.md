@@ -7,17 +7,19 @@ cover: assets/3.png
 date: 2024-03-21
 previous: 02_markdown_basics.html
 next: 04_writing_content_in_markdown.html
-description: Step-by-step guide to installing Jekyll and preparing your development
-  environment for creating Jekyll sites.
-percent: 30
-duration: 2
+description: Install Ruby, Jekyll and Bundler, create your first Jekyll site and preview
+  it in your browser.
+percent: 27
+duration: 5
+quiz_total: 35
+date_updated: 2026-11-24
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:
   - section: Introduction to Markdown and Jekyll
     content:
-    - name: Overview of Jekyll and Static Sites
-      link: 01_overview.html
+    - name: Course Overview
+      link: 00_intro.html
     - name: Introduction to Markdown
       link: 02_markdown_basics.html
     - name: Setting Up Your Environment
@@ -42,102 +44,146 @@ navigation:
       link: 09_building_and_testing_locally.html
     - name: Deploying to GitHub Pages
       link: 10_deploying_to_github_pages.html
+    - name: Summary and Next Steps
+      link: 11_summary.html
 ---
 
 
 ![Environment Setup cover image]({{ page.cover }}){:class="cover"}
 
-## Introduction
+By the end of this lesson you will be able to install Jekyll, create a new site and view it running at `http://localhost:4000` on your own computer.
 
-Before diving into creating content and customizing your Jekyll site, it's essential to set up your local development environment. This lesson will guide you through installing Jekyll, Ruby, and other necessary tools.
+## Why install anything?
 
-## Prerequisites
+You could write Markdown in any editor, but to see it as a finished website you need Jekyll, and Jekyll is a Ruby program. Think of Ruby as the engine, Jekyll as the machine you build on it, and Bundler as the parts list that makes sure every computer uses the same versions. Setting this up once means every later lesson is just writing and refreshing.
 
-- **Ruby:** Jekyll is built with Ruby. Ensure you have Ruby and the RubyGem package manager installed.
-- **Git:** Version control is crucial for managing your site's source code.
+```mermaid
+flowchart LR
+    R["Ruby<br/>(the language)"] --> G["RubyGems<br/>(installs packages called gems)"]
+    G --> J["Jekyll<br/>(the site builder)"]
+    G --> B["Bundler<br/>(locks gem versions)"]
+    J --> S["Your site on localhost:4000"]
+    B --> S
+```
 
-## Installing Ruby
+> **Teachers**: this lesson installs software, so it is the one most likely to be blocked on school-managed laptops and Chromebooks. Test one machine before the class, or ask your IT team to install Ruby and Jekyll in advance. Allow a full session, because installs differ between operating systems. If installing is impossible, learners can still do lessons 1, 2 and 4 in an online Markdown previewer and join again at lesson 10 with GitHub only.
 
-The installation process varies depending on your operating system.
+## Step 1: install Ruby
 
-### Windows
+The Jekyll installation guide at [jekyllrb.com/docs/installation](https://jekyllrb.com/docs/installation/) is the final word, because versions change. These are the usual routes.
 
-1. Download and install Ruby using the RubyInstaller for Windows.
-2. During installation, check the option to add Ruby to your PATH.
+**Windows.** Download **Ruby+Devkit** from [RubyInstaller](https://rubyinstaller.org/downloads/). When the installer finishes, leave the "Run ridk install" box ticked and accept the default choice in the window that opens, so the tools that build gems are installed too.
 
-### macOS
-
-macOS comes with Ruby installed, but you may need to update it. Use Homebrew:
+**macOS.** The Ruby that ships with macOS is meant for the system itself, and the Jekyll guide recommends installing your own. With [Homebrew](https://brew.sh):
 
 ```bash
 brew install ruby
 ```
 
-Add Ruby to your PATH using the instructions provided by Homebrew.
+Homebrew then prints a line to add to your shell profile so the new Ruby is found before the system one. Follow it, then open a new terminal.
 
-### Linux
-
-Use your package manager to install Ruby. For example, on Ubuntu:
+**Linux (Debian or Ubuntu).**
 
 ```bash
-sudo apt-get install ruby-full
+sudo apt install ruby-full build-essential zlib1g-dev
 ```
 
-## Installing Jekyll
+On Linux, also stop gems being installed as the administrator, by telling Ruby to keep them in your home folder:
 
-With Ruby installed, you can install Jekyll and Bundler:
+```bash
+echo 'export GEM_HOME="$HOME/gems"' >> ~/.bashrc
+echo 'export PATH="$HOME/gems/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Check it worked. Each command should print a version number:
+
+```bash
+ruby -v
+gem -v
+```
+
+## Step 2: install Jekyll and Bundler
 
 ```bash
 gem install jekyll bundler
 ```
 
-## Setting Up a Jekyll Project
-
-Create a new Jekyll site in your desired directory:
+## Step 3: create and preview a site
 
 ```bash
-jekyll new my-awesome-site
-```
-
-Change into your new directory:
-
-```bash
-cd my-awesome-site
-```
-
-Build the site and make it available on a local server:
-
-```bash
+jekyll new robot-log
+cd robot-log
 bundle exec jekyll serve
 ```
 
-Open your web browser and go to `http://localhost:4000` to see your new site.
+`jekyll new` creates a folder with a starter site. `bundle exec` runs Jekyll using exactly the versions in the folder's `Gemfile`. When the terminal says the server is running, open `http://localhost:4000` in your browser. `localhost` means "this computer", so only you can see it. Press Ctrl+C in the terminal to stop the server.
 
-## Version Control with Git
+Take a look at what was created:
 
-Initialize a Git repository in your project folder:
+| File or folder | What it is for |
+| --- | --- |
+| `_config.yml` | Site-wide settings such as the title. Restart the server after editing it |
+| `Gemfile` | The gems this site needs |
+| `index.markdown` | Your home page |
+| `about.markdown` | An example extra page |
+| `_posts/` | Blog posts, one Markdown file each |
+| `_site/` | The built site. Jekyll writes it, so never edit it |
+{:class="table table-single"}
+
+## Step 4: keep it in Git
 
 ```bash
 git init
-```
-
-Add and commit your Jekyll project:
-
-```bash
 git add .
 git commit -m "Initial commit"
 ```
 
-## Practice Exercise
+The starter site includes a `.gitignore` that already leaves out `_site/`, so only your source files are saved. If Git is new to you, the [Git course](/learn/git/) covers it.
 
-1. Install Ruby, Jekyll, and Bundler following the steps above.
-2. Create a new Jekyll project named `learn-jekyll`.
-3. Run your site locally and take a screenshot of your browser displaying the site.
+## Try it Yourself
 
-## Additional Resources
+1. Install Ruby, Jekyll and Bundler and create a site called `robot-log`.
+2. With the server running, open `_config.yml`, change `title`, stop the server with Ctrl+C and start it again. Does the new title show?
+3. Edit `index.markdown` and add a sentence about your robot. Refresh the browser without restarting anything.
+4. Challenge: run `bundle exec jekyll serve --port 4001`. What changes?
 
-- [Jekyll Installation Documentation](https://jekyllrb.com/docs/installation/)
-- [Ruby Official Website](https://www.ruby-lang.org/en/downloads/)
-- [Git Official Website](https://git-scm.com/)
+## Common Issues
 
----
+- **Problem**: `jekyll: command not found`.
+- **Solution**: Close and reopen the terminal, then run `ruby -v` and `gem -v`. If those work, run `gem install jekyll bundler` again.
+- **Why**: A new terminal reads your updated PATH, and the command only exists once the gem is installed.
+
+- **Problem**: `cannot load such file -- webrick` when starting the server.
+- **Solution**: Run `bundle add webrick`, then start the server again.
+- **Why**: From Ruby 3.0, the small web server Jekyll uses for previewing is no longer bundled, so it has to be added to the site.
+
+- **Problem**: The browser shows the old title after I edited `_config.yml`.
+- **Solution**: Stop the server with Ctrl+C and run `bundle exec jekyll serve` again.
+- **Why**: Jekyll rebuilds when pages change but only reads `_config.yml` at start-up.
+
+- **Problem**: `Address already in use` or port 4000 is busy.
+- **Solution**: Stop the other server, or choose another port with `--port 4001`.
+- **Why**: Only one program can listen on a port at a time.
+
+## Check your understanding
+
+{% quiz %}
+? What does `bundle exec jekyll serve` do?
+- [ ] Publishes your site to the internet
+- [x] Builds the site and previews it on your computer
+- [ ] Installs Ruby
+> It builds the site and serves it at `http://localhost:4000`, only on your own computer.
+
+? You edit `_config.yml` while the server is running. What must you do to see the change?
+- [ ] Nothing, it updates instantly
+- [x] Stop and restart the server
+- [ ] Delete the `_site` folder by hand
+> Jekyll only reads `_config.yml` at start-up.
+
+? Which folder holds the built site that Jekyll generates?
+- [ ] `_posts/`
+- [x] `_site/`
+- [ ] `_layouts/`
+> `_site/` is the output. You edit the source files and let Jekyll regenerate it.
+{% endquiz %}

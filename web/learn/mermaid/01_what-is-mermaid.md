@@ -12,6 +12,7 @@ description: Learn what diagrams as code means, why it's so handy for makers, an
 percent: 12
 duration: 5
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to explain what "diagrams as code" means and name the places where Mermaid diagrams are drawn for you.
 
 ---
 

@@ -7,9 +7,12 @@ cover: /learn/mini_rack/assets/banners/02_2u_design.jpg
 date: 2025-02-16
 previous: 01_components.html
 next: 03_bottom.html
-description: Learn how to create the 2U corner piece for the mini-rack
-percent: 30
-duration: 3
+description: Learn how rack units work and design the 2U corner piece for the mini-rack
+  in Fusion 360
+percent: 27
+duration: 6
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Mini-Rack 3D Design Tutorial
 - content:
@@ -29,12 +32,14 @@ navigation:
       link: 04_top.html
     - name: Create the Handle
       link: 05_handle.html
-    - name: Create the Cluster Panel
+    - name: Create the Cluster Panel Plate
       link: 06_panel.html
     - name: Create the Pi-Tray
       link: 07_pi_tray.html
     - name: Create the Top Panel
       link: 08_top_panel.html
+    - name: Create the Laser-Cut Cluster Panel
+      link: 09_cluster_panel.html
   - section: Printing
     content:
     - name: Print the parts
@@ -46,6 +51,10 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain how rack unit sizes decide where the holes go, and build the 2U corner in Fusion 360.
+
+Ahoy there makers! The 2U corner is the longest corner part, and it is the one that teaches us rack sizes. Every number in it comes from the rack standard, so take a few minutes over the measurements before you start clicking.
+
 In this lesson we'll create the 2U corner piece for the mini-rack.
 
 > ## What is a U?
@@ -56,12 +65,12 @@ In this lesson we'll create the 2U corner piece for the mini-rack.
 
 ## Common Rack Dimensions
 
-There are a number of key dimenions that are common to this design (and racks in general):
+There are a number of key dimensions that are common to this design (and racks in general):
 
-- 6M Holes: `6mm`
-- Pitch between 1U holes - `15.875mm`
+- Hole diameter: `6mm`
+- Pitch between holes within a U - `15.875mm`
 - 1U Height - `44.5mm` (you can use the `44.45mm` here instead)
-- pitch between U's - `12.75mm`
+- Gap between U's - `12.75mm` (last hole of one U to the first hole of the next)
 
 ---
 
@@ -124,21 +133,21 @@ There are a number of key dimenions that are common to this design (and racks in
 
     ![Extrude](/learn/mini_rack/assets/2u_12_extrude.png){:class="img-fluid w-100"}
 
-1. Create cons construction plans for each rib:
+1. Create construction planes for each rib:
 
-1. Create a new consuction plane `14mm` from the top:
+1. Create a new construction plane `14mm` from the top:
 
     ![Construction](/learn/mini_rack/assets/2u_13_construction.png){:class="img-fluid w-100"}
 
-1. Create a new consuction plane `15.875mm` from the last construction plane:
+1. Create a new construction plane `15.875mm` from the last construction plane:
 
     ![Construction](/learn/mini_rack/assets/2u_14_construction.png){:class="img-fluid w-100"}
 
-1. Create a new consuction plane `14.5mm` from the last construction plane:
+1. Create a new construction plane `14.5mm` from the last construction plane:
 
     ![Construction](/learn/mini_rack/assets/2u_15_construction.png){:class="img-fluid w-100"}
 
-1. Create another new consuction plane `14.5mm` from the last construction plane:
+1. Create another new construction plane `14.5mm` from the last construction plane:
 
     ![Construction](/learn/mini_rack/assets/2u_16_construction.png){:class="img-fluid w-100"}
 
@@ -158,4 +167,54 @@ There are a number of key dimenions that are common to this design (and racks in
 
     ![Extrude](/learn/mini_rack/assets/2u_20_extrude.png){:class="img-fluid w-100"}
 
----
+Once the last rib is in, orbit the part and check that it matches the picture at the top of the lesson.
+
+## Where the numbers come from
+
+Look again at the hole measurements. Three holes sit in each U, `15.875mm` apart. Two gaps of 15.875mm make 31.75mm. Subtract that from the height of one U (44.45mm) and 12.7mm is left to reach the first hole of the next U. This course uses 44.5mm for the U height, which is why the gap between U's is written as `12.75mm`. The 0.05mm difference is far too small to matter in a printed part, but now you know where each number comes from.
+
+This is why a rack is so useful. The hole pattern is a standard, so rack parts line up with your frame. A "10 inch" rack is roughly half the width of the standard 19 inch rack, and ten inches is 254mm.
+
+## Try it Yourself
+
+1. Work out how tall a 3U corner would need to be, in millimetres.
+2. In the dimensions picture, count how many `6mm` holes sit in the 2U body. Does the count match three holes per U?
+3. Challenge: the 2U corner is two U's. Which sketch dimensions would you edit to build a 1U corner?
+
+## Common Issues
+
+- **Problem**: I cannot extrude a profile, because nothing highlights.
+- **Solution**: Check the sketch is closed, with no gaps between lines, and that you finished the sketch before extruding.
+- **Why**: Fusion 360 can only extrude closed outlines.
+
+- **Problem**: The extrude cut goes into the wrong side of the part.
+- **Solution**: Change the direction in the extrude dialogue, or choose symmetric for the ribs.
+- **Why**: A cut follows the direction arrow, and that depends on which face you sketched on.
+
+- **Problem**: My sketch lines are blue and move when I drag them.
+- **Solution**: Add the missing dimensions until the lines turn black.
+- **Why**: Blue lines are not fully constrained, so Fusion 360 does not know exactly where they belong.
+
+> **Teachers**: This is the longest build lesson, so allow a double session. Check before the lesson that learners can sign in to Fusion 360, because it needs an Autodesk account and an internet connection. Pairs work well, with one person following the steps and the other checking each picture. The same shapes can be rebuilt in FreeCAD, see the [FreeCAD course](/learn/freecad/).
+
+## Check your understanding
+
+{% quiz %}
+? How tall is 1U?
+- [ ] 15.875mm
+- [x] 44.45mm (1.75 inches)
+- [ ] 254mm
+> A rack unit is 1.75 inches, which is 44.45mm.
+
+? What is the spacing between neighbouring holes inside a U?
+- [x] 15.875mm
+- [ ] 12.75mm
+- [ ] 6mm
+> Holes are 15.875mm apart. 12.75mm is the gap between the last hole of one U and the first of the next.
+
+? Why are the ribs extruded to construction planes?
+- [ ] To make the part print faster
+- [x] To place each rib at an exact distance from the top
+- [ ] To round off the edges
+> Each construction plane is measured from the one before, so the ribs land in the right positions.
+{% endquiz %}

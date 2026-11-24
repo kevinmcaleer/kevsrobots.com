@@ -1,119 +1,131 @@
 ---
 title: What is MeshCore?
-description: Understand what MeshCore is, the four device roles, and how it differs from Meshtastic
+description: Understand what MeshCore is, the firmware roles, and how its routing differs from other LoRa mesh systems
 type: page
 layout: lesson
 cover: /learn/meshcore/assets/banners/01_what_is_meshcore.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-MeshCore is a lightweight, hybrid-routing mesh protocol for packet radios. In plain English: it is firmware that turns a cheap LoRa board into a node on a self-organising, encrypted text messaging network.
+By the end of this lesson you will be able to name the MeshCore roles, say what each one does, and explain why a companion node does not extend your range.
 
-It is free, open source under the MIT licence, and it runs on hardware you can buy for the price of a takeaway.
+MeshCore is a lightweight, open source (MIT licence) mesh routing library and firmware for LoRa and other packet radios. In plain English, it turns a cheap LoRa board into a node on a self-organising, encrypted text messaging network.
 
 ---
 
 ## What problem does it solve?
 
-Mobile phones are wonderful right up until the moment there is no signal. Hills, valleys, festivals, remote workshops, hiking trips, power cuts, and boats all have the same problem - the infrastructure is somewhere else.
+Mobile phones are wonderful right up until there is no signal. Hills, festivals, remote workshops, hiking trips, power cuts and boats all have the same problem: the infrastructure is somewhere else.
 
-A LoRa mesh moves the infrastructure to you. Each node can talk directly to any other node in radio range, and repeaters extend that range by forwarding packets onward. There is no central server, no SIM card, and no subscription.
+A LoRa mesh moves the infrastructure to you. Nodes talk directly to other nodes in radio range, and repeaters extend that range by forwarding packets onward. There is no central server, no SIM card and no subscription.
 
 ![MeshCore roles](/learn/meshcore/assets/roles.svg){:class="img-fluid w-100"}
 
 ---
 
-## The four roles
+## The roles
 
-When you flash MeshCore you choose a **role** for the board. This is the single most important decision in the whole course, so let's take them one at a time.
+When you flash MeshCore you choose what the board will be. This is the most important decision in the course, so let's take the roles one at a time.
 
-### Companion (also called a client)
+### Companion (the client)
 
-**What it does:** Connects to your phone, tablet or computer over Bluetooth LE or USB serial. This is the node you actually talk through.
+**What it does:** connects to your phone or computer over Bluetooth LE or USB serial. This is the node you talk through.
 
-**Why this matters:** A companion node does **not** repeat other people's traffic. It sends your messages and receives messages addressed to you or your channels, and that is it. If you buy two boards and flash both as companions, you have a network with no range extension at all.
+**Why this matters:** a companion does **not** repeat other people's traffic. If you flash two boards as companions you have two messengers, but no range extension at all.
 
 ### Repeater
 
-**What it does:** Forwards packets on behalf of other nodes to extend the range of the network. It has no phone attached and normally sits somewhere high with a power supply.
+**What it does:** forwards packets for other nodes. It has no phone attached and normally sits somewhere high with a power supply.
 
-**Why this matters:** This is the piece that turns two radios into a *network*. Critically, a MeshCore repeater does **not** blindly rebroadcast everything it hears - it makes a decision about whether a packet needs forwarding. That is what keeps a MeshCore mesh quiet and usable as it grows.
+**Why this matters:** this is what turns radios into a *network*. A MeshCore repeater does not blindly rebroadcast everything it hears. It decides whether a packet needs forwarding, which keeps the mesh quiet as it grows.
 
 ### Room Server
 
-**What it does:** A bulletin-board style message store. It holds posts and hands them to users when they come back into range, a bit like a tiny email server.
-
-**Why this matters:** In a mesh, if you are out of range when a message is sent, you miss it. A room server keeps a rolling buffer of recent posts - 32 by default - and tracks where each user got to, so you can catch up later.
-
-Full build in [part two of this series](/learn/meshcore_rooms_sensors/).
+**What it does:** a simple bulletin-board server that stores posts and hands them to users when they come back into range, a bit like a tiny email server. According to the MeshCore FAQ, a client logging in receives the previous 32 unseen messages.
 
 ### Sensor
 
-**What it does:** Reports telemetry - temperature, humidity, battery voltage - into the mesh rather than carrying conversations.
+**What it does:** reports telemetry, such as temperature or battery voltage, into the mesh rather than carrying conversations.
 
-**Why this matters:** It turns your mesh into a long-range, no-subscription IoT network. A sensor on a beehive at the bottom of a field is a very satisfying project.
-
-Full build in [part two of this series](/learn/meshcore_rooms_sensors/).
-
-**In this course** we will build one **Repeater** and one **Companion**. Those two roles cover 90% of real world use.
+Room servers and sensors are built in the follow-on course [MeshCore Room Servers and Sensors](/learn/meshcore_rooms_sensors/). In this course we build one **Repeater** and one **Companion**.
 
 ---
 
-## How is this different from Meshtastic?
+## How routing differs from flooding-only meshes
 
-If you have been around LoRa before, you will have heard of Meshtastic. Both are excellent projects and they run on much of the same hardware, but they solve the problem differently.
+MeshCore uses hybrid routing. The first message to a new contact **floods** through the repeaters to find them. The reply carries back the route it took, and later messages follow that stored path, so only the repeaters named in the path forward them.
 
-### Routing
+Why this matters: airtime is the scarce resource in LoRa. Flooding costs airtime in proportion to the number of repeaters; path routing costs it in proportion to the number of hops. The next few lessons show you why.
 
-**Meshtastic** uses managed flooding - a message is rebroadcast by every node that hears it, up to a hop limit. Simple, robust, and it works brilliantly with a handful of nodes.
+```mermaid
+sequenceDiagram
+    participant A as You
+    participant R as Repeater
+    participant B as Friend
+    A->>R: First message (flood)
+    R->>B: Forwarded
+    B-->>R: Reply carrying the path taken
+    R-->>A: Path learned and stored
+    A->>R: Next message (path: via R)
+    R->>B: Forwarded, no flooding
+```
 
-**MeshCore** uses hybrid routing. The very first message to a new contact floods to find them, the destination replies with the route it took, and every message after that follows that specific path. Only the repeaters named in the path bother to forward it.
-
-**Why this matters:** Airtime is the scarce resource in a LoRa network. Flooding uses airtime proportional to the number of nodes; path routing uses airtime proportional to the number of hops. As a network grows past a couple of dozen nodes, that difference is the difference between a network that works and one that chokes on its own chatter.
-
-### Clients repeat by default
-
-In Meshtastic, an ordinary client node will typically also rebroadcast traffic. In MeshCore, a companion node **never** repeats. Repeating is a deliberate, separate role.
-
-**Why this matters:** It means you cannot accidentally build a mesh out of pocket devices. You have to plan your infrastructure - which is more work up front, and far better behaved once it is running.
-
-### Remote administration
-
-MeshCore repeaters have a full command line, reachable over USB, over the web config tool, or **remotely over the mesh itself** from your phone. You can change the name, transmit power or advert interval of a repeater on a hilltop without climbing the hill.
+MeshCore's own README describes it as similar in spirit to projects such as Meshtastic and Reticulum, with a focus on lightweight multi-hop routing and fixed roles. It is a different protocol: a MeshCore node and a Meshtastic node cannot talk to each other, even on identical hardware. I will not compare feature by feature here, because both projects move quickly. Check each project's own documentation before you choose.
 
 ---
 
 ## What MeshCore is not
 
-- It is **not** LoRaWAN. LoRaWAN needs gateways and a network server, and is designed for sensors reporting to the cloud. MeshCore is peer to peer.
-- It is **not** fast. You are sending short text messages at a few hundred bits per second. There is no voice, no images, no web browsing.
-- It is **not** anonymous. Messages are end-to-end encrypted, but adverts announce your node's name and public key to anyone listening.
+- **Not LoRaWAN.** LoRaWAN needs gateways and a network server and is aimed at sensors reporting to the cloud. MeshCore is peer to peer.
+- **Not fast.** You send short text messages at a few hundred to a few thousand bits per second. There is no voice, no images and no web browsing.
+- **Not anonymous.** Direct messages are encrypted, but adverts announce your node's name and public key to anyone listening.
 
 ---
 
 ## Try it Yourself
 
-1. Open [map.meshcore.io](https://map.meshcore.io) and find your nearest MeshCore repeater. How far away is it?
-2. Look up your local MeshCore community - in the UK, [localmesh.co.uk](https://localmesh.co.uk) coordinates settings so everyone's nodes can hear each other.
-3. Challenge: sketch your own street or village and mark the highest point you could reach with a mains socket. That is where your repeater wants to live.
+1. Open [map.meshcore.io](https://map.meshcore.io) and find the MeshCore repeater nearest to you. How far away is it?
+2. Look for a local MeshCore community for your region. In the UK, [localmesh.co.uk](https://localmesh.co.uk) is one place to start.
+3. Challenge: sketch your street or village and mark the highest point you could reach with a power socket. That is where your repeater wants to live.
 
 ---
 
 ## Common Issues
 
-**Problem**: "I bought two boards and flashed both as companions - why does nothing get further away?"
+- **Problem**: I flashed both boards as companions and my range has not improved.
+- **Solution**: Reflash one board with repeater firmware.
+- **Why**: Companion nodes never forward traffic for others, so without a repeater your range is whatever the two radios manage line of sight.
 
-**Solution**: Flash one as a repeater.
+- **Problem**: My friend runs Meshtastic. Can we message each other?
+- **Solution**: No, you both need to run the same firmware.
+- **Why**: The protocols, packet formats and encryption are different, even on the same board.
 
-**Why**: Companion nodes do not forward traffic for others. Without a repeater your range is simply whatever the two radios can manage line of sight.
+> **Teachers**: MeshCore adverts broadcast a node's name to anyone in range. Have learners choose a nickname, never a full name or address, for every node.
 
-**Problem**: "My friend runs Meshtastic - can we talk to each other?"
+## Check your understanding
 
-**Solution**: No. You will both need to run the same firmware.
+{% quiz %}
+? Which role forwards other people's packets to extend the network's range?
+- [ ] Companion
+- [x] Repeater
+- [ ] Sensor
+> A repeater forwards packets. A companion never repeats, so two companions alone give you no extra range.
 
-**Why**: The protocols, packet formats and encryption are completely different, even on identical hardware.
+? What happens to the first message you send to a brand new contact?
+- [ ] It follows a path that every node already knows
+- [x] It floods through the repeaters, and the reply brings back the path for later messages
+- [ ] It is sent over the internet
+> The first message floods to find the contact; the reply carries the route, and later messages use that stored path.
+
+? Which statement about MeshCore is true?
+- [ ] It is the same protocol as LoRaWAN
+- [ ] It needs a monthly subscription
+- [x] It is peer to peer and needs no central server
+> MeshCore nodes talk to each other directly or through repeaters, with no gateway or network server.
+{% endquiz %}
 
 ---

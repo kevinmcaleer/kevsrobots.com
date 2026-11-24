@@ -11,6 +11,7 @@ description: What you'll learn in this beginner's course on drawing diagrams wit
 percent: 6
 duration: 4
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -127,5 +128,9 @@ None. It helps to know a little Markdown; if it's new to you, have a look at [Ma
 Every example shows you the Mermaid code first, then the diagram that code draws, right there on the page. Copy the code into the [Mermaid Live Editor](https://mermaid.live) and change it - that's the quickest way to learn. Each lesson has a **Try it yourself** challenge, a list of **Common issues** with fixes, and a short quiz. Your progress and quiz score are saved in your browser and shown in the sidebar.
 
 Let's start drawing!
+
+---
+
+> **Teachers**: This course suits learners aged about 11 and up who can type and save a text file; no coding or hardware is needed. Each lesson takes about 30 to 45 minutes, and the project in lesson 13 is best split over two sessions. Each learner needs only a computer with a web browser, and everything can be done on the free Mermaid Live Editor with no account, though your school network must allow `mermaid.live`. The GitHub, Obsidian and command-line parts are optional extras and can be skipped or demonstrated by the teacher.
 
 ---

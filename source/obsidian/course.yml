@@ -6,10 +6,25 @@
   cover: assets/cover.jpg
   video: zo3mb3EeJXQ
   groups:
-      - obsidian
-      - raspberry pi
-  description: >- 
-     Learn how to use Obsidian for note-taking and knowledge management.
+      - productivity
+      - raspberrypi
+  description: >-
+     Learn how to use Obsidian for note-taking and knowledge management, by building a
+     robot build log vault with linked notes, tags, properties, tasks, a canvas and a Base.
+  outcomes:
+    - Explain that a vault is just a folder of plain Markdown files, and create one
+    - Write notes that link to each other with wikilinks, and follow backlinks
+    - Organise notes with tags and properties
+    - Track jobs with task checkboxes, and lay out a project on a Canvas
+    - Build a Base that turns your notes into a sortable table
+    - Read the graph view to find orphaned notes and clusters
+  prerequisites:
+    - No Obsidian or Markdown experience is needed
+    - Helpful but not required, Mastering Markdown for Documentation with Jekyll
+  you_need:
+    - A Windows, macOS or Linux computer, or a Raspberry Pi running Raspberry Pi OS
+    - An internet connection to download Obsidian
+    - Optionally, a robot or electronics project to write about
   content:
   - section:
       name: Overview
@@ -39,4 +54,3 @@
       content:
       - 10_markdown_in_obsidian.md
       - 11_markdown_course_link.md
-

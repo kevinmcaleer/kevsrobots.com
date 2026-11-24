@@ -7,10 +7,12 @@ cover: /learn/bottango/assets/banners/07_sync_music.jpg
 date: 2025-05-10
 previous: 06_triggers.html
 next: 08_arduino_mode.html
-description: Learn how to sync your servo movements to music and audio tracks in Bottango.
+description: Learn how to add audio to a Bottango project and time your servo movements
+  to the beat or to speech.
 percent: 72
-duration: 4
-date_updated: 2025-05-03
+duration: 5
+quiz_total: 30
+date_updated: 2026-11-24
 navigation:
 - name: Bottango Basics
 - content:
@@ -55,111 +57,95 @@ navigation:
 
 ---
 
-One of Bottango’s most powerful features is the ability to **synchronize your animations with music or sound effects**. This is perfect for building animatronics that lip-sync, dance, or react to music in time.
+By the end of this lesson you will be able to add an audio track to an animation and place keyframes against its waveform.
 
----
+A puppet that moves in time with a voice or a song feels alive. Bottango lets you load audio onto the timeline, see its waveform, and place keyframes exactly where the beat or the syllable lands.
 
-## Step 1: Add an Audio Track
+> **Note**: the Bottango docs cover this under **Audio and Video**, with pages on importing audio and video and on audio on hardware. Button names may have moved in newer versions, so check there if yours looks different.
 
-1. Open your Bottango project.
-2. In the timeline view, click **Add Audio**.
-3. Choose a `.mp3` or `.wav` file from your computer.
-4. The audio waveform will appear in the timeline.
+## Step 1: Add an audio track
 
-> Tip: Use short, high-quality audio clips for best results.
+1. Open your project and the animation you want to score.
+2. Use the add audio option in the animation to import a sound file. Bottango's docs list audio and video import as supported, and the Crash Course includes an "Add Audio" step. Check the docs for the file types your version accepts.
+3. The audio waveform appears alongside your servo tracks.
 
----
+Short, clean clips work best. A 10 to 30 second clip is plenty for a first try.
 
-## Step 2: Align Keyframes with the Beat
+## Step 2: Line up keyframes with the waveform
 
-1. Play the audio using the timeline preview.
-2. Use the waveform as a visual guide to **place keyframes** at musical beats or lyric changes.
-3. You can **zoom in** on the timeline for precise placement.
+1. Play the audio with the timeline preview.
+2. Use the waveform as a guide: loud peaks usually mean a beat, and gaps mean silence.
+3. Zoom in on the timeline to place keyframes precisely.
 
-This makes it easy to time head nods, arm waves, or jaw movements with music.
+```mermaid
+flowchart LR
+    A["Audio waveform<br/>peaks at the beats"] --> B["Place keyframes<br/>on the peaks"]
+    B --> C["Play back and check by ear"]
+    C -->|"feels late or early"| B
+```
 
----
+## Step 3: Simple lip-sync
 
-## Step 3: Lip-Syncing Basics
+To make a jaw talk:
 
-To create a simple lip-sync effect:
+1. Assign a servo to the jaw or mouth.
+2. Add a keyframe with the jaw open at each strong syllable, and one with it closed in between.
+3. Use easing so it opens and closes naturally.
 
-- Assign a servo to control the jaw or mouth
-- Create quick up/down movements at syllables or beats
-- Use easing curves to make the motion look more natural
+A tip from animators: you do not need to match every sound. Open the jaw on the strong, loud parts of words, and the brain fills in the rest.
 
-For more realism, try animating multiple mouth positions (visemes) using multiple servos.
+## Where does the sound play?
 
----
+By default, Bottango plays audio on your computer's speakers, while the servos move through the board. The docs also have an **Audio on Hardware** page for playing sound from the hardware itself. Because audio and servo commands travel separately, timing can drift if you use Bluetooth speakers, which add a delay. Use wired speakers for tight sync.
 
-## Optional: Use Audio Triggers
+## Example: a dancing robot
 
-If you want animations to start **when audio begins**, create a trigger:
+1. Load a short music clip.
+2. Add a nod on each beat of the first verse.
+3. Add bigger movements for the chorus.
+4. Loop the playback and refine until it feels right.
 
-1. Go to the **Triggers** panel.
-2. Choose **Audio Starts** as the source.
-3. Set the action to **Play Animation** or **Start Timeline**.
+## Common Issues
 
-You can also sync lighting, gamepad actions, or other animations using audio events.
+- **Problem**: The movement seems late compared to the sound.
+- **Solution**: Move your keyframes a little earlier, and use wired speakers.
+- **Why**: Servos take time to move and wireless speakers add delay, so the movement needs to start before the sound.
 
----
+- **Problem**: I cannot place a keyframe exactly on the beat.
+- **Solution**: Zoom in on the timeline.
+- **Why**: At a wide zoom each pixel covers a lot of time.
 
-## Output Options
+- **Problem**: The audio file will not load.
+- **Solution**: Check the file type against the docs, or export your clip as a common type such as WAV or MP3 and try again.
+- **Why**: Not every audio format is supported.
 
-- Bottango plays audio **on your computer**, not on the microcontroller.
-- If you’re using a Bluetooth speaker or need tight timing, test playback latency.
-- For installations or stage performances, consider routing audio and animation output through a synced show controller.
-
----
-
-## Example: Dancing Robot
-
-1. Load a short music clip (e.g. 10–30 seconds).
-2. Add servo keyframes to match the beat.
-3. Add dramatic motions for chorus or breaks.
-4. Use **loop playback** to rehearse and refine.
-
-The result? A robot or puppet that dances in time with the music — great for stage props, Halloween decorations, or interactive art.
-
----
-
-You've now learned how to animate with rhythm and sound — awesome work!
-
----
+> **Teachers**: only use audio you have the right to use. Pupils love to import chart songs, but these are protected by copyright, and recordings of themselves speaking are a better choice. If you use voice recordings of pupils, get permission and tell them where the files will be stored.
 
 ## Try it Yourself
 
-Let's put audio sync into practice! Try these creative exercises:
+1. **Beat matching**: load a 5 to 10 second clip with a clear beat and make a servo nod on each beat.
+2. **Lip-sync**: record yourself saying "Hello, I am a robot!" and make a jaw open on each strong syllable.
+3. **Two-servo dance**: make one servo move left and right with the melody, and another bob with the drums.
+4. Challenge: add a "wake up" movement at the start of the clip and a "sleep" pose at the end.
 
-1. **Beat Matching**: Load a short music clip with a clear beat (5-10 seconds):
-   - Add a servo animation that nods or bobs on each beat
-   - Use the audio waveform to place keyframes precisely
-   - Test with different songs - does it stay in sync?
+## Check your understanding
 
-2. **Simple Lip-Sync**: Record yourself saying "Hello, I am a robot!" (or use a text-to-speech tool):
-   - Load the audio into Bottango
-   - Create jaw movements that open/close with each syllable
-   - Tips: Open jaw on vowels (a, e, i, o, u), close on consonants
+{% quiz %}
+? How can you place keyframes precisely against audio?
+- [ ] Turn off the waveform
+- [x] Use the waveform as a guide and zoom in on the timeline
+- [ ] Always use the slowest easing
+> The waveform shows beats and zooming in gives fine control.
 
-3. **Musical Performance**: Choose a 15-second music clip and create a "performance":
-   - Servo 1: Moves left-right with melody
-   - Servo 2 (if available): Bobs up-down with bass/drums
-   - Make big dramatic movements during chorus or crescendos
-   - Enable loop playback for rehearsal
+? Why might movement look late compared to the sound?
+- [x] Servos need time to move, and wireless speakers add delay
+- [ ] The animation has too many keyframes
+- [ ] The servo is wired backwards
+> Start the movement earlier, and use wired speakers for tight timing.
 
-4. **Reaction Animation**: Create an animation triggered by audio starting:
-   - Set up audio trigger: "When audio starts"
-   - Action: Play a "wake up" animation (slow movement to ready position)
-   - When audio ends: Return to "sleep" position
-
-**Advanced Challenge**: Create a "talking character" that:
-- Has realistic lip-sync with 3+ different mouth positions
-- Head nods emphasize certain words
-- Eyes blink occasionally (if you have an extra servo)
-- Plays back a 20-30 second dialogue clip
-
----
-
-Next up: [Advanced Arduino Mode](08_arduino_mode.md)
-
----
+? What is a good first lip-sync approach?
+- [ ] Match every single sound
+- [x] Open the jaw on the strong syllables and close it in between
+- [ ] Keep the jaw still
+> You do not need to match every sound.
+{% endquiz %}

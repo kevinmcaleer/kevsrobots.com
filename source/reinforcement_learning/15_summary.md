@@ -1,141 +1,158 @@
 ---
 title: Summary and What's Next
-description: Recap the key concepts, review what you've built, and find out where to take your robotics and AI journey next.
+description: Recap the key ideas, review what you built, and find out where to take your robotics and AI journey next.
 layout: lesson
+code_target: cpython
 type: page
 cover: /learn/reinforcement_learning/assets/banners/15_summary.jpg
-date_updated: 2026-06-13
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-You made it! Let's take a moment to look back at the journey from "my robot crashes into the sofa" to "my robot has a trained policy it discovered on its own."
+By the end of this lesson you will be able to explain the whole Q-learning pipeline from reward to robot in your own words, and choose a next step.
 
 ---
 
-## What You've Built
+You made it! Let's look back at the journey from "my robot crashes into the sofa" to "my robot runs a policy it learned from experience".
 
-Over the course of 14 lessons, you:
-
-1. **Understood why hardcoded rules fail** — and why trial-and-error learning is a fundamentally better approach for dynamic environments
-2. **Defined the RL vocabulary** — agent, environment, state, action, reward — in terms of a physical robot
-3. **Designed a reward function** — including learning to spot reward-hacking traps like the statue problem
-4. **Discretised continuous sensors** — turning messy real-world readings into clean state labels a lookup table can index
-5. **Understood Markov Decision Processes** — just enough theory to know why the current state is enough
-6. **Implemented discount factors** — and saw the Bellman equation as a simple recursive Python function
-7. **Built a Q-table from scratch** — using a Python `defaultdict` with JSON serialisation for Pico deployment
-8. **Implemented ε-greedy exploration** — with epsilon decay that transitions from full exploration to mostly exploitation
-9. **Coded the complete Q-learning update rule** — and understood every term: α, γ, TD target, TD error
-10. **Trained in simulation** — watching the average episode reward rise from negative (crashes) to positive (goal reached) over hundreds of episodes
-11. **Understood the sim-to-real gap** — and applied practical mitigations: sensor noise in training, conservative thresholds, safety fallbacks
-12. **Read and filtered HC-SR04 data** — using median-of-three filtering and mapping to the same state bins as training
-13. **Deployed to the Pico** — loading the JSON Q-table in MicroPython and running the greedy policy in a live control loop
-14. **Looked ahead to Deep RL** — understanding where tables run out of road and what neural network approximators make possible
+```mermaid
+flowchart LR
+    A["Reward<br/>lesson 3"] --> B["States and actions<br/>lessons 2 and 4"]
+    B --> C["Q-table<br/>lesson 7"]
+    C --> D["Epsilon-greedy<br/>lesson 8"]
+    D --> E["Update rule<br/>lesson 9"]
+    E --> F["Train in simulation<br/>lesson 10"]
+    F --> G["Stress-test<br/>lesson 11"]
+    G --> H["Run on the Pico<br/>lessons 12 and 13"]
+```
 
 ---
 
-## Key Concepts Checklist
+## What you have built
 
-Use this as a revision guide. You should be able to explain each item in your own words:
-
-**Core vocabulary:**
-- [ ] What is a reinforcement learning agent?
-- [ ] What distinguishes the environment from the agent?
-- [ ] What is a state, and why do we discretise continuous readings?
-- [ ] What is an action space, and what are the four actions our robot uses?
-- [ ] What is a reward, and why does its design matter so much?
-
-**The framework:**
-- [ ] What does the Markov property tell us about what information we need?
-- [ ] What is an episode, and what ends one?
-- [ ] What does the discount factor γ control?
-- [ ] What is the Bellman equation, in plain English?
-
-**The algorithm:**
-- [ ] What does a Q-value represent?
-- [ ] How is a Q-table indexed?
-- [ ] What is the ε-greedy strategy and why do we need it?
-- [ ] What is epsilon decay and what problem does it solve?
-- [ ] Write the Q-learning update rule from memory (as a Python expression with comments)
-
-**Deployment:**
-- [ ] What are three sources of the sim-to-real gap?
-- [ ] How does median-of-three filtering help with real sensor noise?
-- [ ] Why do we use a simplified state (heading + distance only) on the real robot?
-- [ ] What is a safety fallback and why is it important?
-
-**Beyond tabular:**
-- [ ] At what point does a lookup table become impractical?
-- [ ] What does a DQN's neural network approximate?
-- [ ] Name two deep RL algorithms suitable for continuous action spaces
+1. **Why rules struggle.** A one-rule robot circled a room for ever, because the rule was written for a different layout.
+2. **The vocabulary.** Agent, environment, state, action and reward, and the loop between them.
+3. **A reward function.** And how to catch statues and spinners by scoring behaviours before training.
+4. **Discrete states.** Turning sensor readings into labels a table can index.
+5. **The framework.** The Markov property, discounted returns and the Bellman idea.
+6. **A Q-table and epsilon-greedy exploration.** Plus epsilon decay.
+7. **The Q-learning update.** And a corridor where you watched the goal's value spread backwards.
+8. **A grid-world trainer.** With a learning curve from about -8.6 to about 60.
+9. **A stress test.** Sensor noise and wheel slip, and the trade-off between safety and progress.
+10. **A real sensor and a real deployment.** Median filtering, matching thresholds and a three-row Q-table on a Pico.
+11. **An honest view of deep RL.** Where tables stop and what carries over.
 
 ---
 
-## The Q-Learning Update Rule (From Memory)
+## The update rule, one last time
 
-This is the one equation worth memorising. Here it is one more time as commented Python:
+Everything comes down to this one line, in plain text:
+
+`Q[s][a] = Q[s][a] + alpha * (reward + gamma * max(Q[s2]) - Q[s][a])`
+
+Here it is with real numbers, so you can check your understanding. Suppose the current estimate is 0, the reward is 1, the best Q-value in the next state is 5, alpha is 0.2 and gamma is 0.9.
 
 ```python
-# Q-learning update — commit this to memory
-# Bellman-derived, Watkins 1989, still the heart of modern RL
+q_sa = 0.0          # Q[s][a], the current estimate
+reward = 1.0
+best_next = 5.0     # max(Q[s2])
+alpha = 0.2         # learning rate
+gamma = 0.9         # discount factor
 
-q_table[state][action] += alpha * (
-    reward                          # what I just got
-    + gamma * max(q_table[next_state].values())  # discounted best future
-    - q_table[state][action]        # minus my current estimate (TD error)
-)
+td_target = reward + gamma * best_next      # 1 + 0.9 * 5 = 5.5
+td_error = td_target - q_sa                 # 5.5 - 0 = 5.5
+q_sa = q_sa + alpha * td_error              # 0 + 0.2 * 5.5 = 1.1
 
-# alpha (learning rate):  how boldly I update — typically 0.1–0.3
-# gamma (discount):       how much I trust the future — typically 0.9–0.99
-# TD error:               positive = I was too pessimistic, negative = too optimistic
+print(f"TD target {td_target:.2f}, TD error {td_error:.2f}, new Q {q_sa:.2f}")
 ```
-{: .no-snakie }
+
+```
+TD target 5.50, TD error 5.50, new Q 1.10
+```
 
 ---
 
-## What's Next
+## Key concepts checklist
 
-You've covered tabular Q-learning end-to-end. Here are the natural next steps, in roughly increasing order of difficulty:
+Can you explain each of these in your own words?
 
-### Stay on the Robot
-
-**[MicroPython Robotics Projects](/learn/micropython_robotics/)**
-If you haven't completed this course, it covers the hardware foundations (motors, sensors, PWM) that the deployment lessons assumed. A great place to consolidate the physical side.
-
-**[Learn ROS](/learn/learn_ros/)**
-The Robot Operating System is the industry-standard framework for building complex multi-component robots. If you want to scale from a two-wheeled Pico robot to a full robot arm or mobile platform, ROS is the next major skill to acquire.
-
-### Go Deeper on AI
-
-**NumPy** — before any deep learning framework, get comfortable with numerical arrays. The [Pandas and NumPy](/learn/pandas_and_numpy/) course on this site is a good starting point.
-
-**OpenAI Gymnasium** — the standard RL environment API. Try the `FrozenLake`, `CartPole`, and `MountainCar` environments with your Q-learning code first, then graduate to DQN for `CartPole`.
-
-**PyTorch or JAX** — the deep learning frameworks used in most modern RL research. PyTorch has excellent beginner tutorials and an active community.
-
-**Spinning Up in Deep RL** — OpenAI's free educational resource: [spinningup.openai.com](https://spinningup.openai.com). Covers policy gradients, PPO, SAC, and more with clean implementations.
-
-### Read the Papers
-
-- **Q-Learning**: Watkins & Dayan, 1992 — the original paper; very readable
-- **DQN**: Mnih et al., 2013/2015 — the Atari breakthrough; Nature version is open access
-- **PPO**: Schulman et al., 2017 — the most widely deployed policy gradient algorithm
-- **AlphaGo**: Silver et al., 2016 — combines RL with Monte Carlo tree search
+- What an agent, environment, state, action and reward are
+- Why reward design matters, and what reward hacking looks like
+- Why we discretise sensor readings
+- What the Markov property says, and what gamma controls
+- What a Q-value represents, and how the Q-table is indexed
+- Why epsilon-greedy needs both exploring and exploiting
+- Each term in the update rule: alpha, gamma, TD target and TD error
+- Three causes of the sim-to-real gap
+- Why the real robot uses a state it can actually measure
+- When a table stops being enough
 
 ---
 
-## A Final Word
+## What's next
 
-When you started this course, a robot that *learns* might have seemed like something reserved for research labs with expensive GPUs and machine-learning PhDs. I hope this course has shown you that the core ideas are genuinely accessible — a Python dictionary, a reward signal, and enough patience to let a virtual robot crash into walls several hundred times is all you really need to get started.
+**Stay on the robot**
 
-The same Bellman equation that powers cutting-edge robotics research is running in your `q_table[state][action] += alpha * td_error` line. The scale is different. The principle is identical.
+- [Reinforcement Learning with Gymnasium](/learn/gymnasium/): the direct sequel. It moves the same BurgerBot grid world onto the standard Gymnasium API and Stable-Baselines3.
+- [MicroPython Robotics Projects](/learn/micropython_robotics/): consolidate the motors, sensors and PWM used in lessons 12 and 13.
+- [Learn ROS](/learn/learn_ros/): the standard framework for bigger robots with many parts.
+- [Robotics 101](/learn/robotics_101/): the wider picture of how robots sense, think and move.
 
-Keep building. Keep experimenting. And keep letting your robots learn.
+**Go deeper on AI**
+
+- [Pandas and NumPy](/learn/pandas_and_numpy/): numerical arrays, the foundation of nearly all deep learning code.
+- Reading: Watkins and Dayan (1992) on Q-learning, and Mnih and colleagues (2015, Nature) on DQN.
 
 ---
 
-*Thank you for working through this course. If you'd like to share what you built, post it on social media and tag [@kevinmcaleer28](https://www.youtube.com/@kevinmcaleer28) — I'd love to see your trained robots in action.*
+## Try it Yourself
+
+1. Redo lesson 10 on a new map you design. Does the same code learn it? How many episodes does it need?
+2. Write your own reward table for a different robot task, then score three hand-written behaviours with it, as in lesson 3.
+3. Choose one setting from `avoid_sim.py`, such as the obstacle count, predict how the results change, then check.
+4. Challenge: add a second sensor band for left and right to the simulator, so there are more states. Does a smarter state help?
+
+## Common Issues
+
+- **Problem**: My results do not match the lessons.
+- **Solution**: Check you copied each program whole, and that seeds are set the way the lesson shows.
+- **Why**: Every random choice flows from the seed, so small edits change the numbers.
+
+- **Problem**: My robot works in simulation and not on the floor.
+- **Solution**: Revisit lesson 11's checklist: thresholds, noise, calibration and the safety override.
+- **Why**: A simulation is a model, and the gap between the model and the real robot is where policies fail.
+
+## Check your understanding
+
+{% quiz %}
+? What does the TD error measure?
+- [ ] How often the robot explores
+- [x] The gap between the TD target and the current Q estimate
+- [ ] The total reward in an episode
+> The update moves the estimate a fraction alpha of the way across that gap.
+
+? Why does the real robot use only the distance band as its state?
+- [ ] The Pico cannot run Python
+- [x] It can only use what it can actually sense, and it has no way to measure its grid position
+- [ ] Three states are always best
+> A deployed policy can only use inputs that exist on the robot.
+
+? Which is true about our trained reflex policy?
+- [x] It is no cleverer than a hand-written rule, but it uses the same method that scales up
+- [ ] It learns in real time on the Pico
+- [ ] It builds a map of the room
+> The value of the course is the method. The three-state policy matches the simple rule.
+{% endquiz %}
 
 ---
+
+## A final word
+
+When you started, a robot that *learns* may have seemed like something for research labs with expensive GPUs. I hope this course has shown that the core ideas are within reach: a Python dictionary, a reward signal, and the patience to let a virtual robot bump into walls a few hundred times.
+
+The same Bellman idea that sits inside research systems is running in your `q_table[state][action]` line. The scale is different. The principle is the same.
+
+Keep building, keep experimenting, and keep letting your robots learn. If you build something with it, I would love to see it, so share it and tag [@kevinmcaleer28](https://www.youtube.com/@kevinmcaleer28).

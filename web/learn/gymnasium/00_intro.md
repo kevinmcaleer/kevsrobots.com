@@ -10,7 +10,9 @@ description: Meet the industry-standard Gymnasium API, explore Stable-Baselines3
   and train neural-network agents on the BurgerBot grid-world you already know.
 percent: 6
 duration: 4
-date_updated: 2026-06-14
+quiz_total: 56
+snakie: false
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning with Gymnasium
 - content:
@@ -52,7 +54,7 @@ navigation:
       link: 12_meet_stable_baselines3.html
     - name: Train, Evaluate, and Export
       link: 13_train_evaluate_export.html
-    - name: "What You Have Built \u2014 and Where to Go Next"
+    - name: What You Have Built, and Where to Go Next
       link: 14_summary.html
 ---
 
@@ -69,67 +71,65 @@ Watch this first: a MuJoCo pendulum learns to balance with Stable-Baselines3 and
 
 ## Overview
 
-In the Reinforcement Learning for Beginners course you built everything by hand: a custom `GridWorld` class, a Q-table stored in a plain Python dictionary, an epsilon-greedy action selector, and a reward function tuned for the BurgerBot maze. That was exactly the right place to start. Understanding every line of a hand-rolled environment is how the concepts stick.
+In the [Reinforcement Learning for Beginners](/learn/reinforcement_learning/) course you built everything by hand: a `GridWorld` class, a Q-table stored in a plain Python dictionary, an epsilon-greedy action selector and a reward function tuned for the BurgerBot maze. That was the right place to start, because understanding every line of a hand-rolled environment is how the ideas stick.
 
-This course takes those same ideas and ports them onto the tools that real researchers and industry teams use every day. Gymnasium (maintained by the Farama Foundation) is the standard API for describing environments. Stable-Baselines3 (SB3) is a library of battle-tested agents — DQN, PPO, A2C, and more — that plug straight into any Gymnasium environment. Together they let you swap algorithms, share code with the community, and eventually scale up to problems where a lookup table simply runs out of road.
+This course ports those same ideas onto the tools that researchers and industry teams use. **Gymnasium**, maintained by the Farama Foundation, is the standard API for describing environments. **Stable-Baselines3** (SB3) is a library of ready-made agents, including DQN and PPO, that plug into any Gymnasium environment. Together they let you swap algorithms, share code with the community, and move on to problems where a lookup table runs out of road.
 
-The through-line project is the BurgerBot grid-world you already know. By the end you will have wrapped it as a first-class Gymnasium environment, validated it with the official checker, trained a neural-network policy on it with SB3, and exported that policy as a JSON table that the Pico loader from the previous course can read directly.
+The through-line project is the BurgerBot grid-world you already know. By the end you will have wrapped it as a proper Gymnasium environment, checked it with the official checker, trained a neural-network policy on it, and exported that policy as a JSON lookup table.
+
+```mermaid
+flowchart LR
+    A["Hand-built GridWorld<br/>(previous course)"] --> B["Gymnasium API<br/>reset and step"]
+    B --> C["Custom BurgerBotEnv<br/>checked and registered"]
+    C --> D["Wrappers and<br/>vector envs"]
+    D --> E["Stable-Baselines3<br/>PPO agent"]
+    E --> F["nn_policy.json<br/>lookup table"]
+```
 
 ## Prerequisites
 
-This course picks up where the Reinforcement Learning for Beginners course finishes. Before starting here, make sure you have completed:
-
-- [Reinforcement Learning for Beginners](/learn/reinforcement_learning/) — you need to be comfortable with Q-tables, epsilon-greedy exploration, the BurgerBot GridWorld sim, and the concept of discretizing continuous sensor readings. This course does not re-explain those ideas; it builds on them.
-- [Introduction to Python](/learn/python/) — we use list comprehensions, dictionaries, f-strings, and basic classes throughout.
+- [Reinforcement Learning for Beginners](/learn/reinforcement_learning/): you need Q-tables, epsilon-greedy exploration and the BurgerBot grid-world. This course builds on those ideas and does not re-teach them.
+- [Introduction to Python](/learn/python/): functions, dictionaries, f-strings and simple classes.
 
 ## Course Content
 
-- What the Gymnasium API is and why the community standardised on it
-- The history of OpenAI Gym and why Farama Foundation's Gymnasium replaced it
-- Installing Gymnasium in a virtual environment and running your first environment
-- The five return values of `env.step()` and why `terminated` and `truncated` are separate
+- What the Gymnasium API is, and why it replaced OpenAI Gym
+- Installing Gymnasium and running your first environment
+- The five values returned by `env.step()` and why `terminated` and `truncated` are separate
 - Observation spaces and action spaces: `Discrete`, `Box`, `MultiDiscrete`
-- Porting your tabular Q-learning agent to run against any Gymnasium environment
-- Reproducibility: seeding, episode lifecycle, `env.close()`
-- The `gym.Env` contract and how to write a custom environment from scratch
-- Wrapping the BurgerBot grid-world as a validated Gymnasium environment
-- Registering a custom environment and implementing an ANSI text renderer
-- Gymnasium wrappers: `TimeLimit`, `RecordEpisodeStatistics`, and custom wrappers
-- Vectorised environments for parallel training
-- Stable-Baselines3: training DQN and PPO in ten lines of code
-- Evaluating a trained policy, saving and loading models
-- Exporting a neural-network policy as a lookup table for Pico deployment
+- Running your tabular Q-learning agent on CartPole
+- Seeding, the episode lifecycle and `env.close()`
+- The `gym.Env` contract, and a custom environment that passes `check_env`
+- Wrapping BurgerBot, registering it with `gym.register` and rendering it as text
+- Wrappers, and vectorised environments
+- Training DQN and PPO with Stable-Baselines3, then saving, loading and evaluating
+- Exporting a neural-network policy as a lookup table
 
 ## Key Results
 
 After completing this course, you will be able to:
 
-- Install and use the Gymnasium API to interact with standard benchmark environments
-- Explain the difference between `terminated` and `truncated` and why it matters for training
-- Write a custom `gym.Env` subclass that passes `check_env`
-- Train a Stable-Baselines3 agent on a custom environment in under twenty lines of code
-- Export a trained neural-network policy to a JSON file compatible with Pico hardware
+- Use the Gymnasium API to interact with standard environments, with the current return values
+- Explain the difference between `terminated` and `truncated` and why it matters for learning
+- Write a custom `gym.Env` that passes `check_env`, and register it with `gym.make`
+- Train a Stable-Baselines3 agent on your own environment in about twenty lines
+- Export a trained policy to a JSON table, and say honestly what that table can and cannot do on a Pico
 
-## What You'll Need
+## What you'll need
 
-This course runs entirely on a regular computer. You do not need a Pico, a BurgerBot, or any other hardware for the lessons themselves. The export lesson produces a file you can later load onto a Pico using the loader from the previous course.
+This course runs entirely on a normal computer. There is no hardware to build.
 
-- A laptop or desktop running macOS, Linux, or Windows
-- Python 3.10 or later (Python 3.11 or 3.12 recommended)
-- `pip install gymnasium stable-baselines3` — both install via pip; stable-baselines3 pulls in PyTorch automatically
-- About 1 GB of free disk space for PyTorch
-- The code and q_table.json from the Reinforcement Learning for Beginners course (for the export lesson)
+- A laptop or desktop running macOS, Linux or Windows
+- Python 3.10 or newer
+- A virtual environment and `pip install "gymnasium[classic-control]" stable-baselines3` (the next lesson walks through it)
+- Free disk space for PyTorch, which SB3 installs for you. On Linux the default download includes NVIDIA GPU libraries and took about 5 GB in testing. A GPU is not needed: everything here trains on a CPU in under a minute.
 
-A GPU is not required. All training in this course runs comfortably on CPU in a few minutes.
+## How the course works
 
-## How the Course Works
+Every program in this course was run before it was published, with fixed random seeds, using **Python 3.13, Gymnasium 1.4.0 and Stable-Baselines3 2.9.2**. The output shown is what we saw. Where a number depends on random training, we say so, and your numbers may differ a little on other machines.
 
-Code blocks show complete, runnable scripts. Every script in this course was tested with Gymnasium 1.x and Stable-Baselines3 2.x before publication. Where training takes a long time, the lesson notes a reduced `total_timesteps` value you can use to verify the script runs, then suggests a larger value for a better-trained policy.
+Programs are complete: save them, run them, change them. From lesson 8 onwards we keep the BurgerBot environment in one file called `burgerbot_env.py`, and later programs import it from there, so keep all your files in one folder.
 
-Notes and warnings appear as blockquotes:
+Each lesson opens with an objective and ends with **Try it Yourself** exercises, **Common Issues** and a short quiz. Notes appear as blockquotes. The `> **Teachers**:` notes cover classroom catches.
 
-> **Note:** Extra context that is useful but not essential.
-
-> **Warning:** Something that will bite you if you skip it.
-
-Each lesson that introduces runnable code ends with a "Try It Yourself" section and a "Common Issues" section. Work through the exercises — the fastest way to build intuition is to break things on purpose and read the error messages.
+> **Teachers**: The course suits learners aged about 14 and up who have finished the Reinforcement Learning for Beginners course and are comfortable with Python classes. Allow 30 to 45 minutes per lesson, and a double period for lessons 8, 12 and 13. Each learner or pair needs one computer with Python and an internet connection for the first install. The PyTorch download is large, so install it once in advance on a classroom machine or ask learners to install before the lesson, as many school networks throttle big downloads. No hardware is used. Lessons 1 to 10 need only Gymnasium, which is small, so a class can start before PyTorch arrives.

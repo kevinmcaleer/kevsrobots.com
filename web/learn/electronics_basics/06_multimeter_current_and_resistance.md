@@ -10,8 +10,9 @@ next: 07_series_and_parallel.html
 description: Measure current by putting the meter in the circuit, and resistance and
   continuity with the power off.
 percent: 42
-duration: 4
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -66,9 +67,21 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to measure current, resistance and continuity safely, and know which measurements need the circuit switched off.
+
 ## Overview
 
 Voltage is measured across a part. Current and resistance are different, and getting the method wrong can blow the meter's fuse. In this lesson we measure the night light's LED current, check resistor values, and use the continuity beeper to find broken connections.
+
+Which socket and dial setting for which job:
+
+| To measure | Red probe socket | Dial | Circuit |
+|---|---|---|---|
+| Voltage | V | DCV | On, probes across the part |
+| Current | mA | DCA (mA) | On, meter placed in the loop |
+| Resistance | V (ohm) | Ohm | Off, part ideally removed |
+| Continuity | V (ohm) | Beeper symbol | Off |
+{:class="table table-single"}
 
 ## Measuring current: the meter joins the loop
 
@@ -80,7 +93,17 @@ Current is the flow *through* the loop, so the meter has to become part of the l
 4. Remove the jumper that goes from the resistor to the positive rail. Touch the red probe to the rail side and the black probe to the resistor side, so current flows through the meter.
 5. Connect the battery. The reading should be about 9 mA, the same number we calculated.
 
-**The big mistake:** never measure voltage or measure a battery directly with the meter in the current setting. A current meter has almost zero resistance inside, so across a battery it is a short circuit. Most meters have a fuse that pops, and a few do not have a fuse at all. Always switch the dial and move the plug back after you finish measuring current.
+**The big mistake:** never put the meter across a battery, or measure voltage, while the meter is set up for current. A current meter has almost zero resistance inside, so across a battery it is a short circuit. Most meters have a fuse that pops, and a few have none at all, so the battery and meter can get hot. Always switch the dial and move the red lead back to the voltage socket after measuring current.
+
+Here is the current measurement as a picture. The meter replaces the jumper, so every milliamp passes through it:
+
+```mermaid
+flowchart LR
+    P["Battery positive rail"] --> M["Multimeter in mA mode<br>replaces the jumper"]
+    M --> R["270 ohm resistor"]
+    R --> L["LED"]
+    L --> N["Battery negative rail"]
+```
 
 ## Measuring resistance: power off
 
@@ -94,7 +117,7 @@ Try it on the 270 ohm resistor. Real resistors are within 5 percent (gold band) 
 
 ## Continuity: the beeper
 
-The diode and sound symbol is the **continuity** setting. When there is a low resistance path, under about 50 ohm, the meter beeps. Use it to:
+The diode and sound symbol is the **continuity** setting. When there is a low resistance path, roughly under 50 ohm (it varies between meters), the meter beeps. Use it to:
 
 - Check a jumper wire is not broken inside the insulation.
 - Find out which breadboard holes are joined.
@@ -130,6 +153,8 @@ Resistance from the meter should be close to 270 ohm
 - Measuring resistance with the power on. This gives a garbage reading, and could damage the meter.
 - Using the 200 ohm range for a 10k resistor and seeing OL. Try a higher range.
 
+> **Teachers**: the current socket is the one learners damage. Before the lesson, check that each meter has a working fuse, and have learners say out loud where the red lead goes before every measurement. Spare fuses for the meters in your kit are worth buying. Do not let learners measure resistance on a powered circuit, or measure mains of any kind.
+
 ## Try it Yourself
 
 1. Measure the current through the LED with a 270 ohm resistor, then a 1k resistor. Do the readings match your Ohm's law predictions?
@@ -138,10 +163,32 @@ Resistance from the meter should be close to 270 ohm
 
 ## Common Issues
 
-**Problem**: The meter reads 0.00 mA when the circuit is on.
-**Solution**: Check the red probe is in the mA socket and the fuse is not blown.
-**Why**: A meter with a blown fuse acts as an open circuit in current mode.
+- **Problem**: The meter reads 0.00 mA when the circuit is on.
+- **Solution**: Check the red probe is in the mA socket and the fuse is not blown.
+- **Why**: A meter with a blown fuse acts as an open circuit in current mode.
 
-**Problem**: Resistance readings change when I touch the legs.
-**Solution**: Hold the probes only by their insulated handles.
-**Why**: Your body is a resistor too, usually several hundred kilo ohms, which adds in parallel on high value resistors.
+- **Problem**: Resistance readings change when I touch the legs.
+- **Solution**: Hold the probes only by their insulated handles.
+- **Why**: Your body is a resistor too, usually several hundred kilo ohms, which adds in parallel on high value resistors.
+
+## Check your understanding
+
+{% quiz %}
+? To measure the current through the LED, where does the meter go?
+- [ ] Across the LED, in parallel
+- [x] In the loop, so the current flows through it
+- [ ] Across the battery
+> Current is the flow through the loop, so you break the loop and let it pass through the meter.
+
+? Why must the circuit be off when you measure resistance?
+- [x] The meter sends its own tiny current, and a powered circuit gives garbage readings
+- [ ] Resistance only exists when the power is off
+- [ ] The meter has no ohm range when the battery is connected
+> The meter measures resistance by sending its own tiny current, so other power sources spoil the reading and may damage it.
+
+? What does the continuity beeper tell you?
+- [ ] The battery is full
+- [x] There is a low resistance path between the probes
+- [ ] The resistor is 270 ohm
+> It beeps when the resistance between the probes is low, which is how you check wires, switches and breadboard rows.
+{% endquiz %}

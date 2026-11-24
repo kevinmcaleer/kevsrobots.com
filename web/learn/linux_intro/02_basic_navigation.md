@@ -7,17 +7,19 @@ cover: /learn/linux_intro/assets/ls-l.png
 date: 2024-08-23
 previous: 01a_man.html
 next: 02a_user.html
-description: Learn how to navigate the filesystem using basic commands like pwd, ls,
-  and cd.
+description: Find your way around the Raspberry Pi OS filesystem with pwd, ls and
+  cd, and learn absolute and relative paths, tab completion and history.
 percent: 12
-duration: 4
+duration: 5
+quiz_total: 85
+date_updated: 2026-11-24
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
 - content:
   - section: Getting Started with the Command Line
     content:
-    - name: Introduction to the Terminal
-      link: 01_intro_terminal.html
+    - name: Course Overview
+      link: 00_intro.html
     - name: Getting Help with `man`
       link: 01a_man.html
     - name: Basic Command Line Navigation
@@ -44,6 +46,8 @@ navigation:
       link: 08_monitoring_performance.html
     - name: Managing Processes
       link: 09_managing_processes.html
+    - name: Services and systemctl
+      link: 09a_services.html
   - section: Networking Basics
     content:
     - name: Networking Commands
@@ -68,162 +72,176 @@ navigation:
       link: 16_final_project_overview.html
     - name: Final Project Steps
       link: 17_final_project_steps.html
-  - section: Resources and Next Steps
+  - section: Summary and Next Steps
     content:
-    - name: Resources and Next Steps
+    - name: Summary and Next Steps
       link: 18_resources_next_steps.html
     - name: Linux Command Line Cheatsheet
       link: 19_cheatsheet.html
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-Navigating the filesystem is a fundamental skill when working with the command line. In this lesson, you'll learn how to use basic commands to find your way around the Raspberry Pi OS filesystem.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
+By the end of this lesson you will be able to say where you are in the filesystem, list what is there, and move to any folder using absolute or relative paths.
 
-- Understand the structure of the Raspberry Pi OS filesystem.
-- Learn how to use the `pwd`, `ls`, `cd`, `clear` and `history` commands.
-- Differentiate between absolute and relative paths.
+## The filesystem is a tree
 
----
+Everything on your Pi, from your photos to the robot code you wrote last week, lives in one big upside-down tree. The trunk is `/`, called **root**. Every folder branches off it.
 
-### Understanding the Filesystem Structure
+```mermaid
+flowchart TD
+    R["/ (root)"] --> home["/home"]
+    R --> etc["/etc: settings"]
+    R --> var["/var: logs and changing data"]
+    R --> usr["/usr: installed programs"]
+    R --> tmp["/tmp: scratch space"]
+    R --> opt["/opt: optional software"]
+    home --> me["/home/pi: your home folder"]
+    me --> docs["Documents"]
+    me --> dl["Downloads"]
+    me --> hl["homelab (we make this next lesson)"]
+```
 
-The Linux filesystem is organized in a hierarchical structure, starting from the root directory (`/`). Every file and directory is nested within this structure. Here's a basic overview:
+You will spend nearly all your time inside your **home folder**, `/home/YOURNAME`. The other folders belong to the system. We will visit `/etc` (settings) and `/var` (logs) later when we look after services.
 
-- `/` : Root directory, the top level of the filesystem.
-- `/home` : Contains user directories, like `/home/pi` for the Raspberry Pi user.
-- `/etc` : Configuration files for the system.
-- `/var` : Variable data, such as logs and temporary files.
-- `/usr` : User programs and data.
-- `/bin` : Essential system binaries.
-- `/lib` : Shared libraries.
-- `/opt` : Optional software packages.
-- `/tmp` : Temporary files.
+## Where am I? `pwd`
 
----
-
-### The `pwd` Command
-
-The `pwd` (print working directory) command displays the current directory you are in. This is useful to know where you are in the filesystem.
+`pwd` stands for **print working directory**. It tells you the folder you are in right now:
 
 ```bash
-pwd
+$ pwd
+/home/pi
 ```
 
 ![pwd command](/learn/linux_intro/assets/pwd.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
----
+## What is here? `ls`
 
-## The `ls` Command
+`ls` lists the contents of the folder:
 
-The `ls` (list) command lists the contents of a directory. You can use it to see files and subdirectories within your current directory.
-
-``` bash
-ls
+```bash
+$ ls
+Bookshelf  Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
 ```
 
 ![ls command](/learn/linux_intro/assets/ls.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
-You can also use options with ls to get more detailed information:
+The `-l` flag gives the **long** listing, with permissions, owner, size and date. Add `-a` to show hidden files (names that start with a dot) and `-h` to make sizes friendly:
 
 ```bash
-ls -l
+$ ls -lah
+total 96K
+drwx------ 17 pi pi 4.0K Nov 24 09:14 .
+drwxr-xr-x  3 root root 4.0K Aug 23  2024 ..
+-rw-------  1 pi pi 2.1K Nov 24 09:10 .bash_history
+-rw-r--r--  1 pi pi  220 Aug 23  2024 .bash_logout
+-rw-r--r--  1 pi pi 3.5K Aug 23  2024 .bashrc
+drwxr-xr-x  2 pi pi 4.0K Aug 23  2024 Documents
 ```
 
 ![ls -l command](/learn/linux_intro/assets/ls-l.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
----
+Don't worry about all the columns yet. We decode them in the permissions lesson. Also notice `.` (this folder) and `..` (the folder above), which come in handy in a moment.
 
-## The `cd` Command
+## Moving around with `cd`
 
-The `cd` (change directory) command allows you to navigate between directories. For example, to move into the `Documents` directory, you would type:
+`cd` means **change directory**:
 
 ```bash
-cd Documents
+$ cd Documents
+$ pwd
+/home/pi/Documents
 ```
 
 ![cd command](/learn/linux_intro/assets/cd.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
-To return to the home directory, simply type:
+Three shortcuts you will use every day:
 
 ```bash
-cd $HOME
+$ cd ..        # up one folder
+$ cd ~         # straight home (typing just "cd" does the same)
+$ cd -         # back to the folder you were in before
 ```
 
 ![cdhome command](/learn/linux_intro/assets/cdhome.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
-To back up one directory, use:
+![cd .. command](/learn/linux_intro/assets/cddotdot.png){:class="w-100 img-fluid card-shadow rounded-3"}
+
+## Absolute and relative paths
+
+A **path** is the address of a file or folder. There are two kinds:
+
+- **Absolute**: starts at `/`, so it works from anywhere. Example: `/home/pi/Documents`.
+- **Relative**: starts from where you are now. From `/home/pi`, the path `Documents` means the same folder.
 
 ```bash
-cd ..
+$ cd /etc/apt        # absolute: works from anywhere
+$ cd ../..           # relative: up two folders, from /etc/apt to /
+$ pwd
+/
+$ cd home/pi         # relative: no leading slash, so from where we are
 ```
 
-![cd  .. command](/learn/linux_intro/assets/cddotdot.png){:class="w-100 img-fluid card-shadow rounded-3"}
+If a path fails, check the first character. A leading `/` means "from the very top".
 
----
+## Typing less
 
-## Absolute vs. Relative Paths
+The terminal helps you type:
 
-- **Absolute Path:** A path that starts from the root directory `/`, e.g., `/home/pi/Documents`.
-- **Relative Path:** A path relative to the current directory, e.g., `Documents` if you are in `/home/pi`.
+- **Tab** completes names. Type `cd Doc` and press `Tab` to get `cd Documents/`. Press it twice to see all the choices.
+- **Up arrow** brings back your last command, and again for the one before.
+- `history` lists past commands as a numbered list. `!42` re-runs number 42, and `!!` re-runs the last one. Forgot `sudo`? Type `sudo !!`.
+- **`Ctrl + R`** searches your history as you type.
+- `clear` (or `Ctrl + L`) tidies the screen.
 
----
+> **Careful**: `!42` runs whatever number 42 was, without asking. Look at the history first, so you do not re-run a delete.
 
-## Clearing the console
+Pi progress: you can now go anywhere on the Pi and know where you are. Next we make a tidy place for our Docker projects.
 
-To clear the terminal screen, you can use the `clear` command:
+## Try it Yourself
 
-        clear
+1. Starting from your home folder, go to `/etc`, list it with `ls`, and come back home using `cd` with no arguments.
+2. Use only relative paths to go from `/home/YOURNAME/Documents` to `/home/YOURNAME/Downloads` in one command (hint: `..`).
+3. Use `ls -la` to find three hidden files in your home folder.
+4. Challenge: use `Ctrl + R` to find the last `cd` command you ran, without scrolling.
 
-This will clear the terminal screen, making it easier to read the output of new commands.
+## Common Issues
 
----
+- **Problem**: `bash: cd: Documents: No such file or directory`.
+- **Solution**: Run `pwd` and `ls` to check where you are, and check the capital letters.
+- **Why**: Relative paths depend on your current folder, and Linux treats `Documents` and `documents` as different names.
 
-## History Command
+- **Problem**: `cd My Projects` says `too many arguments`.
+- **Solution**: Put the name in quotes (`cd "My Projects"`) or escape the space (`cd My\ Projects`). Better, avoid spaces in folder names.
+- **Why**: The shell splits on spaces, so it thinks you gave `cd` two folders.
 
-The `history` command is a useful tool that shows you a list of the commands you’ve previously run in the terminal. This can help you remember commands you've used before or quickly repeat them without typing them out again.
+## Check your understanding
 
-To see your command history, simply type:
+{% quiz %}
+? Which path is absolute?
+- [ ] Documents/robot
+- [ ] ../Downloads
+- [x] /home/pi/Documents
+> An absolute path starts at the root `/` and works from anywhere.
 
-```bash
-history
-```
+? You are in `/home/pi/Documents`. What does `cd ..` do?
+- [x] Moves you up to `/home/pi`
+- [ ] Moves you down into a new folder
+- [ ] Lists hidden files
+> `..` always means the folder above the current one.
 
-This will display a numbered list of your recent commands.
+? Which flag shows hidden files, whose names start with a dot?
+- [ ] ls -l
+- [x] ls -a
+- [ ] ls -h
+> `-a` means all, including hidden files. `-l` is the long listing and `-h` makes sizes readable.
 
-### Re-running Previous Commands
-
-You can easily re-run a command from your history by using the `!` symbol followed by the command number. For example, if the command you want to repeat is number 42 in the history list, you can type:
-
-```bash
-!42
-```
-
-This will execute the command exactly as you ran it before.
-
-### Using History for Efficiency
-
-- **Repeating the Last Command**: If you want to run the very last command again, you can use `!!`:
-
-  ```bash
-  !!
-  ```
-
-  This is handy if you forgot to use `sudo` and want to rerun the command with it.
-
-- **Searching Your History**: You can search for a previous command by typing `Ctrl + r` and then start typing part of the command. This will show you the most recent match from your history, which you can then execute by pressing `Enter`.
-
----
-
-## Summary
-
-In this lesson, you learned how to navigate the filesystem using the `pwd`, `ls`, `cd`, `clear` and `history` commands, and you now understand the difference between absolute and relative paths. These are essential skills for working efficiently in the command line.
-
----
+? You ran a command and forgot `sudo`. What re-runs it with sudo?
+- [ ] !sudo
+- [x] sudo !!
+- [ ] history -sudo
+> `!!` expands to your last command, so `sudo !!` runs it again with sudo in front.
+{% endquiz %}

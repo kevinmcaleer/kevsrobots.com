@@ -10,8 +10,9 @@ next: 06_speed_with_pwm.html
 description: Wire an L298N or DRV8833 motor driver to a Raspberry Pi Pico with the
   same pin layout used across KevsRobots courses.
 percent: 30
-duration: 5
-date_updated: 2026-11-21
+duration: 7
+quiz_total: 49
+date_updated: 2026-11-24
 navigation:
 - name: Motors and motor drivers
 - content:
@@ -68,7 +69,9 @@ navigation:
 
 ---
 
-Time to build. We will wire Scout's two motors to an L298N driver, test one motor with a few lines of code, then look at the smaller DRV8833 as an alternative. Do the wiring with everything powered off.
+By the end of this lesson you will be able to wire an L298N or a DRV8833 to a Pico with a separate motor battery, and spin a motor in both directions from MicroPython.
+
+Time to build. We will wire Scout's two motors to an L298N driver, test one motor with a few lines of code, then look at the smaller DRV8833 as an alternative. Do the wiring with everything powered off, and check the battery's positive and negative leads twice before you connect them, because a reversed battery can destroy a driver.
 
 ## L298N wiring
 
@@ -95,10 +98,35 @@ Then the power side:
 | Right motor wires | OUT3 and OUT4 |
 {:class="table table-single"}
 
+This is the whole L298N setup as a picture, with the signal wires from the Pico on one side and the power on the other:
+
+```mermaid
+flowchart LR
+    subgraph PICO["Raspberry Pi Pico"]
+        P1["GP0, GP1, GP2"]
+        P2["GP3, GP4, GP5"]
+        PG["GND"]
+    end
+    subgraph DRV["L298N board"]
+        D1["IN1, IN2, ENA"]
+        D2["IN3, IN4, ENB"]
+        DG["GND"]
+        DV["12V motor supply input"]
+        OUT["OUT1 to OUT4"]
+    end
+    P1 --> D1
+    P2 --> D2
+    PG --- DG
+    BAT["4xAA battery pack"] --> DV
+    BAT --- DG
+    OUT --> ML["Left motor: OUT1, OUT2"]
+    OUT --> MR["Right motor: OUT3, OUT4"]
+```
+
 Three things catch people out:
 
 1. **Remove the ENA and ENB jumpers.** Most boards ship with small jumpers over the enable pins, which tie them permanently high. We need those pins free so the Pico can send PWM.
-2. **Leave the 5V-enable jumper in** if your battery is under about 12 V. That powers the driver's logic from the battery. Do not use the board's 5V pin to power the Pico on a 4xAA supply, as the regulator needs more headroom.
+2. **Leave the 5V-enable jumper in** if your battery is under about 12 V. That powers the driver's logic from the battery through the board's small 5 V regulator. A regulator needs a few volts of headroom, so on a 4xAA pack the logic supply may sit below 5 V. If the driver gets erratic as the batteries run down, try fresh cells first. Do not use the board's 5V pin to power the Pico on a 4xAA supply.
 3. **Join grounds.** The battery negative, the L298N GND and the Pico GND must all connect.
 
 ## Your first spin
@@ -179,14 +207,38 @@ Ratings to remember: the DRV8833 takes 2.7 to 10.8 V and about 1.5 A per channel
 
 ## Common Issues
 
-**Problem**: Nothing moves on the L298N.
-**Solution**: Check the ENA jumper is removed and GP2 is connected, the battery is wired to 12V, and grounds are joined.
-**Why**: With EN low the bridge is disabled, and with no common ground the inputs are meaningless.
+- **Problem**: Nothing moves on the L298N.
+- **Solution**: Check the ENA jumper is removed and GP2 is connected, the battery is wired to 12V, and grounds are joined.
+- **Why**: With EN low the bridge is disabled, and with no common ground the inputs are meaningless.
 
-**Problem**: The DRV8833 motor jerks once, then nothing.
-**Solution**: Make sure SLP/nSLEEP is high, and that the battery voltage is above about 3 V.
-**Why**: The chip sleeps whenever nSLEEP is low, and under-voltage protection shuts it off.
+- **Problem**: The DRV8833 motor jerks once, then nothing.
+- **Solution**: Make sure SLP/nSLEEP is high, and that the battery is at least 2.7 V, the lowest motor supply the chip accepts.
+- **Why**: The chip sleeps whenever nSLEEP is low, and under-voltage protection shuts it off.
 
-**Problem**: The driver gets very hot.
-**Solution**: Check for a stalled wheel or shorted motor terminals, and let it cool.
-**Why**: Stall current turns directly into heat in the driver chip.
+- **Problem**: The driver gets very hot.
+- **Solution**: Check for a stalled wheel or shorted motor terminals, and let it cool.
+- **Why**: Stall current turns directly into heat in the driver chip.
+
+> **Teachers**: wire with the batteries out. Reversed battery leads and loose wires touching are the usual causes of dead drivers, so have a second learner check each connection against the tables. The L298N heatsink gets hot after a few seconds of running, so remind learners not to grab it. If boards are shared, label them with their jumper settings so the next group knows whether the ENA and ENB jumpers have been removed.
+
+## Check your understanding
+
+{% quiz %}
+? Why do you remove the ENA and ENB jumpers on the L298N?
+- [x] They tie the enable pins high, and we need those pins free so the Pico can send PWM
+- [ ] They cut power to the motors
+- [ ] They connect the ground wires
+> With the jumper in place the enable pin is always high, so you could never vary the speed.
+
+? Where does the speed PWM go on an L298N compared with a DRV8833?
+- [x] L298N: the ENA/ENB pin. DRV8833: the input pins
+- [ ] Both: the ground pin
+- [ ] L298N: the OUT pins. DRV8833: the VM pin
+> The L298N has a separate enable pin for speed. The DRV8833 has none, so PWM goes on its input pins.
+
+? Which three grounds must be joined?
+- [x] Battery negative, driver GND and Pico GND
+- [ ] Only the motor and the battery
+- [ ] None, the driver is isolated
+> A shared ground gives the driver a reference for the Pico's signals.
+{% endquiz %}

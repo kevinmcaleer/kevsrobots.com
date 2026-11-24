@@ -4,16 +4,33 @@ description: "Learn how resistors and LEDs combine in series and in parallel, an
 layout: lesson
 type: page
 cover: /learn/electronics_basics/assets/banners/07_series_and_parallel.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to tell series from parallel circuits and calculate the total resistance and current of each.
+
 ## Overview
 
 So far every circuit has had one path. Real robots join parts together, and there are only two ways to do it: one after another (series) or side by side (parallel). Knowing both lets you build the voltage divider at the heart of our night light's light sensor in the next lesson.
+
+The two patterns side by side:
+
+```mermaid
+flowchart LR
+    subgraph Series
+    direction LR
+    S1["Supply +"] --> SA["R1"] --> SB["R2"] --> S2["GND"]
+    end
+    subgraph Parallel
+    direction LR
+    P1["Supply +"] --> PA["R1"] --> P2["GND"]
+    P1 --> PB["R2"] --> P2
+    end
+```
 
 ## Series: one path
 
@@ -84,6 +101,8 @@ A handy trick: if you are short of a value, combine what you have. Need 5k? Two 
 - Forgetting that the supply voltage has to be higher than the sum of LED forward voltages in series. Three red LEDs (6 V) will not light from a 4.5 V pack.
 - Using the parallel formula for series, and vice versa. Series adds, parallel shrinks.
 
+> **Teachers**: the series LED exercise needs a supply above 4 V, so it works with the 3 x AA pack but not on 3.3 V. If you only have USB or Pico power in your room, run the parallel exercise and use the calculator helper for the series one.
+
 ## Try it Yourself
 
 1. Build two LED and resistor branches in parallel on your breadboard. Measure the current through each with the meter (lesson 6), and the total from the battery.
@@ -92,10 +111,32 @@ A handy trick: if you are short of a value, combine what you have. Need 5k? Two 
 
 ## Common Issues
 
-**Problem**: Two LEDs in series do not light from my 3.3 V supply.
-**Solution**: Use them in parallel with their own resistors, or use a higher voltage.
-**Why**: Their forward voltages add up to about 4 V, more than the supply has.
+- **Problem**: Two LEDs in series do not light from my 3.3 V supply.
+- **Solution**: Use them in parallel with their own resistors, or use a higher voltage.
+- **Why**: Their forward voltages add up to about 4 V, more than the supply has.
 
-**Problem**: One of my parallel LEDs is much brighter than the other.
-**Solution**: Check both resistors have the same value, and the LEDs are the same colour.
-**Why**: Different colours have different forward voltages, so the current is different.
+- **Problem**: One of my parallel LEDs is much brighter than the other.
+- **Solution**: Check both resistors have the same value, and the LEDs are the same colour.
+- **Why**: Different colours have different forward voltages, so the current is different.
+
+## Check your understanding
+
+{% quiz %}
+? Two 1k resistors are in parallel. What is the total resistance?
+- [x] 500 ohm
+- [ ] 2k
+- [ ] 1k
+> Two equal resistors in parallel give half the resistance, so 500 ohm. In series they would add to 2k.
+
+? Why give each parallel LED its own resistor?
+- [x] Slightly different LEDs would otherwise hog the current
+- [ ] It makes the battery last longer
+- [ ] Parallel LEDs will not light otherwise
+> With one shared resistor, one LED could take too much current. Each branch gets its own resistor.
+
+? Three red LEDs (about 2.0 V each) in series on a 4.5 V pack. What happens?
+- [ ] They light brightly
+- [x] They will not light, as 6 V is more than the supply
+- [ ] They light dimly but evenly at 4.5 V
+> The forward voltages add up to about 6 V, which is more than the pack can provide.
+{% endquiz %}

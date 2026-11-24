@@ -10,8 +10,9 @@ next: 03_your-first-repository.html
 description: Install Git on Windows, macOS, Linux or Raspberry Pi, and set your name,
   email and default branch
 percent: 21
-duration: 5
-quiz_total: 35
+duration: 6
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to install Git on your computer, tell it who you are, and set a default branch name and editor.
 
 ## Is Git already installed?
 
@@ -177,6 +180,8 @@ init.defaultbranch=main
 core.editor=nano
 ```
 
+> **Teachers**: on shared school computers, `--global` settings are stored in the logged-in user's profile, and may be wiped at log-out or shared between pupils. Leave out `--global` inside each project folder (so the name and email apply to that repository only), or check with your IT team where the profile lives. You may also need an administrator to install Git.
+
 ---
 
 ## Try it yourself
@@ -218,6 +223,12 @@ core.editor=nano
 - [x] So new repositories start on a branch called `main`, matching GitHub
 - [ ] It makes Git run faster
 > Older versions of Git call the first branch `master`. Setting it to `main` avoids mismatches when you push to GitHub.
+
+? Some Git commands open an editor and you land in Vim. How do you get out?
+- [ ] Close the laptop
+- [x] Press `Esc`, type `:q!` and press Enter
+- [ ] Type `git quit`
+> That is the Vim way out, and `core.editor` lets you choose a friendlier editor.
 {% endquiz %}
 
 ---

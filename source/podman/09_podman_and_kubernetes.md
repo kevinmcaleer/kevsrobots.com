@@ -1,115 +1,134 @@
 ---
 title: Podman and Kubernetes
-description: Learn how to use Podman with Kubernetes — including generating Kubernetes YAML files, running them locally, and preparing workloads for production.
+description: Export the robot pod as Kubernetes YAML with podman kube generate, recreate it with podman kube play, and understand how this prepares your project for a real cluster.
 layout: lesson
 type: page
 cover: /learn/podman/assets/banners/09_podman_and_kubernetes.jpg
-date_updated: 2025-05-24
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-One of Podman’s most powerful features is its **native support for Kubernetes YAML**.
+By the end of this lesson you will be able to export a running pod as Kubernetes YAML, recreate it from that file, and say what Podman can and cannot do with Kubernetes files.
 
-This makes it easy to develop container workloads locally and then **export them directly to Kubernetes** — no need to rewrite configs or convert tools.
+**Kubernetes** is a system for running containers across many machines. You describe what you want in YAML files and Kubernetes makes it happen. You do not need a cluster to learn the file format, because Podman can read and write it on a single Raspberry Pi.
 
----
+## Why bother?
 
-## Generating Kubernetes YAML from Podman
+A YAML file is a written-down, shareable recipe for your pod. Instead of retyping `podman pod create` and `podman run` commands, you keep one file in version control and recreate the pod from it. If you ever move to Kubernetes, the same file is a head start.
 
-You can create containers or pods with Podman and then export them as Kubernetes-compatible YAML.
-
-```bash
-podman generate kube mypod > mypod.yaml
-````
-
-This includes:
-
-* Pod and container configuration
-* Environment variables
-* Ports and volumes
-* Restart policies (as annotations)
-
-> The output is structured as a `Pod` definition — ready to use with `kubectl` or `podman play kube`.
-
----
-
-## Running Kubernetes YAML with Podman
-
-Test Kubernetes manifests locally using:
-
-```bash
-podman play kube mypod.yaml
+```mermaid
+flowchart LR
+    A["Running pod<br/>robot-pod"] -- "podman kube generate" --> B["robot-pod.yaml"]
+    B -- "podman kube play" --> C["Pod recreated<br/>on any Podman machine"]
+    B -. "kubectl apply" .-> D["Kubernetes cluster"]
 ```
 
-This will:
+## Generate the YAML
 
-* Create a pod and containers from the YAML file
-* Apply port mappings, environment variables, etc.
-* Use Podman’s pod infrastructure
-
----
-
-## Example Workflow
+You need the `robot-pod` from lesson 7 running. Check with `podman pod ps`, and rebuild it if needed. Then:
 
 ```bash
-# Create a pod manually
-podman pod create --name apppod -p 8080:80
-
-# Add services
-podman run -dt --pod apppod --name app nginx
-podman run -dt --pod apppod --name db redis
-
-# Export as Kubernetes YAML
-podman generate kube apppod > apppod.yaml
-
-# Recreate from YAML
-podman play kube apppod.yaml
+podman kube generate robot-pod -f robot-pod.yaml
 ```
 
-This lets you build your apps locally and **deploy using the same manifests** you’ll use in production.
+Open the file with `nano robot-pod.yaml`. You will see a `Pod` definition, with each of your containers listed with its image, environment variables and the published port. Exact contents vary between Podman versions, so yours will not match anyone else's line for line. The important shape looks like this (shortened):
 
----
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: robot-pod
+spec:
+  containers:
+    - name: robot-redis
+      image: docker.io/library/redis:7-alpine
+    - name: robot-web
+      image: localhost/robot-status:latest
+      env:
+        - name: REDIS_HOST
+          value: localhost
+        - name: ROBOT_NAME
+          value: Sparky
+      ports:
+        - containerPort: 5000
+          hostPort: 5000
+```
+{: .no-snakie }
 
-## Integration with Kubernetes Clusters
+`containerPort` and `hostPort` come from the `-p 5000:5000` you gave the pod.
 
-While Podman is not a Kubernetes runtime itself (like `CRI-O`), it plays a key role in:
+## Play the YAML
 
-* Prototyping and testing deployments
-* Validating configurations before deploying to the cloud
-* Generating boilerplate YAML for clusters
+Remove the existing pod first, then recreate it from the file:
 
-> Podman works well alongside Kubernetes tools like `kubectl`, `minikube`, or `kind`.
+```bash
+podman pod rm -f robot-pod
+podman kube play robot-pod.yaml
+podman pod ps
+```
 
----
+The pod is back, with the same containers. To tear down everything the file created:
 
-## Use Case: Local Dev + Cloud Deployment
+```bash
+podman kube play --down robot-pod.yaml
+```
 
-1. Develop and test containers with Podman
-2. Use `generate kube` to export configuration
-3. Use `kubectl apply` to deploy to a real Kubernetes cluster
+The older spellings `podman generate kube` and `podman play kube` still work in many versions, but `podman kube generate` and `podman kube play` are the current names.
 
-This simplifies **testing and CI/CD pipelines**, and bridges local workflows with production orchestration.
+## What Podman does and does not do
 
----
+- `podman kube play` understands the basic Kubernetes objects such as a `Pod`, a `Deployment`, and a few more. It runs them on **one machine**
+- It does not turn your Pi into a cluster. There is no scheduling across machines, no self-healing across nodes
+- For real clusters you would use a tool like `kubectl` with a cluster such as k3s, which is a small Kubernetes distribution
+- A `localhost/robot-status` image exists only on your Pi. For another machine you would push it to a registry first
 
-## Caveats
+## Try it Yourself
 
-* `podman play kube` only supports basic `Pod`, `Deployment`, and `Service` objects
-* More complex Kubernetes features (e.g., Ingress, ConfigMaps, secrets) require manual YAML editing or use of Kubernetes CLI
+1. Generate the YAML, then edit `ROBOT_NAME` in the file to a new name and play it. Did the page change?
+2. Add `-s` to the generate command (`podman kube generate -s robot-pod`) and see what extra object appears
+3. Challenge: write down what you would have to change in the YAML before using it on a different machine that does not have your local image
 
----
+## Common Issues
 
-## Podman + CRI-O
+- **Problem**: `podman kube play` fails because the pod already exists.
+- **Solution**: Remove the old pod with `podman pod rm -f robot-pod`, or run `podman kube play --replace robot-pod.yaml`.
+- **Why**: Pod names must be unique, so a second pod with the same name is refused.
 
-In Kubernetes environments, Podman’s sibling tool — **CRI-O** — serves as the container runtime. It uses the same container libraries and OCI standards.
+- **Problem**: `podman kube generate` reports that it cannot find the pod.
+- **Solution**: Run `podman pod ps` to check the name, and create the pod first.
+- **Why**: The command exports an existing pod, container or volume; it does not invent one.
 
-> If you’re comfortable with Podman, transitioning to **CRI-O + Kubernetes** will feel very familiar.
+- **Problem**: The generated file mentions an image that cannot be pulled on another machine.
+- **Solution**: Push your image to a registry and change the `image:` line.
+- **Why**: `localhost/...` means "built on this machine".
 
----
+## Check your understanding
 
-Next up: [Podman in Production](10_podman_in_production)
+{% quiz %}
+? Which command exports a pod as Kubernetes YAML?
+- [ ] `podman pod save`
+- [x] `podman kube generate`
+- [ ] `podman build -k`
+> `podman kube generate NAME -f file.yaml` writes the file.
 
----
+? Which command recreates a pod from that YAML?
+- [ ] `podman kube apply`
+- [x] `podman kube play`
+- [ ] `podman pod import`
+> `play` creates the pod and containers from the file.
+
+? Does `podman kube play` make a multi-machine Kubernetes cluster?
+- [ ] Yes, automatically
+- [x] No, it runs the objects on your one machine
+- [ ] Yes, but only with sudo
+> Podman runs the YAML locally. A cluster needs Kubernetes itself.
+
+? How do you remove everything created by a YAML file?
+- [ ] `podman kube clean`
+- [x] `podman kube play --down file.yaml`
+- [ ] `podman rm -a`
+> `--down` removes what `play` created.
+{% endquiz %}

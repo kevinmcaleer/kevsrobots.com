@@ -5,6 +5,7 @@ layout: lesson
 type: video
 video_id:  zwn2mXlYwis
 cover: /learn/podman/assets/banners/01_video.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}

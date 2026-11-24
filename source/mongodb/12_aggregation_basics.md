@@ -4,12 +4,14 @@ description: Use MongoDB's aggregation pipeline to count, total and group your P
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/12_aggregation_basics.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build an aggregation pipeline with $match, $group, $sort, $project, $unwind and $lookup to produce totals and reports.
 
 `find()` is brilliant at answering "show me the parts that match this". But some questions aren't about individual parts at all. How many parts do I have in each category? What's my whole workshop worth? Which project uses the most parts?
 
@@ -33,6 +35,20 @@ db.parts.aggregate([
   { stage two },
   ...
 ])
+```
+
+---
+
+## The big picture
+
+A pipeline is a conveyor belt. Each stage takes the documents from the one before and hands its result to the next.
+
+```mermaid
+flowchart LR
+    A[("parts")] --> B["$match<br/>quantity above 0"]
+    B --> C["$group<br/>by category, sum value"]
+    C --> D["$sort<br/>biggest first"]
+    D --> E["Report"]
 ```
 
 ---
@@ -348,21 +364,51 @@ db.parts.aggregate([
 
 ## Common Issues
 
-**Problem:** Every total comes out as `0`.  
-**Solution:** Write `{ $sum: "$quantity" }`, not `{ $sum: "quantity" }`.  
-**Why:** Without the `$`, MongoDB sees the text "quantity" rather than the field's value, and text adds up to nothing.
+- **Problem**: Every total comes out as `0`.
+- **Solution**: Write `{ $sum: "$quantity" }`, not `{ $sum: "quantity" }`.
+- **Why**: Without the `$`, MongoDB sees the text "quantity" rather than the field's value, and text adds up to nothing.
 
-**Problem:** `MongoServerError: a group specification must include an _id`  
-**Solution:** Every `$group` needs an `_id`. Use `_id: null` if you want one group for everything.  
-**Why:** `_id` is how `$group` decides which crate each document goes in.
+- **Problem**: `MongoServerError: a group specification must include an _id`
+- **Solution**: Every `$group` needs an `_id`. Use `_id: null` if you want one group for everything.
+- **Why**: `_id` is how `$group` decides which crate each document goes in.
 
-**Problem:** `MongoServerError: The field 'category' must be an accumulator object`  
-**Solution:** Put the field you're grouping by in `_id`, and give every other field an accumulator like `$sum` or `$push`.  
-**Why:** Each group may hold many documents, so MongoDB needs to know how to combine their values.
+- **Problem**: `MongoServerError: The field 'category' must be an accumulator object`
+- **Solution**: Put the field you're grouping by in `_id`, and give every other field an accumulator like `$sum` or `$push`.
+- **Why**: Each group may hold many documents, so MongoDB needs to know how to combine their values.
 
-**Problem:** Parts go missing after `$unwind`.  
-**Solution:** Use `{ $unwind: { path: "$used_in", preserveNullAndEmptyArrays: true } }` if you want to keep them.  
-**Why:** The VL53L0X and the LED strip have an empty `used_in` list, so there's nothing to unwind and they're dropped.
+- **Problem**: Parts go missing after `$unwind`.
+- **Solution**: Use `{ $unwind: { path: "$used_in", preserveNullAndEmptyArrays: true } }` if you want to keep them.
+- **Why**: The VL53L0X and the LED strip have an empty `used_in` list, so there's nothing to unwind and they're dropped.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Does an aggregation pipeline change the stored documents?
+- [ ] Yes, always
+- [x] No, it only produces results
+- [ ] Only with $group
+> Documents flow through the stages and the stored data stays as it was.
+
+? What does $group with _id: null give you?
+- [x] One grand total across all documents
+- [ ] A document per category
+- [ ] An error
+> A single group for everything is how you get the value of the whole workshop.
+
+? What does $unwind do with a used_in list of three projects?
+- [ ] Joins it to another collection
+- [x] Makes one document per list item
+- [ ] Sorts it
+> $unwind splits a list into one document per item, so you can group by project.
+
+? Which stage joins in documents from another collection?
+- [x] $lookup
+- [ ] $match
+- [ ] $limit
+> $lookup is the join stage.
+{% endquiz %}
 
 ---
 

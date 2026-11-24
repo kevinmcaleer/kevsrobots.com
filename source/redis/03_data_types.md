@@ -2,170 +2,145 @@
 layout: lesson
 title: Redis Data Types
 type: page
-description: Learn about Redis data types and how to use them in Python.
+description: Tour the five main Redis data types and learn which robot or maker job each one is made for.
 cover: /learn/redis/assets/banners/03_data_types.jpg
+code_target: cpython
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-### Overview
-
-In this lesson, we will cover Redis data types and how to use them in Python. Redis supports several data types, including strings, hashes, lists, sets, and sorted sets. We will cover how to create and manipulate each data type in Redis, and how to interact with them using the Redis Python library.
+By the end of this lesson you will be able to name the five main Redis data types, pick the right one for a robot job, and check what type a key holds.
 
 ---
 
-### Lesson Content
+## Overview
 
-In this lesson, we will cover:
+In a spreadsheet everything is a cell. In Redis, the value under a key can be one of several shapes, and each shape has its own commands. Picking the right shape is most of the skill. If you choose well, Redis does the hard work for you: it keeps things in order, throws away duplicates and counts in one step.
 
-* [Redis data types](#redis-data-types)
-* [String data type](#string-data-type)
-* [Hash data type](#hash-data-type)
-* [List data type](#list-data-type)
-* [Set data type](#set-data-type)
-* [Sorted set data type](#sorted-set-data-type)
-* [Using Redis data types with Python](#using-redis-data-types-with-python)
+```mermaid
+flowchart TD
+    Q{"What are you storing?"} -->|"One value, like a latest reading"| S["String"]
+    Q -->|"Several named fields about one thing"| H["Hash"]
+    Q -->|"Things in order, a queue or a recent history"| L["List"]
+    Q -->|"Unique things, no order"| T["Set"]
+    Q -->|"Things ranked by a score"| Z["Sorted set"]
+```
 
----
+## The five shapes, and what they are for
 
-### Redis Data Types
+| Type | Think of it as | Robot or maker example |
+| --- | --- | --- |
+| String | One labelled box | The latest distance reading, a counter of laps |
+| Hash | A small dictionary | Everything about robot 1: mode, battery, distance |
+| List | A queue or a stack | Commands waiting for the robot, the last 10 readings |
+| Set | A bag with no duplicates | The names of everyone who visited your stand today |
+| Sorted set | A ranked scoreboard | Fastest maze times, highest scores |
+{:class="table table-single"}
 
-Redis supports several data types, each with its own set of commands and operations. Here are the main data types in Redis:
+## Trying each one by hand
 
-* Strings: used to store text or binary data.
-* Hashes: used to store key-value pairs, where the keys and values are both strings.
-* Lists: used to store a collection of ordered elements.
-* Sets: used to store a collection of unordered elements with no duplicates.
-* Sorted sets: used to store a collection of unique elements, each with a score that keeps them in order.
+Here is one of each in `redis-cli`. The `type` command tells you what shape a key holds.
 
----
+```
+127.0.0.1:6379> set robot:1:distance 42.5
+OK
+127.0.0.1:6379> type robot:1:distance
+string
+127.0.0.1:6379> hset robot:1:state mode explore battery 7.4 distance 42.5
+(integer) 3
+127.0.0.1:6379> hget robot:1:state battery
+"7.4"
+127.0.0.1:6379> rpush robot:1:jobs forward left stop
+(integer) 3
+127.0.0.1:6379> lrange robot:1:jobs 0 -1
+1) "forward"
+2) "left"
+3) "stop"
+127.0.0.1:6379> sadd visitors:today alice bob alice
+(integer) 2
+127.0.0.1:6379> zadd laps:best 12.4 alice 9.8 bob
+(integer) 2
+127.0.0.1:6379> zrange laps:best 0 -1 withscores
+1) "bob"
+2) "9.8"
+3) "alice"
+4) "12.4"
+```
 
-### String Data Type
+Notice that the set kept only two names even though we added `alice` twice, and the sorted set put `bob`'s faster time first without being asked.
 
-The string data type is the most basic data type in Redis. It is used to store text or binary data. Here are some examples of string operations in Redis:
+## The same tour in Python
+
+Each Redis command has a Python method with the same name in lower case: `SET` is `set()`, `HGET` is `hget()`. That means the [Redis command reference](https://redis.io/docs/latest/commands/) is useful even when you are writing Python.
+
+Save this as `tour.py`:
 
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r.flushdb()   # start with an empty database (careful on a shared server!)
 
-# Set a string value
-redis_client.set('mykey', 'myvalue')
+r.set('robot:1:distance', 42.5)
+r.hset('robot:1:state', mapping={'mode': 'explore', 'battery': 7.4, 'distance': 42.5})
+r.rpush('robot:1:jobs', 'forward', 'left', 'stop')
+r.sadd('visitors:today', 'alice', 'bob', 'alice')
+r.zadd('laps:best', {'alice': 12.4, 'bob': 9.8})
 
-# Get a string value
-value = redis_client.get('mykey')
+for key in sorted(r.keys('*')):
+    print(key, '->', r.type(key))
 
-# Append a string to an existing value
-redis_client.append('mykey', 'appended value')
+print(r.hgetall('robot:1:state'))
+print(r.lrange('robot:1:jobs', 0, -1))
+print(r.smembers('visitors:today') == {'alice', 'bob'})
+print(r.zrange('laps:best', 0, -1, withscores=True))
 ```
 
----
-
-### Hash Data Type
-
-The hash data type is used to store key-value pairs, where the keys and values are both strings. Here are some examples of hash operations in Redis:
-
-```python
-import redis
-
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
-
-# Set a hash value
-redis_client.hset('myhash', 'key1', 'value1')
-
-# Get a hash value by key
-value = redis_client.hget('myhash', 'key1')
-
-# Get all hash values
-all_values = redis_client.hgetall('myhash')
-```
-
----
-
-### List Data Type
-
-The list data type is used to store a collection of ordered elements. Here are some examples of list operations in Redis:
-
-```python
-import redis
-
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
-
-# Add an element to a list
-redis_client.rpush('mylist', 'element1')
-
-# Get an element by index
-element = redis_client.lindex('mylist', 0)
-
-# Get all elements in a list
-all_elements = redis_client.lrange('mylist', 0, -1)
+Running it prints:
 
 ```
-
----
-
-### Set Data Type
-
-The set data type is used to store a collection of unordered elements with no duplicates. Here are some examples of set operations in Redis:
-
-```python
-import redis
-
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
-
-# Add an element to a set
-redis_client.sadd('myset', 'element1')
-
-# Check if an element is already in a set
-element_exists = redis_client.sismember('myset', 'element1')
-
-# Get all elements in a set
-all_elements = redis_client.smembers('myset')
+laps:best -> zset
+robot:1:distance -> string
+robot:1:jobs -> list
+robot:1:state -> hash
+visitors:today -> set
+{'mode': 'explore', 'battery': '7.4', 'distance': '42.5'}
+['forward', 'left', 'stop']
+True
+[('bob', 9.8), ('alice', 12.4)]
 ```
 
----
+The hash comes back as a Python dictionary, which makes hashes a natural fit for a robot's state. The values are still text (`'7.4'`), so convert them when you need numbers. A set has no order, which is why we compare it to a set instead of printing it.
 
-### Sorted Set Data Type
+## Naming keys
 
-The sorted set data type is used to store a collection of unique elements, each with a numeric score. Redis keeps them sorted by score, and two elements can share the same score. Here are some examples of sorted set operations in Redis:
+All the keys above use colons, like `robot:1:state`. That is just a convention, but it makes keys easy to organise, and you can find a group with `keys robot:1:*`. Use `keys` only when learning, because on a big database it is slow. Real programs track their own key names.
 
-```python
-import redis
+## Try it Yourself
 
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+1. In `redis-cli`, store a hash for a second robot called `robot:2:state` with a `mode` and a `battery`
+2. Use `type` on each of your keys. Which one would give an error if you used `get` on it?
+3. Add `robot:2:jobs` as a list, and a set called `sensors:fitted` holding `ultrasonic`, `camera` and `ultrasonic`. How many members does it hold?
+4. Challenge: decide which data type you would use for "the five most recent obstacle distances", and explain your choice to a friend
 
-# Add an element to a sorted set
-redis_client.zadd('mysortedset', {'element1': 1})
+## Common Issues
 
-# Get the lowest-scoring element (rank 0)
-element = redis_client.zrange('mysortedset', 0, 0)
+- **Problem**: `(error) WRONGTYPE Operation against a key holding the wrong kind of value`
+- **Solution**: Use `type yourkey` to see what it holds, then use that type's commands (`hgetall` for a hash, `lrange` for a list).
+- **Why**: A key has exactly one type, and `get` only works on strings.
 
-# Get all elements in a sorted set with scores
-all_elements = redis_client.zrange('mysortedset', 0, -1, withscores=True)
+- **Problem**: Numbers come back from a hash as strings like `'7.4'`.
+- **Solution**: Convert with `float()` or `int()` when you read them.
+- **Why**: Redis stores everything as text and does not remember that you meant a number.
 
-```
+- **Problem**: Your `set` call quietly replaced an earlier value.
+- **Solution**: Give different things different key names, or use `set key value nx` to only set it if it does not exist.
+- **Why**: Setting a key that exists overwrites it, whatever type it held.
 
----
-
-### Using Redis Data Types with Python
-
-Each Redis command has a Python method with the same name, in lower case: `SET` is `set()`, `HGET` is `hget()` and so on. That makes the [Redis command reference](https://redis.io/docs/latest/commands/) useful even when you're writing Python.
-
-Hashes are a natural fit for Python dictionaries, because you can store a whole dictionary in one go:
-
-```python
-robot = {'name': 'BurgerBot', 'wheels': '2', 'sensor': 'ultrasonic'}
-redis_client.hset('robot:1', mapping=robot)
-
-print(redis_client.hgetall('robot:1'))
-# {'name': 'BurgerBot', 'wheels': '2', 'sensor': 'ultrasonic'}
-```
-
-The key name `robot:1` uses a colon to group related keys. That's just a convention, but it makes keys easier to organise.
-
----
+## Check your understanding
 
 {% quiz %}
 ? Which data type would you use for a game leaderboard?
@@ -179,21 +154,18 @@ The key name `robot:1` uses a colon to group related keys. That's just a convent
 - [ ] List
 - [ ] Hash
 > Sets hold unique members with no particular order.
+
+? You want to keep mode, battery and distance for one robot under a single key. What fits best?
+- [ ] A list
+- [x] A hash
+- [ ] A set
+> A hash holds named fields, like a small dictionary.
+
+? What does `type robot:1:jobs` print after `rpush robot:1:jobs forward left stop`?
+- [x] `list`
+- [ ] `string`
+- [ ] `queue`
+> `rpush` creates a list, and `type` reports the shape of the key.
 {% endquiz %}
 
----
-
-### Key Takeaways
-
-After completing this lesson, you should be able to:
-
-* Describe the main Redis data types and their use cases
-* Perform basic operations on Redis data types using the Redis Python library
-
----
-
-### Conclusion
-
-In this lesson, we covered Redis data types and how to use them in Python. We described the main data types in Redis, including strings, hashes, lists, sets, and sorted sets, and demonstrated how to perform basic operations on each data type using the Redis Python library. In the next lesson, we will cover Redis commands and transactions.
-
----
+> **Teachers**: `flushdb` in the example deletes every key in the current database. On a Redis server shared by a class, one learner running it wipes everyone's work. Give each learner their own Redis, or remove that line and use key names with their own prefix.

@@ -5,6 +5,20 @@
   level: beginner
   layout: course
   cover: assets/cover.jpg
+  outcomes:
+    - Set up a Raspberry Pi Pico with MicroPython and run programs from Thonny
+    - Read the Pico's built-in temperature sensor with the ADC
+    - Convert a raw ADC reading to voltage and then to degrees Celsius
+    - Smooth noisy readings by averaging and calibrate them with an offset
+    - Build a temperature alert that lights the on-board LED
+    - Diagnose the common reasons a temperature reading looks wrong
+  prerequisites:
+    - No programming experience needed
+    - Helpful but not required, the MicroPython course
+  you_need:
+    - A Raspberry Pi Pico, Pico W or Pico 2, and a data-capable USB cable
+    - A computer with Thonny installed (we do this in lesson 2)
+    - Optional, a room thermometer for calibration and an SSD1306 I2C OLED display
   groups:
     - pico
     - micropython
@@ -17,7 +31,7 @@
     - section:
         name: Introduction to the Raspberry Pi Pico and MicroPython
         content:
-          - 01_course_introduction.md
+          - 00_intro.md
           - 02_setting_up_thonny.md
           - 03_installing_micropython_on_pico.md
     - section:
@@ -41,3 +55,4 @@
         content:
           - 11_project_ideas_and_extensions.md
           - 12_troubleshooting_temperature_readings.md
+          - 13_summary_and_next_steps.md

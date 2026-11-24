@@ -4,14 +4,32 @@ description: Write every chunk into ChromaDB with the metadata that makes filter
 layout: lesson
 type: page
 cover: /learn/obsidian_rag/assets/banners/08_building_the_index.jpg
-date_updated: 2026-08-23
+date_updated: 2026-11-24
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to open a persistent cosine collection, write chunks to it in batches with clean metadata, and check the result with a stats function.
+
 We can read notes, and we can chunk them. Now let's get those chunks into ChromaDB.
+
+```mermaid
+sequenceDiagram
+    participant V as iter_notes
+    participant C as chunk_note
+    participant W as write_chunks
+    participant DB as ChromaDB
+    V->>C: Note
+    C->>W: list of Chunk
+    loop every 200 chunks
+        W->>DB: upsert(ids, documents, metadatas)
+        DB->>DB: embed each document
+        DB->>DB: store text, metadata and vector
+    end
+```
 
 ## Opening the collection
 
@@ -97,9 +115,9 @@ Look back at the metadata dict from `chunk_note`. Each field has a job:
 
 Two rules Chroma enforces that will bite you:
 
-**Values must be strings, numbers, booleans or lists of strings.** No nested dicts, no `datetime` objects. If your frontmatter has a `created` date, convert it with `str()` or `.timestamp()` before it goes anywhere near here.
+**Values must be strings, numbers, booleans or non-empty lists.** No nested dicts, no `datetime` objects. If your frontmatter has a `created` date, convert it with `str()` or `.timestamp()` before it goes anywhere near here.
 
-**A `None` value nulls the entire metadata dict for that chunk.** Not just that key - the whole thing comes back as `None`. This is why `chunk_note` uses `note.tags or ["untagged"]` rather than letting an untagged note write an empty list. It costs nothing and saves you an afternoon.
+**A `None` value is silently dropped.** The key simply vanishes, and if every value in the dict was `None` the whole entry reads back as `None`. An empty list is louder: it raises a `ValueError`. That is why `chunk_note` uses `note.tags or ["untagged"]` rather than letting an untagged note write an empty list. It costs nothing and saves you an afternoon.
 
 ---
 
@@ -185,21 +203,27 @@ def collection_stats(db_path: Path = DB_PATH) -> dict:
 
 `collection.get()` with no arguments returns everything, so this is genuinely reading every row. Fine for tens of thousands of chunks; if your vault is enormous you would want to track the count separately.
 
-The `if m` guard is there because of the `None` metadata trap. If any chunk got written with a bad metadata value, this counts around it instead of raising `TypeError` - and the gap between `notes` and the number of notes you expected tells you something went wrong.
+The `if m` guard is there because of the `None` metadata trap. If any chunk ended up with no metadata at all, this counts around it instead of raising `TypeError` - and the gap between `notes` and the number of notes you expected tells you something went wrong.
 
 ---
 
 ## How long this takes
 
-The overwhelming majority of the time is spent embedding, not writing to disk. Benchmarking 1,000 chunks of roughly 180 words each on an Apple Silicon laptop:
+The overwhelming majority of the time is spent embedding, not writing to disk. Time your own machine with a few lines:
 
+```python
+# time_it.py - a scratch script in the project root
+import time
+
+from vault_rag.index import index_vault
+
+start = time.time()
+stats = index_vault("testvault", "timedb", verbose=False)
+elapsed = time.time() - start
+print(f"{stats.chunks} chunks in {elapsed:.1f}s = {stats.chunks / elapsed:.0f} chunks per second")
 ```
-1000 chunks in 8.2s = 121 chunks/sec
-```
 
-So a 1,000 note vault producing 4,000 chunks takes about half a minute. Your number will differ - it scales with your CPU and with how long your chunks are - but that is the order of magnitude to expect.
-
-A Raspberry Pi 5 is several times slower, which is still perfectly fine for a once-a-day index.
+Point it at your real vault (and a scratch database such as `timedb`) to get your own chunks per second, then multiply by the number of chunks lesson 7 told you to expect. The figure scales with your CPU and with how long your chunks are, so mine would not mean much on your machine. A Raspberry Pi will be slower than a laptop, which is still perfectly fine for an index you build once and then update a little at a time.
 
 The first run is slower than that because the embedding model has to download. Do not benchmark the first run.
 
@@ -216,7 +240,7 @@ The first run is slower than that because the embedding model has to download. D
 
 ## Common Issues
 
-- **Problem**: `ValueError: Expected metadata value to be a str, int, float, bool, or list of str`
+- **Problem**: `ValueError: Expected metadata value to be a str, int, float, bool, SparseVector, list, or None, got 2026-03-14 which is a date`
 - **Solution**: Something in your frontmatter is a date or a nested dict. Wrap it in `str()`.
 - **Why**: PyYAML helpfully converts `created: 2026-03-14` into a `datetime.date` object. Chroma cannot store that.
 
@@ -231,3 +255,33 @@ The first run is slower than that because the embedding model has to download. D
 - **Problem**: The run dies partway through on one specific note.
 - **Solution**: Wrap the body of the loop in `try` / `except Exception` and print the path before re-raising.
 - **Why**: The traceback tells you what broke but not *which note* broke it, and in a 2,000 note vault that is not a helpful place to start.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why does `write_chunks` upsert in batches of 200?
+- [ ] Chroma can only store 200 documents in total
+- [x] One call has a hard maximum size, and batching keeps memory sensible and loses less work if something crashes
+- [ ] Batches make the embeddings more accurate
+> `client.get_max_batch_size()` reports the cap, and small batches also protect your progress.
+
+? `ids`, `documents` and `metadatas` are three parallel lists. What must be true of them?
+- [x] Position 3 in each list must describe the same chunk
+- [ ] They must be sorted alphabetically
+- [ ] They must all be the same type
+> Chroma matches them by position, so build them all from the same loop over the batch.
+
+? Which metadata value will make `upsert` raise an error?
+- [ ] A string
+- [ ] A number
+- [x] A `datetime.date` object from YAML frontmatter
+> Chroma cannot store dates, so convert with `str()` or `.timestamp()` first.
+
+? Why does the index store the path relative to the vault rather than the absolute path?
+- [x] Move the vault to another machine and the index still makes sense
+- [ ] Absolute paths are not allowed in metadata
+- [ ] Relative paths are shorter to embed
+> The relative path is also what the citation shows.
+{% endquiz %}

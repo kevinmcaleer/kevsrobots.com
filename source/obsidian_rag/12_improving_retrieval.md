@@ -4,12 +4,15 @@ description: Hybrid search for exact terms, query expansion, and the changes tha
 layout: lesson
 type: page
 cover: /learn/obsidian_rag/assets/banners/12_improving_retrieval.jpg
-date_updated: 2026-08-23
+date_updated: 2026-11-24
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add an exact-match keyword pass for part numbers, merge it with the vector results, and decide which improvements are worth trying first.
 
 Retrieval works. Now let's make it good.
 
@@ -36,6 +39,19 @@ Now a chunk from a note tagged `#3dprinting` is findable by a question about 3D 
 Try it and measure it - lesson 17 shows how. On some vaults it helps a lot; on vaults with hundreds of tags per note it adds noise. This is a real trade, not a free win.
 
 ---
+
+```mermaid
+flowchart TD
+    Q["Question"] --> I{"Contains a part number<br/>or error code?"}
+    Q --> V["Vector search<br/>top_k x 3"]
+    I -- yes --> K["Keyword pass:<br/>regex on chunk text"]
+    I -- no --> S["Skip the keyword pass"]
+    K --> M["merge_hits:<br/>exact matches first"]
+    V --> M
+    S --> M
+    M --> D["diversify:<br/>cap chunks per note"]
+    D --> H["Final hits"]
+```
 
 ## Hybrid search for exact terms
 
@@ -76,6 +92,7 @@ def keyword_hits(collection, question: str, limit: int = 5) -> list[Hit]:
                     title=metadata.get("title", metadata["path"]),
                     section=metadata.get("section", ""),
                     distance=0.0,          # an exact match is as good as it gets
+                    chunk_index=metadata.get("chunk_index", 0),
                 )
             )
     return found
@@ -112,6 +129,35 @@ Only bother running the keyword pass when the question contains something identi
 
 ---
 
+## Putting hybrid search to work
+
+The two functions above do nothing until something calls them. Add one more function that does the whole job, and use it in place of `search` from now on:
+
+```python
+# vault_rag/retrieve.py  (add below merge_hits)
+def hybrid_search(question: str, top_k: int = TOP_K, db_path: Path = DB_PATH,
+                  where: dict | None = None) -> list[Hit]:
+    """Vector search, plus an exact-match pass for part numbers and error codes."""
+    collection = get_collection(db_path)
+    if collection.count() == 0:
+        return []
+    exact = keyword_hits(collection, question)
+    semantic = search(question, top_k=top_k, db_path=db_path, where=where)
+    return diversify(merge_hits(semantic, exact, limit=top_k * 2), top_k)
+```
+
+Try the practice vault with a question that names a part number:
+
+```python
+# try_it.py - a scratch script in the project root
+from vault_rag.retrieve import hybrid_search
+
+for hit in hybrid_search("did the TB6612FNG run hot?", db_path="testdb", top_k=3):
+    print(f"{hit.score:>4.0%}  {hit.label}")
+```
+
+The chunk that literally contains `TB6612FNG` comes back first at 100%, because exact matches are given a distance of 0.0. That 100% means "contains your exact term", not "perfect meaning match". One honest limitation: the keyword pass does not apply your `where` filter, so with a tag or folder filter on, exact matches from other notes can still slip in. The finished command line tool in lesson 16 uses `hybrid_search`.
+
 ## Ask a better question
 
 Retrieval quality depends enormously on the question, and short questions are weak. "Motors" gives the embedding model three syllables to work with. "Why did the N20 motors stall when the robot was on carpet" gives it a paragraph's worth of meaning.
@@ -137,14 +183,18 @@ A chunk boundary can land right before the sentence that answers the question. S
 
 ```python
 # vault_rag/retrieve.py  (optional - add below expand_query)
-def with_neighbours(collection, hit: Hit, index: int) -> list[str]:
+def with_neighbours(collection, hit: Hit) -> list[str]:
     """Fetch the chunks either side of this one from the same note."""
-    wanted = [f"{hit.path}::{i}" for i in (index - 1, index + 1) if i >= 0]
+    wanted = [
+        f"{hit.path}::{i}"
+        for i in (hit.chunk_index - 1, hit.chunk_index + 1)
+        if i >= 0
+    ]
     result = collection.get(ids=wanted, include=["documents"])
     return result["documents"]
 ```
 
-This trades tokens for recall. If your top hit is usually right but the answer feels truncated, it is a good trade. If your top hit is often wrong, fix that first - neighbours of a wrong chunk are also wrong.
+`Hit` already carries `chunk_index` (we added it in lesson 10), so there is nothing to look up. Running this on the SMARS "Motor wiring" hit from the practice vault returns the "SMARS" intro chunk and the "Motor driver" chunk either side of it. This trades tokens for recall. If your top hit is usually right but the answer feels truncated, it is a good trade. If your top hit is often wrong, fix that first - neighbours of a wrong chunk are also wrong.
 
 ---
 
@@ -154,7 +204,7 @@ Three techniques you will see recommended everywhere, and why we are not reachin
 
 **A bigger embedding model.** Swapping all-MiniLM-L6-v2 for something larger does help, but it is slower, needs more disk, and the improvement is smaller than the one you get from better chunks. Do the free thing first.
 
-**A re-ranker.** A cross-encoder model that re-scores the top 20 hits is genuinely effective and is the standard next step in production RAG. It also adds a second model, another few hundred megabytes, and real latency per query. Worth it once you have measured that retrieval is your bottleneck - not before.
+**A re-ranker.** A cross-encoder model that re-scores the top 20 hits is genuinely effective and is the standard next step in production RAG. It also adds a second model to download and real latency on every query. Worth it once you have measured that retrieval is your bottleneck - not before.
 
 **Maximal Marginal Relevance.** MMR picks results that are relevant *and* different from each other by comparing candidate embeddings. Our per-note cap from lesson 10 achieves most of the same benefit for a fraction of the complexity, because in a notes vault near-duplicates almost always live in the same note.
 
@@ -189,3 +239,33 @@ The order of operations that actually works: **fix chunking, add hybrid search f
 - **Problem**: Query expansion made results worse.
 - **Solution**: Only expand very short queries, and drop the padding if a real question comes in.
 - **Why**: Adding "notes about..." to an already detailed question dilutes it - you are averaging in the meaning of filler words.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What is the single biggest improvement to retrieval, and the cheapest?
+- [ ] A bigger embedding model
+- [x] Putting the breadcrumb (and optionally tags) into the chunk text
+- [ ] Adding a re-ranker
+> A chunk's vector can only encode words that are in its text, so give it the words it needs.
+
+? Why does the keyword pass use `where_document` with `$regex` and `(?i)`?
+- [x] `$contains` is case sensitive, and the regex flag makes the match ignore case
+- [ ] Regex is faster than `$contains`
+- [ ] `$contains` cannot be used on documents
+> That way `tb6612fng` still finds `TB6612FNG`.
+
+? Why is `re.escape` applied to the identifier?
+- [ ] To make it uppercase
+- [x] A part number such as `L298-N` can contain characters that mean something special in a regular expression
+- [ ] To stop Chroma indexing it
+> Without it, a hyphen can turn into a bad character range and raise `re.error`.
+
+? When should `expand_query` pad a question?
+- [x] Only when the question is very short, such as one or two words
+- [ ] Always
+- [ ] Never, it only makes results worse
+> Padding a detailed question dilutes it by averaging in filler words.
+{% endquiz %}

@@ -5,17 +5,30 @@
   level: beginner
   layout: course
   cover: assets/markdown.png
+  outcomes:
+    - Write headings, lists, links, images, code and tables in Markdown, and tell core features from extensions
+    - Install Ruby, Jekyll and Bundler and preview a site on your own computer
+    - Use front matter, layouts and includes to share one design across many pages
+    - Use Liquid to list posts and show content conditionally
+    - Add your own CSS and a plugin to a Jekyll site
+    - Publish a site on GitHub Pages and update it with a Git push
+  prerequisites:
+    - Comfort typing commands in a terminal, such as Introduction to the Linux Command Line on Raspberry Pi OS
+    - Helpful but not required, the Git course
+  you_need:
+    - A Windows, macOS or Linux computer where you can install software
+    - A text editor of your choice
+    - A free GitHub account for the publishing lesson
+    - An internet connection
   groups:
-    - markdown
-    - jekyll
-    - documentation
+    - productivity
   description: >-
       This comprehensive course is designed to teach you how to effectively use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll. From the basics of Markdown to deploying your site, you'll learn everything you need to get started.
   content:
     - section:
         name: Introduction to Markdown and Jekyll
         content:
-          - 01_overview.md
+          - 00_intro.md
           - 02_markdown_basics.md
           - 03_setup_environment.md
     - section:
@@ -34,3 +47,4 @@
         content:
           - 09_building_and_testing_locally.md
           - 10_deploying_to_github_pages.md
+          - 11_summary.md

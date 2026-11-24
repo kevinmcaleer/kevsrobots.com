@@ -6,10 +6,12 @@ type: page
 cover: /learn/object_model/assets/banners/08_summary.jpg
 date: 2025-12-04
 previous: 07_troubleshooting.html
-description: Review what you've learned and discover exciting next steps for advancing
-  your computer vision and edge AI skills
+description: Recap the full pipeline from photos to a detector running on the Raspberry
+  Pi AI Camera, pick a project to build next, and find related courses.
 percent: 100
-duration: 7
+duration: 5
+quiz_total: 24
+date_updated: 2026-11-24
 navigation:
 - name: Building Object Detection Models with Raspberry Pi AI Camera
 - content:
@@ -27,17 +29,17 @@ navigation:
     content:
     - name: Training Custom Object Detection Models
       link: 03_training.html
-    - name: Converting Models to ONNX Format
+    - name: Exporting and Quantising for the IMX500
       link: 04_onnx_conversion.html
   - section: Deployment
     content:
-    - name: Deploying to Raspberry Pi AI Camera
+    - name: Deploying to the Raspberry Pi AI Camera
       link: 05_deployment.html
     - name: Real-Time Object Detection
       link: 06_realtime_detection.html
   - section: Advanced Topics
     content:
-    - name: Troubleshooting and Optimization
+    - name: Troubleshooting and Improving Your Model
       link: 07_troubleshooting.html
     - name: Course Summary and Next Steps
       link: 08_summary.html
@@ -48,320 +50,100 @@ navigation:
 
 ---
 
-## Overview
+By the end of this lesson you will be able to describe the whole detector pipeline in your own words and choose a next project to build with it.
 
-Congratulations! You've completed the journey from zero to deploying custom object detection models on edge hardware. This final lesson celebrates your accomplishments, reviews key concepts, and guides you toward exciting next projects and advanced topics.
+## What you have built
 
----
+You started with a pile of photos and ended with a camera that names objects and a program that reacts to them. Every stage was a place where something could go wrong, and you now know what to check at each one.
 
-## What You've Accomplished
+```mermaid
+flowchart LR
+    A[01 Setup] --> B[02 Photos and labels]
+    B --> C[03 Fine-tune YOLO]
+    C --> D[04 Export and quantise]
+    D --> E[05 Package on the Pi]
+    E --> F[06 Live detection]
+    F --> G[07 Measure and improve]
+    G -.new photos.-> B
+```
 
-You now possess a complete, production-ready skill set for building custom object detection systems:
+The dotted line is the most important one. Real detectors improve in a loop: run it, find where it fails, photograph those cases, label, retrain, export, test. Each lap makes it better.
 
-### Technical Skills Gained
+## The ideas to keep
 
-**Dataset Creation:**
-- Collecting diverse, high-quality image datasets
-- Annotating objects with precise bounding boxes using LabelImg
-- Organizing data with proper train/test splits
-- Understanding dataset quality requirements
+- **Data first.** Variety and honest labels matter more than model tricks.
+- **Transfer learning.** Start from a pre-trained model and teach it your objects.
+- **Small models for small chips.** The IMX500 needs a compact, INT8-quantised network, which is why we used the nano YOLO model.
+- **Change one thing at a time.** Test with the stock model, then yours, then your program.
+- **Measure.** Precision and recall tell you which kind of wrong you have.
+- **React steadily.** Threshold and debounce so a robot does not twitch.
 
-**Model Training:**
-- Leveraging transfer learning with pre-trained models
-- Training custom PyTorch object detection models
-- Monitoring training with loss curves and metrics
-- Evaluating model performance
+## Project ideas
 
-**Model Optimization:**
-- Converting PyTorch models to ONNX format
-- Verifying model correctness across frameworks
-- Preparing models for edge hardware (IMX500)
-- Optimizing for speed and size
+**Beginner**
 
-**Edge Deployment:**
-- Deploying models to Raspberry Pi AI Camera
-- Running real-time inference on embedded hardware
-- Building complete detection applications
-- Handling real-world challenges and edge cases
+- A "did I leave my keys here" shelf camera that prints when keys appear or disappear.
+- A desk guard that logs when a mug is picked up.
 
-**Production Skills:**
-- Troubleshooting accuracy and performance issues
-- Implementing robust error handling
-- Monitoring system health and metrics
-- Optimizing for production environments
+**Intermediate**
 
----
+- A robot that drives towards a specific object and stops at a set distance, using box size as a rough distance guide.
+- A parts counter for a workshop bin, counting boxes of screws on a shelf.
 
-## Course Milestones
+**Advanced**
 
-Let's review your journey:
+- A pick-and-place arm that uses box position to line up its gripper.
+- A multi-camera setup that reports to a central dashboard over your network.
 
-### Lesson 00: Introduction
-You learned what's possible with custom object detection and set your goals.
+## Keep learning
 
-### Lesson 01: Development Environment
-You set up Jupyter Lab and created an isolated Python environment for ML development.
+Courses on this site that go well with what you have just learned:
 
-### Lesson 02: Dataset Preparation
-You collected and annotated your own custom dataset with 200+ images per class.
+- [Python](/learn/python/) to get stronger with the language behind the scripts
+- [Computer vision with cvzone](/learn/cvzone/) for OpenCV style vision on any camera
+- [Pandas and NumPy](/learn/pandas_and_numpy/) for working with the arrays and results your model produces
+- [Linux intro](/learn/linux_intro/) for confident terminal work on the Pi
+- [Docker](/learn/docker/) for packaging projects so they run the same everywhere
 
-### Lesson 03: Model Training
-You trained a Faster R-CNN model using transfer learning, achieving working detection in ~1 hour.
+For the official detail, the [Raspberry Pi AI Camera documentation](https://www.raspberrypi.com/documentation/accessories/ai-camera.html) and the [Ultralytics Sony IMX500 guide](https://docs.ultralytics.com/integrations/sony-imx500/) are the places that will change first, so check them when something stops working.
 
-### Lesson 04: ONNX Conversion
-You converted your PyTorch model to the universal ONNX format for cross-platform deployment.
+> **Teachers**: A good assessment is a short project report: the class chosen, how many photos, the precision and recall before and after one improvement, and one example the detector still gets wrong. This rewards honest measurement more than a high score. Allow a full lesson for the final demo, because setting up cameras takes longer than learners expect.
 
-### Lesson 05: Deployment
-You deployed your model to the Raspberry Pi AI Camera and ran your first edge inference.
+## Try it Yourself
 
-### Lesson 06: Real-Time Detection
-You built a complete real-time detection application with visualization and monitoring.
+1. Write the pipeline from memory in six steps, then compare with the diagram.
+2. Add a second class to your dataset, retrain and see which class has lower recall.
+3. Pick one project idea and list what photos you would need to take for it.
+4. Challenge: run one full improvement lap. Find one failure, add 30 photos of it, retrain, export, and measure precision and recall again.
 
-### Lesson 07: Troubleshooting
-You mastered systematic debugging and optimization techniques for production systems.
+## Common Issues
 
----
+- **Problem**: A project that worked suddenly fails after an update to Raspberry Pi OS or the tools.
+- **Solution**: Check the official AI Camera docs for changes, and re-run the stock model test from lesson 05.
+- **Why**: The IMX500 software is under active development, and package names or commands can change.
 
-## Real-World Project Ideas
+- **Problem**: A retrained model is worse than the previous one.
+- **Solution**: Keep every `best.pt` with a note of the dataset and settings, and compare them on the same fixed test photos.
+- **Why**: Without a record you cannot tell which change helped or hurt.
 
-Apply your new skills to exciting projects:
+## Check your understanding
 
-### Beginner Projects
+{% quiz %}
+? What is the most important loop in improving a detector?
+- [ ] Training for ever more epochs
+- [x] Find failures, photograph those cases, label, retrain, export and test again
+- [ ] Raising the threshold to 1.0
+> Better data from the failures you actually see is the most reliable improvement.
 
-**1. Smart Doorbell**
-- Detect person, package, or pet at your door
-- Send notifications to your phone
-- Save images of visitors
+? Why does this course use a nano-sized model?
+- [ ] Nano models are always the most accurate
+- [x] The IMX500 runs a small quantised network on the sensor itself, so the model must be compact
+- [ ] Larger models cannot be trained
+> The camera has limited on-chip memory and a small neural processor.
 
-**2. Desk Item Finder**
-- Detect your commonly lost items (keys, phone, wallet)
-- Voice-activated: "Where are my keys?"
-- LED indicator points to detected object
-
-**3. Pet Monitor**
-- Detect when your pet approaches food bowl
-- Track time spent at bowl
-- Alert if bowl is empty
-
-### Intermediate Projects
-
-**4. Warehouse Inventory System**
-- Count boxes on pallets automatically
-- Detect damaged or misplaced items
-- Generate inventory reports
-
-**5. Plant Health Monitor**
-- Detect healthy vs diseased leaves
-- Count fruits ready for harvest
-- Alert when pests detected
-
-**6. Parking Space Monitor**
-- Detect occupied vs empty parking spaces
-- Guide drivers to available spots
-- Track parking patterns
-
-### Advanced Projects
-
-**7. Autonomous Robot Navigator**
-- Detect obstacles and landmarks
-- Plan paths through environments
-- Integrate with motor control
-
-**8. Manufacturing Quality Control**
-- Detect defects on production line
-- Reject defective products automatically
-- Generate quality reports
-
-**9. Multi-Camera Security System**
-- Multiple Raspberry Pi cameras networked
-- Centralized detection and alerting
-- Activity tracking across zones
-
----
-
-## Next Steps: Advancing Your Skills
-
-### Dive Deeper into Computer Vision
-
-**Advanced Object Detection:**
-- Try YOLO models for even faster detection
-- Implement instance segmentation (pixel-perfect masks)
-- Explore 3D object detection
-- Learn pose estimation for human skeletons
-
-**Recommended Resources:**
-- [PyTorch Official Tutorials](https://pytorch.org/tutorials/)
-- [Papers with Code](https://paperswithcode.com) - Latest research
-- [Hugging Face Computer Vision](https://huggingface.co/models?pipeline_tag=object-detection)
-
-### Expand Edge AI Knowledge
-
-**Other Edge Hardware:**
-- Google Coral TPU for faster inference
-- NVIDIA Jetson for more powerful AI
-- ESP32-CAM for ultra-low-power applications
-- Intel Neural Compute Stick
-
-**Edge ML Frameworks:**
-- TensorFlow Lite for mobile/edge
-- OpenVINO for Intel hardware
-- TVM for compiler optimizations
-
-### Build on Raspberry Pi
-
-**Hardware Integration:**
-- Add servos to track detected objects
-- Integrate with sensors (PIR, ultrasonic)
-- Build robot platforms with detection
-- Create multi-device networks
-
-**Software Integration:**
-- Connect to Home Assistant
-- Integrate with MQTT for IoT
-- Build REST APIs for web access
-- Add database for long-term storage
-
----
-
-## Community and Learning Resources
-
-### Join the Community
-
-**KevsRobots Community:**
-- Share your projects in the forum
-- Get help with challenges
-- Inspire others with your creations
-
-**Broader Communities:**
-- r/computervision on Reddit
-- PyTorch Forums
-- Raspberry Pi Forums
-- Edge AI Summit
-
-### Continue Learning
-
-**KevsRobots Courses:**
-- [Introduction to Python](/learn/python/)
-- [MicroPython for Robotics](/learn/micropython/)
-- [Building Robots with SMARS](/learn/smars/)
-- [Docker for Makers](/learn/docker/)
-
-**External Resources:**
-- Fast.ai Practical Deep Learning
-- Stanford CS231n (Computer Vision)
-- Andrew Ng's Machine Learning Course
-- PyImageSearch tutorials
-
----
-
-## Your Path Forward
-
-### Short-Term (Next 2 Weeks)
-
-1. **Build your first complete project** from the ideas above
-2. **Share it** with the KevsRobots community
-3. **Help others** in the forums who are starting out
-
-### Medium-Term (Next 3 Months)
-
-1. **Explore advanced detection models** (YOLO, EfficientDet)
-2. **Integrate with robotics** projects
-3. **Contribute to open-source** computer vision projects
-
-### Long-Term (This Year)
-
-1. **Master multiple CV tasks** (detection, segmentation, tracking)
-2. **Build a portfolio** of deployed edge AI projects
-3. **Mentor others** learning computer vision
-
----
-
-## Final Challenge
-
-Build something uniquely yours! Combine what you've learned with your own interests:
-
-- **Maker?** Build a robot that sorts tools by detecting them
-- **Gardener?** Create a plant disease early warning system
-- **Photographer?** Build an AI-powered wildlife camera trap
-- **Parent?** Make a toy organizer that finds missing pieces
-- **Artist?** Create an interactive art installation with detection
-- **Educator?** Build a learning tool for students
-
-**Share your creation:**
-- Post on social media with #KevsRobots #EdgeAI
-- Write a blog post about your journey
-- Create a tutorial helping others build it
-- Submit to Raspberry Pi project showcase
-
----
-
-## Thank You!
-
-You've invested significant time and effort to master these skills. The maker and AI communities are better with you in them.
-
-**Remember:**
-- Every expert was once a beginner
-- Every bug you solve makes you stronger
-- Every project you share inspires others
-- The best way to learn is to teach
-
----
-
-## Stay Connected
-
-**KevsRobots:**
-- Website: [kevsrobots.com](https://www.kevsrobots.com)
-- YouTube: [KevsRobots Channel](https://www.youtube.com/kevsrobots)
-- GitHub: [KevinMcAleer](https://github.com/kevinmcaleer)
-- Discord: Join our maker community
-
-**Share Your Success:**
-Send Kevin your project photos and stories - they might be featured in a future video or blog post!
-
----
-
-## Course Completion Certificate
-
-You've completed **Building Object Detection Models with Raspberry Pi AI Camera**!
-
-**Skills Verified:**
-- Custom dataset creation and annotation
-- PyTorch model training and transfer learning
-- Model conversion and optimization (ONNX)
-- Edge deployment on Raspberry Pi AI Camera
-- Real-time inference application development
-- Production troubleshooting and optimization
-
-**Next recommended course:** [Advanced Computer Vision] or [Robotics with AI]
-
----
-
-## One Last Thing...
-
-The models you've trained are just the beginning. The real magic happens when you deploy them in the real world, solving actual problems and delighting users.
-
-Don't let your project gather dust on your hard drive. **Build it. Deploy it. Share it.**
-
-The world needs more makers like you who can turn ideas into reality.
-
-Now go build something amazing!
-
----
-
-## Feedback
-
-Help make this course better for future learners:
-- What was the most valuable lesson?
-- What topic needs more depth?
-- What projects would you like to see?
-- Any bugs or errors to report?
-
-Share your feedback in the KevsRobots forums or email directly.
-
----
-
-**Happy Making!**
-
-Kevin McAleer and the KevsRobots Team
-
----
+? Which pair of numbers tells you whether a detector misses things or invents things?
+- [ ] Epochs and batch size
+- [x] Recall and precision
+- [ ] Width and height
+> Recall measures misses and precision measures false alarms.
+{% endquiz %}

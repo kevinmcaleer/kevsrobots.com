@@ -68,6 +68,6 @@
       <text x="12" y="40" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#7ee787">sensor</text>
     </g>
     <text class="t" x="24" y="272" fill="#7ee787">Silence is the normal state.</text>
-    <text class="t" x="24" y="296" fill="#7ee787">Months on a battery instead of days.</text>
+    <text class="t" x="24" y="296" fill="#7ee787">Far less airtime and battery use.</text>
   </g>
 </svg>

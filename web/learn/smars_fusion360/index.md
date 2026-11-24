@@ -8,11 +8,24 @@ description: Design the SMARS robot chassis in Fusion 360, step by step. In Part
   you sketch and extrude the base, shell it, shape the classic SMARS sides and cut
   the wheel holes and Arduino slots.
 level: beginner
-course_duration: 0h 20m
+course_duration: 0h 57m
 lesson_count: 17
 first_lesson: 00_intro.html
-quiz_total: 7
+quiz_total: 48
 video: 3qd_63cWbvk
+outcomes:
+- Sketch a dimensioned rectangle and turn it into a solid with Extrude
+- Hollow a block with Shell and round its edges with Fillet
+- Cut openings, side shapes, holes and slots through a body with Extrude set to Cut
+- Mirror a feature to the other side of a part
+- Explain why printed parts need wall thickness, rounded edges and clearance holes
+prerequisites:
+- None, no CAD experience needed
+- Helpful but not required, Build a SMARS robot
+you_need:
+- A computer that can run Autodesk Fusion (the free personal-use licence is fine)
+- A mouse with a scroll wheel, which makes orbiting and zooming easier
+- A 3D printer is optional, only to print the finished design
 navigation:
 - name: Design a SMARS Robot in Fusion 360 - Part 1, The Chassis Shell
 - content:

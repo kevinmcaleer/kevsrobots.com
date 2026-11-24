@@ -7,11 +7,13 @@ cover: /learn/reinforcement_learning/assets/banners/02_anatomy_of_robotic_rl.jpg
 date: 2026-06-13
 previous: 01_beyond_predefined_steps.html
 next: 03_designing_the_reward_function.html
-description: "Define the core reinforcement learning vocabulary \u2014 agent, environment,\
-  \ state, action, reward \u2014 in concrete robot terms."
+description: Define the core reinforcement learning vocabulary (agent, environment,
+  state, action, reward) in concrete robot terms, and run the loop in code.
 percent: 18
-duration: 6
-date_updated: 2026-06-13
+duration: 7
+quiz_total: 45
+code_target: cpython
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning for Beginners
 - content:
@@ -64,167 +66,169 @@ navigation:
 
 ---
 
-Every field has its jargon, and reinforcement learning is no exception. The good news is that the core vocabulary is small — five terms cover almost everything — and each one maps neatly onto something physical on your robot.
-
-Let's pin down each concept in terms of the BurgerBot-style robot we're going to train.
+By the end of this lesson you will be able to name the five parts of a reinforcement learning problem, point to each one on a robot, and write the loop that connects them.
 
 ---
 
-## The Five Core Concepts
-
-### Agent
-
-The **agent** is the decision-maker — the code that looks at the current situation and chooses what to do next.
-
-For our robot, the agent is not the whole MicroPython program. It's specifically the part that takes in a sensor reading and returns a motor command. Everything else — the physics of wheels, the reflection of ultrasound off a wall — is outside the agent's control.
-
-```python
-# The agent is just this decision function:
-def agent_choose_action(state):
-    # Look up the best known action for this state
-    return best_action_from_q_table(state)
-```
-
-### Environment
-
-The **environment** is everything the agent is *not*. It includes:
-
-- The physical arena (walls, obstacles, goal)
-- The robot's chassis, motors, and wheels
-- The laws of physics (friction, momentum)
-- The sensor (ultrasonic distance readings)
-
-The environment receives an action from the agent, updates its state, and hands back an **observation** and a **reward**. The agent never directly touches the environment's internals — it can only send actions and receive observations in return.
-
-In our simulation, the environment is a Python object. On the real robot, the environment is the physical world.
-
-### State
-
-The **state** is a snapshot of the environment that the agent uses to make decisions.
-
-For our robot, a state might be: "the ultrasonic sensor is reading 12 cm, and I'm currently moving forward." We need to express this as something the agent can index into a table, so we'll convert it into a simple label — more on that in lesson 4.
-
-```python
-# A state could be as simple as a string label
-state = "near"          # obstacle closer than 15 cm
-state = "medium"        # obstacle between 15 and 40 cm
-state = "far"           # obstacle further than 40 cm
-```
-
-The agent doesn't know the whole environment — it only sees the state. This is an important constraint: the agent must make good decisions using only the information available in the state.
-
-### Action
-
-An **action** is a choice the agent makes. In our robot's case, the action is a motor command:
-
-```python
-ACTIONS = ["forward", "turn_left", "turn_right", "stop"]
-```
-
-The agent picks one action per time step. The environment executes it, physics happen, and a new state appears.
-
-### Reward
-
-The **reward** is a numerical signal that tells the agent whether the action it just took was a good idea.
-
-- A **positive reward** ("well done, keep doing that") pushes the agent to take that action more often in similar states.
-- A **negative reward** (a "penalty" or "cost") pushes it away from that action.
-
-```python
-# Simple reward function for obstacle avoidance
-def compute_reward(new_state, hit_obstacle, reached_goal):
-    if hit_obstacle:
-        return -10.0    # strong discouragement
-    if reached_goal:
-        return +50.0    # strong encouragement
-    if new_state == "far":
-        return +1.0     # mild encouragement for open space
-    return 0.0          # neutral
-```
-
-The reward is the only feedback the agent ever gets from the environment. Designing it carefully is one of the most important skills in applied RL — we'll dedicate the whole next lesson to it.
+Every field has its jargon, and reinforcement learning is no exception. The good news is that five terms cover almost everything, and each one maps onto something physical on your robot. We will use a BurgerBot-style robot throughout: two DC motors and an ultrasonic sensor on a Raspberry Pi Pico.
 
 ---
 
-## The Agent-Environment Loop
+## The five core concepts
 
-These five concepts connect in a cycle that repeats many thousands of times during training:
+**Agent.** The decision-maker. On our robot it is not the whole program, only the part that takes in a sensor reading and returns a motor command.
 
-```
-  ┌──────────────────────────────────────────┐
-  │                                          │
-  │   AGENT                                  │
-  │   ┌──────────────────┐                   │
-  │   │                  │                   │
-  │   │  observe state s │◄──────────────────┤
-  │   │  choose action a │                   │
-  │   │                  │                   │
-  │   └────────┬─────────┘                   │
-  │            │ action a                    │
-  │            ▼                             │
-  │   ENVIRONMENT                            │
-  │   ┌──────────────────┐                   │
-  │   │                  │                   │
-  │   │  execute action  │                   │
-  │   │  compute reward  ├──► reward r       │
-  │   │  new state s'    ├──► new state s'  ─┘
-  │   │                  │
-  │   └──────────────────┘
-```
+**Environment.** Everything the agent is *not*: the arena, the wheels and floor, friction, and the sensor itself. The environment receives an action, changes, and hands back an observation and a reward. In our simulation it is a Python object. On the real robot it is the physical world.
 
-In code, one step of this loop looks like:
+**State.** A snapshot of the situation that the agent uses to decide. For us that will be a small label such as `"near"`, `"medium"` or `"far"` for what the sensor sees. The agent only knows what the state tells it.
 
-```python
-# One time step in the agent-environment loop
-action = agent.choose(state)          # agent decides
-next_state, reward, done = env.step(action)  # environment responds
-agent.learn(state, action, reward, next_state)  # agent updates its knowledge
-state = next_state                    # move forward in time
-```
-{: .no-snakie }
+**Action.** A choice the agent makes each time step, for example one of `"forward"`, `"turn_left"`, `"turn_right"` or `"stop"`.
 
-This loop runs inside an **episode** — a single attempt at the task, from start to finish (or until a time limit). After an episode ends (the robot reached the goal, or crashed, or ran out of time), the environment resets and a new episode begins.
+**Reward.** A single number saying how good the last action was. Positive pushes the agent to repeat it, negative pushes it away. It is the only feedback the agent ever gets, so lesson 3 is devoted to designing it.
 
 ---
 
-## Mapping to Real Hardware
+## The agent-environment loop
 
-Here's how the abstract concepts map to the physical BurgerBot:
+These five parts connect in a cycle that repeats thousands of times during training:
+
+```mermaid
+flowchart LR
+    A["Agent<br/>(chooses)"] -- "action" --> E["Environment<br/>(responds)"]
+    E -- "new state" --> A
+    E -- "reward" --> A
+```
+
+One **episode** is a single attempt, from the start until the goal is reached, the robot crashes, or a step limit runs out. Then the environment resets and a new episode begins.
+
+---
+
+## The loop in code
+
+Here is a complete, runnable version. The environment is a five-cell corridor with the goal at the end, and the agent is deliberately clueless: it picks at random. A fixed seed makes the output repeatable.
+
+```python
+import random
+
+ACTIONS = ["forward", "back"]
+
+
+class Corridor:
+    """The environment: a corridor of 5 cells with the goal at the far end."""
+
+    def __init__(self):
+        self.length = 5
+        self.position = 0
+
+    def reset(self):
+        self.position = 0
+        return self.position                      # the state
+
+    def step(self, action):
+        if action == "forward":
+            self.position = min(self.position + 1, self.length - 1)
+        else:
+            self.position = max(self.position - 1, 0)
+        done = self.position == self.length - 1   # reached the goal?
+        reward = 10.0 if done else -1.0           # treat, or small cost per step
+        return self.position, reward, done
+
+
+def random_agent(state):
+    """The agent: for now it ignores the state and picks at random."""
+    return random.choice(ACTIONS)
+
+
+random.seed(3)
+env = Corridor()
+state = env.reset()
+total_reward = 0.0
+
+for step in range(1, 101):
+    action = random_agent(state)                  # agent decides
+    next_state, reward, done = env.step(action)   # environment responds
+    if step <= 5:
+        print(f"step {step:2d}: state {state} -> {action:<7} -> state {next_state}, reward {reward:+.0f}")
+    total_reward += reward
+    state = next_state
+    if done:
+        break
+
+print(f"Episode over after {step} steps, total reward {total_reward:+.0f}")
+```
+
+You should see:
+
+```
+step  1: state 0 -> forward -> state 1, reward -1
+step  2: state 1 -> forward -> state 2, reward -1
+step  3: state 2 -> back    -> state 1, reward -1
+step  4: state 1 -> back    -> state 0, reward -1
+step  5: state 0 -> forward -> state 1, reward -1
+Episode over after 19 steps, total reward -8
+```
+
+The random agent wanders and finally stumbles onto the goal after 19 steps. A different seed gives a different episode, and learning will mean replacing `random_agent` with something that improves. Notice the shape of `step()`: it takes an action and returns `(next_state, reward, done)`. We will keep that shape for every environment in the course, including the grid world.
+
+---
+
+## Mapping to real hardware
 
 | RL concept | On the real robot |
 |---|---|
 | Agent | The MicroPython control script |
-| Environment | The physical arena and floor |
-| State | Discretised HC-SR04 reading (near / medium / far) |
-| Action | Motor commands (forward, turn left, turn right, stop) |
-| Reward | Computed after each move (collision = negative, progress = positive) |
-| Episode | One power-on navigation run until goal or crash |
+| Environment | The arena, floor, wheels and sensor |
+| State | A distance band from the ultrasonic sensor (near, medium, far) |
+| Action | A motor command (forward, turn left, turn right, stop) |
+| Reward | Defined by you; on a real robot it often needs extra sensing to measure |
+| Episode | One run until the goal, a crash or a time limit |
 {:class="table table-single"}
 
-In simulation, all of these exist as Python objects. The only difference on the real robot is that `env.step()` sends actual voltage to motors and reads actual ultrasound — the agent code stays almost identical.
+That reward row hides a catch. In simulation the reward is free, because the simulator knows when you hit something. On a real robot you need a bumper, a current spike or a person with a stopwatch to produce it. That is one reason we train in simulation and only *run* the finished policy on the robot.
+
+> **Note:** the agent sees only the state, not the whole world. A forward-facing ultrasonic sensor says nothing about what is beside the robot. That is called **partial observability**, and we will meet it again in lesson 11.
 
 ---
 
-## Try It Yourself
+## Try it Yourself
 
-1. Write out the state-action-reward loop for a different robot task — say, a robot arm picking up a block. What would the states be? What are the possible actions? What would earn a reward?
-
-2. For the obstacle-avoidance task, try to think of a state that provides *too little* information. What could go wrong if the agent only knew "obstacle detected: yes/no" (one bit of state) rather than the actual distance band?
-
-3. For the same task, think of a state with *too much* information — say, the raw 16-bit distance reading from the sensor in millimetres. Why might having 65,536 possible state values cause problems for a table-based agent?
-
----
+1. Change `random.seed(3)` to `random.seed(7)` and run again. How many steps does the random agent take now? Try five seeds and write down the numbers.
+2. Change the reward so each non-goal step costs `-5` instead of `-1`. How does `total_reward` change, and does the agent behave differently?
+3. Sketch the five parts for a different robot, such as a line follower or a robot arm that picks up a block. What are its states, actions and reward?
+4. Challenge: make `random_agent` always return `"forward"`. What happens, and why is that agent not really *learning*?
 
 ## Common Issues
 
-**"I'm not sure what counts as part of the agent vs the environment."**
-A useful rule of thumb: if the agent's code *controls* it, it's part of the agent. If it just *observes* it, the observable thing is in the environment. The line can be blurry, but for our robot, everything that runs on the Pico is the agent; everything around and under the robot is the environment.
+- **Problem**: I cannot tell whether the agent or the environment owns something.
+- **Solution**: If the code *chooses* it, it belongs to the agent. If the code merely *observes or suffers* it, it belongs to the environment.
+- **Why**: The split decides what goes inside `step()` and what the agent is allowed to see.
 
-**"What if the state doesn't fully describe the situation?"**
-In the real world, it often doesn't. A one-dimensional ultrasonic reading tells you about what's directly ahead, but nothing about what's to the side. This is called a **partially observable** environment. Tabular Q-learning handles partial observability by treating whatever state you give it as complete. That's an approximation — but it works well enough for our purposes, and we'll revisit this in lesson 11.
+- **Problem**: My loop never ends.
+- **Solution**: Add a step limit like `for step in range(1, 101)`, and make sure `done` becomes `True` somewhere.
+- **Why**: An episode needs an ending, either a goal or a time limit, or training stalls on one run.
+
+## Check your understanding
+
+{% quiz %}
+? What does the environment send back to the agent after each action?
+- [ ] Only a reward
+- [x] A new state and a reward
+- [ ] The best action to try next
+> The environment returns the new state and the reward. Choosing the action is the agent's job.
+
+? Which of these is an episode?
+- [ ] A single sensor reading
+- [x] One attempt from the start until the goal, a crash or a step limit
+- [ ] The whole training run
+> An episode is one attempt. Training is made of many episodes.
+
+? In the corridor example, why does the random agent take a different number of steps with a different seed?
+- [x] It chooses its actions at random, so each seed gives a different wander
+- [ ] The corridor gets longer
+- [ ] The reward changes
+> Only the agent's random choices change with the seed. The corridor and rewards stay the same.
+{% endquiz %}
 
 ---
 
-Next up: designing the reward function — the signal that teaches your robot what "good" actually means.
-
----
+Next up: designing the reward function, the signal that teaches your robot what "good" means.

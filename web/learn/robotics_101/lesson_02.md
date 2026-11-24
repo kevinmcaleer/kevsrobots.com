@@ -10,15 +10,16 @@ next: lesson_03.html
 description: Learn about the term 'Robot', who the Father of robotics is, and examples
   from the early age of robotics
 percent: 48
-duration: 5
-quiz_total: 12
+duration: 6
+quiz_total: 17
+date_updated: 2026-11-24
 navigation:
 - name: Robotics 101
 - content:
   - section: Overview
     content:
     - name: Introduction
-      link: 00_overview.html
+      link: 00_intro.html
   - section: Robotics 101
     content:
     - name: What is a Robot - a Definition
@@ -35,6 +36,8 @@ navigation:
 
 
 ![Hand washing toy](assets/hand_washing.jpg){:class="cover"}
+
+By the end of this lesson you will be able to say where the word "robot" came from and name some landmark automata and robots, from the 12th century to today.
 
 ## Contents
 
@@ -63,7 +66,7 @@ The word 'robot' itself was not new, having been in the Slavic language as robot
 
 ## Father of Robotics
 
-Ismail al-Jazari, 12th century
+Ismail al-Jazari, 12th century. He is often called the father of robotics, though that title is a matter of opinion: many people built clever machines before and after him.
 
 *“...is quite likely that it was an early programmable automata. It has a programmable drum machine with pegs (cams) that bump into little levers that operated the percussion.”*
 
@@ -103,7 +106,7 @@ Automaton in the Swiss Museum CIMA [^2].
 
 ### The Writer
 
-One of the first programmable robots [^3]. The Writer was built in the 1770s using 6,000 moving parts by Pierre Jaquet-Droz, his son Henri-Louis, and Jean-Frédéric Leschot.
+An early programmable automaton [^3]. The Writer was built in the 1770s using 6,000 moving parts by Pierre Jaquet-Droz, his son Henri-Louis, and Jean-Frédéric Leschot.
 
 [![The Writer](assets/the_writer.jpg){:class="img-fluid w-50"}](assets/the_writer.jpg)
 
@@ -115,7 +118,7 @@ One of the first programmable robots [^3]. The Writer was built in the 1770s usi
 
 ### George & Eric
 
-In 1928, one of the first humanoid robots ‘Eric’ (brother to George) was exhibited at the annual exhibition of Model Engineers Society in London.
+In 1928, an early humanoid robot called ‘Eric’ was exhibited at the annual exhibition of a model engineers' society in London. A later robot, ‘George’, was built as his brother.
 
 W. H. Richards with "George", 1932 [^4]
 
@@ -148,17 +151,17 @@ Pictured here with Sparko
 ### Some examples of robots from today
 
 - **Industrial** - Manufacturing, packaging, distribution, production
-- **Educational** - Lego Mindstorms
+- **Educational** - robot kits such as LEGO Mindstorms (since retired by LEGO), the BBC micro:bit and SMARS
 - **Entertainment** - Movies, Short-Circuit, Star Wars, iRobot
 - **Healthcare** - prosthetic limbs
-- **Military** - Drones, bomb-disposal, Satellite positioning and surveillance
+- **Military** - Drones and bomb-disposal robots
 
 ### Domestic
 
 - **Cleaning Robots** - Roomba
-- **Toys** - Furby
-- **Self driving vehicles** - Tesla
-- **Assistants** - AIBO
+- **Toys** - Furby, a toy with motors and simple sensors
+- **Driver assistance and self-driving vehicles** - cars that steer, brake or park with the help of sensors and software
+- **Robot pets** - Sony's AIBO
 
 ---
 
@@ -176,7 +179,7 @@ K.I.T.T. (Knight Industries Two Thousand) - a fictional non-humanoid robot [^6]
 
 ### EveR-2
 
-EveR-2, the first android that has the ability to sing [^7]
+EveR-2, an android from South Korea that could sing [^7]
 
 [![EveR-2](assets/ever2.jpg){:class="img-fluid w-25"}](assets/ever2.jpg)
 
@@ -184,22 +187,29 @@ EveR-2, the first android that has the ability to sing [^7]
 
 ## Robotics
 
-The term was coined by Isaac Asimov in 1941.
+The term was coined by the writer Isaac Asimov, who used it in a story published in 1941.
 
 [![Isaac Asimov](assets/isaac_asimov.jpg){:class="img-fluid w-25"}](assets/isaac_asimov.jpg)
 
 The three laws of Robotics:
 
-1. First Law
-A robot may not injure a human being or, through inaction, allow a human being to come to harm.
-2. Second Law
-A robot must obey the orders given it by human beings except where such orders would conflict with the First Law.
-3. Third Law
-A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.
+1. **First Law**: A robot may not injure a human being or, through inaction, allow a human being to come to harm.
+2. **Second Law**: A robot must obey the orders given it by human beings except where such orders would conflict with the First Law.
+3. **Third Law**: A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.
 
-*Isaac Asimov, 1942 from the short story "Runaround"*
+*Isaac Asimov, 1942, from the short story "Runaround"*
+
+These laws come from science fiction. They are a clever way to think about robot behaviour, but real robots are not built with them inside.
 
 ---
+
+## Try it Yourself
+
+1. Make a timeline on paper with these dates: 1206, 1738, 1770s, 1920, 1928, 1939, 1941. Write one robot or event next to each.
+2. Look at the Writer and Elektro. What did each need to "program" it, and how is that different from a program you could type today?
+3. Challenge: invent a fourth law of robotics. What problem would it solve, and could a real robot follow it?
+
+> **Teachers**: Elektro's list of party tricks includes smoking cigarettes. It is a real part of the history, but you may want to skip it, or use it to discuss how attitudes have changed. Image credits are in the footnotes.
 
 ## Check your understanding
 
@@ -220,7 +230,13 @@ A robot must protect its own existence as long as such protection does not confl
 - [x] Isaac Asimov
 - [ ] Karel Čapek
 - [ ] Westinghouse Electric
-> Asimov first used "robotics" in 1941, and set out his Three Laws of Robotics in the 1942 story "Runaround".
+> Asimov first used "robotics" in a story published in 1941, and set out his Three Laws of Robotics in the 1942 story "Runaround".
+
+? Which historic automaton was built in the 1770s with about 6,000 moving parts, and could write?
+- [ ] The Duck of Vaucanson
+- [x] The Writer
+- [ ] Elektro
+> The Writer was built by Pierre Jaquet-Droz, his son Henri-Louis and Jean-Frédéric Leschot. Elektro came later, for the 1939 World's Fair.
 {% endquiz %}
 
 ---

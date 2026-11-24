@@ -1,5 +1,90 @@
 [
   {
+    "slug": "ai_hat_2",
+    "name": "Raspberry Pi AI HAT+ 2 - Vision and Generative AI",
+    "description": "Give a robot eyes and a brain with the Raspberry Pi AI HAT+ 2. Fit the HAT, run object detection and pose estimation from the camera, turn detections into robot behaviour, then run a language model and a vision-language model on the HAT itself.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "ai",
+      "raspberrypi",
+      "robots"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/00_intro.html"
+      },
+      {
+        "file": "01_what_is_the_ai_hat_2.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/01_what_is_the_ai_hat_2.html"
+      },
+      {
+        "file": "02_fitting_the_hat.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/02_fitting_the_hat.html"
+      },
+      {
+        "file": "03_software_setup.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/03_software_setup.html"
+      },
+      {
+        "file": "04_object_detection_with_rpicam_apps.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/04_object_detection_with_rpicam_apps.html"
+      },
+      {
+        "file": "05_pose_and_segmentation.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/05_pose_and_segmentation.html"
+      },
+      {
+        "file": "06_reading_detections_in_python.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/06_reading_detections_in_python.html"
+      },
+      {
+        "file": "07_detections_to_robot_behaviour.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/07_detections_to_robot_behaviour.html"
+      },
+      {
+        "file": "08_a_language_model_on_the_hat.md",
+        "section": "A brain",
+        "url": "/learn/ai_hat_2/08_a_language_model_on_the_hat.html"
+      },
+      {
+        "file": "09_a_chat_page_in_your_browser.md",
+        "section": "A brain",
+        "url": "/learn/ai_hat_2/09_a_chat_page_in_your_browser.html"
+      },
+      {
+        "file": "10_asking_the_robot_what_it_sees.md",
+        "section": "A brain",
+        "url": "/learn/ai_hat_2/10_asking_the_robot_what_it_sees.html"
+      },
+      {
+        "file": "11_performance_and_choosing_hardware.md",
+        "section": "Choosing and fixing",
+        "url": "/learn/ai_hat_2/11_performance_and_choosing_hardware.html"
+      },
+      {
+        "file": "12_troubleshooting.md",
+        "section": "Choosing and fixing",
+        "url": "/learn/ai_hat_2/12_troubleshooting.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Choosing and fixing",
+        "url": "/learn/ai_hat_2/13_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "arduino_to_python",
     "name": "Arduino to MicroPython - A Quick Start Guide",
     "description": "Transition from Arduino C++ to MicroPython quickly and easily. Learn Python syntax with side-by-side comparisons, control hardware, and build IoT and robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.",
@@ -507,9 +592,8 @@
     "author": "Kevin McAleer",
     "date_published": "2025-05-10",
     "groups": [
-      "animation",
-      "robotics",
-      "arduino"
+      "arduino",
+      "robots"
     ],
     "lessons": [
       {
@@ -572,14 +656,14 @@
   {
     "slug": "brachiograph",
     "name": "BrachioGraph Tutorial",
-    "description": "Learn how to build your own BrachioGraph, a simple drawing robot that uses two stepper motors to create beautiful drawings.  This course covers the essential steps from assembling the robot, installing the software, and creating your first drawing.",
+    "description": "Build your own BrachioGraph, a cheap pen plotter made from three hobby servos, lolly sticks and a Raspberry Pi. Wire it up, install the software, calibrate it, and draw shapes and vectorised images from Python.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-07-26",
     "groups": [
-      "robot arm",
+      "robotarms",
       "python",
-      "raspberry pi"
+      "raspberrypi"
     ],
     "lessons": [
       {
@@ -814,20 +898,19 @@
   {
     "slug": "c_pico",
     "name": "Getting Started with C on the Raspberry Pi Pico",
-    "description": "Learn how to program the Raspberry Pi Pico using the C programming language.  This beginner-friendly course covers the fundamentals of C, how to set up your development environment,  and how to write simple programs that run on real hardware. By the end of the course, you'll have a  solid grasp of programming basics and will create your first hardware project; a blinking LED.",
+    "description": "Learn how to program the Raspberry Pi Pico using the C programming language. This beginner-friendly course covers the fundamentals of C, how to set up your development environment, and how to write simple programs that run on real hardware. By the end of the course, you'll have a solid grasp of programming basics and will create your first hardware project; a blinking LED.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2025-06-16",
     "groups": [
-      "raspberry pi",
-      "pico",
-      "c-programming"
+      "raspberrypi",
+      "pico"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/c_pico/01_intro.html"
+        "url": "/learn/c_pico/00_intro.html"
       },
       {
         "file": "02_what_is_c.md",
@@ -884,9 +967,9 @@
     "author": "Kevin McAleer",
     "date_published": "2023-10-07",
     "groups": [
-      "computer vision",
-      "python",
-      "cvzone"
+      "raspberrypi",
+      "ai",
+      "python"
     ],
     "lessons": [
       {
@@ -993,13 +1076,12 @@
   {
     "slug": "docker_swarm",
     "name": "Raspberry Pi 5 Cluster with Docker Swarm",
-    "description": "This course guides beginners through the process of setting up a Raspberry Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage, and scale a mini-computing cluster for various projects.",
+    "description": "Build a Raspberry Pi 5 cluster and turn it into a Docker Swarm. Deploy stacks, scale and update services, rebalance after a node failure, then monitor, maintain and back up your cluster.",
     "cover": "assets/docker_swarm.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-02-03",
     "groups": [
-      "docker",
-      "raspberry pi"
+      "raspberrypi"
     ],
     "lessons": [
       {
@@ -1078,23 +1160,22 @@
         "url": "/learn/docker_swarm/13_project-ideas.html"
       },
       {
-        "file": "14_further-resources.md",
+        "file": "14_summary-and-next-steps.md",
         "section": "Conclusion",
-        "url": "/learn/docker_swarm/14_further-resources.html"
+        "url": "/learn/docker_swarm/14_summary-and-next-steps.html"
       }
     ]
   },
   {
     "slug": "duckdb",
     "name": "DuckDB - Fast, free analytics",
-    "description": "Learn how to use DuckDB, the fast, free, and embeddable database designed for analytics.",
+    "description": "Learn how to use DuckDB, the fast, free, and embeddable database designed for analytics. Query robot sensor logs, parts lists and print histories with SQL, from the shell and from Python, then save them as Parquet and tune the speed.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2025-09-04",
     "groups": [
-      "databases",
       "python",
-      "raspberry pi"
+      "raspberrypi"
     ],
     "lessons": [
       {
@@ -1153,11 +1234,6 @@
         "url": "/learn/duckdb/08_performance_tuning.html"
       },
       {
-        "file": "09_conclusion.md",
-        "section": "Conclusion and Next Steps",
-        "url": "/learn/duckdb/09_conclusion.html"
-      },
-      {
         "file": "10_additional_resources.md",
         "section": "Conclusion and Next Steps",
         "url": "/learn/duckdb/10_additional_resources.html"
@@ -1166,6 +1242,11 @@
         "file": "11_mini_capstone.md",
         "section": "Conclusion and Next Steps",
         "url": "/learn/duckdb/11_mini_capstone.html"
+      },
+      {
+        "file": "09_conclusion.md",
+        "section": "Conclusion and Next Steps",
+        "url": "/learn/duckdb/09_conclusion.html"
       }
     ]
   },
@@ -1272,8 +1353,9 @@
     "author": "Kevin McAleer",
     "date_published": "2023-01-29",
     "groups": [
-      "robotics",
-      "fusion 360"
+      "3ddesign",
+      "robots",
+      "3dprinting"
     ],
     "lessons": [
       {
@@ -1331,19 +1413,19 @@
   {
     "slug": "fastapi",
     "name": "Building User Authentication for Static Sites with FastAPI",
-    "description": "This course teaches you how to build a user authentication system using Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll learn to implement features like registration, login, and user management, integrating these with a frontend built with Jekyll.",
+    "description": "Build a robot telemetry API with Python and FastAPI: a Pico or any robot posts sensor readings, a static Jekyll dashboard shows them, and only logged-in users can switch the robot's LEDs. You will use Pydantic v2 models, SQLite, hashed passwords, signed tokens, CORS and a safe deployment.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-03-28",
     "groups": [
-      "fastapi",
-      "python"
+      "python",
+      "raspberrypi"
     ],
     "lessons": [
       {
-        "file": "01_course_overview.md",
+        "file": "00_intro.md",
         "section": "Introduction to User Authentication",
-        "url": "/learn/fastapi/01_course_overview.html"
+        "url": "/learn/fastapi/00_intro.html"
       },
       {
         "file": "02_setting_up_the_environment.md",
@@ -1384,6 +1466,11 @@
         "file": "09_deploying_the_solution.md",
         "section": "Integrating with a Jekyll Site",
         "url": "/learn/fastapi/09_deploying_the_solution.html"
+      },
+      {
+        "file": "10_summary.md",
+        "section": "Integrating with a Jekyll Site",
+        "url": "/learn/fastapi/10_summary.html"
       }
     ]
   },
@@ -1395,14 +1482,14 @@
     "author": "Kevin McAleer",
     "date_published": "2024-04-17",
     "groups": [
-      "freecad",
-      "3d modeling"
+      "3ddesign",
+      "3dprinting"
     ],
     "lessons": [
       {
-        "file": "01_introduction_to_freecad.md",
+        "file": "00_intro.md",
         "section": "Getting Started with FreeCAD",
-        "url": "/learn/freecad/01_introduction_to_freecad.html"
+        "url": "/learn/freecad/00_intro.html"
       },
       {
         "file": "02_installing_freecad.md",
@@ -1534,9 +1621,8 @@
     "author": "Kevin McAleer",
     "date_published": "2026-11-04",
     "groups": [
-      "git",
-      "github",
-      "productivity"
+      "productivity",
+      "micropython"
     ],
     "lessons": [
       {
@@ -1621,7 +1707,7 @@
     "groups": [
       "ai",
       "python",
-      "robotics"
+      "robots"
     ],
     "lessons": [
       {
@@ -1838,7 +1924,7 @@
   {
     "slug": "intermediate_micropython",
     "name": "Intermediate level MicroPython",
-    "description": "This course is designed to take you from a beginner to an intermediate level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules and Packages, DocStrings, Interrupts and Timers, and MP Remote.",
+    "description": "Take your MicroPython further. Build robot code with classes, inheritance and decorators, organise it into modules and packages, respond to the world with interrupts and timers, and manage your Pico from the command line with mpremote. Every example is checked on MicroPython, not just standard Python.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-07-07",
@@ -1849,9 +1935,9 @@
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/intermediate_micropython/01_intro.html"
+        "url": "/learn/intermediate_micropython/00_intro.html"
       },
       {
         "file": "02_oop.md",
@@ -1933,19 +2019,18 @@
   {
     "slug": "jekyll",
     "name": "Building Websites with Jekyll",
-    "description": "Learn how to build static websites using Jekyll, from basic setup to advanced features.",
+    "description": "Learn how to build static websites using Jekyll, from basic setup to advanced features. Along the way you build Maker's Log, a robot build-log site with posts, a parts list, your own layouts, plugins and a projects portfolio, then publish it on GitHub Pages.",
     "cover": "assets/jekyll.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-01-24",
     "groups": [
-      "jekyll",
-      "website development"
+      "productivity"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction to Jekyll and Static Sites",
-        "url": "/learn/jekyll/01_intro.html"
+        "url": "/learn/jekyll/00_intro.html"
       },
       {
         "file": "02_install.md",
@@ -1978,28 +2063,27 @@
         "url": "/learn/jekyll/07_realworld.html"
       },
       {
-        "file": "08_bonus.md",
-        "section": "Bonus",
-        "url": "/learn/jekyll/08_bonus.html"
+        "file": "08_summary.md",
+        "section": "Summary",
+        "url": "/learn/jekyll/08_summary.html"
       }
     ]
   },
   {
     "slug": "k3s",
     "name": "Running K3s on Raspberry Pi",
-    "description": "Learn how to build your own lightweight Kubernetes cluster using K3s and Raspberry Pi. This hands-on course will guide you through setup, configuration, networking, persistent storage, and deploying real workloads \u2014 all on affordable single-board computers. Ideal for homelabbers, IoT developers, and anyone curious about Kubernetes at the edge.",
+    "description": "Learn how to build your own lightweight Kubernetes cluster using K3s and Raspberry Pi. This hands-on course will guide you through setup, configuration, networking, persistent storage, and deploying real workloads, all on affordable single-board computers. Ideal for homelabbers, IoT developers, and anyone curious about Kubernetes at the edge.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2025-06-01",
     "groups": [
-      "docker",
-      "raspberry pi"
+      "raspberrypi"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/k3s/01_intro.html"
+        "url": "/learn/k3s/00_intro.html"
       },
       {
         "file": "02_hardware_requirements.md",
@@ -2096,9 +2180,8 @@
     "author": "Kevin McAleer",
     "date_published": "2023-01-07",
     "groups": [
-      "ros",
-      "raspberry pi",
-      "robotics"
+      "raspberrypi",
+      "robots"
     ],
     "lessons": [
       {
@@ -2206,12 +2289,12 @@
   {
     "slug": "learning_platform",
     "name": "How to use the Learning Platform",
-    "description": "Learn how to use the new Learning Platform",
+    "description": "A short, friendly guide to the Learn section of KevsRobots.com: find a course, follow a learning pathway, run code in your browser, download files, track your progress with quizzes, and use it all in a classroom.",
     "cover": "assets/learn.jpg",
     "author": "Kevin McAleer",
     "date_published": "2022-12-04",
     "groups": [
-      "learning platform"
+      "productivity"
     ],
     "lessons": [
       {
@@ -2226,13 +2309,23 @@
       },
       {
         "file": "02_navigate_content.md",
-        "section": "Navigating Content",
+        "section": "Finding and using content",
         "url": "/learn/learning_platform/02_navigate_content.html"
       },
       {
         "file": "03_download_content.md",
-        "section": "Navigating Content",
+        "section": "Finding and using content",
         "url": "/learn/learning_platform/03_download_content.html"
+      },
+      {
+        "file": "04_track_progress.md",
+        "section": "Finding and using content",
+        "url": "/learn/learning_platform/04_track_progress.html"
+      },
+      {
+        "file": "05_for_teachers.md",
+        "section": "Wrapping up",
+        "url": "/learn/learning_platform/05_for_teachers.html"
       }
     ]
   },
@@ -2244,13 +2337,13 @@
     "author": "Kevin McAleer",
     "date_published": "2024-08-23",
     "groups": [
-      "linux"
+      "raspberrypi"
     ],
     "lessons": [
       {
-        "file": "01_intro_terminal.md",
+        "file": "00_intro.md",
         "section": "Getting Started with the Command Line",
-        "url": "/learn/linux_intro/01_intro_terminal.html"
+        "url": "/learn/linux_intro/00_intro.html"
       },
       {
         "file": "01a_man.md",
@@ -2303,6 +2396,11 @@
         "url": "/learn/linux_intro/09_managing_processes.html"
       },
       {
+        "file": "09a_services.md",
+        "section": "System Monitoring and Management",
+        "url": "/learn/linux_intro/09a_services.html"
+      },
+      {
         "file": "10_networking_commands.md",
         "section": "Networking Basics",
         "url": "/learn/linux_intro/10_networking_commands.html"
@@ -2344,12 +2442,12 @@
       },
       {
         "file": "18_resources_next_steps.md",
-        "section": "Resources and Next Steps",
+        "section": "Summary and Next Steps",
         "url": "/learn/linux_intro/18_resources_next_steps.html"
       },
       {
         "file": "19_cheatsheet.md",
-        "section": "Resources and Next Steps",
+        "section": "Summary and Next Steps",
         "url": "/learn/linux_intro/19_cheatsheet.html"
       }
     ]
@@ -2362,15 +2460,13 @@
     "author": "Kevin McAleer",
     "date_published": "2024-03-21",
     "groups": [
-      "markdown",
-      "jekyll",
-      "documentation"
+      "productivity"
     ],
     "lessons": [
       {
-        "file": "01_overview.md",
+        "file": "00_intro.md",
         "section": "Introduction to Markdown and Jekyll",
-        "url": "/learn/markdown/01_overview.html"
+        "url": "/learn/markdown/00_intro.html"
       },
       {
         "file": "02_markdown_basics.md",
@@ -2416,6 +2512,11 @@
         "file": "10_deploying_to_github_pages.md",
         "section": "Publishing Your Site",
         "url": "/learn/markdown/10_deploying_to_github_pages.html"
+      },
+      {
+        "file": "11_summary.md",
+        "section": "Publishing Your Site",
+        "url": "/learn/markdown/11_summary.html"
       }
     ]
   },
@@ -2427,9 +2528,6 @@
     "author": "Kevin McAleer",
     "date_published": "2026-11-04",
     "groups": [
-      "mermaid",
-      "markdown",
-      "documentation",
       "productivity"
     ],
     "lessons": [
@@ -2513,14 +2611,12 @@
   {
     "slug": "meshcore",
     "name": "Off-Grid Messaging with MeshCore",
-    "description": "Build your own off-grid LoRa mesh network with MeshCore and two cheap Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal, no subscription.",
+    "description": "Build your own off-grid LoRa mesh network with MeshCore and two Heltec V3 boards, one as a repeater and one as a client. No internet, no phone signal, no subscription.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2026-08-05",
     "groups": [
-      "electronics",
-      "lora",
-      "meshcore"
+      "electronics"
     ],
     "lessons": [
       {
@@ -2613,9 +2709,7 @@
     "author": "Kevin McAleer",
     "date_published": "2026-08-05",
     "groups": [
-      "electronics",
-      "lora",
-      "meshcore"
+      "electronics"
     ],
     "lessons": [
       {
@@ -3033,15 +3127,16 @@
     "author": "Kevin McAleer",
     "date_published": "2025-05-20",
     "groups": [
-      "robotics",
+      "robots",
       "micropython",
-      "raspberry pi"
+      "raspberrypi",
+      "pico"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/micropython_robotics/01_intro.html"
+        "url": "/learn/micropython_robotics/00_intro.html"
       },
       {
         "file": "02_dc_motors.md",
@@ -3108,9 +3203,10 @@
     "author": "Kevin McAleer",
     "date_published": "2025-02-16",
     "groups": [
-      "raspberry pi",
-      "3d modeling",
-      "stands_and_cases"
+      "raspberrypi",
+      "3ddesign",
+      "stands_and_cases",
+      "lasercutting"
     ],
     "lessons": [
       {
@@ -3157,6 +3253,11 @@
         "file": "08_top_panel.md",
         "section": "Part Designs",
         "url": "/learn/mini_rack/08_top_panel.html"
+      },
+      {
+        "file": "09_cluster_panel.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/09_cluster_panel.html"
       },
       {
         "file": "07_print.md",
@@ -3464,8 +3565,7 @@
     "groups": [
       "python",
       "ai",
-      "raspberry pi",
-      "computer vision"
+      "raspberrypi"
     ],
     "lessons": [
       {
@@ -3518,13 +3618,13 @@
   {
     "slug": "obsidian",
     "name": "Obsidian",
-    "description": "Learn how to use Obsidian for note-taking and knowledge management.",
+    "description": "Learn how to use Obsidian for note-taking and knowledge management, by building a robot build log vault with linked notes, tags, properties, tasks, a canvas and a Base.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2025-08-24",
     "groups": [
-      "obsidian",
-      "raspberry pi"
+      "productivity",
+      "raspberrypi"
     ],
     "lessons": [
       {
@@ -3712,14 +3812,13 @@
   {
     "slug": "octapi",
     "name": "OctaPi",
-    "description": "Learn how to use Crack the Enigma code using a Cluster of Raspberry Pis and Python.",
+    "description": "Build a cluster of Raspberry Pis and use Python and dispy to share out the work of cracking an Enigma message. Start with py-enigma on one computer, then scale up.",
     "cover": "assets/octapi.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-02-18",
     "groups": [
-      "octapi",
       "python",
-      "clusters"
+      "raspberrypi"
     ],
     "lessons": [
       {
@@ -3756,6 +3855,102 @@
         "file": "06_octapi.md",
         "section": "Build OctaPi",
         "url": "/learn/octapi/06_octapi.html"
+      }
+    ]
+  },
+  {
+    "slug": "open_duck_mini",
+    "name": "Build an Open Duck Mini Walking Robot",
+    "description": "Build an Open Duck Mini, the open-source walking robot inspired by Disney's BDX droid. Print and assemble it, wire up a Raspberry Pi Zero 2W, 14 serial bus servos and an IMU, get it walking with the pretrained policy, then learn how its reinforcement learning brain was trained and train your own.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "robots",
+      "ai",
+      "raspberrypi",
+      "3dprinting"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Meet the duck",
+        "url": "/learn/open_duck_mini/00_intro.html"
+      },
+      {
+        "file": "01_what_is_open_duck_mini.md",
+        "section": "Meet the duck",
+        "url": "/learn/open_duck_mini/01_what_is_open_duck_mini.html"
+      },
+      {
+        "file": "02_parts_list.md",
+        "section": "Parts and printing",
+        "url": "/learn/open_duck_mini/02_parts_list.html"
+      },
+      {
+        "file": "03_printing_the_parts.md",
+        "section": "Parts and printing",
+        "url": "/learn/open_duck_mini/03_printing_the_parts.html"
+      },
+      {
+        "file": "04_bus_servos_and_ids.md",
+        "section": "Parts and printing",
+        "url": "/learn/open_duck_mini/04_bus_servos_and_ids.html"
+      },
+      {
+        "file": "05_assembling_the_legs.md",
+        "section": "Assembly",
+        "url": "/learn/open_duck_mini/05_assembling_the_legs.html"
+      },
+      {
+        "file": "06_head_body_and_battery.md",
+        "section": "Assembly",
+        "url": "/learn/open_duck_mini/06_head_body_and_battery.html"
+      },
+      {
+        "file": "07_wiring_the_electronics.md",
+        "section": "Assembly",
+        "url": "/learn/open_duck_mini/07_wiring_the_electronics.html"
+      },
+      {
+        "file": "08_setting_up_the_pi.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/08_setting_up_the_pi.html"
+      },
+      {
+        "file": "09_testing_imu_motors_and_controller.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/09_testing_imu_motors_and_controller.html"
+      },
+      {
+        "file": "10_calibration_and_offsets.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/10_calibration_and_offsets.html"
+      },
+      {
+        "file": "11_first_steps.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/11_first_steps.html"
+      },
+      {
+        "file": "12_how_the_duck_learned_to_walk.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/12_how_the_duck_learned_to_walk.html"
+      },
+      {
+        "file": "13_training_your_own_policy.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/13_training_your_own_policy.html"
+      },
+      {
+        "file": "14_troubleshooting.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/14_troubleshooting.html"
+      },
+      {
+        "file": "15_summary.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/15_summary.html"
       }
     ]
   },
@@ -3944,20 +4139,20 @@
   {
     "slug": "pca9685",
     "name": "Building a Robot Arm with Raspberry Pi and PCA9685",
-    "description": "Dive into the exciting world of robotics by learning how to control a robot arm using a Raspberry Pi, Python, and the PCA9685 board. This course covers everything from setting up your Raspberry Pi, understanding the PCA9685 board, programming with Python, to constructing and controlling a 4-servo robot arm. Perfect for beginners and enthusiasts alike, this course will guide you through each step with practical examples and hands-on projects.",
+    "description": "Build Buddy Jr, a small 3D printed robot arm with four servos, and bring it to life with a Raspberry Pi, Python and a PCA9685 servo driver. You'll set up the Pi, wire the board safely with a separate servo supply, learn the maths from angle to pulse, assemble the arm and program smooth, repeatable movements.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-04-06",
     "groups": [
-      "robotics",
-      "raspberry pi",
-      "pca9685"
+      "robotarms",
+      "raspberrypi",
+      "electronics"
     ],
     "lessons": [
       {
-        "file": "01_course_introduction.md",
+        "file": "00_intro.md",
         "section": "Getting Started with Raspberry Pi and Python",
-        "url": "/learn/pca9685/01_course_introduction.html"
+        "url": "/learn/pca9685/00_intro.html"
       },
       {
         "file": "02_raspberry_pi_setup.md",
@@ -4029,9 +4224,9 @@
     ],
     "lessons": [
       {
-        "file": "01_course_introduction.md",
+        "file": "00_intro.md",
         "section": "Introduction to the Raspberry Pi Pico and MicroPython",
-        "url": "/learn/pico_temp_sensor/01_course_introduction.html"
+        "url": "/learn/pico_temp_sensor/00_intro.html"
       },
       {
         "file": "02_setting_up_thonny.md",
@@ -4087,6 +4282,11 @@
         "file": "12_troubleshooting_temperature_readings.md",
         "section": "Project Challenges and Next Steps",
         "url": "/learn/pico_temp_sensor/12_troubleshooting_temperature_readings.html"
+      },
+      {
+        "file": "13_summary_and_next_steps.md",
+        "section": "Project Challenges and Next Steps",
+        "url": "/learn/pico_temp_sensor/13_summary_and_next_steps.html"
       }
     ]
   },
@@ -4098,14 +4298,14 @@
     "author": "Kevin McAleer",
     "date_published": "2025-05-24",
     "groups": [
-      "raspberry pi",
-      "docker"
+      "raspberrypi",
+      "python"
     ],
     "lessons": [
       {
-        "file": "01_intro_to_podman.md",
+        "file": "00_intro.md",
         "section": "Getting Started",
-        "url": "/learn/podman/01_intro_to_podman.html"
+        "url": "/learn/podman/00_intro.html"
       },
       {
         "file": "01_video.md",
@@ -4182,15 +4382,13 @@
     "author": "Kevin McAleer",
     "date_published": "2024-03-23",
     "groups": [
-      "pydantic",
-      "data validation",
-      "fastapi"
+      "python"
     ],
     "lessons": [
       {
-        "file": "01_overview_of_pydantic.md",
+        "file": "00_intro.md",
         "section": "Introduction to Pydantic",
-        "url": "/learn/pydantic/01_overview_of_pydantic.html"
+        "url": "/learn/pydantic/00_intro.html"
       },
       {
         "file": "02_setting_up_your_development_environment.md",
@@ -4243,9 +4441,9 @@
         "url": "/learn/pydantic/11_performance_optimization_tips.html"
       },
       {
-        "file": "12_case_studies_and_real_world_applications.md",
+        "file": "12_case_study_and_summary.md",
         "section": "Best Practices and Real-world Applications",
-        "url": "/learn/pydantic/12_case_studies_and_real_world_applications.html"
+        "url": "/learn/pydantic/12_case_study_and_summary.html"
       }
     ]
   },
@@ -4355,20 +4553,19 @@
   {
     "slug": "redis",
     "name": "Using Redis with Python",
-    "description": "Learn how to use Redis with Python to build fast, scalable applications.",
+    "description": "Learn how to use Redis with Python to share robot sensor readings, queue jobs, count visitors, rank scores and send live messages, then build a robot telemetry hub with a live dashboard.",
     "cover": "assets/redis-cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-04-12",
     "groups": [
-      "redis",
       "python",
-      "databases"
+      "raspberrypi"
     ],
     "lessons": [
       {
-        "file": "01_introduction.md",
+        "file": "00_intro.md",
         "section": "Introduction to Redis",
-        "url": "/learn/redis/01_introduction.html"
+        "url": "/learn/redis/00_intro.html"
       },
       {
         "file": "02_redis_basics.md",
@@ -4411,9 +4608,19 @@
         "url": "/learn/redis/09_redis_pub_sub.html"
       },
       {
-        "file": "10_summary.md",
-        "section": "Conclusion",
-        "url": "/learn/redis/10_summary.html"
+        "file": "10_expiry_and_persistence.md",
+        "section": "Keeping data",
+        "url": "/learn/redis/10_expiry_and_persistence.html"
+      },
+      {
+        "file": "11_robot_telemetry_hub.md",
+        "section": "Project and Conclusion",
+        "url": "/learn/redis/11_robot_telemetry_hub.html"
+      },
+      {
+        "file": "12_summary.md",
+        "section": "Project and Conclusion",
+        "url": "/learn/redis/12_summary.html"
       }
     ]
   },
@@ -4513,6 +4720,106 @@
     ]
   },
   {
+    "slug": "robot_senses",
+    "name": "Give Your Robot Senses",
+    "description": "Give one small tracked robot a sense at a time. Learn what each sensor measures, how to read it in MicroPython, and how to turn the readings into behaviour. Then move up to navigation: wall following, and the ideas behind mapping and SLAM.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "robots",
+      "arduino",
+      "electronics"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/robot_senses/00_intro.html"
+      },
+      {
+        "file": "01_how_robots_sense.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/01_how_robots_sense.html"
+      },
+      {
+        "file": "02_meet_modulino_smars.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/02_meet_modulino_smars.html"
+      },
+      {
+        "file": "03_qwiic_and_i2c.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/03_qwiic_and_i2c.html"
+      },
+      {
+        "file": "04_first_connection.md",
+        "section": "How robots sense",
+        "url": "/learn/robot_senses/04_first_connection.html"
+      },
+      {
+        "file": "05_see_distance.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/05_see_distance.html"
+      },
+      {
+        "file": "06_feel_movement.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/06_feel_movement.html"
+      },
+      {
+        "file": "07_speak_the_buzzer.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/07_speak_the_buzzer.html"
+      },
+      {
+        "file": "08_show_the_led_matrix.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/08_show_the_led_matrix.html"
+      },
+      {
+        "file": "09_move_the_motors.md",
+        "section": "One sense at a time",
+        "url": "/learn/robot_senses/09_move_the_motors.html"
+      },
+      {
+        "file": "10_readings_to_decisions.md",
+        "section": "From readings to behaviour",
+        "url": "/learn/robot_senses/10_readings_to_decisions.html"
+      },
+      {
+        "file": "11_combining_senses.md",
+        "section": "From readings to behaviour",
+        "url": "/learn/robot_senses/11_combining_senses.html"
+      },
+      {
+        "file": "12_project_reactive_robot.md",
+        "section": "From readings to behaviour",
+        "url": "/learn/robot_senses/12_project_reactive_robot.html"
+      },
+      {
+        "file": "13_wall_following.md",
+        "section": "Navigation",
+        "url": "/learn/robot_senses/13_wall_following.html"
+      },
+      {
+        "file": "14_mapping_and_slam.md",
+        "section": "Navigation",
+        "url": "/learn/robot_senses/14_mapping_and_slam.html"
+      },
+      {
+        "file": "15_troubleshooting.md",
+        "section": "Wrapping up",
+        "url": "/learn/robot_senses/15_troubleshooting.html"
+      },
+      {
+        "file": "16_summary.md",
+        "section": "Wrapping up",
+        "url": "/learn/robot_senses/16_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "robotics_101",
     "name": "Robotics 101",
     "description": "A friendly first look at robots: what a robot is, a quick history from ancient automata to today, the skills you need to build one, and the parts that make a robot work.",
@@ -4520,15 +4827,15 @@
     "author": "Kevin McAleer",
     "date_published": "2023-01-17",
     "groups": [
-      "robotics",
-      "raspberry pi",
-      "ros"
+      "robots",
+      "arduino",
+      "micropython"
     ],
     "lessons": [
       {
-        "file": "00_overview.md",
+        "file": "00_intro.md",
         "section": "Overview",
-        "url": "/learn/robotics_101/00_overview.html"
+        "url": "/learn/robotics_101/00_intro.html"
       },
       {
         "file": "lesson_01.md",
@@ -4560,48 +4867,52 @@
   {
     "slug": "rust",
     "name": "Introduction to Rust",
-    "description": "Learning Rust with me, is a course that will teach you how to use Rust on Raspberry Pi.",
+    "description": "Learn the Rust programming language from scratch, with a Python and MicroPython maker in mind. Write and run real programs on your computer, build a small web server, then set up Rust to blink an LED on the Raspberry Pi Pico.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-03-09",
     "groups": [
-      "rust",
       "pico"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
-        "section": "Overview",
-        "url": "/learn/rust/01_intro.html"
+        "file": "00_intro.md",
+        "section": "Getting Started",
+        "url": "/learn/rust/00_intro.html"
+      },
+      {
+        "file": "01_install-and-hello.md",
+        "section": "Getting Started",
+        "url": "/learn/rust/01_install-and-hello.html"
       },
       {
         "file": "02_rust_and_python.md",
-        "section": "Setting Up a Rust Environment",
+        "section": "Getting Started",
         "url": "/learn/rust/02_rust_and_python.html"
       },
       {
         "file": "03_rust_basics.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/03_rust_basics.html"
       },
       {
         "file": "04_ownership_and_borrowing.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/04_ownership_and_borrowing.html"
       },
       {
         "file": "05_structs_and_enums.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/05_structs_and_enums.html"
       },
       {
         "file": "06_error_handling.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/06_error_handling.html"
       },
       {
         "file": "07_common_collections.md",
-        "section": "Basics",
+        "section": "The Language",
         "url": "/learn/rust/07_common_collections.html"
       },
       {
@@ -4639,20 +4950,20 @@
   {
     "slug": "scrawly_wally",
     "name": "Wall Drawing Robot Tutorial",
-    "description": "Learn how to build your own wall drawing robot using a Raspberry Pi Zero 2 W, stepper motors, and a gondola with a marker.  This course covers the essential steps from assembling the robot, installing the software, and creating your first drawing.",
+    "description": "Learn how to build your own wall drawing robot using a Raspberry Pi Zero 2 W, stepper motors, and a gondola with a marker. This course covers the essential steps from assembling the robot, installing the software, and creating your first drawing.",
     "cover": "/assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-08-02",
     "groups": [
-      "raspberry pi",
-      "robotics",
-      "robot arm"
+      "raspberrypi",
+      "robots",
+      "python"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/scrawly_wally/01_intro.html"
+        "url": "/learn/scrawly_wally/00_intro.html"
       },
       {
         "file": "02_components.md",
@@ -4858,9 +5169,9 @@
     "author": "Kevin McAleer",
     "date_published": "2023-07-20",
     "groups": [
-      "smars",
-      "robotics",
-      "fusion 360"
+      "3ddesign",
+      "3dprinting",
+      "robots"
     ],
     "lessons": [
       {
@@ -4958,9 +5269,9 @@
     "author": "Kevin McAleer",
     "date_published": "2023-07-20",
     "groups": [
-      "smars",
-      "robotics",
-      "fusion 360"
+      "3ddesign",
+      "3dprinting",
+      "robots"
     ],
     "lessons": [
       {
@@ -5063,9 +5374,8 @@
     "author": "Kevin McAleer",
     "date_published": "2023-03-04",
     "groups": [
-      "smars",
-      "robotics",
-      "raspberry pi",
+      "robots",
+      "raspberrypi",
       "python"
     ],
     "lessons": [
@@ -5883,18 +6193,18 @@
   {
     "slug": "sql",
     "name": "Getting Started with SQL",
-    "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management.",
+    "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management, by building a Robot Workshop database in SQLite.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-11-01",
     "groups": [
-      "databases"
+      "python"
     ],
     "lessons": [
       {
-        "file": "00_course_overview.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/sql/00_course_overview.html"
+        "url": "/learn/sql/00_intro.html"
       },
       {
         "file": "01_introduction_to_sql.md",

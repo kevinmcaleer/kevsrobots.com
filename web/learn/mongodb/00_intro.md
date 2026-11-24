@@ -9,8 +9,9 @@ next: 01_what_is_a_database.html
 description: Learn MongoDB from scratch - no database experience needed - and build
   a Parts Bin app to track every part in your workshop
 percent: 5
-duration: 5
-date_updated: 2026-10-18
+duration: 6
+quiz_total: 64
+date_updated: 2026-11-24
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -143,7 +144,7 @@ After completing this course, you will:
 
 ## What you'll need
 
-- **A computer** running Windows, macOS or Linux. A **Raspberry Pi 5** with 64-bit Raspberry Pi OS works too (older Pis need the cloud option - lesson 3 explains why)
+- **A computer** running Windows, macOS or Linux. A **Raspberry Pi 5** with 64-bit Raspberry Pi OS works too (older Pis need the cloud option, and lesson 3 explains why)
 - **Docker** (recommended), or a free **MongoDB Atlas** account if you would rather not install anything. We cover both, plus a normal install, in lesson 3
 - **Python 3.10 or newer** for the last part of the course
 - **A terminal** - the Command Prompt, PowerShell, Terminal on a Mac, or a Linux shell. You do not need to be an expert, I will tell you exactly what to type
@@ -185,8 +186,10 @@ And what the computer prints back is shown in a plain block, so you can check yo
 { ok: 1 }
 ```
 
-Every example in the course has been run against a real MongoDB 8.0 server, so if your output looks different, something is worth a second look - and the **Common Issues** section at the end of most lessons will probably tell you what.
+The commands and Python scripts in this course were run against real MongoDB servers (versions 7.0 and 8.0) while the course was being reworked, so if your output looks different, something is worth a second look - and the **Common Issues** section at the end of most lessons will probably tell you what.
 
-Most lessons also finish with a **Try it Yourself** section: a few small challenges, with the answers tucked away so you can check your work once you have had a go.
+Most lessons also finish with a **Try it Yourself** section: a few small challenges, with the answers tucked away so you can check your work once you have had a go. Before the recap there is a short **Check your understanding** quiz, and your score is kept in your browser.
+
+> **Teachers**: this course suits secondary school learners and above, and adult hobbyists, who can type commands into a terminal. Allow 30 to 45 minutes per lesson, and 60 to 90 minutes for the Parts Bin project in lesson 15. Each learner (or pair) needs a computer that can run Docker, or an internet connection for a free Atlas account. No electronics are needed, so the whole course works with no hardware at all. Lesson 3 covers the likely school snags (administrator rights, blocked sites), lesson 9 explains why learners should not share one database, and lesson 16 is a good talking point about passwords and data protection.
 
 Right then. Let's find out what a database actually is.

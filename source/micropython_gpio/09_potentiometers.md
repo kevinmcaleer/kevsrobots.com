@@ -10,6 +10,8 @@ cover: /learn/micropython_gpio/assets/banners/09_potentiometers.jpg
 
 ---
 
+By the end of this lesson you will be able to wire a potentiometer to an ADC pin and use its position as an input.
+
 ## Overview
 
 A potentiometer (or "pot") is a knob that gives you a voltage you can change by hand. It's the perfect first analog input. In this lesson you'll wire one up and read it.
@@ -55,9 +57,36 @@ Turn the knob and watch the numbers change. Thonny's **View > Plotter** draws th
 
 ---
 
-## Try it yourself
+---
 
-Combine this with lesson 6: use the potentiometer to set the LED brightness by passing `pot.read_u16()` straight to `led.duty_u16()`.
+## Wiring table
+
+| Potentiometer pin | Connects to |
+| --- | --- |
+| Outer pin 1 | 3V3(OUT), physical pin 36 |
+| Middle pin (wiper) | GP26, physical pin 31 |
+| Outer pin 2 | AGND, physical pin 33 |
+{:class="table table-single"}
+
+---
+
+## Try it Yourself
+
+1. Run the program and turn the knob. Open View > Plotter in Thonny to see it as a graph.
+2. Swap the two outer pins. What changes?
+3. Challenge: use the reading to set an LED's brightness by passing `pot.read_u16()` straight to `led.duty_u16()` on a PWM pin.
+
+## Common Issues
+
+- **Problem**: The reading jumps between 0 and 65535.
+- **Solution**: Check the wiper (middle pin) is on GP26, not an outer pin.
+- **Why**: The outer pins are fixed at 3V3 and GND, so reading one gives a steady extreme.
+
+- **Problem**: The reading never reaches the full range.
+- **Solution**: Check the outer pins really go to 3V3(OUT) and GND.
+- **Why**: The wiper can only reach the voltages on the outer pins.
+
+## Check your understanding
 
 {% quiz %}
 ? Which potentiometer pin goes to the ADC input?
@@ -65,6 +94,18 @@ Combine this with lesson 6: use the potentiometer to set the LED brightness by p
 - [x] The middle pin (the wiper)
 - [ ] None, it connects to 3V3
 > The wiper's voltage changes as you turn the knob. The outer pins go to 3V3 and GND.
+
+? What is the potentiometer's middle pin called?
+- [ ] The anode
+- [x] The wiper
+- [ ] The rail
+> The wiper slides along the resistor and gives the variable voltage.
+
+? Swapping the two outer pins does what?
+- [ ] Breaks the pot
+- [x] Reverses the direction the reading changes
+- [ ] Nothing
+> The wiper now rises as the knob turns the other way.
 {% endquiz %}
 
 ---

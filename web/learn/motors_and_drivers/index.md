@@ -9,9 +9,10 @@ description: Learn how DC motors, servos and stepper motors work, why they need 
   Along the way you will build Scout, a two-wheeled drive base with a servo-mounted
   head that drives a square, spins on the spot and looks left and right.
 level: beginner
-course_duration: 1h 16m
+course_duration: 1h 38m
 lesson_count: 17
 first_lesson: 00_intro.html
+quiz_total: 49
 outcomes:
 - Explain the difference between DC, servo and stepper motors and pick the right one
   for a job

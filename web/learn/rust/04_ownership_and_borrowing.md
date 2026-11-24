@@ -3,26 +3,28 @@ layout: lesson
 title: Ownership and Borrowing
 author: Kevin McAleer
 type: page
-cover: /learn/scrawly_wally/assets/4.png
+cover: /learn/rust/assets/banners/04_ownership_and_borrowing.jpg
 date: 2024-03-09
 previous: 03_rust_basics.html
 next: 05_structs_and_enums.html
-description: 'Dive into Rust''s unique features: ownership, references, and borrowing,
-  and understand their impact on memory safety and concurrency.'
-percent: 28
-duration: 3
+description: Understand Rust's ownership rules, references and borrowing, and read
+  the compiler error you meet when a value has moved.
+percent: 35
+duration: 5
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Introduction to Rust
 - content:
-  - section: Overview
+  - section: Getting Started
     content:
     - name: Introduction to Rust
-      link: 01_intro.html
-  - section: Setting Up a Rust Environment
-    content:
+      link: 00_intro.html
+    - name: Installing Rust and Your First Program
+      link: 01_install-and-hello.html
     - name: 'Rust vs. Python: Understanding the Differences'
       link: 02_rust_and_python.html
-  - section: Basics
+  - section: The Language
     content:
     - name: Rust Basics
       link: 03_rust_basics.html
@@ -53,60 +55,155 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-One of Rust's distinguishing features is its ownership system, which is a set of rules that the compiler checks at compile time. It does not slow down your program while running. This lesson will cover the concepts of ownership, references, and borrowing, as well as lifetimes, which are all central to understanding how Rust manages memory.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
-
-- Comprehend Rust's ownership principles and how they contribute to memory safety.
-- Understand references and the borrowing rules in Rust.
-- Learn about lifetimes and their role in managing references.
+By the end of this lesson you will be able to explain the three ownership rules, and use `&` and `&mut` to lend a value without giving it away.
 
 ---
 
-### Understanding Ownership
+## Who owns the data?
 
-Ownership in Rust means that each value in Rust has a variable that's called its owner. There can only be one owner at a time, and when the owner goes out of scope, the value will be dropped.
+Ownership is the idea that makes Rust different. Think of a robot's log file. If you hand the only copy to a friend, you no longer have it. Rust treats data the same way. The rules are:
 
-The rules of ownership are:
-
-1. Each value in Rust has a variable that’s called its ‘owner’.
+1. Every value has one **owner**, a variable.
 2. There can only be one owner at a time.
-3. When the owner goes out of scope, the value will be dropped.
+3. When the owner goes out of scope, the value is dropped (its memory is freed).
 
-This system prevents memory leaks and allows for more efficient memory management.
+The compiler checks these rules while compiling, so they cost nothing when your program runs.
 
-### References and Borrowing
+Here is a complete program that shows ownership, borrowing and a lifetime:
 
-Instead of transferring ownership, Rust uses references to give you access to values without taking ownership of them. This process is called 'borrowing'. As with ownership, there are rules for borrowing:
+```rust
+fn describe(name: &String) -> usize {
+    println!("describing {}", name);
+    name.len()
+}
 
-1. You may have either one mutable reference or any number of immutable references to a value at a time.
-2. References must always be valid.
+fn add_entry(log: &mut String, entry: &str) {
+    log.push_str(entry);
+    log.push('\n');
+}
 
-Borrowing allows you to use values without taking ownership, enabling multiple parts of your code to access data without duplicating it.
+fn longest<'a>(a: &'a str, b: &'a str) -> &'a str {
+    if a.len() >= b.len() { a } else { b }
+}
 
-### Lifetimes
+fn main() {
+    let name = String::from("Scout");
+    let length = describe(&name); // borrow: we still own `name`
+    println!("{} has {} letters", name, length);
 
-Lifetimes are Rust's way of ensuring that all borrows are valid. They are a part of the type system and describe the scope for which a reference is valid. In many cases, lifetimes are implicit and inferred, just like most types are, but there are situations where you need to annotate them explicitly.
+    let mut log = String::new();
+    add_entry(&mut log, "boot");
+    add_entry(&mut log, "wheels ok");
+    print!("{}", log);
 
-Lifetimes ensure that references do not outlive the data they refer to, preventing dangling references.
+    let moved = name; // ownership moves to `moved`
+    println!("now owned by moved: {}", moved);
 
----
+    println!("longer name: {}", longest("Scout", "Rover"));
+}
+```
 
-> ### Python Comparisons
->
-> - In Python, memory management is handled by garbage collection, so the concepts of ownership, borrowing, and lifetimes are not directly applicable.
-> - Python allows you to reference objects multiple times without explicit rules, relying on reference counting and garbage collection to manage memory, which contrasts with Rust's compile-time checks for memory safety and access rules.
+Output:
 
----
+```text
+describing Scout
+Scout has 5 letters
+boot
+wheels ok
+now owned by moved: Scout
+longer name: Scout
+```
 
-## Summary
+```mermaid
+flowchart LR
+    A["name owns 'Scout'"] -->|"let moved = name"| B["moved owns 'Scout'"]
+    A -.->|"name can no longer be used"| X["compile error"]
+```
 
-In this lesson, you learned about Rust's ownership, borrowing, and lifetimes. Understanding these concepts is fundamental to writing safe and efficient Rust code, as they enable Rust to manage memory safety without a garbage collector.
+## Moving
 
----
+`let moved = name;` does not copy the text. It **moves** it: `moved` is now the owner and `name` is finished. Small fixed-size values such as numbers and booleans are the exception: they are simply copied, so `let b = a;` leaves `a` usable.
+
+Using a moved value is the first error every Rust learner meets:
+
+<!-- code-check: skip -->
+```rust
+let name = String::from("Scout");
+let moved = name;
+println!("{} and {}", name, moved);
+```
+
+```text
+error[E0382]: borrow of moved value: `name`
+  |
+2 |     let name = String::from("Scout");
+  |         ---- move occurs because `name` has type `String`, which does not implement the `Copy` trait
+3 |     let moved = name;
+  |                 ---- value moved here
+4 |     println!("{} and {}", name, moved);
+  |                           ^^^^ value borrowed here after move
+```
+
+**Why this matters:** two owners of the same memory would both try to free it, which is a classic bug in C. Rust rules it out at compile time.
+
+## Borrowing
+
+Often you just want to look at a value, not own it. A **reference**, written `&`, borrows it. In `describe(&name)` the function looks at the text and gives it back untouched, so `name` is still ours afterwards.
+
+To change a borrowed value, take a **mutable reference** with `&mut`, as `add_entry(&mut log, ...)` does. The borrowing rules are:
+
+- Any number of `&` references **or** exactly one `&mut`, never both at once.
+- References must always point at something that still exists.
+
+Why? If two parts of your code could change the same sensor reading at once, you would get confusing bugs. Rust stops that before it exists.
+
+## Lifetimes in one minute
+
+A lifetime says how long a reference is valid. Usually the compiler works it out. The `'a` in `longest<'a>` tells it that the returned reference lives no longer than the two it was given. You will not write many lifetimes early on, but when you see `'a`, read it as "these references are linked".
+
+## Try it Yourself
+
+1. Run the program, then change `describe(&name)` to `describe(name)`. What does the compiler say, and why?
+2. Create the move error on purpose, read it, and fix it with `.clone()` as the compiler suggests.
+3. Write `fn shout(text: &mut String)` that adds `"!"` to the end of the text, and call it on a `let mut` string.
+4. Challenge: try to hold two `&mut` references to the same string at once, and read the error.
+
+## Common Issues
+
+- **Problem**: `borrow of moved value`.
+- **Solution**: Borrow with `&` instead of passing the value, or use `.clone()` if you really need a second copy.
+- **Why**: Passing a `String` by value moves ownership into the function, so the caller cannot use it afterwards.
+
+- **Problem**: `cannot borrow as mutable` when you try to change something.
+- **Solution**: Declare it `let mut` and pass `&mut value`.
+- **Why**: Borrowing mutably needs the original to be mutable too.
+
+- **Problem**: Cloning everything to silence errors.
+- **Solution**: Try borrowing first and clone only when two owners are genuinely needed.
+- **Why**: Clones copy data, which wastes memory and time, and on a microcontroller memory is scarce.
+
+## Check your understanding
+
+{% quiz %}
+? What happens to a `String` after `let b = a;`?
+- [ ] Both `a` and `b` own it
+- [x] Ownership moves to `b`, and `a` can no longer be used
+- [ ] It is deleted
+> A move transfers ownership. The old variable is no longer valid.
+
+? Which borrows are allowed at the same time?
+- [x] Many `&` references, or exactly one `&mut`
+- [ ] One `&` and one `&mut`
+- [ ] Any number of `&mut`
+> Rust allows many readers or one writer, never both.
+
+? When is a value dropped?
+- [ ] When the program exits
+- [x] When its owner goes out of scope
+- [ ] When a garbage collector next runs
+> There is no garbage collector. Dropping happens at a known point.
+{% endquiz %}

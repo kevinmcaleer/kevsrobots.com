@@ -1,90 +1,159 @@
 ---
 title: Verifying Cluster Setup
-description: Learn how to verify and troubleshoot your Docker Swarm cluster setup on Raspberry Pi, ensuring all nodes are correctly configured and operational.
+description: >-
+    Check that every node is healthy, then prove the cluster works by running a real test service and reaching it through any node.
 layout: lesson
 type: page
 cover: /learn/docker_swarm/assets/banners/05_verifying-cluster-setup.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Ensuring a Successful Docker Swarm Cluster Configuration
-
-After adding your Raspberry Pi devices as nodes in the Docker Swarm, it's crucial to verify that the cluster is functioning as intended. This lesson will guide you through the steps to check the health and configuration of your Swarm, ensuring that all nodes are operational and properly communicating with each other.
+By the end of this lesson you will be able to check a swarm's health with `docker node ls` and `docker node inspect`, and prove it works by running a test service and reaching it through any node.
 
 ---
 
-### Overview of Verification Steps
+## Step 1: are all the nodes there?
 
-Verifying your Docker Swarm cluster involves checking the status of nodes, services, and the Swarm's overall health. This process helps identify and troubleshoot potential issues early on.
+On a manager:
 
----
+```bash
+docker node ls
+```
 
-### Step 1: Listing Nodes in the Swarm
+For a healthy three-node cluster, expect output along these lines:
 
-- **Command**: To view all nodes in your Swarm and their status, run the following command on a manager node:
+```plaintext
+ID                            HOSTNAME   STATUS   AVAILABILITY   MANAGER STATUS
+x1a...  *                     pi-node1   Ready    Active         Leader
+k9b...                        pi-node2   Ready    Active         Reachable
+m3c...                        pi-node3   Ready    Active         Reachable
+```
 
-  ```sh
-  docker node ls
-  ```
+What to look for:
 
-- **Expected Output**: This command outputs a list of all nodes, including their ID, hostname, status (Ready or Down), availability (Active, Pause, Drain), and role (Manager or Worker).
+- **STATUS** should be `Ready`. `Down` means the manager cannot reach that node.
+- **AVAILABILITY** should be `Active`. `Drain` or `Pause` means the node will not get new tasks (we meet drain in lesson 9).
+- **MANAGER STATUS**: exactly one `Leader`, and the others `Reachable`. `Unreachable` means a manager has lost contact.
 
-### Step 2: Inspecting a Node
-
-- **Command**: For detailed information about a specific node, use:
-
-  ```sh
-  docker node inspect <NODE_ID> --pretty
-  ```
-
-  Replace `<NODE_ID>` with the ID of the node you wish to inspect.
-- **Usefulness**: This provides detailed information about the node's configuration, including labels, operating system, Docker version, and more. It's useful for troubleshooting specific node issues.
+The `*` marks the node you are talking to.
 
 ---
 
-### Step 3: Checking Service Status
+## Step 2: look closer at a node
 
-If you've already deployed services to your Swarm:
+```bash
+docker node inspect pi-node2 --pretty
+```
 
-- **Command**: Check the status of a deployed service with:
-
-  ```sh
-  docker service ls
-  ```
-
-- **Expected Output**: This shows all services running in the Swarm, including the number of replicas, image used, and ports exposed. For more detailed service information, use `docker service ps <SERVICE_NAME>`.
+This prints the node's hostname, role, availability, Docker Engine version, architecture (`aarch64` on a 64-bit Pi) and resources. It's the first place to look when one node behaves differently from the rest, for example a different Docker version.
 
 ---
 
-### Step 4: Analyzing Logs
+## Step 3: run a real test service
 
-Logs can provide crucial insights into the operation of your Swarm:
+A list of `Ready` nodes is encouraging, but let's prove the cluster can actually *do* something. Create a small nginx web service with four replicas:
 
-- **Command**: To view logs for a specific service, use:
+```bash
+docker service create --name smoke --replicas 4 --publish 8101:80 nginx:alpine
+```
 
-  ```sh
-  docker service logs <SERVICE_NAME>
-  ```
+Watch where Swarm placed the containers (called *tasks*):
 
-- **Application**: This is particularly helpful for debugging issues with service deployment or operation.
+```bash
+docker service ps smoke
+```
+
+You will see one row per task with the node it landed on. On a three-node cluster, the four tasks spread across the nodes. That spreading is Swarm's scheduler at work.
+
+```mermaid
+flowchart TB
+    U["You: browser or curl"] -->|"port 8101"| N2["Any node (routing mesh)"]
+    N2 --> T1["smoke.1 on pi-node1"]
+    N2 --> T2["smoke.2 on pi-node2"]
+    N2 --> T3["smoke.3 on pi-node3"]
+    N2 --> T4["smoke.4 on pi-node1"]
+```
+
+### The routing mesh
+
+Because you *published* port 8101, every node in the swarm now listens on it, even nodes not running a task. Swarm calls this the **routing mesh**. From your computer, try each Pi's address:
+
+```bash
+curl -I http://192.168.50.11:8101
+curl -I http://192.168.50.12:8101
+curl -I http://192.168.50.13:8101
+```
+
+Each should answer `HTTP/1.1 200 OK` from the nginx container. That is real proof: the network, the overlay and the scheduler all work.
 
 ---
 
-### Step 5: Troubleshooting Common Issues
+## Step 4: read the logs
 
-Encountering issues is common; here are a few tips:
+```bash
+docker service logs smoke
+```
 
-- **Node Communication**: Ensure all nodes are on the same network and can communicate. Firewall settings or network misconfigurations can prevent nodes from joining the Swarm or communicating properly.
-- **Docker Versions**: Mismatched Docker versions across nodes can cause compatibility issues. Ensure all nodes are running the same Docker version.
-- **Resource Constraints**: Insufficient resources (CPU, memory, disk space) can lead to service deployment failures. Monitor resource usage on your nodes.
+Your `curl` requests appear here, from whichever node served them. This one command gathers logs from every node.
+
+---
+
+## Step 5: tidy up
+
+```bash
+docker service rm smoke
+```
 
 ---
 
-### Summary
+## Try it Yourself
 
-Verifying your Docker Swarm setup is a critical step in ensuring your Raspberry Pi cluster is ready for deploying and managing containerized applications. Regularly checking the status of nodes and services, along with proactive troubleshooting, will keep your Swarm healthy and efficient. With your cluster verified, you're now set to leverage Docker Swarm's full potential on your Raspberry Pi cluster.
+1. Run the smoke test and note which node each of the four tasks landed on.
+2. Scale it up with `docker service scale smoke=8` and check `docker service ps smoke` again.
+3. Challenge: switch off one worker Pi and watch `docker service ps smoke`. Where do its tasks go?
 
 ---
+
+## Common Issues
+
+- **Problem**: `curl` works against one node's IP but not the others.
+- **Solution**: Open 7946 (tcp and udp) and 4789/udp between the nodes.
+- **Why**: The routing mesh relays traffic over the overlay network, which uses those ports.
+
+- **Problem**: `docker service ps` shows tasks stuck at `Pending` or repeatedly `Rejected`.
+- **Solution**: Run `docker service ps --no-trunc smoke` and read the error column. Typical causes are no image for the platform, or no node with enough memory.
+- **Why**: Swarm only schedules a task where it can run. The error text says what blocked it.
+
+- **Problem**: A node shows `Down` right after joining.
+- **Solution**: Check the node's clock and network, and that its Docker Engine is running.
+- **Why**: Nodes prove themselves with certificates that depend on the correct time.
+
+> **Teachers**: Learners often skip this verification step and then misdiagnose later problems. Make it a checkpoint: each group shows you a three-node `docker node ls` and a `200 OK` from every node before moving on.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does an `Unreachable` manager status mean?
+- [ ] The node is a worker
+- [x] The other managers have lost contact with that manager
+- [ ] The node is paused
+> `Reachable` is normal for non-leader managers. `Unreachable` means the others cannot contact it.
+
+? Why does `curl` to a node that is not running a task still work?
+- [ ] Docker copies the container to that node
+- [x] The routing mesh forwards published-port traffic to a node that has a task
+- [ ] It does not, that is a mistake
+> Publishing a port opens it on every node, and the routing mesh relays requests to a running task.
+
+? Which command gathers logs from all tasks of a service?
+- [x] `docker service logs <name>`
+- [ ] `docker logs <name>` on one node
+- [ ] `docker node logs`
+> `docker service logs` collects the output of every task in the service, from every node.
+{% endquiz %}

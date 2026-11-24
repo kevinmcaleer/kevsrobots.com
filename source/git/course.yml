@@ -5,10 +5,24 @@
   level: beginner
   layout: course
   cover: assets/cover.jpg
+  outcomes:
+    - Install Git and set it up with your name, email and default branch
+    - Save snapshots of a project with git add and git commit, and read its history
+    - Undo mistakes safely with git restore, git commit --amend and git revert
+    - Keep secrets and junk out of a repository with .gitignore
+    - Use branches, merge them, and resolve a merge conflict
+    - Publish a project on GitHub, sign in safely, and keep copies in sync with push, pull and pull requests
+  prerequisites:
+    - No Git or GitHub experience needed
+    - Comfortable typing a command into a terminal and pressing Enter
+  you_need:
+    - A computer running Windows, macOS or Linux, or a Raspberry Pi
+    - A text editor such as VS Code or Thonny
+    - A free GitHub account (for modules 10 to 12)
+    - Optional for the final project, a Raspberry Pi Pico robot with two motors and an HC-SR04 sensor
   groups:
-      - git
-      - github
       - productivity
+      - micropython
   description: >-
      Learn to track your code and projects with Git: commits, history, undoing mistakes, branches, merging, and sharing your work on GitHub.
   content:

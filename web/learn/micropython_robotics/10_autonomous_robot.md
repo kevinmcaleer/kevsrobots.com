@@ -10,15 +10,16 @@ next: 11_final_project.html
 description: Combine motor control and sensors to give your robot autonomous movement
   and basic decision-making.
 percent: 80
-duration: 2
-date_updated: 2025-05-10
+duration: 5
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico
 - content:
   - section: Introduction
     content:
     - name: Introduction to MicroPython Robotics Projects
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Motors and Movement
     content:
     - name: Controlling DC Motors with the Raspberry Pi Pico
@@ -49,11 +50,11 @@ navigation:
       link: 10_autonomous_robot.html
   - section: Final Project
     content:
-    - name: "Final Project \u2013 Build Your Own Robot"
+    - name: Final Project - Build Your Own Robot
       link: 11_final_project.html
   - section: Summary
     content:
-    - name: "Course Summary and What\u2019s Next"
+    - name: Course Summary and What's Next
       link: 12_summary.html
 ---
 
@@ -62,115 +63,158 @@ navigation:
 
 ---
 
-You’ve learned how to control your robot manually. Now it’s time to **make it think for itself** — at least a little! In this lesson, you’ll combine your motor and sensor skills to create simple autonomous behavior.
+By the end of this lesson you will be able to write a sense, decide, act loop, and build an explorer that scans with the servo and turns towards the most open space.
 
----
+You've driven your robot by hand. Now let's make it think for itself, at least a little. An **autonomous** robot decides what to do from its sensor readings instead of waiting for you. Almost every robot, from a vacuum cleaner to a Mars rover, runs the same three-step loop.
 
-## What Is Autonomous Behavior?
+## The sense, decide, act loop
 
-Autonomous robots make decisions based on sensor data instead of waiting for human input. This can be as simple as:
+```mermaid
+flowchart LR
+    S["Sense: read the distance"] --> D["Decide: is it clear?"]
+    D -->|"clear"| A1["Act: drive forward"]
+    D -->|"blocked"| A2["Act: back up and turn"]
+    A1 --> S
+    A2 --> S
+```
 
-- Avoiding obstacles
-- Following a line
-- Choosing the clearest path
+Writing it as a loop makes the robot easy to debug: when something goes wrong you can ask, did it sense wrongly, decide wrongly, or act wrongly?
 
-We’ll build a basic robot that explores its environment and avoids crashing into things.
+## Version 1: bump-free wanderer
 
----
-
-## Basic Decision-Making Logic
-
-Here’s a simple behavior loop:
-
-1. **Move forward**
-2. **Check for obstacle**  
-   - If detected, stop
-   - Scan left and right
-   - Turn in the direction with more space
-3. Repeat
-
----
-
-## Example: Obstacle-Avoiding Explorer
-
-This example assumes:
-
-- A forward-facing ultrasonic sensor
-- Motors controlled with `forward()`, `backward()`, `left()`, `right()`, `stop()`
-- Optional: sensor mounted on a servo for scanning
+This robot drives forward while the way is clear. If something is within 20 cm, it stops, backs up for half a second, then spins a random way for a random time, so it does not get stuck in the same corner. It needs `robot.py` and `sonar.py` on the Pico.
 
 ```python
 from time import sleep
-from machine import Pin, time_pulse_us, PWM
+from random import choice, randint
+from robot import Robot
+from sonar import Sonar
 
-# Set up motors and ultrasonic sensor
-# (use previous lessons for wiring and functions)
+bot = Robot()
+sonar = Sonar()
 
-def get_distance():
-    # Trigger pulse and measure response
-    trigger.low()
-    sleep(0.002)
-    trigger.high()
-    sleep(0.01)
-    trigger.low()
-    duration = time_pulse_us(echo, 1, 30000)
-    return duration / 58
+CLEAR_CM = 20
+SPEED = 60
 
-def explore():
-    while True:
-        distance = get_distance()
-        print("Distance:", distance)
+while True:
+    distance = sonar.distance_cm()          # sense
 
-        if distance > 20:
-            forward()
-        else:
-            stop()
-            backward()
-            sleep(0.5)
-            stop()
-            right()
-            sleep(0.5)
-            stop()
+    if distance is None or distance > CLEAR_CM:
+        bot.forward(SPEED)                  # decide: clear, act: go
+    else:
+        bot.stop()                          # decide: blocked, act: dodge
+        sleep(0.2)
+        bot.backward(SPEED)
+        sleep(0.5)
+        turn = choice([bot.spin_left, bot.spin_right])
+        turn(SPEED)
+        sleep(randint(3, 8) / 10)           # 0.3 to 0.8 seconds
+        bot.stop()
 
-        sleep(0.1)
-
-# Run the loop
-explore()
+    sleep(0.06)
 ```
-{: .no-snakie }
 
----
+A note on `distance is None`: no echo at all usually means nothing is in range, so the way is clear. If your robot drives into soft things like curtains, which can swallow the sound, treat `None` as blocked instead. It is your robot, your decision.
 
-## Optional: Scan for Best Direction
+## Version 2: choose the best direction
 
-If your sensor is on a servo, sweep left and right, then turn toward the direction with more space:
+A random turn is better than nothing, but a robot with a servo can look first. When blocked, it scans left and right and turns towards the larger gap. This needs `servo.py` too, with the servo on GP10:
 
 ```python
-def scan_and_choose():
-    set_angle(45)
-    left_dist = get_distance()
-    set_angle(135)
-    right_dist = get_distance()
-    set_angle(90)  # Reset forward
+from time import sleep
+from robot import Robot
+from sonar import Sonar
+from servo import Servo
 
-    if right_dist > left_dist:
-        right()
+bot = Robot()
+sonar = Sonar()
+servo = Servo()
+
+CLEAR_CM = 20
+SPEED = 60
+servo.angle(90)
+sleep(0.5)
+
+
+def look(angle):
+    servo.angle(angle)
+    sleep(0.4)                       # let the servo arrive
+    d = sonar.distance_cm()
+    return 400 if d is None else d   # no echo means lots of room
+
+
+def choose_direction():
+    left_gap = look(150)
+    right_gap = look(30)
+    servo.angle(90)
+    print("left", left_gap, "right", right_gap)
+    return "left" if left_gap > right_gap else "right"
+
+
+while True:
+    distance = sonar.distance_cm()
+    if distance is None or distance > CLEAR_CM:
+        bot.forward(SPEED)
     else:
-        left()
+        bot.stop()
+        sleep(0.2)
+        side = choose_direction()
+        bot.backward(SPEED)
+        sleep(0.4)
+        if side == "left":
+            bot.spin_left(SPEED)
+        else:
+            bot.spin_right(SPEED)
+        sleep(0.5)
+        bot.stop()
+    sleep(0.06)
 ```
 
----
+The angles depend on how you mounted the servo. If the robot turns towards the wall, swap 150 and 30. A spin of 0.5 seconds is about a quarter turn at this speed on a smooth floor, but yours will differ, so adjust the time until it matches.
 
-## Try It Yourself
+## Debug by printing
 
-- Add timed turns for corners
-- Combine line following and obstacle avoidance
-- Add randomness to movement direction for exploration
+When a robot misbehaves, make it tell you what it is thinking. A `print()` of the distance and the decision in each loop shows you instantly whether it saw the wall. Keep the robot on a block with its USB cable attached for the first tests, then free it once the prints look sensible.
 
----
+## Common Issues
 
-With autonomous behavior, your robot can now explore without constant input — a major milestone in robotics!
+- **Problem**: The robot hits obstacles before it reacts.
+- **Solution**: Raise `CLEAR_CM`, lower `SPEED`, or reduce the `sleep(0.06)` at the end of the loop.
+- **Why**: The robot keeps moving while it senses and decides, so it needs room to stop.
 
-Next up: [Final Project – Build Your Own Robot](11_final_project)
+- **Problem**: The robot gets stuck wiggling in a corner.
+- **Solution**: Make the backing up and turning longer, or use the random turn.
+- **Why**: A short dodge can leave the robot still facing the same wall.
 
----
+- **Problem**: The robot turns towards the wall in version 2.
+- **Solution**: Swap the angles used for `left_gap` and `right_gap`.
+- **Why**: The servo's 0 to 180 direction depends on how it is mounted.
+
+## Try it Yourself
+
+1. Change `CLEAR_CM` to 10, 20 and 40, and describe how the robot's personality changes.
+2. Add a `print()` of every decision and read the output while the robot runs.
+3. Make the robot slow down when something is within 40 cm, before it stops.
+4. Challenge: combine this with line following: follow the line, but stop and wait when an obstacle blocks it.
+
+## Check your understanding
+
+{% quiz %}
+? What are the three steps of the loop in this lesson?
+- [ ] Charge, run, stop
+- [x] Sense, decide, act
+- [ ] Wire, code, test
+> Every autonomous robot reads sensors, makes a decision, then moves.
+
+? Why does the first version turn a random way and for a random time?
+- [ ] To use less battery
+- [x] So it does not get stuck repeating the same turn in a corner
+- [ ] Because the sonar cannot measure left or right
+> Randomness breaks the repeating pattern that traps a robot in one spot.
+
+? In version 2, why does `look()` pause after moving the servo?
+- [x] The servo needs time to arrive before the sonar measures
+- [ ] The motors need to stop first
+- [ ] To keep the Pico cool
+> A reading taken while the servo is still moving can come from the wrong direction.
+{% endquiz %}

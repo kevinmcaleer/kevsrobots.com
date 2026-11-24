@@ -1,132 +1,297 @@
 ---
 layout: lesson
-title: Securing Endpoints with JWT Tokens in FastAPI
+title: Protected Routes and User Management
 author: Kevin McAleer
 type: page
-cover: assets/7.png
+cover: /learn/fastapi/assets/banners/07_user_management_apis.jpg
 date: 2024-03-28
 previous: 06_implementing_registration_and_login.html
 next: 08_integrating_with_jekyll.html
-description: Learn how to use JWT tokens for securing API endpoints, ensuring that
-  only authenticated users can access specific functionalities in your FastAPI application.
-percent: 77
-duration: 3
+description: Protect the robot's readings and LEDs behind a login, let users update
+  their own details, and give admins their own routes.
+percent: 70
+duration: 8
+quiz_total: 27
+code_target: cpython
+date_updated: 2026-11-24
 navigation:
 - name: Building User Authentication for Static Sites with FastAPI
 - content:
   - section: Introduction to User Authentication
     content:
     - name: Introduction to FastAPI and User Authentication Basics
-      link: 01_course_overview.html
+      link: 00_intro.html
     - name: Setting Up the Development Environment for FastAPI
       link: 02_setting_up_the_environment.html
   - section: FastAPI and User Authentication Basics
     content:
-    - name: Introduction to FastAPI
+    - name: Routes, Parameters and Request Bodies
       link: 03_fastapi_intro.html
-    - name: User Authentication Flow
+    - name: How User Authentication Works
       link: 04_user_authentication_flow.html
   - section: Building the Authentication API
     content:
-    - name: Creating User Models with Pydantic and SQLAlchemy
+    - name: Models, SQLite and Lifespan
       link: 05_creating_user_models.html
-    - name: Implementing Registration and Login with FastAPI
+    - name: Registration and Login
       link: 06_implementing_registration_and_login.html
-    - name: Securing Endpoints with JWT Tokens in FastAPI
+    - name: Protected Routes and User Management
       link: 07_user_management_apis.html
   - section: Integrating with a Jekyll Site
     content:
-    - name: Integrating FastAPI Authentication with a Jekyll Static Site
+    - name: Connecting a Static Jekyll Site to the API
       link: 08_integrating_with_jekyll.html
-    - name: Deploying Your FastAPI Authentication System and Jekyll Site
+    - name: Settings, Secrets and Deployment
       link: 09_deploying_the_solution.html
+    - name: Summary and What's Next
+      link: 10_summary.html
 ---
 
 
-![Securing Endpoints with JWT Tokens]({{ page.cover }}){:class="cover"}
-
-## Introduction
-
-After implementing registration and login functionalities, the next step is to secure your API endpoints. By requiring a valid JWT token for access, you can ensure that only authenticated users can perform certain actions.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Understanding JWT Tokens
+By the end of this lesson you will be able to protect routes with a dependency, let users update only the fields they send, and restrict some routes to admins.
 
-JWT tokens are a secure way to transmit information between parties as a JSON object. In the context of authentication, they are used to verify that the person making a request to your API is indeed who they claim to be.
+## Who may do what?
 
----
+Now the fun part. We have users and tokens, so let's decide who can touch the robot:
 
-## Securing an Endpoint
+| Route | Who can call it |
+|---|---|
+| `GET /readings`, `GET /leds` | Anyone, so the public dashboard works |
+| `POST /readings`, `PUT /leds/{colour}` | Any logged-in user |
+| `GET /users/me`, `PATCH /users/me` | The logged-in user, about themselves |
+| `GET /users`, `DELETE /users/{id}` | Admins only |
+{:class="table table-single"}
 
-To secure an endpoint, we'll use FastAPI's dependency injection system to create a dependency that extracts and verifies the JWT token from the request headers.
+Notice how little code this needs. A route is protected simply by asking for `CurrentUser` or `AdminUser` in its arguments.
 
----
+## Protecting readings
 
-### Creating a Token Dependency
-
-First, we need a function that will extract the token from the request, decode it, and verify its validity.
+In `readings.py`, add one import and one argument. Everything else stays as it was:
 
 ```python
-from fastapi import HTTPException, Depends, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
-from sqlalchemy.orm import Session
-from .database import get_db
-from . import models
+from deps import CurrentUser   # new import, next to "from db import DB"
 
-security = HTTPBearer()
+@router.post("", status_code=201, response_model=Reading)
+def add_reading(reading: ReadingIn, db: DB, user: CurrentUser):   # user is new
+    ...                                                            # body unchanged
+```
+{: .no-snakie }
 
-def get_current_user(token: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
-    try:
-        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-        user = db.query(models.User).filter(models.User.email == email).first()
-        if user is None:
-            raise HTTPException(status_code=401, detail="User not found")
+Without a valid token, the robot now gets `401 Not authenticated`, and the function body never runs.
+
+## LEDs: reading is public, writing is not
+
+Add `LedCommand` to `models.py`, together with `UserUpdate`:
+
+```python
+class UserUpdate(BaseModel):
+    """Every field is optional, so a caller can change just one thing."""
+    email: EmailStr | None = None
+    password: str | None = Field(default=None, min_length=8, max_length=128)
+
+
+class LedCommand(BaseModel):
+    on: bool
+```
+{: .no-snakie }
+
+Then create `leds.py`:
+
+```python
+from typing import Literal
+
+from fastapi import APIRouter
+
+from deps import CurrentUser
+from models import LedCommand
+
+router = APIRouter(prefix="/leds", tags=["leds"])
+
+Colour = Literal["red", "green", "blue"]
+
+# The robot's LED state lives in memory. The robot polls GET /leds and copies it.
+led_state: dict[str, bool] = {"red": False, "green": False, "blue": False}
+
+
+@router.get("")
+def read_leds():
+    """Public: the robot (or the dashboard) asks what the LEDs should be doing."""
+    return led_state
+
+
+@router.put("/{colour}")
+def set_led(colour: Colour, command: LedCommand, user: CurrentUser):
+    """Logged-in users only: switch one LED on or off."""
+    led_state[colour] = command.on
+    return {"colour": colour, "on": command.on, "set_by": user.username}
+```
+
+`Colour = Literal["red", "green", "blue"]` means FastAPI will reject `/leds/purple` with a 422 before our function runs. A robot can poll `GET /leds` every few seconds and copy the state to its real pins.
+
+## users.py
+
+```python
+from fastapi import APIRouter, HTTPException
+
+from db import DB
+from deps import AdminUser, CurrentUser
+from models import UserPublic, UserUpdate
+from security import hash_password
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+
+@router.get("/me", response_model=UserPublic)
+def read_me(user: CurrentUser):
+    return user
+
+
+@router.patch("/me", response_model=UserPublic)
+def update_me(update: UserUpdate, user: CurrentUser, db: DB):
+    # exclude_unset keeps only the fields the caller actually sent, and we
+    # also ignore any sent as null, because every column is required.
+    sent = update.model_dump(exclude_unset=True)
+    changes = {column: value for column, value in sent.items() if value is not None}
+    if "password" in changes:
+        changes["password_hash"] = hash_password(changes.pop("password"))
+    if not changes:
         return user
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    # The column names come from our own model fields, never from the caller.
+    assignments = ", ".join(f"{column} = ?" for column in changes)
+    db.execute(f"UPDATE users SET {assignments} WHERE id = ?", (*changes.values(), user.id))
+    row = db.execute("SELECT * FROM users WHERE id = ?", (user.id,)).fetchone()
+    return UserPublic(**row)
+
+
+@router.get("", response_model=list[UserPublic])
+def list_users(admin: AdminUser, db: DB):
+    rows = db.execute("SELECT * FROM users ORDER BY id").fetchall()
+    return [UserPublic(**row) for row in rows]
+
+
+@router.delete("/{user_id}", status_code=204)
+def delete_user(user_id: int, admin: AdminUser, db: DB):
+    if user_id == admin.id:
+        raise HTTPException(status_code=400, detail="Admins cannot delete themselves")
+    cursor = db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    if cursor.rowcount == 0:
+        raise HTTPException(status_code=404, detail="No user with that id")
 ```
 
----
+Three ideas are worth a slow read:
 
-### Applying the Dependency to an Endpoint
+- **`model_dump(exclude_unset=True)`** returns only the fields the caller actually sent. If someone sends `{}` nothing changes, and if they send only an email, the password is left alone. This is why every `UserUpdate` field is optional.
+- **`AdminUser`** is a dependency that depends on `CurrentUser`. A normal user gets `403 Forbidden`, which means "I know who you are, and the answer is no". An invalid token is `401`.
+- **The f-string in the SQL** is safe only because the column names come from our own model fields, never from the caller. The values still travel through `?` placeholders.
 
-Now, let's use our `get_current_user` dependency to secure an endpoint. This example shows how to create an endpoint that returns user profile information only if the user is authenticated.
+Finally, wire the new routers into `main.py`. Remove the temporary `/users/me` route from lesson 6 (it now lives in `users.py`):
 
 ```python
-@app.get("/users/me/")
-def read_user_me(current_user: models.User = Depends(get_current_user)):
-    return current_user
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+import auth
+import leds
+import readings
+import users
+from db import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="Robot Telemetry API", lifespan=lifespan)
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(readings.router)
+app.include_router(leds.router)
+
+
+@app.get("/")
+def status():
+    return {"robot": "pico-bot", "status": "online"}
 ```
 
----
+## Real responses
 
-## Revoking JWT Tokens
+We ran this exact code, with `kev` as admin and `robot_one` as a normal user:
 
-It's important to note that JWT tokens cannot be "revoked" like traditional session tokens since they are stateless. However, you can implement token expiry or use a server-side blacklist for tokens that should no longer be valid.
+```
+POST /readings  (no token)                       401 {"detail": "Not authenticated"}
+POST /readings  (robot_one's token)              201 {"sensor": "temperature", "value": 21.5, "id": 1, ...}
+PUT  /leds/red  {"on": true}  (robot_one)        200 {"colour": "red", "on": true, "set_by": "robot_one"}
+PUT  /leds/purple                                422 ... "Input should be 'red', 'green' or 'blue'" ...
+GET  /leds                                       200 {"red": true, "green": false, "blue": false}
+PATCH /users/me {"email": "nope"}                422 ... "An email address must have an @-sign." ...
+GET  /users  (robot_one)                         403 {"detail": "Admins only"}
+GET  /users  (kev)                               200 [{"id": 1, ...}, {"id": 2, ...}]
+DELETE /users/1  (kev, himself)                  400 {"detail": "Admins cannot delete themselves"}
+DELETE /users/2  (kev)                           204
+DELETE /users/2  (kev, again)                    404 {"detail": "No user with that id"}
+```
 
----
+```mermaid
+flowchart TD
+    A[Request arrives] --> T{Valid token?}
+    T -->|no| U[401 Unauthorised]
+    T -->|yes| R{Route needs admin?}
+    R -->|no| OK[Run the route]
+    R -->|yes| Y{role is admin?}
+    Y -->|yes| OK
+    Y -->|no| F[403 Forbidden]
+```
 
-## Summary
+A deleted user's token stops working straight away, because `get_current_user` looks the user up on every request. That is the benefit of checking the database instead of trusting the token alone.
 
-You've learned how to secure API endpoints using JWT tokens, an essential aspect of building secure web applications. This method allows you to control access to your API, ensuring that only authenticated users can access sensitive information or perform certain actions.
+> **Teachers**: Because the first account becomes the admin, whoever registers first on a shared class server controls it. Register your own teacher account before learners connect, or run one API per group. Remind learners that their LED commands change one shared robot, so agree whose turn it is.
 
----
+## Try it Yourself
 
-## Additional Resources
+1. Log in as the admin in `/docs`, register a second user, and use `GET /users` to list both. Then try the same call as the second user.
+2. Add a `GET /users/me/readings` route. Hint: add a `user_id` column to `readings` and fill it in `add_reading`.
+3. Add a `PUT /leds` route that sets all three LEDs at once, using a model with three booleans.
+4. Challenge: add a `POST /users/{user_id}/promote` route, admin only, that sets another user's role to `admin`.
 
-- [FastAPI - Security](https://fastapi.tiangolo.com/tutorial/security/)
-- [PyJWT - JSON Web Token library in Python](https://pyjwt.readthedocs.io/en/latest/)
-- [FastAPI Security - Advanced Usage](https://fastapi.tiangolo.com/advanced/security/)
+## Common Issues
 
----
+- **Problem**: A normal user gets `403` when you expected `401`, or the other way round.
+- **Solution**: Use 401 for "you are not logged in or your token is bad" and 403 for "you are logged in but not allowed".
+- **Why**: The codes tell the caller what to fix: log in again, or ask for permission.
 
-## Lesson Assignment
+- **Problem**: `PATCH /users/me` with `{"email": null}` seems to do nothing.
+- **Solution**: Send a real value, or leave the field out.
+- **Why**: `exclude_unset` keeps fields that were sent even when the value is `None`, so `update_me` filters out nulls. Without that line, the `NOT NULL` column would make SQLite refuse the update, and the caller would see a 500 error.
 
-Experiment with securing another endpoint in your application, perhaps one that modifies data. Reflect on how the security requirements might differ between read and write operations, and how you can use JWT tokens to enforce these requirements.
+- **Problem**: `GET /users/me` returns 404 or an error about `user_id`.
+- **Solution**: Make sure `/me` is declared before any `/{user_id}` route that uses the same method.
+- **Why**: FastAPI tries routes in the order they are written, so the first match wins.
 
----
+## Check your understanding
+
+{% quiz %}
+? What status code means "you are logged in, but you are not allowed to do this"?
+- [ ] 401
+- [x] 403
+- [ ] 404
+> 401 means we do not know who you are. 403 means we know, and the answer is no.
+
+? What does `model_dump(exclude_unset=True)` return?
+- [ ] Every field, including defaults
+- [x] Only the fields that were actually sent in the request
+- [ ] Only the fields that failed validation
+> That is what lets one `UserUpdate` model change just an email, just a password, or both.
+
+? How do we make a route admin-only?
+- [x] Add `admin: AdminUser` to its arguments
+- [ ] Give the route a secret URL
+- [ ] Check the role in the browser
+> `AdminUser` depends on `CurrentUser` and raises 403 unless the role is `admin`.
+{% endquiz %}

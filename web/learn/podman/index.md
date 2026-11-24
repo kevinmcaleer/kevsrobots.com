@@ -10,16 +10,33 @@ description: Learn how to transition from Docker to Podman and unlock better con
   features like systemd integration  and Kubernetes support. Perfect for developers
   and DevOps professionals looking to modernize  their container workflows.
 level: intermediate
-course_duration: 0h 32m
+course_duration: 1h 9m
 lesson_count: 14
-first_lesson: 01_intro_to_podman.html
+first_lesson: 00_intro.html
+quiz_total: 47
+outcomes:
+- Explain what daemonless and rootless mean and why they matter
+- Install Podman on Raspberry Pi OS and run your first container without sudo
+- Build, run, inspect and clean up images and containers with the Podman CLI
+- Group containers into a pod and export it as Kubernetes YAML
+- Run a container as a systemd service that restarts and starts at boot, using Quadlet
+- Migrate a Docker robot status app to Podman
+prerequisites:
+- Docker
+- Introduction to the Linux Command Line on Raspberry Pi OS
+you_need:
+- A Raspberry Pi 4 or 5 running Raspberry Pi OS (64-bit), or another Debian-based
+  Linux PC
+- An internet connection to pull images
+- A terminal, on the Pi itself or over SSH
+- A web browser on any computer on the same network
 navigation:
 - name: From Docker to Podman
 - content:
   - section: Getting Started
     content:
     - name: Introduction to Podman
-      link: 01_intro_to_podman.html
+      link: 00_intro.html
     - name: 'Video: Podman vs Docker'
       link: 01_video.html
     - name: Docker vs Podman Architecture
@@ -30,7 +47,7 @@ navigation:
     content:
     - name: CLI Compatibility and Basic Commands
       link: 04_cli_compatibility_and_commands.html
-    - name: "Podman Features Docker Doesn\u2019t Have"
+    - name: Podman Features Docker Doesn't Have
       link: 05_podman_unique_features.html
     - name: Managing Containers and Images
       link: 06_managing_containers_and_images.html

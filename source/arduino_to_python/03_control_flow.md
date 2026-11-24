@@ -1,73 +1,32 @@
 ---
 title: Control Flow - If, Loops, and No Braces!
-description: Learn how if/else statements, for loops, and while loops work in MicroPython without curly braces - indentation is everything
+description: Learn how if/elif/else, for loops, while loops and switch-style choices work in MicroPython without curly braces
 layout: lesson
 type: page
 cover: /learn/arduino_to_python/assets/banners/03_control_flow.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Control Flow: The Python Way
+By the end of this lesson you will be able to rewrite Arduino `if`, `while`, `for` and `switch` code as MicroPython using colons and indentation.
 
-Control flow - if statements, loops, and logic - works similarly in Python and C++, but with one huge difference: **no curly braces**. Instead, Python uses indentation and colons.
+## Same ideas, new punctuation
 
-This takes some getting used to, but most programmers find it cleaner once they adjust. Let's explore each control structure side-by-side.
+Decisions and loops work the same way in both languages. The change is the punctuation: a colon opens the block, indentation defines it, and the parentheses are optional.
 
-## If Statements
-
-The basic if statement structure changes from braces to colons and indentation:
-
-**Arduino C++:**
-```cpp
-int temperature = 25;
-
-if (temperature > 30) {
-    digitalWrite(LED_PIN, HIGH);
-    Serial.println("Hot!");
-}
+```mermaid
+flowchart TD
+    A["Read temperature"] --> B{"temperature > 30?"}
+    B -- yes --> C["print Hot"]
+    B -- no --> D{"temperature > 20?"}
+    D -- yes --> E["print Warm"]
+    D -- no --> F["print Cool"]
 ```
 
-**MicroPython:**
-```python
-temperature = 25
-
-if temperature > 30:
-    led.on()
-    print("Hot!")
-```
-
-Key differences:
-- **Colon `:` starts the block** (instead of opening brace)
-- **Indentation defines the block** (instead of closing brace)
-- No parentheses required (but allowed)
-
-## If-Else Statements
-
-**Arduino C++:**
-```cpp
-if (temperature > 30) {
-    digitalWrite(LED_PIN, HIGH);
-} else {
-    digitalWrite(LED_PIN, LOW);
-}
-```
-
-**MicroPython:**
-```python
-if temperature > 30:
-    led.on()
-else:
-    led.off()
-```
-
-Notice the `else:` also needs a colon, and the code below it is indented.
-
-## If-Else If-Else (Elif)
-
-C++ uses `else if`, Python uses `elif`:
+## If, elif and else
 
 **Arduino C++:**
 ```cpp
@@ -75,90 +34,52 @@ if (temperature > 30) {
     Serial.println("Hot");
 } else if (temperature > 20) {
     Serial.println("Warm");
-} else if (temperature > 10) {
-    Serial.println("Cool");
 } else {
-    Serial.println("Cold");
+    Serial.println("Cool");
 }
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
+temperature = 25
+
 if temperature > 30:
     print("Hot")
 elif temperature > 20:
     print("Warm")
-elif temperature > 10:
-    print("Cool")
 else:
-    print("Cold")
-```
+    print("Cool")
+{% endcapture %}
+{% include snakie.html code=snakie_code name="control_flow_1.py" %}
 
-`elif` is shorter and cleaner than `else if`. Remember the colon after each condition!
-
-## Comparison Operators
-
-These are identical in both languages:
-
-| Operator | Meaning | Example |
-|----------|---------|---------|
-| `==` | Equal to | `if x == 10:` |
-| `!=` | Not equal | `if x != 10:` |
-| `>` | Greater than | `if x > 10:` |
-| `<` | Less than | `if x < 10:` |
-| `>=` | Greater or equal | `if x >= 10:` |
-| `<=` | Less or equal | `if x <= 10:` |
-{:class="table table-single"}
-
-## Logical Operators
-
-Here's where Python differs - it uses words instead of symbols:
-
-**Arduino C++:**
-```cpp
-if (temperature > 20 && humidity < 80) {
-    Serial.println("Comfortable");
-}
-
-if (temperature > 35 || humidity > 90) {
-    Serial.println("Uncomfortable");
-}
-
-if (!doorOpen) {
-    Serial.println("Door is closed");
-}
-```
-
-**MicroPython:**
-```python
-if temperature > 20 and humidity < 80:
-    print("Comfortable")
-
-if temperature > 35 or humidity > 90:
-    print("Uncomfortable")
-
-if not door_open:
-    print("Door is closed")
-```
+`else if` becomes `elif`. The comparison operators (`==`, `!=`, `<`, `>`, `<=`, `>=`) are identical. The logical operators become words:
 
 | C++ | Python | Meaning |
 |-----|--------|---------|
-| `&&` | `and` | Both conditions true |
-| `||` | `or` | Either condition true |
-| `!` | `not` | Negation |
+| `&&` | `and` | Both true |
+| `||` | `or` | Either true |
+| `!` | `not` | Opposite |
 {:class="table table-single"}
 
-Python's word-based operators are more readable once you get used to them.
+{% capture snakie_code %}
+temperature = 22
+humidity = 60
+door_open = False
 
-## While Loops
+if temperature > 20 and humidity < 80:
+    print("Comfortable")
+if not door_open:
+    print("Door is closed")
+{% endcapture %}
+{% include snakie.html code=snakie_code name="control_flow_2.py" %}
 
-While loops are nearly identical, just swap braces for colons:
+## While loops and the end of loop()
 
 **Arduino C++:**
 ```cpp
 int count = 0;
-
-while (count < 10) {
+while (count < 5) {
     Serial.println(count);
     count++;
 }
@@ -168,220 +89,74 @@ while (count < 10) {
 
 {% capture snakie_code %}
 count = 0
-
-while count < 10:
+while count < 5:
     print(count)
-    count += 1  # Python has +=, but no ++ operator
+    count += 1      # there is no ++ in Python
 {% endcapture %}
-{% include snakie.html code=snakie_code name="control_flow_1.py" %}
+{% include snakie.html code=snakie_code name="control_flow_3.py" %}
 
-**Important:** Python doesn't have `++` or `--` operators. Use `+= 1` or `-= 1` instead.
-
-## Infinite Loops
-
-In Arduino, your main code runs in `loop()` which repeats forever. In MicroPython, you create an infinite loop explicitly:
-
-**Arduino C++:**
-```cpp
-void loop() {
-    // This repeats forever automatically
-    digitalWrite(LED_PIN, HIGH);
-    delay(1000);
-    digitalWrite(LED_PIN, LOW);
-    delay(1000);
-}
-```
+Python has `+=` and `-=` but no `++` or `--`. And since there is no `loop()` function, `while True:` is how you repeat forever. You will write it in almost every program:
 
 **MicroPython:**
 ```python
-while True:  # Explicit infinite loop
-    led.on()
-    time.sleep(1)
-    led.off()
-    time.sleep(1)
+from machine import Pin
+import time
+
+led = Pin("LED", Pin.OUT)
+
+while True:          # the Python version of loop()
+    led.toggle()
+    time.sleep(0.5)
 ```
-{: .no-snakie }
 
-`while True:` is the Python equivalent of Arduino's `loop()`. You'll use this pattern in almost every MicroPython program.
+## For loops use range()
 
-> **CircuitPython File Naming: boot.py and code.py**
->
-> If you're using CircuitPython instead of MicroPython, there's an important difference in how you structure your main program:
->
-> **MicroPython:**
-> - **boot.py** - Runs first on startup (optional, for configuration)
-> - **main.py** - Your main program code (runs automatically after boot.py)
->
-> **CircuitPython:**
-> - **boot.py** - Runs first on startup (same as MicroPython)
-> - **code.py** - Your main program code (instead of main.py)
->
-> **The key difference:** CircuitPython uses `code.py` as the default filename instead of `main.py`.
->
-> **Auto-reload magic:**
-> - When you save `code.py` on CircuitPython, your board automatically restarts and runs the new code
-> - This happens because CircuitPython shows up as a USB drive - when you save the file, it detects the change
-> - MicroPython requires you to manually restart or use Thonny's "Run" button
->
-> **Example - Same blink code, different workflow:**
->
-> MicroPython (`main.py`):
-> ```python
-> from machine import Pin
-> import time
->
-> led = Pin(25, Pin.OUT)
->
-> while True:
->     led.on()
->     time.sleep(1)
->     led.off()
->     time.sleep(1)
-> ```
->
-> CircuitPython (`code.py`):
-> ```python
-> import board
-> import digitalio
-> import time
->
-> led = digitalio.DigitalInOut(board.LED)
-> led.direction = digitalio.Direction.OUTPUT
->
-> while True:
->     led.value = True
->     time.sleep(1)
->     led.value = False
->     time.sleep(1)
-> ```
->
-> **Practical tip:** If you're switching between platforms:
-> - You can have both `main.py` and `code.py` on your board
-> - MicroPython will run `main.py`, CircuitPython will run `code.py`
-> - Just remember which platform you're using!
-
-## For Loops
-
-For loops work very differently in Python. There's no C-style `for (int i=0; i<10; i++)` syntax.
+Python has no `for (int i = 0; i < 10; i++)`. You loop over a sequence, and `range()` makes the numbers.
 
 **Arduino C++:**
 ```cpp
-// Count from 0 to 9
-for (int i = 0; i < 10; i++) {
-    Serial.println(i);
-}
-
-// Blink LED 5 times
 for (int i = 0; i < 5; i++) {
-    digitalWrite(LED_PIN, HIGH);
-    delay(500);
-    digitalWrite(LED_PIN, LOW);
-    delay(500);
-}
-```
-
-**MicroPython:**
-```python
-# Count from 0 to 9
-for i in range(10):
-    print(i)
-
-# Blink LED 5 times
-for i in range(5):
-    led.on()
-    time.sleep(0.5)
-    led.off()
-    time.sleep(0.5)
-```
-
-Python's `range()` function generates numbers:
-- `range(10)` → 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
-- `range(5, 10)` → 5, 6, 7, 8, 9
-- `range(0, 10, 2)` → 0, 2, 4, 6, 8 (step by 2)
-
-## Iterating Over Lists
-
-Python's for loops really shine when working with lists:
-
-**Arduino C++:**
-```cpp
-int pins[] = {13, 12, 11, 10};
-int numPins = 4;
-
-for (int i = 0; i < numPins; i++) {
-    pinMode(pins[i], OUTPUT);
-    digitalWrite(pins[i], HIGH);
-}
-```
-
-**MicroPython:**
-```python
-pins = [13, 12, 11, 10]
-
-for pin_num in pins:
-    pin = Pin(pin_num, Pin.OUT)
-    pin.on()
-```
-
-No index needed! Python iterates directly over the list items. Much cleaner.
-
-## Break and Continue
-
-These work identically in both languages:
-
-**Arduino C++:**
-```cpp
-// Break - exit loop early
-for (int i = 0; i < 100; i++) {
-    if (digitalRead(BUTTON_PIN)) {
-        break;  // Exit loop when button pressed
-    }
-}
-
-// Continue - skip to next iteration
-for (int i = 0; i < 10; i++) {
-    if (i % 2 == 0) {
-        continue;  // Skip even numbers
-    }
     Serial.println(i);
 }
 ```
 
 **MicroPython:**
-```python
-# Break - exit loop early
-for i in range(100):
-    if button.value():
-        break  # Exit loop when button pressed
 
-# Continue - skip to next iteration
-for i in range(10):
-    if i % 2 == 0:
-        continue  # Skip even numbers
+{% capture snakie_code %}
+for i in range(5):          # 0, 1, 2, 3, 4
     print(i)
+
+for i in range(2, 10, 2):   # start, stop (not included), step: 2, 4, 6, 8
+    print(i)
+{% endcapture %}
+{% include snakie.html code=snakie_code name="control_flow_4.py" %}
+
+You can also loop directly over a list, with no index at all. This is lovely for several LEDs:
+
+```python
+from machine import Pin
+import time
+
+leds = [Pin(n, Pin.OUT) for n in (10, 11, 12, 13)]
+
+for led in leds:        # a running light
+    led.on()
+    time.sleep(0.2)
+    led.off()
 ```
-{: .no-snakie }
 
-## Switch Statements: Python Doesn't Have Them!
+`break` and `continue` work exactly as they do in C++.
 
-Arduino has switch/case. Python doesn't. Use if/elif instead:
+## No switch statement
+
+Python has no `switch`/`case` for this kind of job, so use `if`/`elif`.
 
 **Arduino C++:**
 ```cpp
-int mode = 2;
-
 switch (mode) {
-    case 1:
-        Serial.println("Mode 1");
-        break;
-    case 2:
-        Serial.println("Mode 2");
-        break;
-    case 3:
-        Serial.println("Mode 3");
-        break;
-    default:
-        Serial.println("Unknown");
+  case 1: Serial.println("Mode 1"); break;
+  case 2: Serial.println("Mode 2"); break;
+  default: Serial.println("Unknown");
 }
 ```
 
@@ -394,96 +169,18 @@ if mode == 1:
     print("Mode 1")
 elif mode == 2:
     print("Mode 2")
-elif mode == 3:
-    print("Mode 3")
 else:
     print("Unknown")
 {% endcapture %}
-{% include snakie.html code=snakie_code name="control_flow_2.py" %}
+{% include snakie.html code=snakie_code name="control_flow_5.py" %}
 
-**Alternative: Dictionary dispatch** (advanced pattern):
+Note there is no `break` needed: only the matching branch runs.
 
-{% capture snakie_code %}
-mode = 2
+## CircuitPython note
 
-actions = {
-    1: lambda: print("Mode 1"),
-    2: lambda: print("Mode 2"),
-    3: lambda: print("Mode 3")
-}
+If you meet CircuitPython code, you will see `import board` and `digitalio` instead of `machine`, and the main file is `code.py` rather than `main.py`. The control flow in this lesson is identical; only the hardware library differs.
 
-actions.get(mode, lambda: print("Unknown"))()
-{% endcapture %}
-{% include snakie.html code=snakie_code name="control_flow_3.py" %}
-
-This is more Pythonic but less beginner-friendly. Stick with if/elif for now.
-
-## Nested Control Structures
-
-Indentation makes nesting very clear:
-
-**Arduino C++:**
-```cpp
-if (temperature > 25) {
-    if (humidity > 60) {
-        digitalWrite(FAN_PIN, HIGH);
-        for (int i = 0; i < 3; i++) {
-            digitalWrite(LED_PIN, HIGH);
-            delay(100);
-            digitalWrite(LED_PIN, LOW);
-            delay(100);
-        }
-    }
-}
-```
-
-**MicroPython:**
-```python
-if temperature > 25:
-    if humidity > 60:
-        fan.on()
-        for i in range(3):
-            led.on()
-            time.sleep(0.1)
-            led.off()
-            time.sleep(0.1)
-```
-
-Each nested level adds 4 spaces of indentation. The structure is visually clear.
-
-## Complete Example: Traffic Light
-
-Let's put it all together with a traffic light controller:
-
-**Arduino C++:**
-```cpp
-int redPin = 11;
-int yellowPin = 12;
-int greenPin = 13;
-
-void setup() {
-    pinMode(redPin, OUTPUT);
-    pinMode(yellowPin, OUTPUT);
-    pinMode(greenPin, OUTPUT);
-}
-
-void loop() {
-    // Red light
-    digitalWrite(redPin, HIGH);
-    delay(5000);
-    digitalWrite(redPin, LOW);
-
-    // Green light
-    digitalWrite(greenPin, HIGH);
-    delay(5000);
-    digitalWrite(greenPin, LOW);
-
-    // Yellow light
-    digitalWrite(yellowPin, HIGH);
-    delay(2000);
-    digitalWrite(yellowPin, LOW);
-}
-```
+## Complete example: a traffic light
 
 **MicroPython:**
 ```python
@@ -494,127 +191,66 @@ red = Pin(11, Pin.OUT)
 yellow = Pin(12, Pin.OUT)
 green = Pin(13, Pin.OUT)
 
-while True:
-    # Red light
-    red.on()
-    time.sleep(5)
-    red.off()
-
-    # Green light
-    green.on()
-    time.sleep(5)
-    green.off()
-
-    # Yellow light
-    yellow.on()
-    time.sleep(2)
-    yellow.off()
-```
-
-## Try It Yourself
-
-**Exercise 1: Temperature Warning System**
-
-Write MicroPython code that:
-- Reads a temperature variable
-- If temp > 30: print "TOO HOT" and turn on red LED
-- If temp 20-30: print "COMFORTABLE" and turn on green LED
-- If temp < 20: print "TOO COLD" and turn on blue LED
-
-**Answer:**
-
-{% capture snakie_code %}
-from machine import Pin
-
-temperature = 25  # Simulate sensor reading
-
-red_led = Pin(10, Pin.OUT)
-green_led = Pin(11, Pin.OUT)
-blue_led = Pin(12, Pin.OUT)
-
-if temperature > 30:
-    print("TOO HOT")
-    red_led.on()
-    green_led.off()
-    blue_led.off()
-elif temperature >= 20:
-    print("COMFORTABLE")
-    red_led.off()
-    green_led.on()
-    blue_led.off()
-else:
-    print("TOO COLD")
-    red_led.off()
-    green_led.off()
-    blue_led.on()
-{% endcapture %}
-{% include snakie.html code=snakie_code name="control_flow_4.py" %}
-
-**Exercise 2: Button Counter**
-
-Create a program that:
-- Counts button presses
-- Prints the count each time
-- If count reaches 10, print "MAX REACHED" and reset to 0
-- Blinks an LED for each press
-
-**Answer:**
-
-```python
-from machine import Pin
-import time
-
-button = Pin(14, Pin.IN, Pin.PULL_UP)
-led = Pin(25, Pin.OUT)
-
-count = 0
-last_state = 1
+lights = [(red, 5), (green, 5), (yellow, 2)]   # (pin, seconds)
 
 while True:
-    current_state = button.value()
-
-    # Detect button press (high to low transition)
-    if last_state == 1 and current_state == 0:
-        count += 1
-        print(f"Count: {count}")
-
-        # Blink LED
-        led.on()
-        time.sleep(0.1)
-        led.off()
-
-        # Check for max
-        if count >= 10:
-            print("MAX REACHED")
-            count = 0
-
-    last_state = current_state
-    time.sleep(0.05)  # Debounce delay
+    for light, seconds in lights:
+        light.on()
+        time.sleep(seconds)
+        light.off()
 ```
 
-**Exercise 3: Loop Practice**
+Each pass through the `for` loop lights one lamp for its number of seconds. Adding a fourth stage is one more tuple in the list.
 
-Write a program that:
-- Blinks an LED 10 times
-- Each blink should be faster than the last (start at 1 second, decrease by 0.1s)
-- Print the delay time before each blink
+## Try it Yourself
 
-**Answer:**
+1. Write a program with `temperature = 25` that prints `TOO HOT` above 30, `COMFORTABLE` from 20 to 30, and `TOO COLD` below 20.
+2. Use a `for` loop and `range()` to blink the on-board LED five times.
+3. Change the traffic light so each stage's time is read from the list, and add a "flashing yellow" stage that blinks three times.
+4. Challenge: make a counter that prints the numbers 1 to 20, skipping multiples of 3 with `continue`.
 
-```python
-from machine import Pin
-import time
+## Common Issues
 
-led = Pin(25, Pin.OUT)
+- **Problem**: `SyntaxError` on an `else if` line.
+- **Solution**: Write `elif`.
+- **Why**: Python spells "else if" as one word.
 
-for i in range(10):
-    delay = 1.0 - (i * 0.1)
-    print(f"Blink {i+1}, delay: {delay}s")
+- **Problem**: `SyntaxError: invalid syntax` on `count++`.
+- **Solution**: Use `count += 1`.
+- **Why**: Python has no increment operator.
 
-    led.on()
-    time.sleep(delay)
-    led.off()
-    time.sleep(delay)
-```
+- **Problem**: A line meant to be inside a loop runs only once.
+- **Solution**: Check it is indented to the same level as the other loop lines.
+- **Why**: Indentation alone decides what belongs to a loop.
 
----
+- **Problem**: A loop never stops when you expected it to.
+- **Solution**: Make sure the variable in the condition changes inside the loop, or use `break`. In Thonny, press Stop to interrupt.
+- **Why**: `while` repeats for as long as its condition stays true.
+
+## Check your understanding
+
+{% quiz %}
+? How do you write `else if` in Python?
+- [ ] `else if`
+- [x] `elif`
+- [ ] `elseif`
+> Python uses the single keyword `elif`.
+
+? Which loop is the Python equivalent of Arduino's `loop()`?
+- [ ] `for i in range(1):`
+- [x] `while True:`
+- [ ] `loop():`
+> `while True:` repeats forever, which is what `loop()` does.
+
+? What numbers does `range(2, 10, 2)` produce?
+- [ ] 2, 4, 6, 8, 10
+- [x] 2, 4, 6, 8
+- [ ] 0, 2, 4, 6, 8
+> The stop value is not included, and the step is 2.
+
+? What is the Python version of `count++`?
+- [ ] `count++`
+- [x] `count += 1`
+- [ ] `inc(count)`
+> Python has no `++` operator, so you add one explicitly.
+{% endquiz %}

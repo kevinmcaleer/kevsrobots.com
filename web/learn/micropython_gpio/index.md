@@ -8,11 +8,30 @@ description: Master the use of GPIO pins on the Raspberry Pi Pico with MicroPyth
   Learn about various types of pins, their functions, and how to work with them in
   real-world projects.
 level: beginner
-course_duration: 0h 46m
+course_duration: 1h 6m
 lesson_count: 18
 first_lesson: 00_intro.html
-quiz_total: 33
+quiz_total: 54
 video: M-0P6ipVwNU
+outcomes:
+- Find any Pico pin on the pinout and use the right GP number in MicroPython
+- Wire LEDs, buttons and potentiometers safely, with resistor values worked out
+- Use PWM to fade an LED, set motor speed and position a servo
+- Read analog voltages with the ADC and turn them into volts
+- Talk to other chips and modules over UART, I2C and SPI
+- Protect the Pico from 5V signals with a divider or level shifter
+prerequisites:
+- Learn MicroPython - The basics (/learn/micropython/)
+you_need:
+- A Raspberry Pi Pico or Pico W with MicroPython installed
+- A USB cable and a computer running Thonny
+- A breadboard and jumper wires
+- LEDs, 220 ohm resistors and a push button
+- A 10k potentiometer
+- An L293D motor driver, a small DC motor and a battery pack (lesson 7 only)
+- An SG90 servo (lesson 14 only)
+- An HC-SR04 range finder with 1k and 2k resistors (lesson 15 only)
+- A DS18B20 or DHT11 temperature sensor (lesson 10, optional)
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:

@@ -1,81 +1,141 @@
 ---
 title: "Rust vs. Python: Understanding the Differences"
-description: Explore key differences between Rust and Python with a focus on Rust's features and a summary comparison with Python.
+description: Compare how Rust and Python handle types, memory, errors and speed, and see what changes when you move from MicroPython on a Pico to Rust.
 layout: lesson
-cover: /learn/scrawly_wally/assets/2.png
+type: page
+cover: /learn/rust/assets/banners/02_rust_and_python.jpg
+date_updated: 2026-11-24
+code_target: cpython
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-This lesson delves into Rust's distinctive features, providing an overview for Python programmers interested in understanding what sets Rust apart.
-
----
-
-## Learning Objectives
-
-- Grasp Rust's unique approach to memory management, error handling, and concurrency.
-- Compare these approaches briefly with Python's to appreciate the situational advantages of each language.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-### Memory Management in Rust
-
-Rust uses an ownership model to ensure memory safety without a garbage collector. This model enforces rules about how memory is allocated, used, and freed, directly at compile time, leading to performance benefits and prevention of common bugs like dangling pointers.
-
-### Error Handling in Rust
-
-Rust promotes a more proactive approach to error handling than many languages, including Python. It utilizes `Result` and `Option` types for functions that might fail or return nothing, respectively. This explicit handling makes Rust programs more predictable and safer by design.
-
-### Concurrency in Rust
-
-Rust's approach to concurrency is based on the principles of ownership and type checking, allowing for safe concurrency without data races. This model enables developers to write multithreaded programs that are both efficient and memory-safe.
+By the end of this lesson you will be able to describe four differences between Rust and Python, and say when each language is the better choice for a robot.
 
 ---
 
-> ### Comparisons with Python
->
-> - **Memory Management**: Python uses automatic memory management with a garbage collector. While this simplifies development, it can lead to less control over performance compared to Rust's ownership model.
->
-> - **Error Handling**: Python utilizes exceptions for error handling, which can be caught and handled at runtime. Rust's approach with `Result` and `Option` encourages addressing possible errors upfront, differing from Python's more flexible, but less predictable, exception model.
->
-> - **Concurrency**: Python's Global Interpreter Lock (GIL) limits true parallelism, making concurrency more about improving responsiveness than performance. In contrast, Rust provides more tools for achieving real parallelism without compromising safety.
+## The same function in two languages
 
----
+Let's start with a job every robot has: keeping a motor speed between 0 and 100. Here it is in Python:
 
-### MicroPython vs. Rust
+```python
+def clamp_speed(speed):
+    return max(0, min(100, speed))
 
-While Rust offers high performance and safety, MicroPython, a lean and efficient implementation of the Python 3 programming language, is designed to be easy to use and quick to deploy, especially on microcontrollers like the Raspberry Pi Pico. Here are some detailed comparisons:
+print(clamp_speed(140))
+```
 
-#### REPL in MicroPython
+And here is the same program in Rust:
 
-MicroPython features a Read-Evaluate-Print Loop (REPL), which is an interactive programming environment. This feature allows developers, especially beginners, to write and test code in real-time, line by line, which can significantly speed up the learning process and debugging:
+```rust
+fn clamp_speed(speed: i32) -> i32 {
+    speed.clamp(0, 100)
+}
 
-- **Ease of Use**: With the REPL, new users can start experimenting with code immediately without the overhead of setting up a complete development environment.
-- **Immediate Feedback**: Developers get instant feedback for each line of code, making it easier to understand what each part of the program does.
+fn main() {
+    println!("{}", clamp_speed(140));
+}
+```
 
-In contrast, Rust does not have an interactive REPL as part of its standard tooling, which can make it seem less accessible to beginners. Rust development typically involves writing the complete program, compiling it, and then running it, which can be more time-consuming compared to the instant feedback loop in MicroPython.
+Both print `100`. Notice the differences: Rust uses braces instead of indentation, and `speed: i32` says the input is a 32-bit whole number, while `-> i32` says what comes back. Python works that out while the program runs, but Rust is told up front.
 
-#### Development Environment
+## Compiled versus interpreted
 
-- **MicroPython**: Setting up MicroPython for development, especially on microcontrollers, is usually straightforward. After flashing MicroPython onto a device like the Raspberry Pi Pico, you can connect to it using a serial terminal or WebREPL and start writing Python code directly on the device.
-- **Rust**: Setting up Rust involves installing the Rust compiler and associated tools, writing the code in a text editor or IDE, and then compiling the code for the target platform. For embedded systems like the Raspberry Pi Pico, additional setup is required for cross-compilation and uploading the compiled code to the device.
+Python reads your program and runs it line by line. Rust is **compiled**: the whole program is turned into machine code first, and every type and ownership rule is checked at that point.
 
-#### Code Deployment and Running
+```mermaid
+flowchart TD
+    subgraph Python
+    P1["Edit"] --> P2["Run"]
+    P2 -->|"error at runtime"| P1
+    end
+    subgraph Rust
+    R1["Edit"] --> R2["Compile"]
+    R2 -->|"error at compile time"| R1
+    R2 --> R3["Run"]
+    end
+```
 
-- **MicroPython on Raspberry Pi Pico**: Once MicroPython is flashed onto the Raspberry Pi Pico, uploading new scripts can be as simple as copying a Python file to the device, or entering code directly via the REPL. This simplicity encourages experimentation and rapid development cycles.
-- **Rust on Raspberry Pi Pico**: Deploying Rust code to a Raspberry Pi Pico requires a more complex process. You must write your Rust program, compile it specifically for the Pico's ARM architecture, and then use a tool to upload the binary file to the Pico. This process, while offering more control and efficiency, is less beginner-friendly compared to MicroPython's straightforward approach.
+That is slower to start, but the program you run has already passed a strict check, and it is usually much faster because there is no interpreter in the way.
 
----
+## Four differences that matter
 
-Despite these differences, each language has its own set of advantages depending on the project requirements and the developer's experience. MicroPython is often preferred for rapid development and prototyping, especially for those new to programming or embedded systems. On the other hand, Rust offers more control, safety, and efficiency, making it suitable for projects where performance and resource management are critical.
+| Topic | Python | Rust |
+| --- | --- | --- |
+| Types | Checked while running | Checked at compile time |
+| Memory | Garbage collector frees it | Ownership rules free it, no collector |
+| Errors | Exceptions can happen anywhere | `Result` and `Option` values you must handle |
+| Threads | The standard CPython interpreter runs one thread of Python at a time (the GIL) | Threads run in parallel, and the compiler checks sharing |
+{:class="table table-single"}
 
+**Types.** A wrong type in Python only shows up when that line runs. This fails, but only when the robot reaches it:
 
----
+<!-- code-check: skip -->
+```python
+speed = "50"
+total = speed + 10  # TypeError: can only concatenate str to str
+```
 
-## Summary
+In Rust the same mistake stops the build, so it can never reach the robot.
 
-By understanding Rust's approach to memory management, error handling, and concurrency, you can better appreciate when and why to use Rust over Python. While Python offers simplicity and quick development cycles, Rust provides control, safety, and performance, particularly in systems programming and performance-critical applications.
+**Memory.** Python tidies up with a garbage collector that runs when it likes. Rust decides when memory is freed by following ownership rules (lesson 4), so timing is predictable. Predictable timing is valuable when a motor controller must react in a few milliseconds.
 
----
+**Errors.** Python raises exceptions. Rust returns values that say "this worked" or "this failed", and the compiler makes you deal with them (lesson 6).
+
+## MicroPython and Rust on the Pico
+
+MicroPython gives you a **REPL**, an interactive prompt where you type a line and see the result. Standard Rust has no REPL, so the cycle is write, compile, run. In return you get small, fast programs.
+
+| | MicroPython on a Pico | Rust on a Pico |
+| --- | --- | --- |
+| Getting started | Flash MicroPython once, then copy `.py` files | Install the toolchain, then build a `.uf2` file |
+| Feedback | Instant, via the REPL | After each compile |
+| Speed and size | Slower, needs an interpreter on the board | Fast, no interpreter |
+| Best for | Learning, quick experiments | Tight timing, big projects, reliability |
+{:class="table table-single"}
+
+Neither is better in general. MicroPython is wonderful for trying ideas. Rust is worth the extra setup when speed, memory use and reliability matter. Many makers prototype in MicroPython and move to Rust for the final version.
+
+## Why this matters
+
+Knowing the trade-off helps you choose. A blinking-LED test? MicroPython. A flight controller that must never stall? Rust earns its place.
+
+## Try it Yourself
+
+1. Take a small Python function you wrote earlier and rewrite it in Rust, adding the types. Run it with `cargo run`.
+2. In the Rust `clamp_speed` above, change both `i32` types to `u8` (an unsigned 8-bit number, 0 to 255) and call it with `-5`. What does the compiler say, and why can a `u8` never be negative?
+3. Challenge: write a Rust `fn average(a: f32, b: f32) -> f32`, then try calling it with the text `"3"` and read the error.
+
+## Common Issues
+
+- **Problem**: You expect to type Rust lines into a prompt like the MicroPython REPL.
+- **Solution**: Write a file, then run `cargo run`. Use `cargo check` for a quicker syntax and type check.
+- **Why**: Standard Rust is compiled, so there is no interactive prompt.
+
+- **Problem**: The compiler complains about a type when your Python habits say it should work.
+- **Solution**: Add the type to the variable or function, for example `let x: f32 = 3.0;`.
+- **Why**: Rust will not guess when two types could both fit, so it asks you to say which.
+
+## Check your understanding
+
+{% quiz %}
+? When does Rust check that types match?
+- [ ] While the program runs
+- [x] At compile time
+- [ ] Never, it trusts you
+> Rust checks types and ownership before the program is ever run.
+
+? Which feature does Rust use instead of exceptions for things that can fail?
+- [ ] Garbage collection
+- [x] `Result` and `Option` values
+- [ ] The GIL
+> Functions return a `Result` or `Option` and you must handle both outcomes.
+
+? Which is an advantage of MicroPython over Rust for a first experiment on the Pico?
+- [x] An interactive REPL gives instant feedback
+- [ ] It always runs faster
+- [ ] It needs no board at all
+> The REPL lets you test a line at a time. Rust gives speed and reliability but needs a compile step.
+{% endquiz %}

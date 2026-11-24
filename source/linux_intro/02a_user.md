@@ -1,153 +1,188 @@
 ---
 title: Managing Users and Using `sudo`
-description: Learn how to manage users, use the `sudo` command, and change passwords in a Unix-like system with simple and easy-to-understand instructions.
+description: Learn who you are on the Pi, what sudo really does, and how to add users, groups and passwords safely.
 layout: lesson
+type: page
 cover: /learn/linux_intro/assets/usermgr.jpg
+date_updated: 2026-11-24
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-When using a Unix-like system, like Linux on your Raspberry Pi, it's important to know how to manage users and their permissions. This lesson will teach you how to add and manage users, how to use the `sudo` command to run important tasks, and how to change passwords.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
+By the end of this lesson you will be able to check which user and groups you belong to, use `sudo` safely, and add, change and remove a user account.
 
-- Understand what the `sudo` command does and how to use it.
-- Learn how to add, delete, and manage users.
-- Change user passwords using the `passwd` command.
+## Who are you, and what can you do?
 
----
+Linux was built for many people sharing one computer, so everything on your Pi belongs to somebody. Normal users can change their own files. Only the **root** user, the all-powerful administrator, can change the system itself. Rather than logging in as root (which is easy to get wrong), Linux lets trusted users borrow root's powers for one command at a time with `sudo`, short for "superuser do".
 
-### Understanding `sudo`
+This matters for our Docker-ready Pi. Installing software and managing services needs `sudo`, and later you will add your user to a group called `docker` so you can run containers without it. Today we learn how users and groups work.
 
-The `sudo` command (which stands for "superuser do") lets you run commands with special permissions. This is useful when you need to do things that require more control over the system, like installing software or changing system settings.
-
-#### **How to Use `sudo`:**
-
-To use `sudo`, you put it in front of the command you want to run with higher permissions. For example:
-
-```bash
-sudo apt update
+```mermaid
+sequenceDiagram
+    participant You as You (normal user)
+    participant Sudo as sudo
+    participant Sys as System
+    You->>Sudo: sudo apt update
+    Sudo->>Sudo: Are you in the sudo group?
+    Sudo-->>You: Password please (not always on a Pi)
+    You->>Sudo: password
+    Sudo->>Sys: Run apt update as root
+    Sys-->>You: Output
 ```
 
-This command updates the list of software packages on your system, but since it needs special permissions, you use `sudo` first. Usually, you’ll be asked to type in your password to confirm that you have permission to use `sudo`.
-
-#### **Why Use `sudo` Instead of Logging in as Root?**
-
-- **Safety:** Using `sudo` helps prevent mistakes because you only use special permissions when needed.
-- **Security:** It keeps track of who uses `sudo`, so you know who did what on the system.
-- **Control:** You can decide which users are allowed to use `sudo` by setting up permissions.
-
----
-
-### Adding and Managing Users
-
-#### **1. Adding a New User:**
-
-To add a new user to your system, you use the `adduser` command:
+## Check your identity
 
 ```bash
-sudo adduser username
+$ whoami
+pi
+$ id
+uid=1000(pi) gid=1000(pi) groups=1000(pi),4(adm),27(sudo),29(audio),44(video),100(users),997(gpio),998(i2c),999(spi)
+$ groups
+pi adm sudo audio video users gpio i2c spi
 ```
 
-Replace `username` with the name you want to give the new user. The system will ask you to set a password for the new user and give some extra information (like the full name), but you can skip these extra details if you want.
+`id` shows your user number and every group you belong to. Notice `sudo` in the list, which is why you can use it, and `gpio`, `i2c` and `spi`, which let your user control the Pi's pins without extra powers. The exact list on your Pi will differ.
 
-#### **2. Deleting a User:**
+## Using `sudo`
 
-To remove a user from the system, use the `deluser` command:
+Put `sudo` in front of a command that needs administrator powers:
 
 ```bash
-sudo deluser username
+$ sudo apt update
 ```
 
-If you also want to delete the user’s home directory (where their files are stored), use this command:
+On many Pis set up with Raspberry Pi Imager, the first user is allowed to use `sudo` without typing a password, which is convenient on your own board. Other users, and any Pi you set up differently, will ask for the user's own password.
+
+> **Careful**: `sudo` takes away the safety net. Commands run with `sudo` can delete or overwrite system files, and the shell will not ask "are you sure". Read a `sudo` command twice before you press `Enter`, and never paste one from a website you do not trust. If you are only looking at something, you probably do not need `sudo`.
+
+**Why not just log in as root?** `sudo` limits the damage of a typo to one command, and it writes a log entry of who ran what.
+
+## Adding a user
+
+Let's make a throwaway account called `student` to practise on. This is safe: we delete it again at the end.
 
 ```bash
-sudo deluser --remove-home username
+$ sudo adduser student
+Adding user `student' ...
+Adding new group `student' (1001) ...
+Adding new user `student' (1001) with group `student' ...
+Creating home directory `/home/student' ...
+New password:
+Retype new password:
+passwd: password updated successfully
+Changing the user information for student
+Enter the new value, or press ENTER for the default
+	Full Name []:
+	Room Number []:
+	Work Phone []:
+	Home Phone []:
+	Other []:
+Is the information correct? [Y/n] y
 ```
 
-#### **3. Giving a User `sudo` Permissions:**
-
-If you want a user to be able to use `sudo`, you need to add them to the `sudo` group:
+Press `Enter` to skip the personal details. Now check the account exists:
 
 ```bash
-sudo usermod -aG sudo username
+$ id student
+uid=1001(student) gid=1001(student) groups=1001(student)
 ```
 
-This command adds the user to the group that’s allowed to use `sudo`. The `-aG` part means “append to group,” so the user stays in their other groups too.
+## Groups
 
----
-
-### Changing Passwords
-
-#### **1. Changing Your Own Password:**
-
-To change your own password, use the `passwd` command:
+A **group** gives several users the same permissions at once. Add `student` to a new group called `makers`:
 
 ```bash
-passwd
+$ sudo groupadd makers
+$ sudo usermod -aG makers student
+$ id student
+uid=1001(student) gid=1001(student) groups=1001(student),1002(makers)
 ```
 
-The system will ask you to enter your current password and then type your new password twice to confirm it.
+The `-aG` flag means **a**ppend to the **G**roup. Leave out the `-a` and the user is removed from all their other groups. This is a classic mistake, so remember it.
 
-#### **2. Changing Another User’s Password:**
+To give `student` administrator rights, add them to the `sudo` group, with `sudo usermod -aG sudo student`. Only do this for people you trust.
 
-If you have `sudo` permissions, you can change another user’s password by typing:
+## Passwords
 
 ```bash
-sudo passwd username
+$ passwd
+Changing password for pi.
+Current password:
+New password:
+Retype new password:
+passwd: password updated successfully
 ```
 
-After entering your own password (to use `sudo`), the system will let you set a new password for the user.
+Change another user's password with `sudo passwd student`, and force a change at their next login with `sudo passwd -e student`. Use a strong password on any Pi that is on a network. A Pi with a default or simple password is the first thing attackers try.
 
-#### **3. Making a User Change Their Password on Next Login:**
+## Cleaning up
 
-If you want to force a user to change their password the next time they log in, use this command:
+Remove the practice account and its files:
+
+> **Careful**: `--remove-home` permanently deletes the user's home folder and everything in it, with no bin to recover from. Check the name twice. Only use it on the throwaway `student` account.
 
 ```bash
-sudo passwd -e username
+$ sudo deluser --remove-home student
+Looking for files to backup/remove ...
+Removing user `student' ...
+Warning: group `student' has no more members.
+Done.
+$ sudo groupdel makers
 ```
 
-This expires the current password, so the user has to set a new one the next time they log in.
+Without `--remove-home`, `deluser` removes the account but leaves `/home/student` behind, which you can review before deleting it yourself.
 
----
+Pi progress: you understand users, groups and `sudo`, the three things Docker's installer will ask of you.
 
-### Managing Groups
+> **Teachers**: adding and deleting users changes the whole computer, so do this lesson on Pis the class owns, never on a shared server or a machine with real student accounts. Do not teach learners to hand out `sudo` to each other. Agree one admin password per group and store it somewhere safe. If you re-image the Pi after the course, the practice user disappears anyway.
 
-Groups are a way to organize users, so you can give several users the same permissions at once. Here’s how you can manage groups:
+## Try it Yourself
 
-- **Create a New Group:**
-  ```bash
-  sudo groupadd groupname
-  ```
+1. Run `id` and `groups`, then work out which group lets your user read the Pi's GPIO pins.
+2. Create a user called `student`, a group called `makers`, and put the user in the group. Prove it with `id student`.
+3. Run `sudo passwd -e student`, then check the account status with `sudo passwd -S student`. What changed in the output?
+4. Challenge: remove `student` from `makers` with `sudo deluser student makers`, delete both, and show that `id student` now says `no such user`.
 
-- **Add a User to a Group:**
-  ```bash
-  sudo usermod -aG groupname username
-  ```
+## Common Issues
 
-- **Remove a User from a Group:**
-  ```bash
-  sudo deluser username groupname
-  ```
+- **Problem**: `student is not in the sudoers file. This incident will be reported.`
+- **Solution**: Add the user to the sudo group with `sudo usermod -aG sudo student` from an account that already has `sudo`, then log out and back in.
+- **Why**: `sudo` only works for members of the `sudo` group, and group changes apply to new login sessions.
 
----
+- **Problem**: I added myself to a group but the new permission does not work.
+- **Solution**: Log out and log in again, or run `newgrp groupname`. Check with `groups`.
+- **Why**: The groups are read when you log in, so an open terminal still has the old list.
 
-## Summary
+- **Problem**: `usermod -G makers student` removed the user from `sudo` and other groups.
+- **Solution**: Put them back with `sudo usermod -aG sudo student`, and always use `-aG`.
+- **Why**: Without `-a`, `-G` replaces the full group list instead of adding to it.
 
-In this lesson, you learned how to use the `sudo` command to do tasks that need special permissions, how to manage users on your system, and how to change passwords. These are important skills for keeping your system safe and making sure everyone has the right access.
+## Check your understanding
 
----
+{% quiz %}
+? What does `sudo` do?
+- [ ] Switches you permanently to the root user
+- [x] Runs one command with administrator powers
+- [ ] Shows your password
+> `sudo` borrows root's powers for a single command, and only for users who are allowed to.
 
-## Practice Exercise
+? Which command adds `student` to the group `makers` while keeping their other groups?
+- [ ] sudo usermod -G makers student
+- [x] sudo usermod -aG makers student
+- [ ] sudo adduser makers
+> `-aG` appends. Without `-a` the user's group list is replaced.
 
-Try these tasks to practice what you’ve learned:
+? You want to delete the account `student` and their files. What do you use?
+- [x] sudo deluser --remove-home student
+- [ ] sudo rm student
+- [ ] sudo passwd -d student
+> `--remove-home` deletes the home folder as well, so use it with care.
 
-1. **Add a new user:** Create a user called `student` and give them `sudo` permissions.
-2. **Change your password:** Update your current password using the `passwd` command.
-3. **Manage groups:** Create a new group called `developers` and add the `student` user to this group.
-
----
+? Why is `sudo` safer than working as root all the time?
+- [ ] It makes commands run faster
+- [x] A mistake only affects one command, and it is logged
+- [ ] It hides the password
+> Using root only when you need it limits accidents, and `sudo` keeps a record of what was run.
+{% endquiz %}

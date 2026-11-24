@@ -2,181 +2,147 @@
 title: Registering and Rendering
 description: Register BurgerBotEnv with gym.register so it can be created with gym.make, and learn how render modes work in Gymnasium.
 layout: lesson
+snakie: false
 type: page
 cover: /learn/gymnasium/assets/banners/09_registering_and_rendering.jpg
-date_updated: 2026-06-14
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Why Register?
+By the end of this lesson you will be able to register a custom environment with `gym.register`, create it with `gym.make`, and read its text rendering.
 
-In lesson 2, you created CartPole with `gym.make("CartPole-v1")`. That string looked up the environment in Gymnasium's global registry and instantiated it for you.
+---
 
-Right now, `BurgerBotEnv` is just a class. You can instantiate it directly: `env = BurgerBotEnv()`. That works fine when your environment and your training code are in the same file. But once you split things into separate modules — or want to use Stable-Baselines3's wrappers that call `gym.make` internally — you need your environment registered by ID.
+## Why register?
 
-Registration also future-proofs your code. If you later publish the environment, anyone can install your package and `gym.make("BurgerBot-v0")` just works.
+In lesson 2 you made CartPole with `gym.make("CartPole-v1")`. That string was looked up in Gymnasium's registry, which returned a ready-to-use environment.
 
-## Registering with gym.register
+Right now `BurgerBotEnv` is just a class. You can call `BurgerBotEnv()` directly, and that is fine when everything is in one file. Registering gives your environment an id, and an id gives you three things:
 
-```python
-import gymnasium as gym
+- `gym.make("BurgerBot-v0")` builds it, and Gymnasium adds its standard safety wrappers.
+- A step limit can be attached once, at registration, instead of inside every script.
+- Tools that create environments from a string, such as `gym.make_vec` in the next lessons, can find it.
 
-# gym.register must be called before any gym.make("BurgerBot-v0") call.
-# The id follows the convention: Name-vVersion
-# entry_point is a string "module.path:ClassName" or a callable.
-
-gym.register(
-    id="BurgerBot-v0",
-    entry_point="burgerbot_env:BurgerBotEnv",  # if in a file called burgerbot_env.py
-    max_episode_steps=150,   # automatically adds a TimeLimit wrapper
-)
+```mermaid
+flowchart LR
+    R["gym.register(id, entry_point)"] --> REG[("Gymnasium registry")]
+    M["gym.make('BurgerBot-v0')"] --> REG
+    REG --> I["imports burgerbot_env.py"]
+    I --> B["BurgerBotEnv(**kwargs)"]
+    B --> W["wrappers: TimeLimit, OrderEnforcing, checker"]
+    W --> U["env you use"]
 ```
 
-After this call, `gym.make("BurgerBot-v0")` will find your class.
+## Registering BurgerBot
 
-The `entry_point` string uses the format `"module:ClassName"`. The module is the Python module (file) that contains the class, and `ClassName` is the class itself.
-
-> **Note:** `gym.register` only needs to be called once per Python session. It is common to put it at the top of your training script, or in the `__init__.py` of a package that contains your environments.
-
-## A Self-Contained Registration Example
-
-Here is a complete script that defines, registers, and uses BurgerBotEnv — all in one file. When the entry point is in the same script, use `__main__:ClassName` or pass the class directly:
+Keep `burgerbot_env.py` from lesson 8 in the same folder, and save this as `register_burgerbot.py`:
 
 ```python
-import numpy as np
 import gymnasium as gym
-from gymnasium import spaces
+from gymnasium.utils.env_checker import check_env
 
-# ── World constants ──────────────────────────────────────────────────────────
-GRID_ROWS, GRID_COLS = 7, 7
-OBSTACLES = {(0,3),(1,1),(1,5),(3,0),(3,3),(4,5),(5,1)}
-START, GOAL = (0,0), (6,6)
-ACTIONS   = ["forward","turn_left","turn_right","stop"]
-HEADINGS  = ["north","east","south","west"]
-HEADING_DELTA = {"north":(-1,0),"east":(0,1),"south":(1,0),"west":(0,-1)}
-NEAR, MEDIUM = 1, 3
-
-class BurgerBotEnv(gym.Env):
-    metadata = {"render_modes": ["ansi"]}
-    def __init__(self, max_steps=150, render_mode=None):
-        super().__init__()
-        self.max_steps = max_steps
-        self.render_mode = render_mode
-        self.observation_space = spaces.MultiDiscrete([GRID_ROWS, GRID_COLS, 4, 3])
-        self.action_space = spaces.Discrete(4)
-    def _sensor(self):
-        dr,dc = HEADING_DELTA[self.heading]
-        r,c = self.row+dr, self.col+dc
-        n=0
-        while 0<=r<GRID_ROWS and 0<=c<GRID_COLS:
-            if (r,c) in OBSTACLES: break
-            n+=1
-            if n>=5: break
-            r+=dr; c+=dc
-        if n<=NEAR: return 0
-        if n<=MEDIUM: return 1
-        return 2
-    def _obs(self):
-        return np.array([self.row,self.col,HEADINGS.index(self.heading),self._sensor()],dtype=np.int64)
-    def reset(self,*,seed=None,options=None):
-        super().reset(seed=seed)
-        self.row,self.col=START; self.heading="east"; self.steps=0
-        return self._obs(),{}
-    def step(self,action):
-        self.steps+=1
-        a=ACTIONS[action]; hit=False; moved=False
-        if a=="forward":
-            dr,dc=HEADING_DELTA[self.heading]; nr,nc=self.row+dr,self.col+dc
-            if 0<=nr<GRID_ROWS and 0<=nc<GRID_COLS and (nr,nc) not in OBSTACLES:
-                self.row,self.col=nr,nc; moved=True
-            else: hit=True
-        elif a=="turn_left":
-            self.heading=HEADINGS[(HEADINGS.index(self.heading)-1)%4]
-        elif a=="turn_right":
-            self.heading=HEADINGS[(HEADINGS.index(self.heading)+1)%4]
-        reached=(self.row,self.col)==GOAL
-        if hit: reward=-10.0
-        elif reached: reward=50.0
-        elif moved: reward=1.0
-        else: reward=-0.1
-        terminated=reached or hit; truncated=self.steps>=self.max_steps
-        return self._obs(),reward,terminated,truncated,{}
-    def render(self):
-        if self.render_mode!="ansi": return
-        h={"north":"^","east":">","south":"v","west":"<"}
-        out=""
-        for r in range(GRID_ROWS):
-            for c in range(GRID_COLS):
-                if (r,c)==(self.row,self.col): out+=h[self.heading]+" "
-                elif (r,c) in OBSTACLES: out+="O "
-                elif (r,c)==GOAL: out+="G "
-                else: out+=". "
-            out+="\n"
-        return out
-
-# ── Register ─────────────────────────────────────────────────────────────────
+# "module:ClassName" - Python imports burgerbot_env.py the first time
+# gym.make needs it, so the file must sit beside this script.
 gym.register(
     id="BurgerBot-v0",
-    entry_point=BurgerBotEnv,   # pass the class directly when in the same file
+    entry_point="burgerbot_env:BurgerBotEnv",
     max_episode_steps=150,
 )
 
-# ── Create and use ────────────────────────────────────────────────────────────
 env = gym.make("BurgerBot-v0", render_mode="ansi")
+print("id:", env.spec.id, " max_episode_steps:", env.spec.max_episode_steps)
+print("outer type:", type(env).__name__)
+print("inner type:", type(env.unwrapped).__name__)
+check_env(env.unwrapped)
+print("check_env passed")
 
 obs, info = env.reset(seed=0)
-print("Starting grid:")
 print(env.render())
-
-for step in range(10):
-    action = env.action_space.sample()
-    obs, reward, terminated, truncated, info = env.step(action)
+env.action_space.seed(0)
+for step in range(1, 11):
+    obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
     if terminated or truncated:
-        print(f"Episode ended at step {step + 1}")
+        print(f"Episode ended at step {step}")
         break
-
-print("Final grid:")
 print(env.render())
 env.close()
+
+# Keyword arguments pass through to __init__
+short = gym.make("BurgerBot-v0", max_steps=5)
+short.reset(seed=0)
+for i in range(1, 8):
+    obs, reward, terminated, truncated, info = short.step(3)   # 3 = stop
+    if truncated:
+        print("max_steps=5: a robot that only waits is truncated at step", i)
+        break
+short.close()
+
+# max_episode_steps can also be overridden in gym.make
+tiny = gym.make("BurgerBot-v0", max_episode_steps=3)
+tiny.reset(seed=0)
+for i in range(1, 8):
+    obs, reward, terminated, truncated, info = tiny.step(3)
+    if truncated:
+        print("max_episode_steps=3: truncated at step", i)
+        break
+tiny.close()
 ```
 
-## How render_mode Works
-
-Gymnasium sets the render mode at construction time:
-
-```python
-# ANSI text output — good for grid worlds and terminals
-env = gym.make("BurgerBot-v0", render_mode="ansi")
-
-# RGB image array — good for recording video or feeding to image models
-env = gym.make("CartPole-v1", render_mode="rgb_array")
-
-# Opens a display window — good for watching during development
-env = gym.make("CartPole-v1", render_mode="human")
-
-# No rendering — fastest, use this for training
-env = gym.make("BurgerBot-v0")   # render_mode defaults to None
-```
-
-After construction, call `env.render()` with no arguments:
-
-```python
-output = env.render()
-# For "ansi": output is a string
-# For "rgb_array": output is a NumPy array of shape (H, W, 3)
-# For "human": output is None (the window updates automatically)
-# For None: output is None
-```
-
-## Reading the ANSI Output
-
-BurgerBot's `render()` returns a multi-line string:
+Our output (the `check_env` call may also print a `WARN` about render fps, which is harmless for a text renderer):
 
 ```
+id: BurgerBot-v0  max_episode_steps: 150
+outer type: TimeLimit
+inner type: BurgerBotEnv
+check_env passed
 > . . O . . .
+. O . . . O .
+. . . . . . .
+O . . O . . .
+. . . . . O .
+. O . . . . .
+. . . . . . G
+Episode ended at step 8
+. . > O . . .
+. O . . . O .
+. . . . . . .
+O . . O . . .
+. . . . . O .
+. O . . . . .
+. . . . . . G
+max_steps=5: a robot that only waits is truncated at step 5
+max_episode_steps=3: truncated at step 3
+```
+
+Three things to notice:
+
+- `gym.make` returned a `TimeLimit` wrapper around your class, because we passed `max_episode_steps`. Your own object is underneath, reachable as `env.unwrapped`.
+- The entry point is `"module:ClassName"`. The module is the file name without `.py`. If the file is not in the same folder, or not on Python's path, `gym.make` cannot import it.
+- Keyword arguments to `gym.make` go to `BurgerBotEnv.__init__`, which is how `max_steps=5` took effect. The wrapper's `max_episode_steps` is a second, outer limit: the episode ends at whichever comes first.
+
+> **Note**: `gym.register` runs once per Python session. If you register the same id twice you get a warning that it is being overwritten. Put it at the top of your training script, or in the `__init__.py` of a package of environments.
+
+## How render modes work
+
+You pick the render mode when you create the environment. After that `env.render()` takes no arguments and returns different things depending on the mode:
+
+| render_mode | What `render()` returns |
+| --- | --- |
+| `"ansi"` | A text string, like our grid |
+| `"rgb_array"` | A NumPy array of shape `(height, width, 3)` |
+| `"human"` | Nothing. A window updates itself on every step |
+| `None` | Nothing. The fastest choice for training |
+{:class="table table-single"}
+
+BurgerBot declares `metadata = {"render_modes": ["ansi"]}`, so asking for any other mode gives a warning. You would not see the `human` window here, since it needs a display, but you can always read the `ansi` text in a terminal or a log file.
+
+## Reading the grid
+
+```
+. . > O . . .
 . O . . . O .
 . . . . . . .
 O . . O . . .
@@ -185,25 +151,53 @@ O . . O . . .
 . . . . . . G
 ```
 
-- `>` = the robot, currently facing east
-- `O` = obstacle
-- `G` = goal
-- `.` = empty cell
+The arrow is the robot and points the way it faces: `^` north, `>` east, `v` south, `<` west. `O` is an obstacle, `G` is the goal and `.` is empty floor. In the grid above the robot is in front of the obstacle at the end of row 0, facing it. A forward step there crashes.
 
-The heading characters follow the natural conventions: `^` north, `>` east, `v` south, `<` west.
+## Try it Yourself
 
-## Try It Yourself
-
-1. Register `BurgerBot-v0` and print `gym.spec("BurgerBot-v0")`. What information does the spec contain?
-2. Try `gym.make("BurgerBot-v0", max_episode_steps=10)`. Gymnasium passes keyword arguments through to the constructor when you register with `entry_point=ClassName`. Does the time limit actually change?
-3. Add `"rgb_array"` to `BurgerBotEnv.metadata["render_modes"]` and implement `render()` for that mode: return a `(GRID_ROWS * 32, GRID_COLS * 32, 3)` NumPy array where each cell is a coloured 32x32 block. Use `np.zeros` and fill in colours for the robot, obstacles, goal, and empty cells. Run `check_env` on it.
+1. Print `gym.spec("BurgerBot-v0")`. What fields does it list?
+2. Run `gym.make("BurgerBot-v0", max_steps=500)` with a robot that only waits. It is still stopped at step 150. Which limit is responsible, and why?
+3. Add `"rgb_array"` to `metadata["render_modes"]` and make `render()` return a `(7 * 32, 7 * 32, 3)` `uint8` array in that mode, painting each cell a colour (robot, obstacle, goal, floor). Run `check_env` on it.
+4. Challenge: save the `rgb_array` frame to a PNG with the Pillow library and look at it. Does the picture match the text grid?
 
 ## Common Issues
 
-**Problem:** `gymnasium.error.NameNotFound: Environment BurgerBot-v0 doesn't exist`
-**Solution:** Make sure `gym.register(...)` is called before `gym.make(...)`. If they are in different files, import the file that contains the `gym.register` call first.
-**Why:** The registry is checked at the time of the `gym.make` call. If `register` has not run yet, the ID is not in the registry.
+- **Problem**: `NameNotFound: Environment BurgerBot doesn't exist`
+- **Solution**: Call `gym.register(...)` before `gym.make(...)`, in the same program. If the register call lives in another file, import that file first.
+- **Why**: `gym.make` looks the id up in the registry at that moment. If nothing has registered it yet, the lookup fails.
 
-**Problem:** `gym.make("BurgerBot-v0")` ignores keyword arguments like `max_steps=50`
-**Solution:** The keyword argument must match the `__init__` parameter name exactly. `max_steps` is the parameter name in our BurgerBotEnv, so `gym.make("BurgerBot-v0", max_steps=50)` works.
-**Why:** `gym.make` passes keyword arguments directly to the environment's `__init__`.
+- **Problem**: `ModuleNotFoundError: No module named 'burgerbot_env'` when you call `gym.make`.
+- **Solution**: Run the script from the folder that holds `burgerbot_env.py`.
+- **Why**: The entry point string is imported lazily, using Python's normal search path.
+
+- **Problem**: `gym.make("BurgerBot-v0", max_steps=50)` raises `TypeError`.
+- **Solution**: The keyword must match a parameter of `BurgerBotEnv.__init__` exactly.
+- **Why**: Gymnasium passes your keywords straight to the constructor.
+
+## Check your understanding
+
+{% quiz %}
+? What does the entry point string `"burgerbot_env:BurgerBotEnv"` mean?
+- [x] Import the module `burgerbot_env` and use the class `BurgerBotEnv`
+- [ ] Use the file `burgerbot_env` from the cloud
+- [ ] Rename the class to `burgerbot_env`
+> The format is `module:ClassName`.
+
+? What does `env.render()` return when the render mode is `"ansi"`?
+- [ ] A NumPy array
+- [x] A string
+- [ ] Nothing
+> ANSI mode returns text you can print.
+
+? How do you reach your own `BurgerBotEnv` object after `gym.make` has wrapped it?
+- [ ] `env.inner`
+- [x] `env.unwrapped`
+- [ ] `env.base()`
+> `unwrapped` strips off every wrapper.
+
+? You registered with `max_episode_steps=150` and the class also has `max_steps=150`. What happens?
+- [ ] Gymnasium raises an error
+- [x] Both limits exist and the episode ends at the first one reached
+- [ ] The larger one is ignored at registration
+> They are two independent limits. Keep them in sync or pick one.
+{% endquiz %}

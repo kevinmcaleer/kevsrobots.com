@@ -9,8 +9,9 @@ next: 01_voltage_current_resistance.html
 description: A friendly first course in electronics for robot builders, built around
   a light-sensing night light controlled by a Raspberry Pi Pico.
 percent: 6
-duration: 4
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -65,6 +66,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will know what the course covers, what kit to gather, and how the night light project ties every lesson together.
+
 ## Overview
 
 Every robot you will ever build is a pile of electronics with a brain on top. Motors, sensors, LEDs and the Pico itself all follow the same few rules, and once you know them, wiring stops being scary guesswork and becomes something you can reason about.
@@ -72,6 +75,28 @@ Every robot you will ever build is a pile of electronics with a brain on top. Mo
 In this course we learn those rules by building one thing: a **light-sensing night light**. It starts as a handful of parts on a breadboard, an LED, a resistor and a battery pack. Lesson by lesson we add a light dependent resistor (LDR), a voltage divider, a transistor and a button, and in the last lessons we hand the whole thing to a Raspberry Pi Pico that watches the room and switches the light on when it gets dark.
 
 You do not need any electronics experience. If you can plug a USB cable in, you can do this course.
+
+## Before you start
+
+No electronics experience is needed. Two other courses make good companions:
+
+- [Robotics 101](/learn/robotics_101/) gives the big picture of what a robot is made of. Read it first if you like to see where you are heading.
+- [Learn MicroPython - The basics](/learn/micropython/) helps with the last three lessons, where the Pico reads sensors and runs the finished night light.
+
+You can do lessons 1 to 12 with nothing but a battery pack, a breadboard and a multimeter. The Pico only arrives in lesson 13.
+
+## The night light, stage by stage
+
+Each part of the course adds one stage to the finished project:
+
+```mermaid
+flowchart LR
+    A["Lessons 1 to 4<br>Battery, resistor, LED"] --> B["Lessons 5 to 7<br>Measure it, series and parallel"]
+    B --> C["Lesson 8<br>LDR voltage divider<br>senses light"]
+    C --> D["Lessons 10 and 11<br>Button and transistor<br>switch the LED"]
+    D --> E["Lessons 12 and 13<br>Power and the Pico ADC"]
+    E --> F["Lesson 14<br>Finished night light"]
+```
 
 ## Course Content
 
@@ -113,6 +138,8 @@ After completing this course, you will:
 
 Everything here is cheap. A starter kit from most electronics shops covers nearly the whole list.
 
+> **Teachers**: the course suits ages 11 and up, or any beginner, and each lesson takes 30 to 45 minutes (the project lesson, 14, needs a full session). Per learner or pair you need a breadboard, jumpers, a resistor and LED kit, a multimeter and a 3 x AA battery pack; the Pico is only needed from lesson 13. With no hardware at all, learners can still do the calculations and the computer-side Python scripts in lessons 1 to 12, and a free online circuit simulator can stand in for the breadboard. Multimeters are the item most often short in a class, so plan to share them in groups of three or four.
+
 ## How the course works
 
 Each lesson introduces one idea, shows it on a real circuit, and ends with a **Try it Yourself** section and a **Common Issues** section. Do the exercises. Electronics is a hands-on skill, and a circuit you have built yourself sticks in your head far better than one you have read about.
@@ -128,3 +155,25 @@ A few conventions:
 New to the Pico? You can start right away, but the [Learn MicroPython - The basics](/learn/micropython/) course is a good companion for the later lessons. Want the big picture of robots first? Have a look at [Robotics 101](/learn/robotics_101/).
 
 Ready? Grab your breadboard and let's build something that glows.
+
+## Check your understanding
+
+{% quiz %}
+? What do you build across the whole course?
+- [x] A light-sensing night light controlled by a Pico
+- [ ] A line-following robot
+- [ ] A motor driver board
+> The course builds one project, a night light, adding one stage per lesson.
+
+? Why does the course avoid pins GP0 to GP7?
+- [ ] They cannot be used as outputs
+- [x] The MicroPython Robotics course uses them for motor drivers
+- [ ] They are reserved for USB
+> Keeping GP0 to GP7 free means you can add the motor driver from that course later without rewiring.
+
+? In which lesson does the Raspberry Pi Pico first appear?
+- [ ] Lesson 1
+- [x] Lesson 13, after the breadboard circuits
+- [ ] Lesson 4
+> Lessons 1 to 12 need only a battery pack, breadboard and multimeter. The Pico arrives in lesson 13.
+{% endquiz %}

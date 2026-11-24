@@ -9,8 +9,10 @@ previous: 08_vscode_setup.html
 next: 10_listener.html
 description: Let's create our first ROS2 program
 percent: 50
-duration: 4
-quiz_total: 14
+duration: 5
+quiz_total: 58
+snakie: false
+date_updated: 2026-11-24
 navigation:
 - name: Learn ROS with me
 - content:
@@ -46,7 +48,7 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
-    - name: Talker ROS2 Program
+    - name: Nodes as Classes
       link: 10_listener.html
   - section: ROS2 Python Packages
     content:
@@ -79,6 +81,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to source ROS 2, create a workspace with `colcon`, and run a Python node that logs a message.
+
 ## Watch the video
 
 {% include youtubeplayer.html id="l9_lBNemtZg" %}
@@ -87,21 +91,23 @@ navigation:
 
 ## Source the ROS setup.bash script
 
-To use all the common ROS2 commands we need to `source` the setup script:
+ROS 2 is installed in the container under `/opt/ros/humble`, but your terminal doesn't know that yet. Sourcing the setup script adds the ROS commands and Python libraries to your terminal session.
 
-* **Source the scripts** - From the remote terminal, type:
+* **Source the script** - from the container terminal, type:
 
 ```bash
 source /opt/ros/humble/setup.bash
 ```
 
+Every new terminal needs this, so if `ros2` says "command not found" this is the first thing to check. If you'd rather not retype it, add it to your shell startup file with `echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc`.
+
 ---
 
 ## ROS2 Workspaces
 
-In ROS we use workspaces to manage our robotics projects. They are essentially a folder, with a set of files that ROS expects to see. The great thing is that ROS makes it really easy to set these up with a single `colcon build` command.
+A workspace is a folder laid out the way ROS expects, with your code in a `src` folder. ROS makes setting one up easy, using `colcon`.
 
-* **Create a new workspace** - From the ROS2 container terminal, type:
+* **Create a new workspace** - from the container terminal, type:
 
 ```bash
 cd /ros2
@@ -112,70 +118,51 @@ colcon build
 ls
 ```
 
-*You will see a few new folders created - `build`, `install` and `log`*
+*You will see new folders appear: `build`, `install` and `log`.*
 
-![Screenshot of remote-ssh](assets/remote_ssh08.png){:class="img-fluid w-100 shadow-lg"}
-
----
+![Screenshot of the terminal after colcon build](assets/remote_ssh08.png){:class="img-fluid w-100 shadow-lg"}
 
 > ### What is `colcon`?
 >
-> **colcon** - collective construction
->
-> Colcon is a command line tool to improve the workflow of building, testing and using multiple software packages. It automates the process, handles the ordering and sets up the environment to use the packages.
+> **colcon** stands for "collective construction". It's a command line tool to build, test and use multiple software packages. It handles the ordering of the builds and sets up the environment for you.
+{:class="bg-blue"}
 
----
+With an empty `src` folder colcon builds zero packages, which is fine: it has still created the folders we need.
 
-## Install folder
+## Source the workspace
 
-`colcon` created a new `install` folder; this contains a number of setup scripts that we will use to setup our terminal shell environment with the correct settings for this workspace.
-
-> You can look inside the setup files by using the `cat` command, eg `cat setup.bash` will show you (catalogue) the contents of the script.
-
----
-
-## Source the setup.bash script
-
-Let's go ahead and setup our terminal shell environment with our freshly created workspace bash setup scripts.
-
-* **Source the scripts** - From the remote terminal, type:
+The `install` folder holds setup scripts for this workspace. Source the local one so the terminal knows about our workspace:
 
 ```bash
 source install/setup.bash
 ```
 
----
+*You can look inside a setup script with `cat install/setup.bash`.*
 
 ## Fix permissions
 
-You may need to fix the permissions within the container so that VSCode can write to these files and folders.
-
-* **change mode** - From the ros2 terminal, type:
+The container runs as the `root` user, so the folders it creates are owned by root, and VS Code (running as you) can't save into them. Open the permissions up for this learning project:
 
 ```bash
-chmod 777 -R ../first_app
+chmod 777 -R /ros2/first_app
 ```
 
 ![Screenshot of file change](assets/remote_ssh09.png){:class="img-fluid w-100 shadow-lg"}
+
+*`chmod 777` lets anyone read, write and run these files. That's fine for a throwaway workspace on your own Pi, but don't copy it onto a shared machine.*
 
 ---
 
 ## Create talker.py in src
 
-Let's create our first ROS2 python program.
-
-* **Select the `src` folder and Click New file** - From the VSCode folder window, select the `src` folder and then click the `New Files` button
-* **Name the file** - name the file `talker.py`
+* **Select the `src` folder and click New File** - in the VS Code Explorer
+* **Name the file** - `talker.py`
 
 ![Screenshot of VSCode](assets/remote_ssh10.png){:class="img-fluid w-50 shadow-lg"}
 
----
-
 ## Paste this code
 
-Let's cheat a bit - paste the code below, we'll explain it in the next section
-
-* **Paste this code** - into the new file
+Let's cheat a bit: paste the code below, and we'll explain it right after.
 
 ```python
 #!/usr/bin/env python3
@@ -196,22 +183,21 @@ if __name__ == "__main__":
 
 ![Screenshot of the code above in VSCode](assets/remote_ssh11.png){:class="img-fluid w-50 shadow-lg"}
 
----
-
 ## Run the program
 
-Let's run it! Don't worry we'll explain exactly whats going on.
-
-* **Run the code** - From the ROS2 container terminal, type:
+From the container terminal, type:
 
 ```bash
-colcon build
 python3 src/talker.py
 ```
 
+You'll see a line like `[INFO] [1673801367.468008815] [py_test]: Hello ROS2`, then the program waits.
+
 ![Screenshot of the output of running code](assets/remote_ssh12.png){:class="img-fluid w-100 shadow-lg"}
 
-Congratulations! You've just written a ROS2 program.
+Press `CTRL + C` to stop it. Congratulations! You've just written a ROS2 program.
+
+---
 
 ## What the code means
 
@@ -223,3 +209,45 @@ Congratulations! You've just written a ROS2 program.
 * `rclpy.shutdown()` tidies up when the node stops.
 
 ---
+
+## Try it Yourself
+
+1. Change the message from `Hello ROS2` to your robot's name and run it again.
+2. Change the node name from `py_test` to `my_first_node`. Where does the new name show up in the output?
+3. Replace `.info(...)` with `.warn(...)` and then `.error(...)`. How does the output change?
+4. Challenge: add a second `node.get_logger().info("Ready")` line after the first. Do both appear before the program waits?
+
+## Common Issues
+
+- **Problem**: `ModuleNotFoundError: No module named 'rclpy'`.
+- **Solution**: Run `source /opt/ros/humble/setup.bash`, then try again.
+- **Why**: The setup script is what tells Python where the ROS libraries are. It only affects the terminal you ran it in.
+
+- **Problem**: A long error message (a traceback) appears when you press `CTRL + C`.
+- **Solution**: Ignore it for now. It's `KeyboardInterrupt`, Python telling you the program was stopped.
+- **Why**: `rclpy.spin` is interrupted before reaching `rclpy.shutdown()`. Later you can wrap `spin` in a `try / except KeyboardInterrupt` to tidy it.
+
+- **Problem**: VS Code says it can't save the file (permission denied).
+- **Solution**: Run the `chmod 777 -R` command above.
+- **Why**: The files belong to `root` inside the container.
+
+## Check your understanding
+
+{% quiz %}
+? Why do we `source /opt/ros/humble/setup.bash`?
+- [ ] To install ROS 2
+- [x] So the terminal can find the ROS commands and Python libraries
+- [ ] To restart the container
+> Without it, commands such as `ros2` and `import rclpy` won't work in that terminal.
+
+? What does `colcon build` create inside a workspace?
+- [x] The `build`, `install` and `log` folders
+- [ ] A Docker image
+- [ ] A new node
+> The `install` folder also contains the `setup.bash` we source.
+
+? What does `rclpy.spin(node)` do?
+- [ ] Spins the robot's wheels
+- [x] Keeps the node running and handling events until it's stopped
+- [ ] Builds the workspace
+{% endquiz %}

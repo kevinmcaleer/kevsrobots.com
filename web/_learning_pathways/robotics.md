@@ -13,6 +13,7 @@ stages:
   - Build a SMARS Robot
   build:
   - Motors and motor drivers
+  - Give Your Robot Senses
   - Bus Servos and the Buddy Robot Arm
   - Learn how to program SMARS with Arduino
   - Build your own BurgerBot
@@ -21,6 +22,7 @@ stages:
   - BrachioGraph Tutorial
   - Wall Drawing Robot Tutorial
   - Build a SMARS Quad Walking Robot
+  - Build an Open Duck Mini Walking Robot
   - Robot Eye Mechanism
   - Bottango Basics
   - Learn ROS with me

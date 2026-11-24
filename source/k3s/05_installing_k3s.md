@@ -4,108 +4,159 @@ description: Install K3s on your Raspberry Pi cluster, configure your master nod
 layout: lesson
 type: page
 cover: /learn/k3s/assets/banners/05_installing_k3s.jpg
-date_updated: 2025-05-24
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, you’ll install **K3s** on your Raspberry Pi master node, set up the cluster, and prepare for adding worker nodes.
-
-K3s makes Kubernetes installation fast and easy — especially on resource-limited devices like Raspberry Pi.
+By the end of this lesson you will be able to install a K3s server on a Raspberry Pi, check that it is ready, and find the join token for your workers.
 
 ---
 
-## Step 1: SSH into the Master Node
+## One command, one server
 
-From your main computer, SSH into the Pi that will act as the **control plane (master)**:
+K3s installs with a single script. It sets up a systemd service called `k3s`, so it starts at boot and restarts if it crashes. The same script also gives you `kubectl`, `crictl`, `ctr` and the `k3s-killall.sh` and `k3s-uninstall.sh` helpers.
 
-```bash
-ssh pi@pi-master.local
+```mermaid
+sequenceDiagram
+    participant You
+    participant Pi as pi-server
+    participant Net as get.k3s.io
+    You->>Pi: ssh in
+    Pi->>Net: download install script
+    Net-->>Pi: script, then K3s binary
+    Pi->>Pi: write k3s.service and start it
+    Pi->>Pi: start containerd, Flannel, CoreDNS, Traefik
+    You->>Pi: sudo k3s kubectl get nodes
+    Pi-->>You: pi-server Ready
 ```
 
-> Replace `pi` and `pi-master.local` with your username and hostname or IP if needed.
+---
+
+## Step 1: SSH into the server
+
+From your computer:
+
+```bash
+ssh pi@pi-server.local
+```
+
+Use your own username and hostname or address. Make sure you have done the `cmdline.txt` step from lesson 3 on this Pi first.
 
 ---
 
-## Step 2: Install K3s (Master Node)
+## Step 2: Install K3s
 
-Run this one-liner:
+Piping a script from the internet into `sh` is convenient, and the official quick start does exactly this. It is good practice to read a script before you run it as root, so download it first if you like:
+
+```bash
+curl -sfL https://get.k3s.io -o install-k3s.sh
+less install-k3s.sh
+sudo sh install-k3s.sh
+```
+
+Or run the quick-start one-liner, which does the same thing:
 
 ```bash
 curl -sfL https://get.k3s.io | sh -
 ```
 
-K3s will:
-
-* Download and install Kubernetes
-* Start systemd service: `k3s.service`
-* Set up networking with Flannel
-* Create a default service account and kubeconfig
+It takes a minute or two on a Pi. K3s installs, starts, and brings up its bundled components as pods.
 
 ---
 
-## Step 3: Check Cluster Status
-
-After installation:
+## Step 3: Check the node
 
 ```bash
 sudo k3s kubectl get nodes
 ```
 
-You should see your master node listed as `Ready`.
+You should see one row for `pi-server` with `Ready` under STATUS. The ROLES column shows `control-plane` (and possibly other labels). If it says `NotReady`, wait 30 seconds and try again while the components start.
 
-To make `kubectl` easier to use, copy the K3s kubeconfig to your user’s home directory:
-
-```bash
-mkdir -p ~/.kube
-sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-sudo chown $(id -u):$(id -g) ~/.kube/config
-```
-
-Now you can run:
+Look at what K3s started for you:
 
 ```bash
-kubectl get nodes
+sudo k3s kubectl get pods -n kube-system
 ```
+
+Expect pods for CoreDNS, the local-path provisioner, metrics-server and Traefik, plus a small `svclb-` pod from ServiceLB. A couple of `helm-install-` entries showing `Completed` are normal: K3s installs Traefik using a Helm job. This is the "batteries included" part.
 
 ---
 
-## Step 4: Get the Join Token
+## Step 4: Where things live
 
-You’ll need a token to join worker nodes to the cluster:
+| What | Path |
+|---|---|
+| Admin kubeconfig | `/etc/rancher/k3s/k3s.yaml` |
+| Join token | `/var/lib/rancher/k3s/server/node-token` |
+| Service | `k3s.service` (use `systemctl` and `journalctl -u k3s`) |
+| Uninstall script | `/usr/local/bin/k3s-uninstall.sh` |
+{:class="table table-single"}
+
+The kubeconfig is readable only by root by default, because it grants full administrator access to the cluster. That is why we typed `sudo` above. Fetch the token now, because the workers need it next:
 
 ```bash
 sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
-Copy the token — you’ll use it on the worker nodes in the next lesson.
+Treat the token like a password: anyone who has it can join a machine to your cluster. Copy it somewhere safe for the next lesson.
 
 ---
 
-## Troubleshooting
+## What K3s is doing underneath
 
-| Problem                      | Solution                                    |
-| ---------------------------- | ------------------------------------------- |
-| `k3s.service` fails to start | Check logs: `journalctl -u k3s -e`          |
-| `kubectl` not found          | Use `sudo k3s kubectl` or set up kubeconfig |
-| Token file missing           | Confirm you're on the master node           |
-| Network errors               | Check for cgroup settings and firewalls     |
-{:class="table table-striped"}
+- It runs the control plane (API server, scheduler, controllers) as one process.
+- By default it stores cluster state in an embedded **SQLite** database, which is ideal for a single server. For high availability you would use embedded etcd or an external database instead.
+- The default pod network is **Flannel** with the VXLAN backend.
+
+> **Teachers**: The install pulls several container images and takes a few minutes. If a whole class installs at once over one school connection it can be slow, so stagger the installs or pre-download. Remind learners that the join token is a credential: it should not be pasted into shared documents or screenshots.
 
 ---
 
-## Notes
+## Try it Yourself
 
-* K3s uses a built-in SQLite database by default (great for small clusters).
-* For multi-master HA setups, use an external datastore (e.g. MySQL, Postgres, etcd).
-* The default CNI is **Flannel**, which works well for most local setups.
+1. Run `sudo systemctl status k3s` and find the line that says whether the service is active.
+2. Run `sudo k3s kubectl get pods -A` and count how many pods are running. Which namespaces do they belong to?
+3. Challenge: run `sudo k3s kubectl get nodes -o wide` and find the node's internal IP address. Does it match your plan?
+
+---
+
+## Common Issues
+
+- **Problem**: `k3s.service` fails to start.
+- **Solution**: Run `sudo journalctl -u k3s -e` and read the last lines. If it mentions the memory cgroup, repeat the `cmdline.txt` step from lesson 3.
+- **Why**: K3s needs the memory cgroup on Raspberry Pi OS, and it stops with a clear message when it is missing.
+
+- **Problem**: `kubectl get nodes` says permission denied or cannot read the kubeconfig.
+- **Solution**: Put `sudo` in front, as in `sudo k3s kubectl get nodes`.
+- **Why**: `/etc/rancher/k3s/k3s.yaml` is root-only by default.
+
+- **Problem**: The node stays `NotReady` for several minutes.
+- **Solution**: Check `sudo journalctl -u k3s -e` and confirm the Pi has internet access.
+- **Why**: The first start needs to pull images, and without a connection the node cannot finish setting up.
 
 ---
 
-Your Kubernetes control plane is now running!
+## Check your understanding
 
-Next up: [Adding Nodes](06_adding_nodes)
+{% quiz %}
+? What is the default datastore for a single K3s server?
+- [ ] etcd with three members
+- [x] Embedded SQLite
+- [ ] PostgreSQL
+> K3s uses SQLite by default. Embedded etcd or an external database is for high availability.
 
----
+? Where is the node join token stored?
+- [ ] /etc/rancher/k3s/k3s.yaml
+- [x] /var/lib/rancher/k3s/server/node-token
+- [ ] ~/.kube/token
+> The kubeconfig is a different file. The token is under /var/lib/rancher/k3s/server.
+
+? Why does `k3s kubectl get nodes` need `sudo` at first?
+- [x] The admin kubeconfig is root-only by default
+- [ ] K3s has no kubectl without it
+- [ ] The Pi needs a reboot
+> The kubeconfig has full cluster-admin access, so it is not world-readable.
+{% endquiz %}

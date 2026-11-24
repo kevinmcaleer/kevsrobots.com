@@ -9,8 +9,9 @@ next: 01_motor.html
 description: Finish the SMARS robot chassis in Fusion 360 with motor holders and stub
   wheels
 percent: 5
-duration: 2
-quiz_total: 6
+duration: 3
+quiz_total: 51
+date_updated: 2026-11-24
 navigation:
 - name: Design a SMARS Robot in Fusion 360 - Part 2, Motor Holders and Stub Wheels
 - content:
@@ -81,6 +82,18 @@ This course goes with the video below. Part 2 picks up from where the chassis ha
 
 In [Part 1](/learn/smars_fusion360/) you built the outer shell of the SMARS chassis. In Part 2 you'll add the parts inside and underneath that make it a working robot: holders that grip the two N20 motors, the stub wheels that carry the unpowered wheels, and the slots for the motor clips. At the end you'll have a finished chassis ready to export and 3D print.
 
+> **A note on names**: Fusion 360 is now called Autodesk Fusion. The lessons use the screenshots and wording from the original video, so some menus and buttons may have moved or been renamed since. The tools themselves (Sketch, Extrude, Revolve, Chamfer, Mirror and Pattern) work the same way, so if something is not where the lesson says, look for it by name.
+
+Here is the journey:
+
+```mermaid
+flowchart LR
+    A[Motor holders] --> B[Front cut]
+    B --> C[Stub wheels]
+    C --> D[Motor holder slots]
+    D --> E[Export STL]
+```
+
 ## Course Content
 
 - Sketch and extrude the motor holders, nubs and chamfers
@@ -100,12 +113,16 @@ By the end of Part 2 you will be able to:
 
 ## What you'll need
 
-- [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/personal)
+- [Autodesk Fusion](https://www.autodesk.com/products/fusion-360/personal) (formerly Fusion 360)
 - Your chassis design from [Part 1](/learn/smars_fusion360/)
+- A mouse with a scroll wheel, which makes orbiting and zooming easier
+- A 3D printer and slicer, only if you want to print the result
 
 ## How the course works
 
-Each lesson is one step: a short explanation, the dimensions, and a drawing of the result. Use the video if you need to see a step being done, and try the quiz at the end of each section.
+Each lesson is one step: what to make and why, the dimensions to use, a drawing of the result, what to check afterwards and what commonly goes wrong. Every dimension is listed exactly as it appears in the original lessons, so type them in as given and compare your model with each drawing. Use the video if you need to see a step being done. Each lesson ends with a short quiz, and the lessons are best done in order because every feature builds on the one before.
+
+> **Teachers**: This course suits students aged about 11 and up who have finished Part 1, working alone or in pairs. Allow roughly 15 to 25 minutes per lesson, or two or three lessons per session. Each learner needs a computer with Autodesk Fusion and a free account, so check that your school allows installation and sign-in. A 3D printer is only needed for the final lesson, and the whole course can be completed without one. Learners on shared machines should save their work to their own account or a USB stick.
 
 ## Prerequisites
 

@@ -1,247 +1,133 @@
 ---
 title: Properties in Obsidian
-description: Learn how to use properties (frontmatter) for metadata and organization.
+description: Add structured metadata to notes with properties, using test results and parts as examples.
 type: page
 layout: lesson
 cover: /learn/obsidian/assets/banners/09_properties.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Properties in Obsidian
+By the end of this lesson you will be able to add properties of different types to a note, and write the same block by hand in YAML.
 
-Properties (formerly called frontmatter) are key–value metadata stored at the top of your notes. They power search, filters, Dataview, and Bases, and make it easier to organize and query your vault.
-
----
-
-## What are properties?
-
-Properties live in a YAML block at the very top of a note, surrounded by `---` lines. Many can also be edited via the Properties UI in Obsidian without touching YAML.
+Properties are named values stored at the top of a note, such as `result: pass` or `voltage: 7.4`. They are what Bases read, and they make search and filtering much sharper. You will also hear them called frontmatter, because under the hood they are a YAML block at the very start of the file between two lines of three dashes.
 
 ---
 
-## Common properties
+## A test note with properties
 
-- `title`: Overrides the display title of the note
-- `description`: Short summary shown in listings
-- `tags`: A list of tags (must be a list, not a single string)
-- `aliases`: Alternative names for the note (list)
-- `cssclasses`: Extra CSS classes to style a note (list)
-- `created` / `updated`: Dates for tracking when a note was created/modified
-- `status`: Your custom workflow state, e.g., draft, in-progress, done
-- `due`: A date for tasks or projects
-- `cover`: Path to an image used as a cover/thumbnail
-
-Note: As of Obsidian 1.9, the old singular properties `tag`, `alias`, and `cssclass` are deprecated. Use the plural forms above and make them lists.
-
+```yaml
 ---
-
-## Property types (with examples)
-
-### Text
-Use for free-form strings like titles, authors, statuses, etc.
-
-YAML:
-```yaml
-author: "Ada Lovelace"
-status: "in-progress"
-notes: |
-  Multi-line text is possible using YAML block scalars.
-  Each line is preserved until the indentation ends.
-```
-
-Tips:
-- Wrap text in quotes when it contains punctuation or colons.
-- Use block scalars (|) for multi-line descriptions.
-
-### Number
-Use for anything you’ll sort or compute on numerically.
-
-YAML:
-```yaml
-priority: 1
-estimate_hours: 12.5
-```
-
-Tips:
-- Don’t quote numbers if you want them treated as numbers.
-
-### Checkbox (boolean)
-A simple true/false toggle.
-
-YAML:
-```yaml
-done: false
-archived: true
-```
-
-Tips:
-- YAML recognizes `true/false` (lowercase) as booleans.
-
-### Date and Datetime
-Track when things were created, due, or updated.
-
-YAML:
-```yaml
-created: 2025-08-24
-updated: 2025-08-24
-meeting_time: 2025-08-24T14:30
-```
-
-Dataview example:
-```dataview
-table created, updated
-from "Projects"
-where created >= date(2025-01-01)
-sort created desc
-```
-
-Tips:
-- Prefer ISO format (YYYY-MM-DD) and ISO datetime (YYYY-MM-DDTHH:MM) for reliable sorting.
-
-### List (multi‑value)
-Use when you need multiple values for the same property.
-
-YAML (block list):
-```yaml
-stakeholders:
-  - Alice
-  - Bob
-```
-
-YAML (inline list):
-```yaml
-platforms: [ios, android, web]
-```
-
-Tips:
-- Use lists for `tags`, `aliases`, and `cssclasses`.
-- Inline and block styles are equivalent—pick one for consistency.
-
-### Tags
-Special list used across Obsidian.
-
-YAML:
-```yaml
 tags:
-  - project
-  - planning
-  - projects/mobile
-```
-
-Tips:
-- Always a list. Prefer nested tags for hierarchy (e.g., `projects/mobile`).
-
-### Links to notes and files
-Store relationships to other notes or attach files.
-
-YAML:
-```yaml
-related:
-  - "[[Design Spec]]"
-  - "[[Project Charter]]"
-cover_file: "[[Assets/cover.png]]"
-```
-
-Tips:
-- Quote wiki-links in YAML to avoid parsing quirks.
-- In the Properties UI, choose the Link/File type so Obsidian treats values as links.
-
-### URL and Email
-Clickable external references.
-
-YAML:
-```yaml
-url: https://example.com/docs/overview
-contact: user@example.com
-```
-
-Tips:
-- Use `url` for external docs, issues, or PRs you want to reference.
-
-### Select-style (constrained values)
-Emulate a single-choice field by agreeing on allowed values.
-
-YAML:
-```yaml
-status: draft # allowed: draft | in-progress | done
-```
-
-Tips:
-- In Bases, you can group/sort by `status` to create simple workflows.
-
+  - test
+result: pass
+date: 2026-11-24
+battery_volts: 7.4
+retested: false
+parts:
+  - "[[Motor driver wiring]]"
+  - "[[Parts list]]"
 ---
+```
 
-## YAML example
+Everything after the closing `---` is the normal note body. Obsidian shows the block as a tidy list of fields in a properties panel at the top of the note, and you can edit it there without touching YAML.
 
-```yaml
----
-title: "My Project Plan"
-description: "A plan to deliver the new feature by Q4."
-tags:
-  - project
-  - planning
-aliases:
-  - Project Plan
-cssclasses:
-  - wide
-status: in-progress
-created: 2025-08-01
-due: 2025-10-15
-cover: /assets/img/projects/plan-cover.png
----
+```mermaid
+flowchart TD
+    F["Note file (.md)"] --> Y["YAML block at the top"]
+    F --> B["Body text"]
+    Y --> P["Properties panel in Obsidian"]
+    Y --> BA["Bases and search read it"]
 ```
 
 ---
 
-## Editing properties in Obsidian
+## Adding properties
 
-1. Open a note.
-2. At the top, click into the Properties panel (or use the Properties button) to add/edit properties.
-3. Choose the appropriate type (text, date, checkbox, list, etc.).
+- Type `---` on the very first line of a note.
+- Or run the command **Add file property** from the command palette, press `Ctrl+;` (`Cmd+;` on a Mac), or use the more-options menu on the note.
 
-You can also toggle the visibility of properties per note if you prefer a cleaner view.
+Each property has a **type**. Obsidian offers these: Text, List, Number, Checkbox, Date, Date & time and Tags. Pick the right type, because it decides how the value is shown and how it is sorted.
 
----
+| Property from our log | Type | Example |
+| --- | --- | --- |
+| `result` | Text | `pass` |
+| `battery_volts` | Number | `7.4` |
+| `retested` | Checkbox | `false` |
+| `date` | Date | `2026-11-24` |
+| `parts` | List | two links |
+{:class="table table-single"}
 
-## Using properties with Search and Dataview
-
-Search can filter by properties. For example, search for notes that have the `status` property set to `in-progress`.
-
-With Dataview you can query and display properties as tables or lists:
-
-```dataview
-table status, due
-from "Projects"
-where status = "in-progress"
-sort due asc
-```
+Three properties are special. `tags`, `aliases` and `cssclasses` are always lists, so write them with the plural name and as a list. `aliases` gives a note other names that links can find it by.
 
 ---
 
-## Using properties with Bases (Obsidian 1.9.10+)
+## Tips that save pain
 
-Bases can display your notes as a table or cards, with columns backed by properties. Add, edit, sort, group, and filter on properties directly in the Base. Combine this with consistent properties to build dashboards for projects, reading lists, and more.
+- **Do not quote numbers** if you want to sort on them: `7.4`, not `"7.4"`.
+- **Use `true` and `false`** in lower case for checkboxes.
+- **Dates in ISO order** (year-month-day) sort correctly: `2026-11-24`.
+- **Quote links** in YAML: `"[[Parts list]]"`. Without the quotes, YAML can misread the square brackets.
+- Keep a **short fixed list of values** for things like `result` (`pass`, `fail`, `retest`) and be consistent, because `Pass` and `pass` look different to a filter.
+
+---
+
+## Using properties
+
+- **Search**: you can search for notes by property.
+- **Bases**: each property becomes a column you can sort, filter and group on. See the [previous lesson](/learn/obsidian/08_dataview_and_bases.html).
+- **Publishing**: if you later publish notes with a tool like Jekyll, the same block can feed its metadata.
 
 ---
 
-## Practice exercises
+## Try it Yourself
 
-Try these quick drills to build muscle memory:
-
-- Add frontmatter to a new note with `tags`, `status`, and `date`.
-- Add an inline marker like `#starred` somewhere in the body.
-- Create a Dataview table of in-progress notes, sorted by `date`.
-- Optional: Build a Base filtered to a folder or tag, add columns for `status` and `date`, then sort/group.
-
-Example Dataview:
-
-```dataview
-table file.link as Note, tags, date, authors
-where contains(file.content, "#starred")
-sort date desc
-```
+1. Add `tags`, `result` and `date` properties to a test note using the properties panel, then view the same note as raw YAML.
+2. Add a Number property for `battery_volts` and a Checkbox property for `retested`.
+3. Add a list property called `parts` with a link to another note.
+4. Challenge: create five test notes with the same properties and show them all in a Base.
 
 ---
+
+## Common Issues
+
+- **Problem**: My properties show up as plain text in the note body.
+- **Solution**: Move the block to the very first line of the note, and close it with a second `---` line.
+- **Why**: Obsidian only reads a properties block that sits at the top of the file.
+
+- **Problem**: Obsidian warns that a property is invalid, or a value looks mangled.
+- **Solution**: Check the YAML. Put quotes around values with colons, and around links.
+- **Why**: A colon or square bracket has a meaning in YAML, so unquoted text can be misread.
+
+- **Problem**: Sorting numbers puts 10 before 9.
+- **Solution**: Make sure the property is a Number and the values are not in quotes.
+- **Why**: Text sorts letter by letter, so `10` comes before `9`.
+
+> **Teachers**: properties are a gentle first step into structured data. A class can agree on a fixed set of properties for every test note, then compare results across the whole group in one Base.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Where must the properties block sit in a note?
+- [ ] At the bottom
+- [x] At the very top, between two `---` lines
+- [ ] Anywhere in the note
+> Obsidian only reads properties at the start of the file.
+
+? How should you write a link to another note in a property?
+- [ ] Without quotes
+- [x] In quotes, such as `"[[Parts list]]"`
+- [ ] You cannot link in properties
+> Quoting stops YAML misreading the square brackets.
+
+? Which of these are lists by default?
+- [ ] `title` and `date`
+- [x] `tags`, `aliases` and `cssclasses`
+- [ ] `result` and `done`
+> Those three default properties are lists.
+{% endquiz %}

@@ -4,12 +4,14 @@ description: Count wheel rotations with a slotted-wheel sensor and a Pico interr
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/14_measuring_speed_with_encoders.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to count wheel ticks with an interrupt and turn them into distance and speed.
 
 A DC motor is blind. You ask for speed 60, and it gives you whatever it can, depending on the battery, the floor and the weather. An **encoder** gives Scout a sense of how far each wheel has actually turned. This is a short lesson to show the idea, and you can skip the hardware and still finish the course.
 
@@ -103,6 +105,21 @@ Two details worth understanding:
 - **Debounce:** an edge can flicker for a few microseconds. `min_gap_us` ignores any tick that arrives too soon after the last one, which kills false counts.
 - **Safe reads:** `read()` pauses interrupts for a moment so a tick cannot sneak in half way through reading the count.
 
+Here is what happens each time a slot passes the sensor:
+
+```mermaid
+sequenceDiagram
+    participant W as Slotted wheel
+    participant S as Sensor
+    participant I as IRQ handler
+    participant M as Main program
+    W->>S: slot passes
+    S->>I: rising edge on the pin
+    I->>I: count one tick, if the gap is long enough
+    M->>I: read pauses interrupts briefly
+    I-->>M: tick count
+```
+
 ## Measuring a motor
 
 Spin the left wheel and watch the encoder:
@@ -140,14 +157,36 @@ In the project, we will use this measuring idea by hand: a tape measure and a st
 
 ## Common Issues
 
-**Problem**: The count rises by far too many ticks.
-**Solution**: Raise `min_gap_us`, add a pull-up, and keep the sensor wires away from the motor wires.
-**Why**: Electrical noise and flickering edges make false ticks.
+- **Problem**: The count rises by far too many ticks.
+- **Solution**: Raise `min_gap_us`, add a pull-up, and keep the sensor wires away from the motor wires.
+- **Why**: Electrical noise and flickering edges make false ticks.
 
-**Problem**: The count never changes.
-**Solution**: Check the sensor has power, the LED on the module blinks as a slot passes, and the pin number is right.
-**Why**: An interrupt only fires on a real rising edge on that exact pin.
+- **Problem**: The count never changes.
+- **Solution**: Check the sensor has power, the LED on the module blinks as a slot passes, and the pin number is right.
+- **Why**: An interrupt only fires on a real rising edge on that exact pin.
 
-**Problem**: The Pico locks up or behaves strangely.
-**Solution**: Remove any `print()` or slow work from the handler.
-**Why**: Interrupts must finish in microseconds, or the rest of the program is starved.
+- **Problem**: The Pico locks up or behaves strangely.
+- **Solution**: Remove any `print()` or slow work from the handler.
+- **Why**: Interrupts must finish in microseconds, or the rest of the program is starved.
+
+## Check your understanding
+
+{% quiz %}
+? A disc has 20 slots and the wheel is 65 mm across. About how far is each tick?
+- [x] 10.21 mm
+- [ ] 65 mm
+- [ ] 204 mm
+> One revolution is pi x 65 = 204.2 mm, shared across 20 ticks.
+
+? Why count ticks with an interrupt rather than checking the pin in a loop?
+- [x] A loop doing other things would miss ticks
+- [ ] Interrupts use less power
+- [ ] Loops cannot read pins
+> An IRQ runs a tiny function the instant the pin rises, whatever else the Pico is doing.
+
+? What does a single-channel encoder not know?
+- [x] The direction the wheel is turning
+- [ ] That the wheel is turning
+- [ ] The slot count
+> It only counts ticks, so you subtract them yourself when you commanded reverse.
+{% endquiz %}

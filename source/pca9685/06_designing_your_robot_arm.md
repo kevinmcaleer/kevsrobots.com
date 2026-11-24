@@ -1,80 +1,118 @@
 ---
 title: Design
 description: >-
-    Explore the fundamental concepts behind designing a robot arm, including choosing servos, materials, and planning the construction.
+    Look at how Buddy Jr is designed: four joints, four SG90 servos, five printed parts and a reach you can calculate before you print anything.
 layout: lesson
 type: page
 cover: assets/6.png
+date_updated: 2026-11-24
 ---
 
 ![Designing Your Robot Arm]({{ page.cover }}){:class="cover"}
 
 ---
 
-## Introduction to Robot Arm Design
+By the end of this lesson you will be able to name the joints and printed parts of Buddy Jr, say which PCA9685 channel drives each one, and calculate how far the arm can reach.
 
-Designing a robot arm involves more than just connecting servos; it requires thoughtful consideration of the arm's purpose, the weight it needs to lift, and the range of motion required. This lesson will guide you through the initial steps of designing your robot arm.
+## Design starts with what the arm must do
 
----
+A robot arm is a chain of joints, and each joint is a servo. Before choosing parts, a designer asks three questions: how much must it lift, how far must it reach, and how precisely must it move?
 
-## Defining Your Objectives
+Buddy Jr's answers are modest on purpose. It carries only a small camera, so we can use cheap SG90 micro servos, print light parts and keep the arm simple. Small servos have small torque (twisting force), so every gram of arm hanging out at the end makes the shoulder and elbow work harder. Light and short wins.
 
-Start by defining what you want your robot arm to achieve. Consider the following:
+![Buddy Jr from the side](assets/side.png){:class="img-fluid w-50"}
 
-- **Load Capacity:** How much weight should the arm lift?
-- **Range of Motion:** What should be the reach and flexibility of the arm?
-- **Precision:** How accurately should the arm move or position objects?
+## The four joints
 
----
+```mermaid
+flowchart TD
+    Base["Base servo<br/>channel 0<br/>turns the whole arm left and right"] --> Shoulder["Shoulder servo<br/>channel 1<br/>raises and lowers the upper arm"]
+    Shoulder --> Elbow["Elbow servo<br/>channel 2<br/>bends the forearm"]
+    Elbow --> Camera["Camera holder servo<br/>channel 3<br/>tilts the camera"]
+```
 
-## Selecting Servos
+Each joint moves everything that hangs below it in the chain, which is why the base is the strongest joint and the camera holder the lightest. We'll use these channel numbers for every program from now on. If you wire your servos differently, change the numbers in one place when we reach lesson 8.
 
-Servos are the muscles of your robot arm, and their selection is crucial. Consider:
+## The printed parts
 
-- **Torque:** Higher torque servos can lift more weight but consume more power.
-- **Speed:** Determines how fast the arm can move.
-- **Size:** Larger servos are more powerful but take up more space.
+Buddy Jr's parts are 3D printed. The files are on the [Buddy Jr page](/blog/buddy_jr.html), and the pictures here show what they look like.
 
----
+| Part | How many | What it does |
+|---|---|---|
+| Base | 1 | A flat plate with a round housing; holds the base servo and has space for the PCA9685 |
+| Shoulder (or the older pivot) | 1 | A curved upright that sits on the base servo and holds the shoulder servo |
+| Arm | 2 | The upper arm and the forearm, each with room for a servo |
+| Camera holder | 1 | An L-shaped bracket for a Raspberry Pi camera module, moved by the last servo |
+{:class="table table-single"}
 
-## Materials for Construction
+There are two base designs, v1 and v2, and a shoulder that replaces the older pivot. Use whichever matches the files you downloaded, because the steps are the same.
 
-The choice of materials impacts the durability, weight, and cost of your robot arm. Common options include:
+![The base](assets/base.png){:class="img-fluid w-50"}
+![The arm](assets/arm.png){:class="img-fluid w-50"}
 
-- **Plastic:** Lightweight and inexpensive but less durable.
-- **Aluminum:** A good balance of strength and weight, ideal for most hobbyist projects.
-- **Steel:** Very strong but heavy, used in professional-grade arms.
+## Work out the reach
 
----
+An arm's reach is how far the tip can get from the base. With the arm fully stretched out, it is the length of the upper arm plus the forearm. Kev's code for Buddy Jr treats both as 80 units long, so the full reach is 160 units. You can check what happens when you change the design with a short program. Save it as `reach.py`; it runs on any computer.
 
-## Planning the Construction
+```python
+UPPER_ARM = 80      # length of the upper arm, in the same units as below
+FOREARM = 80        # length of the forearm
 
-Sketch your robot arm design, including the base, joints, and end effector (the part of the arm that interacts with objects). Consider how the servos will be mounted and how the parts will connect to each other.
+max_reach = UPPER_ARM + FOREARM
+min_reach = abs(UPPER_ARM - FOREARM)   # fully folded back on itself
 
----
+print("Maximum reach:", max_reach)
+print("Minimum reach:", min_reach)
 
-## Basic Design Principles
+# What happens if we print a longer forearm?
+for forearm in (60, 80, 100, 120):
+    print("Forearm", forearm, "-> reach", UPPER_ARM + forearm)
+```
 
-- **Stability:** Ensure the base is stable and strong enough to support the arm's movements.
-- **Flexibility:** Design joints that allow for the necessary range of motion.
-- **Simplicity:** Keep the design as simple as possible to reduce potential points of failure.
+**Why this matters:** a longer arm reaches further, but the servo at the shoulder then has to hold a longer lever. Doubling the length of the arm roughly doubles the twisting force the shoulder needs to hold it level. That is the trade-off every arm designer makes.
 
----
+## Tools and materials
 
-## Tools and Techniques
+You'll need a 3D printer (or a friend with one), a small cross-head screwdriver, the screws that come with the servos, and time to clean up the prints. No soldering is needed for this build, as everything plugs into the PCA9685 with the servos' own connectors.
 
-You'll need basic tools for the construction, such as screwdrivers, drills, and possibly a soldering iron for wiring. 3D printing can be an invaluable tool for creating custom parts.
+> **Teachers**: the parts are quick to print, but plan the printer time well in advance for a class, as one set needs a printer for a while. Printed parts can be shared between groups if you print a few sets in advance. Check your school's rules on 3D printers and supervise the removal of parts from the print bed. If you have no printer, lesson 6 still works as a design exercise, and the learners can finish the build using the same servos on a cardboard or craft-stick arm.
 
----
+## Try it Yourself
 
-## Conclusion
+1. Sketch Buddy Jr from the front and mark each joint with its servo channel.
+2. Change `FOREARM` in `reach.py` to 50 and predict the minimum and maximum reach before you run it.
+3. Challenge: design a different end for the arm, such as a pen holder. Which of the four joints would it load most, and why?
 
-Designing a robot arm is an exciting challenge that combines engineering, creativity, and problem-solving. By carefully planning your design and considering the factors discussed in this lesson, you'll set a solid foundation for building your robot arm.
+## Common Issues
 
----
+- **Problem**: A printed part doesn't fit the servo
+- **Solution**: Check the part is the right version (v1 or v2) and that the servo is a 9 g SG90 style. Lightly sand the edges of the slot, a little at a time
+- **Why**: Printers vary slightly in size, and a tight fit is better than a loose one that you then have to fix
 
-## Lesson Assignment
+- **Problem**: The arm droops when it is stretched out
+- **Solution**: Keep the load light, shorten the arm, or add a counterweight on the other side of the shoulder
+- **Why**: A long arm acts like a lever, so the shoulder servo has to supply more twisting force than a small SG90 has
 
-Sketch a design of your robot arm based on the objectives you've defined. List the servos and materials you plan to use and outline the basic construction steps. This exercise will help you visualize your project and guide your building process in the next lessons.
+## Check your understanding
 
----
+{% quiz %}
+? Which channel drives the shoulder joint in this course?
+- [ ] 0
+- [x] 1
+- [ ] 3
+> The base is channel 0, the shoulder is channel 1, the elbow is channel 2 and the camera holder is channel 3.
+
+? What is the maximum reach of an arm with a forearm of 80 and an upper arm of 80?
+- [ ] 80
+- [x] 160
+- [ ] 0
+> Fully stretched out, the reach is the two lengths added together.
+
+? Why keep the arm light?
+- [x] Small servos have little torque, so extra weight makes the shoulder and elbow struggle
+- [ ] Light parts print faster than heavy ones, which is the only reason
+- [ ] The PCA9685 can only drive light loads
+> A small servo's torque is limited, and weight far from the joint multiplies the load.
+{% endquiz %}
+
+Time to pick up the screwdriver. Next lesson, we put Buddy Jr together.

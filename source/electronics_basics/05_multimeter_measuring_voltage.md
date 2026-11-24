@@ -4,12 +4,14 @@ description: "Learn to use a multimeter to measure battery and circuit voltages,
 layout: lesson
 type: page
 cover: /learn/electronics_basics/assets/banners/05_multimeter_measuring_voltage.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to measure DC voltage across a part with a multimeter, and check it against your calculations.
 
 ## Overview
 
@@ -36,6 +38,15 @@ Voltage is measured **across** something. Touch the probes to the two points you
 3. Measure across the LED: probes on its two legs. You should see about 2.0 V.
 
 Now add them up: 2.5 V (resistor) plus 2.0 V (LED) is 4.5 V, which is the battery. This is a fundamental rule: the voltages around a loop add up to the supply. You have just confirmed the calculation from lesson 4 with real hardware.
+
+Measuring across each part gives a voltage map. The drops add up to the supply:
+
+```mermaid
+flowchart LR
+    B["Battery<br>4.5 V"] --> R["Resistor<br>2.5 V across it"]
+    R --> L["LED<br>2.0 V across it"]
+    L --> G["Ground<br>0 V"]
+```
 
 ## Voltages to ground
 
@@ -82,6 +93,8 @@ Small differences of a tenth of a volt are normal. LEDs vary, and batteries sag 
 - Reversed probes: a negative reading just means they are swapped. Nothing breaks.
 - Touching both probe tips together with one finger. Your skin adds resistance, and may give odd readings on resistance mode.
 
+> **Teachers**: multimeters are usually the scarcest kit in a class, so run this as a group activity with one meter per three or four learners and rotate the roles of builder, prober and recorder. Check at the start that nobody has left the dial on a current setting from a previous lesson.
+
 ## Try it Yourself
 
 1. Measure a fresh AA cell, then one that has been used a lot. How much lower is the old one?
@@ -90,10 +103,32 @@ Small differences of a tenth of a volt are normal. LEDs vary, and batteries sag 
 
 ## Common Issues
 
-**Problem**: The meter shows 0.00 or OL.
-**Solution**: Check the dial position, the range, and that the probes touch metal, not the plastic.
-**Why**: OL means "over limit" or open loop, i.e. nothing connected, or the range is too small.
+- **Problem**: The meter shows 0.00 or OL.
+- **Solution**: Check the dial position, the range, and that the probes touch metal, not the plastic.
+- **Why**: OL means "over limit" or open loop, i.e. nothing connected, or the range is too small.
 
-**Problem**: The reading jumps around.
-**Solution**: Press the probes firmly against the legs, or clip them on.
-**Why**: A poor contact flickers in and out.
+- **Problem**: The reading jumps around.
+- **Solution**: Press the probes firmly against the legs, or clip them on.
+- **Why**: A poor contact flickers in and out.
+
+## Check your understanding
+
+{% quiz %}
+? How do you connect the probes to measure the voltage across a resistor?
+- [ ] Break the circuit and put the meter in the gap
+- [ ] Connect both probes to the battery
+- [x] Touch one probe to each end, without breaking the circuit
+> Voltage is measured across a part, so the meter goes in parallel with it.
+
+? The resistor reads 2.5 V and the LED reads 2.0 V. What should the battery read?
+- [ ] About 0.5 V
+- [ ] About 5.0 V and exactly 2.5 V
+- [x] About 4.5 V
+> The voltages around a loop add up to the supply: 2.5 + 2.0 = 4.5 V.
+
+? Your meter shows a negative voltage. What does it mean?
+- [x] The probes are swapped, nothing is broken
+- [ ] The battery is dead
+- [ ] The resistor has failed
+> A negative reading only means red and black are the wrong way round.
+{% endquiz %}

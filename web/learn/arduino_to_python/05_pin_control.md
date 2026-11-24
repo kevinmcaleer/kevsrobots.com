@@ -8,9 +8,11 @@ date: 2025-11-20
 previous: 04_functions.html
 next: 06_analog_pwm.html
 description: Learn how to control GPIO pins in MicroPython using the Pin class instead
-  of Arduino's pinMode, digitalWrite, and digitalRead
+  of pinMode, digitalWrite and digitalRead, including pull-ups, debouncing and interrupts
 percent: 48
-duration: 8
+duration: 7
+quiz_total: 43
+date_updated: 2026-11-24
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:
@@ -53,69 +55,35 @@ navigation:
 
 ---
 
-## Digital Pin Control: A New Approach
+By the end of this lesson you will be able to set up output and input pins with the `Pin` class, read a button with a pull-up, and debounce it.
 
-Arduino uses separate functions for pin setup and control: `pinMode()`, `digitalWrite()`, and `digitalRead()`. MicroPython uses an object-oriented approach with the `Pin` class.
+## Pins become objects
 
-Instead of treating pins as numbers and calling global functions, you create Pin objects and call methods on them. It's cleaner and more Pythonic.
+Arduino has three global functions: `pinMode()`, `digitalWrite()` and `digitalRead()`. MicroPython has one class, `machine.Pin`. You create a `Pin` object once, say whether it is an input or an output, and then call methods on it.
 
-## Setting Up Pins
+| Arduino C++ | MicroPython |
+|-------------|-------------|
+| `pinMode(13, OUTPUT);` | `led = Pin(13, Pin.OUT)` |
+| `pinMode(2, INPUT_PULLUP);` | `button = Pin(2, Pin.IN, Pin.PULL_UP)` |
+| `digitalWrite(13, HIGH);` | `led.on()` or `led.value(1)` |
+| `digitalWrite(13, LOW);` | `led.off()` or `led.value(0)` |
+| `digitalRead(2)` | `button.value()` |
+{:class="table table-single"}
 
-**Arduino C++:**
-```cpp
-const int LED_PIN = 13;
-const int BUTTON_PIN = 2;
+## Pin numbers on the Pico
 
-void setup() {
-    pinMode(LED_PIN, OUTPUT);
-    pinMode(BUTTON_PIN, INPUT);
-}
-```
+On a Raspberry Pi Pico family board you use the GP number printed on the pinout. `Pin(14)` is GP14, which is physical pin 19, not pin 14 on the header. The on-board LED has its own name:
 
-**MicroPython:**
 ```python
 from machine import Pin
 
-LED_PIN = 25
-BUTTON_PIN = 14
-
-led = Pin(LED_PIN, Pin.OUT)
-button = Pin(BUTTON_PIN, Pin.IN)
+led = Pin("LED", Pin.OUT)   # on-board LED on a Pico W or Pico 2 W
+external = Pin(15, Pin.OUT) # GP15, with an LED and resistor
 ```
 
-Key differences:
-- **Import the Pin class** from the `machine` module
-- **Create Pin objects** instead of calling `pinMode()`
-- **Use `Pin.OUT` and `Pin.IN`** instead of `OUTPUT` and `INPUT`
-- **Store the Pin object** in a variable (like `led` or `button`)
+On the original Pico (non-W) the LED is GP25, so `Pin(25, Pin.OUT)` works there, and recent firmware also accepts `"LED"`. Other boards, including the Arduino Nano ESP32, number their pins differently, so always check the board's MicroPython pinout rather than reusing Arduino numbers.
 
-## Pin Numbers
-
-Pin numbers vary by board. Here's a quick reference:
-
-**Arduino Nano ESP32:**
-- D2-D13 (digital pins)
-- LED_BUILTIN = pin 13
-- Uses standard Arduino numbering
-
-**Raspberry Pi Pico / Pico W / Pico 2W:**
-- GP0-GP28 (GPIO pins)
-- Built-in LED = pin 25 (Pico) or "LED" (Pico W/2W)
-- Uses GP numbering (e.g., GP15 = pin 15)
-
-**Example for built-in LED:**
-```python
-# Pico / Pico 2W
-led = Pin(25, Pin.OUT)
-
-# Pico W (WiFi LED is different)
-led = Pin("LED", Pin.OUT)
-
-# Arduino Nano ESP32
-led = Pin(13, Pin.OUT)
-```
-
-## Writing to Digital Pins
+## Writing and blinking
 
 **Arduino C++:**
 ```cpp
@@ -129,193 +97,106 @@ void loop() {
 
 **MicroPython:**
 ```python
+from machine import Pin
 import time
 
+led = Pin("LED", Pin.OUT)
+
 while True:
-    led.on()        # or led.value(1)
-    time.sleep(1)
-    led.off()       # or led.value(0)
-    time.sleep(1)
+    led.toggle()      # Arduino has no equivalent: flip the current state
+    time.sleep(0.5)
 ```
 
-MicroPython gives you two ways to control pins:
-- **`.on()` and `.off()`** - Clear and readable
-- **`.value(1)` and `.value(0)`** - More explicit
+`.toggle()` is a handy bonus. `.on()`, `.off()` and `.value(x)` do the same job as `digitalWrite`, and `.value()` with no argument reads the state back.
 
-Both do the same thing. Most code uses `.on()` and `.off()` for clarity.
+## Reading a button with a pull-up
 
-## Reading from Digital Pins
+A button needs a resistor so the pin is never left floating. The Pico has built-in pull-up and pull-down resistors you switch on in code, as `INPUT_PULLUP` does on an Arduino.
 
-**Arduino C++:**
-```cpp
-void loop() {
-    int buttonState = digitalRead(BUTTON_PIN);
-
-    if (buttonState == HIGH) {
-        digitalWrite(LED_PIN, HIGH);
-    } else {
-        digitalWrite(LED_PIN, LOW);
-    }
-}
+```mermaid
+flowchart LR
+    V["3.3V"] --- R["Internal pull-up"] --- P["GP14 pin"]
+    P --- B["Button"] --- G["GND"]
 ```
+
+With `Pin.PULL_UP` the pin reads `1` when the button is open, and `0` when it is pressed, because pressing connects the pin to GND. This is called active low. `Pin.PULL_DOWN` is the reverse, with the button connecting to 3.3 V.
 
 **MicroPython:**
 ```python
-while True:
-    button_state = button.value()
+from machine import Pin
 
-    if button_state == 1:
+led = Pin("LED", Pin.OUT)
+button = Pin(14, Pin.IN, Pin.PULL_UP)   # button between GP14 and GND
+
+while True:
+    if button.value() == 0:    # pressed
         led.on()
     else:
         led.off()
 ```
 
-**`.value()`** reads the pin state:
-- Returns `1` for HIGH
-- Returns `0` for LOW
+## Debouncing
 
-You can also use `.value()` to write by passing an argument: `.value(1)` or `.value(0)`.
-
-## Pull-up and Pull-down Resistors
-
-Buttons need pull-up or pull-down resistors. MicroPython makes this easy:
-
-**Arduino C++:**
-```cpp
-void setup() {
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
-    // or INPUT_PULLDOWN (if supported)
-}
-```
-
-**MicroPython:**
-```python
-# Pull-up resistor (default state HIGH)
-button = Pin(14, Pin.IN, Pin.PULL_UP)
-
-# Pull-down resistor (default state LOW)
-button = Pin(14, Pin.IN, Pin.PULL_DOWN)
-
-# No resistor (floating - not recommended)
-button = Pin(14, Pin.IN)
-```
-
-**When to use which:**
-- **`Pin.PULL_UP`** - Button connects pin to GND. Pressed = LOW (0), Released = HIGH (1)
-- **`Pin.PULL_DOWN`** - Button connects pin to 3.3V. Pressed = HIGH (1), Released = LOW (0)
-
-Most buttons use pull-up configuration.
-
-## Toggle Method
-
-Here's a handy method Arduino doesn't have:
-
-**MicroPython:**
-```python
-led = Pin(25, Pin.OUT)
-
-# Toggle the LED state (on→off or off→on)
-led.toggle()
-```
-
-This is perfect for simple blinking:
-
-```python
-import time
-
-led = Pin(25, Pin.OUT)
-
-while True:
-    led.toggle()
-    time.sleep(0.5)  # Blink every 500ms
-```
-
-## Getting Pin State
-
-You can read back the current state of an output pin:
-
-**MicroPython:**
-```python
-led = Pin(25, Pin.OUT)
-led.on()
-
-print(led.value())  # Prints: 1
-
-led.off()
-print(led.value())  # Prints: 0
-```
-
-This is useful for maintaining state in complex programs.
-
-## Complete Button-LED Example
-
-**Arduino C++:**
-```cpp
-const int LED_PIN = 13;
-const int BUTTON_PIN = 2;
-
-void setup() {
-    pinMode(LED_PIN, OUTPUT);
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
-}
-
-void loop() {
-    int buttonState = digitalRead(BUTTON_PIN);
-
-    // Active LOW (pressed = LOW)
-    if (buttonState == LOW) {
-        digitalWrite(LED_PIN, HIGH);
-    } else {
-        digitalWrite(LED_PIN, LOW);
-    }
-}
-```
+Mechanical buttons bounce: the contact chatters for a few milliseconds when pressed. The Arduino debounce example uses `millis()`. In MicroPython you use `time.ticks_ms()` and always compare with `time.ticks_diff()` (lesson 7 explains why).
 
 **MicroPython:**
 ```python
 from machine import Pin
+import time
 
-led = Pin(25, Pin.OUT)
 button = Pin(14, Pin.IN, Pin.PULL_UP)
+led = Pin("LED", Pin.OUT)
+
+DEBOUNCE_MS = 50
+stable_state = 1
+last_reading = 1
+last_change = time.ticks_ms()
 
 while True:
-    button_state = button.value()
+    reading = button.value()
+    if reading != last_reading:
+        last_change = time.ticks_ms()          # the pin moved: restart the clock
+        last_reading = reading
+    if time.ticks_diff(time.ticks_ms(), last_change) > DEBOUNCE_MS:
+        if reading != stable_state:
+            stable_state = reading
+            if stable_state == 0:              # a clean press
+                led.toggle()
+                print("Button pressed")
+    time.sleep_ms(5)
+```
 
-    # Active LOW (pressed = 0)
-    if button_state == 0:
+The program only accepts a new state once it has been steady for 50 ms, so one press gives exactly one toggle.
+
+## Many pins, one list
+
+Instead of copying `pinMode` for each LED, build a list of `Pin` objects:
+
+**MicroPython:**
+```python
+from machine import Pin
+import time
+
+leds = [Pin(n, Pin.OUT) for n in (10, 11, 12, 13)]
+
+while True:
+    for led in leds:           # running light, left to right
         led.on()
-    else:
+        time.sleep(0.2)
+        led.off()
+    for led in reversed(leds): # and back again
+        led.on()
+        time.sleep(0.2)
         led.off()
 ```
 
-## Button Debouncing
+## Interrupts
 
-Mechanical buttons bounce - they send multiple signals when pressed. Here's a simple debounce pattern:
+Instead of checking a pin in a loop, you can ask the hardware to call a function when the pin changes, like `attachInterrupt()`:
 
 **Arduino C++:**
 ```cpp
-const int BUTTON_PIN = 2;
-const int DEBOUNCE_DELAY = 50;
-
-int lastButtonState = HIGH;
-unsigned long lastDebounceTime = 0;
-
-void loop() {
-    int reading = digitalRead(BUTTON_PIN);
-
-    if (reading != lastButtonState) {
-        lastDebounceTime = millis();
-    }
-
-    if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
-        // Button state is stable
-        if (reading == LOW) {
-            // Button pressed
-        }
-    }
-
-    lastButtonState = reading;
-}
+attachInterrupt(digitalPinToInterrupt(2), onPress, FALLING);
 ```
 
 **MicroPython:**
@@ -324,290 +205,76 @@ from machine import Pin
 import time
 
 button = Pin(14, Pin.IN, Pin.PULL_UP)
-DEBOUNCE_DELAY = 0.05  # 50ms
+led = Pin("LED", Pin.OUT)
+pressed = False
 
-last_state = 1
-last_time = 0
+def on_press(pin):
+    global pressed
+    pressed = True            # keep handlers tiny: just set a flag
 
-while True:
-    current_state = button.value()
-
-    if current_state != last_state:
-        last_time = time.ticks_ms()
-
-    if (time.ticks_ms() - last_time) > DEBOUNCE_DELAY * 1000:
-        # Button state is stable
-        if current_state == 0:
-            # Button pressed
-            print("Button pressed!")
-
-    last_state = current_state
-    time.sleep(0.01)  # Small delay
-```
-
-**Simpler approach** - just add a delay:
-
-```python
-from machine import Pin
-import time
-
-button = Pin(14, Pin.IN, Pin.PULL_UP)
-led = Pin(25, Pin.OUT)
-
-last_state = 1
+button.irq(trigger=Pin.IRQ_FALLING, handler=on_press)
 
 while True:
-    current_state = button.value()
-
-    # Detect button press (transition from HIGH to LOW)
-    if last_state == 1 and current_state == 0:
+    if pressed:
+        pressed = False
         led.toggle()
-        time.sleep(0.2)  # Simple debounce
-
-    last_state = current_state
-    time.sleep(0.01)
+        print("Press handled")
+    time.sleep_ms(20)
 ```
 
-## Multiple Pin Control
+The handler runs at interrupt time, so keep it very short, and do the printing and delays in the main loop. The triggers are `Pin.IRQ_FALLING`, `Pin.IRQ_RISING`, or both combined with `|`.
 
-Working with multiple pins is cleaner in Python:
+> **Teachers**: A breadboard with one LED and one button per pair is plenty. Check LED resistors before the first power-up, since an LED connected straight to a GPIO pin without a resistor can damage the LED or the pin. If learners share boards, give each pair a labelled pinout printout so everyone uses the same GP numbers.
 
-**Arduino C++:**
-```cpp
-int leds[] = {10, 11, 12, 13};
-int numLeds = 4;
+## Try it Yourself
 
-void setup() {
-    for (int i = 0; i < numLeds; i++) {
-        pinMode(leds[i], OUTPUT);
-    }
-}
+1. Wire an LED and a resistor to GP15 and blink it with `.toggle()` at half-second intervals.
+2. Make the LED follow the button: on while pressed, off when released.
+3. Make a four-LED binary counter on GP10 to GP13: each button press adds one, and it wraps at 16. Hint: `leds[i].value((count >> i) & 1)`.
+4. Challenge: add a second button that cycles through three patterns (all on, alternating, running light) each time it is pressed.
 
-void loop() {
-    // Turn all on
-    for (int i = 0; i < numLeds; i++) {
-        digitalWrite(leds[i], HIGH);
-    }
-    delay(1000);
+## Common Issues
 
-    // Turn all off
-    for (int i = 0; i < numLeds; i++) {
-        digitalWrite(leds[i], LOW);
-    }
-    delay(1000);
-}
-```
+- **Problem**: The LED does nothing, and there is no error.
+- **Solution**: Check the GP number against the pinout, and check the LED is the right way round with a resistor.
+- **Why**: `Pin(15)` is GP15, not the 15th pin on the header.
 
-**MicroPython:**
-```python
-from machine import Pin
-import time
+- **Problem**: The button reads `1` when pressed instead of `0`.
+- **Solution**: With `Pin.PULL_UP` and the button to GND, pressed is `0`. Test with `== 0`.
+- **Why**: Pressing connects the pin to ground, so the logic is inverted.
 
-# Create list of Pin objects
-leds = [Pin(pin_num, Pin.OUT) for pin_num in [10, 11, 12, 13]]
+- **Problem**: One press toggles the LED several times.
+- **Solution**: Use the debounce pattern above, or ignore changes for 50 ms.
+- **Why**: Mechanical contacts bounce for a few milliseconds.
 
-while True:
-    # Turn all on
-    for led in leds:
-        led.on()
-    time.sleep(1)
+- **Problem**: `ValueError: invalid pin` or `OSError`.
+- **Solution**: Use a GP number from the pinout, or the name `"LED"`.
+- **Why**: The pin does not exist on that board.
 
-    # Turn all off
-    for led in leds:
-        led.off()
-    time.sleep(1)
-```
+## Check your understanding
 
-That list comprehension `[Pin(pin_num, Pin.OUT) for pin_num in [10, 11, 12, 13]]` creates all Pin objects in one line!
+{% quiz %}
+? What does `button = Pin(14, Pin.IN, Pin.PULL_UP)` replace in Arduino?
+- [ ] `digitalWrite(14, HIGH)`
+- [x] `pinMode(14, INPUT_PULLUP)`
+- [ ] `analogRead(14)`
+> It sets the pin as an input with the internal pull-up resistor turned on.
 
-## Running Light Pattern
+? A button is wired between the pin and GND with `Pin.PULL_UP`. What does `button.value()` return when it is pressed?
+- [ ] 1
+- [x] 0
+- [ ] None
+> Pressing the button connects the pin to ground, so it reads low.
 
-**MicroPython:**
-```python
-from machine import Pin
-import time
+? Which method flips an LED between on and off?
+- [ ] `led.flip()`
+- [x] `led.toggle()`
+- [ ] `led.swap()`
+> `toggle()` is a MicroPython convenience that has no Arduino equivalent.
 
-leds = [Pin(pin_num, Pin.OUT) for pin_num in [10, 11, 12, 13]]
-
-while True:
-    # Light up LEDs in sequence
-    for led in leds:
-        led.on()
-        time.sleep(0.2)
-        led.off()
-
-    # Light up in reverse
-    for led in reversed(leds):
-        led.on()
-        time.sleep(0.2)
-        led.off()
-```
-
-## Pin Interrupts (Advanced)
-
-Interrupts let you respond to pin changes instantly without polling. This is advanced but powerful:
-
-**MicroPython:**
-```python
-from machine import Pin
-import time
-
-led = Pin(25, Pin.OUT)
-button = Pin(14, Pin.IN, Pin.PULL_UP)
-
-# Interrupt handler function
-def button_pressed(pin):
-    led.toggle()
-    print("Button interrupt!")
-
-# Set up interrupt on falling edge (HIGH→LOW)
-button.irq(trigger=Pin.IRQ_FALLING, handler=button_pressed)
-
-# Main loop can do other things
-while True:
-    print("Doing other work...")
-    time.sleep(2)
-```
-
-**Interrupt triggers:**
-- `Pin.IRQ_FALLING` - HIGH to LOW transition
-- `Pin.IRQ_RISING` - LOW to HIGH transition
-- `Pin.IRQ_FALLING | Pin.IRQ_RISING` - Both transitions
-
-**Important:** Interrupt handlers should be short and fast. Don't use delays or print statements in production interrupt handlers.
-
-## Try It Yourself
-
-**Exercise 1: Traffic Light**
-
-Create a traffic light with 3 LEDs (red, yellow, green) on pins 10, 11, 12:
-- Red on for 5 seconds
-- Green on for 5 seconds
-- Yellow on for 2 seconds
-- Repeat
-
-**Answer:**
-
-```python
-from machine import Pin
-import time
-
-red = Pin(10, Pin.OUT)
-yellow = Pin(11, Pin.OUT)
-green = Pin(12, Pin.OUT)
-
-def all_off():
-    red.off()
-    yellow.off()
-    green.off()
-
-while True:
-    all_off()
-    red.on()
-    time.sleep(5)
-
-    all_off()
-    green.on()
-    time.sleep(5)
-
-    all_off()
-    yellow.on()
-    time.sleep(2)
-```
-
-**Exercise 2: Button Counter**
-
-Create a program that:
-- Counts button presses
-- Displays the count on 4 LEDs in binary (pins 10-13)
-- Button on pin 14 with pull-up
-- Max count = 15 (4 bits), then reset to 0
-
-**Answer:**
-
-```python
-from machine import Pin
-import time
-
-button = Pin(14, Pin.IN, Pin.PULL_UP)
-leds = [Pin(pin_num, Pin.OUT) for pin_num in [10, 11, 12, 13]]
-
-count = 0
-last_state = 1
-
-def display_binary(number):
-    """Display a number on 4 LEDs in binary"""
-    for i in range(4):
-        bit = (number >> i) & 1  # Extract bit i
-        leds[i].value(bit)
-
-while True:
-    current_state = button.value()
-
-    # Detect button press (HIGH to LOW)
-    if last_state == 1 and current_state == 0:
-        count = (count + 1) % 16  # Wrap at 16
-        display_binary(count)
-        print(f"Count: {count} (Binary: {count:04b})")
-        time.sleep(0.2)  # Debounce
-
-    last_state = current_state
-    time.sleep(0.01)
-```
-
-**Exercise 3: Button-Controlled Patterns**
-
-Create a program with:
-- 4 LEDs on pins 10-13
-- 1 button on pin 14 with pull-up
-- Each button press cycles through patterns:
-  1. All LEDs on
-  2. All LEDs off
-  3. Alternating pattern (10, 12 on)
-  4. Other alternating pattern (11, 13 on)
-  5. Running light
-- Hold the pattern until next button press
-
-**Answer:**
-
-```python
-from machine import Pin
-import time
-
-button = Pin(14, Pin.IN, Pin.PULL_UP)
-leds = [Pin(pin_num, Pin.OUT) for pin_num in [10, 11, 12, 13]]
-
-pattern = 0
-last_state = 1
-
-def set_pattern(pattern_num):
-    if pattern_num == 0:  # All on
-        for led in leds:
-            led.on()
-    elif pattern_num == 1:  # All off
-        for led in leds:
-            led.off()
-    elif pattern_num == 2:  # Alternating 1
-        leds[0].on()
-        leds[1].off()
-        leds[2].on()
-        leds[3].off()
-    elif pattern_num == 3:  # Alternating 2
-        leds[0].off()
-        leds[1].on()
-        leds[2].off()
-        leds[3].on()
-
-while True:
-    current_state = button.value()
-
-    # Detect button press
-    if last_state == 1 and current_state == 0:
-        pattern = (pattern + 1) % 4
-        set_pattern(pattern)
-        print(f"Pattern: {pattern}")
-        time.sleep(0.2)
-
-    last_state = current_state
-    time.sleep(0.01)
-```
+? What should an interrupt handler do?
+- [ ] Run long delays and print lots of text
+- [x] Do as little as possible, such as setting a flag
+- [ ] Contain the whole program
+> Interrupt handlers pause the main program, so they should be short.
+{% endquiz %}

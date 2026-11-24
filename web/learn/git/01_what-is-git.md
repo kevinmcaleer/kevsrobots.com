@@ -11,7 +11,8 @@ description: 'Version control explained: snapshots, repositories, commits, and t
   difference between Git and GitHub'
 percent: 14
 duration: 5
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain what version control is, name the key words (repository, commit, branch, remote), and say how Git differs from GitHub.
 
 ## The problem Git solves
 

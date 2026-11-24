@@ -4,12 +4,14 @@ description: Combine two Motor objects into a DriveBase that drives forward, bac
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/08_driving_two_motors.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to mix speed and steering into left and right wheel speeds, and drive Scout straight, round a curve and spin on the spot.
 
 One motor is a test rig. Two motors on opposite sides of a chassis is a **differential drive**, the same design as a tank, a Roomba and most hobby robots, including Scout. There is no steering wheel. The robot turns by running its wheels at different speeds.
 
@@ -48,6 +50,14 @@ print(mix(90, 30))    # (100, 60)   clamped at 100
 ```
 
 The left wheel gets `speed + steer`, the right gets `speed - steer`. To turn right, the left wheel speeds up and the right slows down.
+
+```mermaid
+flowchart LR
+    S["speed"] --> M["mix"]
+    T["steer"] --> M
+    M -->|"speed + steer"| L["left motor"]
+    M -->|"speed - steer"| R["right motor"]
+```
 
 ## drive.py
 
@@ -167,14 +177,38 @@ The wheels should go the same way on "forward". If one is backwards, flip it wit
 
 ## Common Issues
 
-**Problem**: Scout drives in a curve instead of a straight line.
-**Solution**: Try a slightly lower speed value on the faster wheel, for example `base.drive(60, 55)`, or give the faster motor a higher `deadzone`.
-**Why**: Real motors are never identical, and one will always be slightly quicker for the same duty.
+- **Problem**: Scout drives in a curve instead of a straight line.
+- **Solution**: Try a slightly lower speed value on the faster wheel, for example `base.drive(60, 55)`, or give the faster motor a higher `deadzone`.
+- **Why**: Real motors are never identical, and one will always be slightly quicker for the same duty.
 
-**Problem**: "Spin right" makes Scout spin left.
-**Solution**: Add `invert=True` to both motors, or swap which is passed as left and right.
-**Why**: Which direction is "forward" depends on how the motor wires and chassis are orientated.
+- **Problem**: "Spin right" makes Scout spin left.
+- **Solution**: Add `invert=True` to both motors, or swap which is passed as left and right.
+- **Why**: Which direction is "forward" depends on how the motor wires and chassis are orientated.
 
-**Problem**: Scout stalls on spin even though it drives fine.
-**Solution**: Raise the spin speed. Spinning needs more torque to overcome wheel scrub.
-**Why**: Spinning drags the tyres sideways across the floor.
+- **Problem**: Scout stalls on spin even though it drives fine.
+- **Solution**: Raise the spin speed. Spinning needs more torque to overcome wheel scrub.
+- **Why**: Spinning drags the tyres sideways across the floor.
+
+> **Teachers**: robots drive off table edges. Run the first tests with the chassis held up or on a block, and after that on the floor, not a desk. Give each group a clear patch of floor and ask everyone else to stay out of it while a robot is running. Only the group that owns the robot connects its battery.
+
+## Check your understanding
+
+{% quiz %}
+? What does mix(60, 20) return?
+- [x] (80, 40)
+- [ ] (60, 20)
+- [ ] (40, 80)
+> The left wheel gets speed + steer = 80 and the right gets speed - steer = 40, so Scout curves right.
+
+? How does a differential drive robot spin on the spot?
+- [x] Wheels run at equal speeds in opposite directions
+- [ ] Both wheels run forward
+- [ ] One wheel stops
+> Each wheel moves the same distance in opposite directions, so the centre does not move.
+
+? Why might Scout curve when you ask for straight?
+- [x] Real motors are never identical, so one is slightly quicker
+- [ ] The battery is too full
+- [ ] PWM is broken
+> Tune it with different left and right speeds or a different deadzone for each motor.
+{% endquiz %}

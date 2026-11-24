@@ -1,340 +1,157 @@
 ---
-title: Converting Models to ONNX Format
+title: Exporting and Quantising for the IMX500
 description: >-
-    Convert your trained PyTorch model to ONNX format for deployment on the Raspberry Pi AI Camera
+    Understand ONNX and INT8 quantisation, then export your trained YOLO model into the packed format the Raspberry Pi AI Camera needs.
 type: page
 layout: lesson
 cover: /learn/object_model/assets/banners/04_onnx_conversion.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Overview
+By the end of this lesson you will be able to explain why the IMX500 needs a quantised model, and export `best.pt` into a `packerOut.zip` ready to package for the camera.
 
-Your PyTorch model works great on your computer, but the Raspberry Pi AI Camera needs a different format. In this lesson, you'll convert your model to ONNX (Open Neural Network Exchange), a universal format that works across different hardware and frameworks. This is the crucial step before deploying to the Pi.
+## Why you cannot just copy best.pt across
 
----
+`best.pt` is a PyTorch file full of 32-bit floating point numbers. The IMX500's neural processor works with small **8-bit integers**, and it does not run PyTorch at all. So the model has to be converted in several steps:
 
-## Objectives
-
-By the end of this lesson, you will be able to:
-
-- Understand what ONNX is and why it matters
-- Convert PyTorch models to ONNX format
-- Verify ONNX model correctness
-- Prepare models for IMX500 hardware
-- Troubleshoot conversion issues
-
----
-
-## Why ONNX?
-
-ONNX is like a universal translator for neural networks:
-
-**The Problem:**
-- PyTorch models only work with PyTorch
-- Raspberry Pi uses specialized hardware (IMX500 sensor)
-- Direct PyTorch on Pi is slow and inefficient
-
-**The Solution:**
-ONNX converts your model to a format that:
-- Works on any hardware (Pi, mobile, web, embedded devices)
-- Runs faster with hardware optimizations
-- Reduces file size for edge deployment
-- Maintains compatibility across frameworks
-
-**Real-world analogy:**
-Like exporting a document from Word to PDF - anyone can open it, regardless of what software they use.
-
----
-
-## Install ONNX Tools
-
-First, install the required packages:
-
-```bash
-# Install ONNX and verification tools
-pip install onnx onnxruntime
+```mermaid
+flowchart LR
+    A[best.pt PyTorch floats] --> B[ONNX neutral graph]
+    B --> C[INT8 quantised model]
+    C --> D[packerOut.zip converted for IMX500]
+    D --> E[network.rpk made on the Pi]
 ```
 
-**Verify installation:**
+- **ONNX** (Open Neural Network Exchange) is a neutral file format that describes the maths of a model, so different tools can read it. It is the stepping stone between PyTorch and the camera tools.
+- **Quantisation** squeezes each float into one of 256 integer steps. The file shrinks to about a quarter and the integer maths is far faster and cheaper in power.
+- **`packerOut.zip`** is the converted model that Sony's tools produce. A last tool on the Pi turns it into `network.rpk`, the file the camera loads.
+
+## See quantisation happen
+
+This complete program quantises a thousand pretend weights and shows what you gain and lose. Run it, then read the output.
 
 ```python
-import onnx
-import onnxruntime as ort
-
-print(f"✓ ONNX version: {onnx.__version__}")
-print(f"✓ ONNX Runtime version: {ort.__version__}")
-```
-
----
-
-## Convert Your Model to ONNX
-
-Here's the complete conversion process:
-
-```python
-import torch
-import torch.onnx
-from torchvision.models.detection import fasterrcnn_resnet50_fpn
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-
-# ===== Load Your Trained Model =====
-print("Loading trained model...")
-
-NUM_CLASSES = 4  # Adjust to your number of classes
-
-# Create model architecture (same as training)
-model = fasterrcnn_resnet50_fpn(pretrained=False)
-in_features = model.roi_heads.box_predictor.cls_score.in_features
-model.roi_heads.box_predictor = FastRCNNPredictor(in_features, NUM_CLASSES)
-
-# Load trained weights
-model.load_state_dict(torch.load('custom_detector.pth'))
-model.eval()  # Important: set to evaluation mode
-
-print("✓ Model loaded successfully")
-
-# ===== Create Dummy Input =====
-# ONNX needs an example input to trace the model
-dummy_input = torch.randn(1, 3, 640, 640)  # Batch=1, RGB, 640x640
-
-print(f"✓ Dummy input shape: {dummy_input.shape}")
-
-# ===== Export to ONNX =====
-print("\nExporting to ONNX format...")
-
-output_file = "custom_detector.onnx"
-
-torch.onnx.export(
-    model,                      # Model to export
-    dummy_input,                # Example input
-    output_file,                # Output filename
-    export_params=True,         # Store trained weights
-    opset_version=11,           # ONNX version (11 is widely supported)
-    do_constant_folding=True,   # Optimize constant operations
-    input_names=['input'],      # Input tensor name
-    output_names=['boxes', 'labels', 'scores'],  # Output tensor names
-    dynamic_axes={              # Allow variable batch sizes
-        'input': {0: 'batch_size'},
-        'boxes': {0: 'batch_size'},
-        'labels': {0: 'batch_size'},
-        'scores': {0: 'batch_size'}
-    }
-)
-
-print(f"✓ Model exported to {output_file}")
-
-# ===== Check File Size =====
-import os
-file_size_mb = os.path.getsize(output_file) / (1024 * 1024)
-print(f"✓ File size: {file_size_mb:.2f} MB")
-```
-
-**Expected output:**
-```
-Loading trained model...
-✓ Model loaded successfully
-✓ Dummy input shape: torch.Size([1, 3, 640, 640])
-
-Exporting to ONNX format...
-✓ Model exported to custom_detector.onnx
-✓ File size: 45.32 MB
-```
-
----
-
-## Verify Your ONNX Model
-
-Always verify the conversion worked correctly:
-
-```python
-import onnx
-import onnxruntime as ort
 import numpy as np
 
-# ===== Load and Check ONNX Model =====
-print("Verifying ONNX model...")
+rng = np.random.default_rng(1)
+weights = rng.normal(0, 0.1, size=1000).astype(np.float32)   # pretend layer weights
 
-onnx_model = onnx.load("custom_detector.onnx")
 
-# Check model structure is valid
-try:
-    onnx.checker.check_model(onnx_model)
-    print("✓ ONNX model is valid!")
-except Exception as e:
-    print(f"✗ Model validation failed: {e}")
+def quantise_int8(values):
+    """Map floats onto the 256 integer steps from -127 to 127."""
+    scale = np.abs(values).max() / 127
+    q = np.clip(np.round(values / scale), -127, 127).astype(np.int8)
+    return q, scale
 
-# ===== Print Model Info =====
-print("\nModel Information:")
-print(f"  Inputs: {[input.name for input in onnx_model.graph.input]}")
-print(f"  Outputs: {[output.name for output in onnx_model.graph.output]}")
 
-# ===== Test Inference with ONNX Runtime =====
-print("\nTesting inference...")
+q, scale = quantise_int8(weights)
+restored = q.astype(np.float32) * scale
+error = np.abs(weights - restored)
 
-# Create ONNX Runtime session
-ort_session = ort.InferenceSession("custom_detector.onnx")
+print(f"float32 size: {weights.nbytes} bytes")
+print(f"int8 size:    {q.nbytes} bytes")
+print(f"Step size:    {scale:.5f}")
+print(f"Mean error:   {error.mean():.5f}")
+print(f"Worst error:  {error.max():.5f}")
 
-# Create test input
-test_input = np.random.randn(1, 3, 640, 640).astype(np.float32)
-
-# Run inference
-outputs = ort_session.run(None, {'input': test_input})
-
-print("✓ Inference successful!")
-print(f"  Output shapes: {[out.shape for out in outputs]}")
+# One huge outlier stretches the steps and hurts every other weight
+with_outlier = weights.copy()
+with_outlier[0] = 5.0
+q2, scale2 = quantise_int8(with_outlier)
+restored2 = q2.astype(np.float32) * scale2
+print(f"Mean error with one outlier: {np.abs(with_outlier - restored2).mean():.5f}")
 ```
 
-**Expected output:**
-```
-Verifying ONNX model...
-✓ ONNX model is valid!
+Output:
 
-Model Information:
-  Inputs: ['input']
-  Outputs: ['boxes', 'labels', 'scores']
-
-Testing inference...
-✓ Inference successful!
-  Output shapes: [(100, 4), (100,), (100,)]
+```text
+float32 size: 4000 bytes
+int8 size:    1000 bytes
+Step size:    0.00295
+Mean error:   0.00073
+Worst error:  0.00147
+Mean error with one outlier: 0.01010
 ```
 
----
+Four times smaller, with a tiny error. But one outlier made the error about fourteen times worse, because the steps had to stretch to cover it. Real quantisation tools avoid that by looking at **real photos** to choose good step sizes. That is called **calibration**, and it is why the export asks for your `data.yaml`.
 
-## Preparing for IMX500 Deployment
+## Run the export
 
-The Raspberry Pi AI Camera uses the Sony IMX500 sensor, which requires additional conversion. You'll do this step on the Raspberry Pi itself.
+The Ultralytics export for the IMX500 only runs on **Linux with Python 3.10 to 3.12 and Java 17 or later**, which is why lesson 01 checked those. It also only supports the YOLOv8n and YOLO11n models at the time of writing. Check the [Ultralytics Sony IMX500 guide](https://docs.ultralytics.com/integrations/sony-imx500/) if it has changed.
 
-**On your Raspberry Pi, install IMX500 tools:**
+Install Java if you need it. On Debian or Ubuntu that is usually a package such as `openjdk-17-jre`, but the name varies, so check your distribution.
 
-```bash
-# Update package list
-sudo apt update
+```python
+from ultralytics import YOLO
 
-# Install IMX500 tools
-sudo apt install -y imx500-tools python3-imx500-tools
-
-# Verify installation
-imx500-package.sh --version
+model = YOLO("runs/detect/train/weights/best.pt")
+model.export(format="imx", data="robot_dataset/data.yaml")
 ```
+{: .no-snakie }
 
-**Convert ONNX to IMX500 format:**
+Notes on what it does:
 
-```bash
-# Transfer your ONNX file to the Pi first
-# (Use scp, USB drive, or any file transfer method)
+- It quantises to INT8 using your photos for calibration. The exporter requires 8-bit; you cannot ask for 16 or 32-bit.
+- Its first run installs extra export packages, and Ultralytics warns you may need to restart your terminal afterwards. If the first attempt stops after installing things, simply run it again.
+- You can calibrate with a smaller slice of photos using the `fraction` argument if it is slow.
 
-# On the Raspberry Pi:
-cd ~/models
-imx500-package.sh -i custom_detector.onnx -o custom_detector_imx500
+When it finishes you get a folder named after your weights, for example `best_imx_model`, next to `best.pt`. Inside are:
 
-# This creates a .rpk file optimized for IMX500
-```
+| File | What it is |
+| --- | --- |
+| `packerOut.zip` | The converted model, the file you take to the Pi |
+| `labels.txt` | Your class names, in order |
+| `model_imx.onnx` | An ONNX copy used to check the quantised model |
+| `dnnParams.xml`, `model_imx_MemoryReport.json` | Technical details about the converted network |
+{:class="table table-single"}
 
-**What this does:**
-- Optimizes model for IMX500 hardware
-- Converts to fixed-point precision (smaller, faster)
-- Packages with metadata for the camera
-- Creates `.rpk` (Raspberry Pi Package) file
+The memory report tells you how much of the camera's limited on-chip memory the model uses. If a model is too big it will not load, which is the other reason we start from the nano model.
 
----
+> **Teachers**: The export needs Linux and Java, which many school Windows laptops lack. Do this step once on a shared Linux machine or Raspberry Pi 5 per class, collect each group's `best.pt`, and hand back the `best_imx_model` folders. Learners still learn the whole pipeline without installing Java on every device.
 
-## Try It Yourself
+## Try it Yourself
 
-1. **Convert with different input sizes** - Try 320x320 or 800x800 instead of 640x640
-2. **Check model compatibility** - Run `onnx.checker.check_model()` on your exported model
-3. **Compare file sizes** - Export with and without `do_constant_folding` and compare sizes
-
-**Challenge:** Write a script that automatically converts PyTorch → ONNX → IMX500 format in one command.
-
----
+1. Change the outlier in the quantisation program from 5.0 to 1.0 and watch the error. What happens?
+2. Print `restored[:5]` next to `weights[:5]` so you can see the rounding by eye.
+3. Run the export on a model trained for only 10 epochs, then open `labels.txt` and check the names match your classes.
+4. Challenge: change the program to quantise to 4 bits (steps from -7 to 7). How big does the error get?
 
 ## Common Issues
 
-**Problem**: "RuntimeError: ONNX export failed"
-**Solution**: Make sure model is in eval mode: `model.eval()` before export
-**Why**: Training mode has operations (dropout, batch norm) that aren't compatible with ONNX
+- **Problem**: The export fails complaining about Java.
+- **Solution**: Install Java 17 or newer, then open a new terminal and run the export again.
+- **Why**: The Ultralytics guide lists Java 17 or later as a requirement for the IMX export.
 
-**Problem**: "OpsetVersion not supported"
-**Solution**: Try `opset_version=10` or `opset_version=12`
-**Why**: Different hardware supports different ONNX opset versions
+- **Problem**: The export says the format or model is unsupported.
+- **Solution**: Train from `yolo11n.pt` or a YOLOv8n model, and check the Ultralytics IMX500 guide for the current list.
+- **Why**: Only a few small model families are supported at the time of writing.
 
-**Problem**: ONNX file is very large (>100MB)
-**Solution**: Use model quantization or pruning techniques
-**Why**: Full precision models are large; edge devices benefit from compression
+- **Problem**: Detections are much worse after export than in your training results.
+- **Solution**: Calibrate with `data=` pointing at photos that look like what the camera will see, and compare the quantised model with the original in lesson 07.
+- **Why**: Quantisation is lossy and calibration picks the step sizes from real data.
 
-**Problem**: "Input/output names don't match"
-**Solution**: Check your `input_names` and `output_names` match your model's actual tensors
-**Why**: ONNX needs explicit tensor naming for compatibility
+## Check your understanding
 
-**Problem**: Inference results differ between PyTorch and ONNX
-**Solution**: Check numerical precision settings and use `atol=1e-3` for comparisons
-**Why**: Minor numerical differences are normal due to optimization
+{% quiz %}
+? What does quantising to INT8 do?
+- [ ] Makes the model more accurate
+- [x] Stores numbers as 8-bit integers, making the model smaller and faster at a small cost in accuracy
+- [ ] Converts the model to Python code
+> INT8 uses 256 integer steps instead of 32-bit floats.
 
-**Problem**: "imx500-tools: command not found" on Pi
-**Solution**: Ensure you're on latest Raspberry Pi OS: `sudo apt update && sudo apt upgrade`
-**Why**: IMX500 support is recent, needs updated OS
+? Why does the export need your `data.yaml`?
+- [ ] To rename the classes
+- [x] It uses your photos to calibrate the quantisation
+- [ ] To download more photos
+> Calibration with real images chooses good step sizes.
 
----
-
-## Optimization Tips
-
-### Reduce Model Size
-
-```python
-# Option 1: Quantize to INT8 (4x smaller, slightly less accurate)
-import torch.quantization
-
-model_quantized = torch.quantization.quantize_dynamic(
-    model, {torch.nn.Linear}, dtype=torch.qint8
-)
-
-# Then export quantized model
-torch.onnx.export(model_quantized, dummy_input, "detector_quantized.onnx")
-```
-
-### Test Inference Speed
-
-```python
-import time
-
-# Warm up
-for _ in range(10):
-    outputs = ort_session.run(None, {'input': test_input})
-
-# Benchmark
-start_time = time.time()
-num_runs = 100
-
-for _ in range(num_runs):
-    outputs = ort_session.run(None, {'input': test_input})
-
-avg_time = (time.time() - start_time) / num_runs
-print(f"Average inference time: {avg_time*1000:.2f} ms")
-print(f"FPS: {1/avg_time:.1f}")
-```
-
----
-
-## Summary
-
-You've learned:
-- What ONNX is and why it's essential for deployment
-- Converting PyTorch models to ONNX format
-- Verifying model correctness after conversion
-- Preparing models for IMX500 hardware
-- Troubleshooting common conversion issues
-- Optimizing model size and speed
-
-Your model is now ready for deployment! In the next lesson, you'll transfer it to the Raspberry Pi and run it on the AI Camera.
-
----
-
-## Next Lesson
-
-In the next lesson, you'll deploy your ONNX model to the Raspberry Pi AI Camera and run your first inference on the edge device.
-
----
+? Which file do you take to the Raspberry Pi?
+- [ ] `best.pt`
+- [x] `packerOut.zip`
+- [ ] `results.csv`
+> The Pi tool packages `packerOut.zip` into `network.rpk`.
+{% endquiz %}

@@ -1,218 +1,225 @@
 ---
 title: Subqueries and Nested Queries
-description: >-
-    Using subqueries in SQL to perform complex queries within queries
+description: Put one SELECT inside another with scalar subqueries, IN, EXISTS and correlated subqueries, and avoid the NOT IN and NULL trap.
 layout: lesson
+type: page
 cover: /learn/sql/assets/banners/12_subqueries_and_nested_queries.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, we’ll explore **subqueries** (also known as nested queries), which allow you to perform queries within queries. Subqueries are powerful tools for retrieving data based on the results of other queries, enabling more advanced data analysis and manipulation.
+By the end of this lesson you will be able to write a query inside another query, choose between `IN` and `EXISTS`, and explain why `NOT IN` can silently return nothing.
 
 ---
 
-## 1. What is a Subquery?
+Some questions need two steps: "which sensors cost more than the **average** sensor?" First find the average, then compare. A **subquery** lets you do both in one statement, by putting a `SELECT` in brackets inside another.
 
-A **subquery** is a query nested within another SQL query. Subqueries are typically enclosed in parentheses and can appear in various parts of the main query, including the `SELECT`, `FROM`, and `WHERE` clauses.
-
-### Why Use Subqueries?
-
-Subqueries allow you to:
-- Retrieve data based on the results of another query
-- Simplify complex queries by breaking them into smaller parts
-- Make queries more readable and maintainable
-
----
-
-## 2. Types of Subqueries
-
-Subqueries can be categorized based on how and where they’re used:
-
-- **Single-row Subqueries**: Return a single value.
-- **Multi-row Subqueries**: Return multiple values.
-- **Correlated Subqueries**: Depend on values from the outer query and are evaluated row by row.
-- **Non-correlated Subqueries**: Run independently of the outer query and are evaluated once.
-
----
-
-## 3. Subqueries in the `WHERE` Clause
-
-Subqueries are often used in the `WHERE` clause to filter results based on the output of another query.
-
-### Example: Single-row Subquery in `WHERE`
-
-Suppose we have two tables, `employees` and `departments`.
-
-**employees**
-
-```plaintext
-| emp_id | name     | salary | dept_id |
-|--------|----------|--------|---------|
-| 1      | Alice    | 50000  | 1       |
-| 2      | Bob      | 60000  | 2       |
-| 3      | Charlie  | 70000  | 1       |
+```mermaid
+flowchart LR
+    A["Inner query runs: AVG(price) = 2.63"] --> B["Outer query uses the answer"]
+    B --> C["WHERE price > 2.63"]
+    C --> D["MPU6050, VL53L0X"]
 ```
 
-**departments**
+## A subquery that returns one value
 
-```plaintext
-| dept_id | dept_name     |
-|---------|---------------|
-| 1       | Engineering   |
-| 2       | Sales         |
+```sql
+SELECT model, price
+FROM sensors
+WHERE price > (SELECT AVG(price) FROM sensors)
+ORDER BY price;
 ```
 
-- **Example**: Find employees who earn more than the average salary in the `employees` table.
+```text
+model    price
+-------  -----
+MPU6050  3.8
+VL53L0X  6.0
+```
 
-    ```sql
-    SELECT name, salary
-    FROM employees
-    WHERE salary > (SELECT AVG(salary) FROM employees);
-    ```
+The inner query gives a single number (about 2.63), and the outer query treats it like any other value. The same trick finds robots whose battery beats the average:
 
-In this example, the subquery `(SELECT AVG(salary) FROM employees)` returns a single value (the average salary), which is then used as a condition in the `WHERE` clause.
+```sql
+SELECT name, battery_mah
+FROM robots
+WHERE battery_mah > (SELECT AVG(battery_mah) FROM robots);
+```
 
----
+```text
+name   battery_mah
+-----  -----------
+Smars  2000
+```
 
-## 4. Subqueries in the `SELECT` Clause
+## A subquery that returns a list: IN
 
-Subqueries can also be used in the `SELECT` clause to calculate values for each row in the result set.
+If the inner query returns a column of values, test against it with `IN`. Which robots carry a distance sensor?
 
-### Example: Subquery in `SELECT`
+```sql
+SELECT name
+FROM robots
+WHERE robot_id IN (SELECT robot_id FROM sensors WHERE kind = 'distance')
+ORDER BY name;
+```
 
-- **Example**: List each employee’s salary and the average salary of their department.
+```text
+name
+-----------
+Pico Walker
+Smars
+```
 
-    ```sql
-    SELECT name, salary,
-           (SELECT AVG(salary)
-            FROM employees AS e
-            WHERE e.dept_id = employees.dept_id) AS dept_avg_salary
-    FROM employees;
-    ```
+You could write this as a join too. Subqueries often read more naturally when you only need to *test* for membership, and don't need columns from the second table.
 
-In this example, the subquery calculates the average salary for the department of each employee and displays it as `dept_avg_salary`.
+## EXISTS: is there at least one?
 
----
+`EXISTS` asks "does the inner query find any row?" It is true or false, and doesn't care what the row contains (so people write `SELECT 1`). Robots that have a line sensor:
 
-## 5. Subqueries in the `FROM` Clause
+```sql
+SELECT name
+FROM robots AS r
+WHERE EXISTS (
+    SELECT 1 FROM sensors AS s
+    WHERE s.robot_id = r.robot_id AND s.kind = 'line'
+)
+ORDER BY name;
+```
 
-Subqueries can be used in the `FROM` clause to create a temporary table that the main query can then use.
+```text
+name
+-----------
+Line Chaser
+Smars
+```
 
-### Example: Subquery in `FROM`
+Notice the inner query mentions `r.robot_id` from the **outer** query. That makes it a **correlated subquery**: it is re-run for each robot in turn, with that robot's ID filled in. Put `NOT` in front, and you find robots with no sensors at all:
 
-- **Example**: Find the highest salary by department.
+```sql
+SELECT name
+FROM robots AS r
+WHERE NOT EXISTS (SELECT 1 FROM sensors AS s WHERE s.robot_id = r.robot_id)
+ORDER BY name;
+```
 
-    ```sql
-    SELECT dept_name, MAX(salary) AS max_salary
-    FROM (SELECT departments.dept_name, employees.salary
-          FROM employees
-          JOIN departments ON employees.dept_id = departments.dept_id) AS dept_salaries
-    GROUP BY dept_name;
-    ```
+```text
+name
+-----------
+Arm Buddy
+Mystery Bot
+```
 
-In this example, the subquery creates a temporary table `dept_salaries` that includes both department names and salaries. The main query then groups this temporary table by `dept_name` and finds the maximum salary for each department.
+## The NOT IN trap
 
----
+It's tempting to write the same question with `NOT IN`:
 
-## 6. Correlated Subqueries
+```sql
+SELECT name FROM robots
+WHERE robot_id NOT IN (SELECT robot_id FROM sensors);
+```
 
-A **correlated subquery** depends on the outer query for its values and is executed once for each row processed by the outer query. These are useful for filtering or calculating data that depends on row-by-row conditions.
+```text
+name
+----
+```
 
-### Example: Correlated Subquery
+**Nothing came back**, even though Arm Buddy and Mystery Bot clearly have no sensors. The culprit is our spare VL53L0X, whose `robot_id` is `NULL`. The list contains an unknown value, so "is robot 3 not in the list?" can never be answered with a firm yes. Either filter the `NULL` out:
 
-- **Example**: Find employees whose salary is above the average salary in their department.
+```sql
+SELECT name FROM robots
+WHERE robot_id NOT IN (SELECT robot_id FROM sensors WHERE robot_id IS NOT NULL)
+ORDER BY name;
+```
 
-    ```sql
-    SELECT name, salary
-    FROM employees AS e1
-    WHERE salary > (SELECT AVG(salary)
-                    FROM employees AS e2
-                    WHERE e1.dept_id = e2.dept_id);
-    ```
+or use `NOT EXISTS`, which has no such problem. Prefer `NOT EXISTS`.
 
-In this example, the subquery calculates the average salary for each department. The outer query then retrieves employees whose salary is above the department average.
+## Subqueries in the SELECT list
 
----
+A single-value subquery can sit in the column list. This counts each robot's sensors, one robot at a time:
 
-## 7. Using `IN` with Subqueries
+```sql
+SELECT name,
+       (SELECT COUNT(*) FROM sensors AS s WHERE s.robot_id = r.robot_id) AS sensor_count
+FROM robots AS r
+ORDER BY name;
+```
 
-The `IN` operator is commonly used with subqueries to filter results based on a list of values returned by the subquery.
+```text
+name         sensor_count
+-----------  ------------
+Arm Buddy    0
+Line Chaser  2
+Mystery Bot  0
+Pico Walker  2
+Smars        2
+```
 
-### Example: Subquery with `IN`
+A `LEFT JOIN` with `GROUP BY` (lesson 9) gives the same answer, often faster on big tables.
 
-- **Example**: Find employees who work in departments with an average salary greater than $60,000.
+## Subqueries in FROM
 
-    ```sql
-    SELECT name
-    FROM employees
-    WHERE dept_id IN (SELECT dept_id
-                      FROM employees
-                      GROUP BY dept_id
-                      HAVING AVG(salary) > 60000);
-    ```
+You can also treat a query's result as a temporary table, as long as you give it an alias. Which kinds of sensor cost more than 2 on average?
 
-In this example, the subquery returns `dept_id` values where the department’s average salary exceeds $60,000. The outer query then retrieves employees who work in these departments.
+```sql
+SELECT kind, ROUND(avg_price, 2) AS avg_price
+FROM (
+    SELECT kind, AVG(price) AS avg_price
+    FROM sensors
+    GROUP BY kind
+) AS per_kind
+WHERE avg_price > 2
+ORDER BY kind;
+```
 
----
+```text
+kind      avg_price
+--------  ---------
+distance  3.67
+motion    3.8
+```
 
-## Practice Exercise: Using Subqueries
+## Try it Yourself
 
-1. **Filter with a Subquery**: Retrieve employees with a salary greater than the average salary.
+1. List the readings that are above the overall average reading, highest first.
+2. Use `IN` with a subquery on `builds` to find the robots built by `Sam`. (You'll need a second, nested subquery on `builders`.)
+3. Challenge: find sensors that cost more than the average **for their own kind**. Hint: a correlated subquery with `WHERE kind = s.kind`. Only the VL53L0X should appear.
 
-    ```sql
-    SELECT name, salary
-    FROM employees
-    WHERE salary > (SELECT AVG(salary) FROM employees);
-    ```
+## Common Issues
 
-2. **Correlated Subquery**: Find employees who earn more than the average salary of their department.
+- **Problem**: `NOT IN` returns no rows, although I know there are matches.
+- **Solution**: Switch to `NOT EXISTS`, or add `WHERE column IS NOT NULL` inside the subquery.
+- **Why**: If the list contains `NULL`, the comparison is unknown for every row.
 
-    ```sql
-    SELECT name, salary
-    FROM employees AS e1
-    WHERE salary > (SELECT AVG(salary)
-                    FROM employees AS e2
-                    WHERE e1.dept_id = e2.dept_id);
-    ```
+- **Problem**: My `= (SELECT ...)` subquery returns more than one row, but SQLite doesn't complain and I only see one answer.
+- **Solution**: Use `IN` when the inner query can return several rows.
+- **Why**: SQLite quietly uses the first row of the inner query. MySQL and PostgreSQL stop with an error, which is the safer behaviour.
 
-3. **Subquery with `IN`**: Find employees working in departments with an average salary above $50,000.
+- **Problem**: `no such column` when the subquery refers to the outer table.
+- **Solution**: Check that the outer table has an alias (like `r`) and you spelt it the same way inside.
+- **Why**: A correlated subquery finds the outer row through that alias.
 
-    ```sql
-    SELECT name
-    FROM employees
-    WHERE dept_id IN (SELECT dept_id
-                      FROM employees
-                      GROUP BY dept_id
-                      HAVING AVG(salary) > 50000);
-    ```
+## Check your understanding
 
-4. **Subquery in `SELECT`**: Display each employee’s name, salary, and the average salary of their department.
+{% quiz %}
+? What makes a subquery "correlated"?
+- [ ] It returns exactly one row
+- [x] It refers to a column from the outer query, so it is evaluated for each outer row
+- [ ] It uses `JOIN` inside
+> In our `EXISTS` example, `s.robot_id = r.robot_id` links the inner query to the current outer robot.
 
-    ```sql
-    SELECT name, salary,
-           (SELECT AVG(salary)
-            FROM employees AS e
-            WHERE e.dept_id = employees.dept_id) AS dept_avg_salary
-    FROM employees;
-    ```
+? Why did `NOT IN (SELECT robot_id FROM sensors)` return nothing?
+- [ ] No robot is missing a sensor
+- [x] One `robot_id` in the list is `NULL`, which makes every `NOT IN` check unknown
+- [ ] `NOT IN` is not allowed with subqueries
+> The spare VL53L0X has a `NULL` robot. `NOT EXISTS` avoids the problem.
 
----
+? When must a subquery in `FROM` be given an alias?
+- [x] Always
+- [ ] Only when it contains a `GROUP BY`
+- [ ] Never
+> The temporary result needs a name so the outer query can refer to its columns, like `per_kind` above.
+{% endquiz %}
 
-## Summary of Subquery Types
-
-Here’s a summary of the various ways subqueries can be used in SQL:
-
-Subquery Location   | Purpose                                        | Example
---------------------|------------------------------------------------|------------------------------------------------
-`WHERE` Clause      | Filter results based on subquery output        | `WHERE salary > (SELECT AVG(salary) ...)`
-`SELECT` Clause     | Calculate additional values for each row       | `SELECT name, (SELECT AVG(salary) ...) AS avg`
-`FROM` Clause       | Create a temporary table for main query        | `FROM (SELECT dept_name, salary ...) AS temp`
-Correlated Subquery | Row-by-row filtering based on outer query rows | `WHERE salary > (SELECT AVG(salary) ...)`
-{:class="table table-striped"}
-
-Subqueries add powerful functionality to SQL queries, allowing for complex filtering and data manipulation. In the next lesson, we’ll cover views and indexes, which enhance the performance and usability of your database.
-
----
+Now let's make our favourite queries reusable, and make them fast.

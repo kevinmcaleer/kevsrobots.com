@@ -1,26 +1,29 @@
 ---
-layout: lesson
-title: Python Basics for Robotics
+layout: ''
+title: 03_python_basics_for_robotics.md
 author: Kevin McAleer
 type: page
-cover: assets/3.png
+cover: /learn/pca9685/assets/cover.png
 date: 2024-04-06
 previous: 02_raspberry_pi_setup.html
 next: 04_introduction_to_pca9685.html
-description: Learn the fundamentals of Python programming necessary for controlling
-  hardware like servos on a robot arm.
+description: Build Buddy Jr, a small 3D printed robot arm with four servos, and bring
+  it to life with a Raspberry Pi, Python and a PCA9685 servo driver. You'll set up
+  the Pi, wire the board safely with a separate servo supply, learn the maths from
+  angle to pulse, assemble the arm and program smooth, repeatable movements.
 percent: 24
-duration: 3
+duration: 5
+quiz_total: 33
 navigation:
 - name: Building a Robot Arm with Raspberry Pi and PCA9685
 - content:
   - section: Getting Started with Raspberry Pi and Python
     content:
     - name: Introduction
-      link: 01_course_introduction.html
+      link: 00_intro.html
     - name: Setting Up Your Raspberry Pi
       link: 02_raspberry_pi_setup.html
-    - name: Python Basics for Robotics
+    - name: 03_python_basics_for_robotics.md
       link: 03_python_basics_for_robotics.html
   - section: Understanding the PCA9685 Servo Driver
     content:
@@ -46,124 +49,171 @@ navigation:
     content:
     - name: Project Ideas
       link: 11_project_ideas.html
-    - name: Troubleshooting
+    - name: Troubleshooting and Next Steps
       link: 12_troubleshooting_common_issues.html
 ---
 
 
 ![Python Basics for Robotics]({{ page.cover }}){:class="cover"}
 
-## Introduction to Python Programming
-
-Welcome to Lesson 3, where we dive into Python programming for robotics. Python is a versatile and powerful programming language that's widely used in robotics for its simplicity and readability, making it ideal for beginners and professionals alike.
-
 ---
 
-## Why Python for Robotics?
+By the end of this lesson you will be able to write a small Python program that stores joint angles, keeps them within safe limits and steps through them with a loop.
 
-- **Ease of Learning:** Python's syntax is clear and intuitive, making it an excellent choice for those new to programming.
-- **Strong Community:** A vast community of developers means abundant resources, libraries, and frameworks are available.
-- **Versatility:** Python can be used for a wide range of applications, from web development to data analysis and, of course, robotics.
+## Just enough Python
 
----
+You don't need to be a Python wizard to move a robot arm. A few ideas come up again and again, and we'll meet them here using Buddy Jr's four joints as examples. Every listing in this lesson runs on any computer with Python 3, so you can try it on your laptop with no hardware.
 
-## Setting Up Your Python Environment
-
-Assuming you've followed the Raspberry Pi setup from Lesson 2, Python should already be installed on your Raspberry Pi. Here, we'll ensure your Python environment is ready for robotics programming.
-
----
-
-### Python Libraries for Robotics
-
-Install the necessary Python libraries for interfacing with hardware:
-
-```shell
-pip3 install RPi.GPIO Adafruit-PCA9685
+```mermaid
+flowchart LR
+    A["Variables<br/>store an angle"] --> B["Functions<br/>clamp and convert"]
+    B --> C["Dictionaries<br/>name every joint"]
+    C --> D["Loops<br/>step through poses"]
 ```
 
-- `RPi.GPIO` allows you to control the Raspberry Pi GPIO pins—a fundamental requirement for many robotics projects.
-- `Adafruit-PCA9685` is the library we'll use to communicate with the PCA9685 servo controller board.
+## Variables: remembering an angle
 
----
-
-## Python Basics
-
-Let's cover some Python basics that you'll frequently use in robotics projects.
-
----
-
-### Variables and Data Types
-
-In Python, variables don't require explicit declaration to reserve memory space. The declaration happens automatically when you assign a value to a variable.
+A variable is a name for a value. Servo angles are whole numbers or decimals, and joint names are text.
 
 ```python
-x = 10          # Integer
-y = 3.14        # Float
-name = "Robot"  # String
+base_angle = 90        # an integer: degrees
+pulse_ms = 1.5         # a float: milliseconds
+joint = "shoulder"     # a string: text
+
+print(joint, "is at", base_angle, "degrees")
 ```
 
----
+**Why this matters:** `90` on its own means nothing. `base_angle = 90` tells the next person (and future you) what the number is for.
 
-### Control Structures
+**Common mistake:** writing `"90"` with quotes makes text, not a number. Maths on text raises a `TypeError`.
 
-**If Statement:**
+## Functions: do one job, reuse it
+
+A servo only accepts angles between 0 and 180. Asking for 250 would push the joint against something. A function can protect us every time we move.
 
 ```python
-if x > 5:
-    print("x is greater than 5")
+def clamp(value, low, high):
+    """Keep value between low and high."""
+    return max(low, min(high, value))
+
+print(clamp(250, 0, 180))   # 180
+print(clamp(-20, 0, 180))   # 0
+print(clamp(90, 0, 180))    # 90
 ```
 
-**For Loop:**
+Read `clamp` from the inside out: `min(high, value)` stops the value going above `high`, then `max(low, ...)` stops it going below `low`. We'll use this exact function in lesson 8.
 
-{% capture snakie_code %}
-for i in range(5):
-    print(i)
-{% endcapture %}
-{% include snakie.html code=snakie_code name="python_basics_for_robotics_1.py" %}
+## Dictionaries: name every joint
 
-**While Loop:**
+Buddy Jr has four servos on four PCA9685 channels. A dictionary stores `name: value` pairs, so we can write `CHANNELS["elbow"]` instead of remembering that the elbow is channel 2.
 
 ```python
-while x > 0:
-    print(x)
-    x -= 1
+CHANNELS = {"base": 0, "shoulder": 1, "elbow": 2, "camera": 3}
+
+print("The elbow is on channel", CHANNELS["elbow"])
 ```
 
----
+## Loops: repeat without copying
 
-### Functions
-
-Functions are blocks of code that only run when called. They can receive data, operate on it, and return the result.
-
-{% capture snakie_code %}
-def greet(name):
-    return "Hello, " + name + "!"
-
-print(greet("Robot"))
-{% endcapture %}
-{% include snakie.html code=snakie_code name="python_basics_for_robotics_2.py" %}
-
----
-
-### Working with Libraries
-
-Import a library and use its functions:
+A `for` loop repeats a block for each item. A `while` loop repeats while a condition is true. Together with `time.sleep()` they make a joint sweep.
 
 ```python
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
+import time
+
+CHANNELS = {"base": 0, "shoulder": 1, "elbow": 2, "camera": 3}
+poses = [90, 60, 120, 90]          # a list: angles in order
+
+for name, channel in CHANNELS.items():
+    print("Channel", channel, "is the", name)
+
+for angle in poses:
+    print("Move the base to", angle, "degrees")
+    time.sleep(0.5)                # wait half a second
+
+count = 3
+while count > 0:
+    print("Starting in", count)
+    count -= 1
+    time.sleep(1)
+print("Go!")
 ```
 
----
+Notice that `count -= 1` makes the number smaller each time round. Without it, `while count > 0` would never finish.
 
-## Conclusion
+## Putting it together
 
-You've now covered the basics of Python programming! With these fundamentals, you're well-equipped to start exploring more complex robotics projects. Practice writing some basic Python scripts to familiarize yourself with these concepts.
+Save this as `joint_planner.py`. It checks a list of requested angles, clamps any that are out of range and prints the plan. Later the `print` line becomes a real servo move.
 
----
+```python
+import time
 
-## Lesson Assignment
+CHANNELS = {"base": 0, "shoulder": 1, "elbow": 2, "camera": 3}
+MIN_ANGLE = 0
+MAX_ANGLE = 180
 
-Create a simple Python script that turns an LED on and off using the `RPi.GPIO` library. This exercise will prepare you for controlling servos in the upcoming lessons.
 
----
+def clamp(value, low, high):
+    """Keep value between low and high."""
+    return max(low, min(high, value))
+
+
+plan = [
+    ("base", 90),
+    ("shoulder", 45),
+    ("elbow", 200),      # too big on purpose
+    ("camera", -10),     # too small on purpose
+]
+
+for joint, requested in plan:
+    safe = clamp(requested, MIN_ANGLE, MAX_ANGLE)
+    channel = CHANNELS[joint]
+    note = "" if safe == requested else "  (clamped from " + str(requested) + ")"
+    print("Channel", channel, joint, "->", safe, "degrees" + note)
+    time.sleep(0.2)
+```
+
+Run it with `python3 joint_planner.py`. You should see the elbow clamped to 180 and the camera clamped to 0.
+
+## Try it Yourself
+
+1. Add a fifth joint called `"gripper"` on channel 4 to `CHANNELS` and to the plan.
+2. Change `MAX_ANGLE` to 150 for the shoulder only. Hint: a second dictionary of limits, such as `LIMITS = {"shoulder": (20, 150)}`, keyed by joint name.
+3. Challenge: write a function `describe(joint, angle)` that returns a sentence, then print one for every joint.
+
+## Common Issues
+
+- **Problem**: `KeyError: 'wrist'`
+- **Solution**: Check the spelling against the keys in `CHANNELS`, such as `"camera"`
+- **Why**: A dictionary only knows the names you stored. Asking for a key that isn't there raises a `KeyError`
+
+- **Problem**: `IndentationError`
+- **Solution**: Indent the body of every `def`, `for` and `while` by the same amount, usually four spaces
+- **Why**: Python uses the indent to decide which lines belong inside the loop or function
+
+- **Problem**: `TypeError: unsupported operand type(s)`
+- **Solution**: Check you haven't put a number in quotes, and use `int()` or `float()` to convert text to a number
+- **Why**: `"90" + 10` mixes text and a number, and Python won't guess what you meant
+
+## Check your understanding
+
+{% quiz %}
+? What does `clamp(250, 0, 180)` return?
+- [ ] 250
+- [x] 180
+- [ ] 0
+> `min(180, 250)` is 180, and `max(0, 180)` is 180, so the value is held at the top of the range.
+
+? Why store the channels in a dictionary?
+- [ ] It makes the servo faster
+- [x] Names such as `"elbow"` are easier to read than channel numbers
+- [ ] Python requires it
+> `CHANNELS["elbow"]` says what you mean, and the number is kept in one place so you only change it once.
+
+? What stops `while count > 0:` running forever in the countdown?
+- [x] `count -= 1` makes count smaller each time round
+- [ ] `time.sleep(1)`
+- [ ] The `print` call
+> Without a line that changes `count`, the condition would stay true for ever.
+{% endquiz %}
+
+Next up: the PCA9685 board itself.

@@ -7,12 +7,13 @@ cover: /learn/reinforcement_learning/assets/banners/07_the_q_table.jpg
 date: 2026-06-13
 previous: 06_looking_into_the_future.html
 next: 08_exploration_vs_exploitation.html
-description: "Build the robot's cheat sheet \u2014 a Python dictionary that stores\
-  \ the estimated value of every action in every state."
+description: Build the robot's cheat sheet, a Python dictionary that stores the estimated
+  value of every action in every state, and save it as JSON.
 percent: 48
 duration: 6
+quiz_total: 45
 code_target: cpython
-date_updated: 2026-06-13
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning for Beginners
 - content:
@@ -65,190 +66,158 @@ navigation:
 
 ---
 
-We've talked about learning from rewards and discounting the future. Now we need a data structure to hold everything the robot has learned so far. That structure is called the **Q-table**, and it's simpler than its name suggests.
+By the end of this lesson you will be able to build a Q-table in Python, read the best action out of it, and save it to JSON and load it back.
 
 ---
 
-## What Is a Q-Table?
-
-Q stands for **quality** (sometimes called **action-value**). The Q-table is a lookup table with one row per state and one column per action. Each cell holds a single number: the agent's best current estimate of how much total (discounted) reward it will earn if it takes that action in that state and then follows its best policy from there onward.
-
-```
-State               | forward | turn_left | turn_right | stop
---------------------|---------|-----------|------------|------
-(1,0,"east","far")  |   3.21  |    0.42   |    0.38    | -0.10
-(1,1,"east","near") |  -4.50  |    1.21   |    1.19    |  0.05
-(1,2,"north","far") |   2.80  |    0.10   |    0.34    | -0.10
-...
-```
-
-The **best action** in any state is simply the column with the highest value in that row. The agent can make a decision just by looking up its current state and picking the action with the biggest Q-value.
+We have talked about learning from rewards and discounting the future. Now we need somewhere to keep what the robot has learned. That place is the **Q-table**, and it is simpler than its name suggests.
 
 ---
 
-## Implementing the Q-Table in Python
+## What is a Q-table?
 
-We'll use a Python `defaultdict` to store the Q-table. It automatically creates a zero-initialised action dictionary whenever the agent encounters a new state for the first time.
+**Q** stands for **quality**. The Q-table has one row per state and one column per action. Each cell holds one number: the agent's current estimate of the total discounted reward it will collect if it takes that action in that state and then acts well afterwards. We write one cell as `Q[state][action]`.
+
+```mermaid
+flowchart LR
+    S["state<br/>(1, 1, 'east', 'near')"] --> T["Q-table row"]
+    T --> F["forward: -4.50"]
+    T --> L["turn_left: 1.21"]
+    T --> R["turn_right: 1.19"]
+    T --> P["stop: 0.05"]
+    L --> B["highest, so the best action is turn_left"]
+```
+
+To act, the agent looks up its current state and picks the column with the biggest number. A big negative number on `forward` says "do not drive into that".
+
+---
+
+## Building and using it
+
+We use a `defaultdict`, which creates a zeroed row the first time a new state is seen, so we never need to list every state in advance. Run this complete program, which also fills in a few values by hand so we can read the table.
 
 ```python
+import ast
+import json
 from collections import defaultdict
 
-# Actions our BurgerBot can take
 ACTIONS = ["forward", "turn_left", "turn_right", "stop"]
 
-def make_q_table():
-    """
-    Create an empty Q-table as a defaultdict.
 
-    When the agent visits a new state for the first time,
-    the defaultdict creates an entry automatically with Q=0.0
-    for every action. This avoids KeyError and means we don't
-    need to pre-populate all states upfront.
-    """
+def make_q_table():
+    """An empty Q-table. Any new state starts with a Q-value of 0.0 per action."""
     return defaultdict(lambda: {action: 0.0 for action in ACTIONS})
 
-q_table = make_q_table()
 
-# Accessing a brand new state works immediately
-print(q_table[(0, 0, "north", "far")])
-# Output: {'forward': 0.0, 'turn_left': 0.0, 'turn_right': 0.0, 'stop': 0.0}
-```
-
----
-
-## Reading the Best Action
-
-Given a Q-table and a state, picking the best action is a one-liner:
-
-```python
 def best_action(q_table, state):
-    """
-    Return the action with the highest Q-value in this state.
-
-    If multiple actions tie, max() returns the first one found
-    (dictionary insertion order in Python 3.7+).
-    """
+    """Return the action with the highest Q-value in this state."""
     action_values = q_table[state]
     return max(action_values, key=lambda a: action_values[a])
 
-# Example — imagine the Q-table already has these values:
-q_table[(1, 1, "east", "near")] = {
-    "forward":    -4.50,
-    "turn_left":   1.21,
-    "turn_right":  1.19,
-    "stop":        0.05,
-}
 
-print(best_action(q_table, (1, 1, "east", "near")))
-# Output: 'turn_left'   (highest Q-value = 1.21)
-```
-
----
-
-## Visualising a Small Q-Table
-
-It's helpful to print your Q-table in a readable format during training so you can watch values evolve. Here's a simple printer for our 4-action case:
-
-```python
-def print_q_table(q_table, max_rows=10):
-    """
-    Print the Q-table in a readable grid format.
-    Only shows states the agent has actually visited.
-    """
-    header = f"{'State':<35} {'forward':>8} {'turn_left':>10} {'turn_right':>11} {'stop':>7}"
+def print_q_table(q_table):
+    header = f"{'State':<26}{'forward':>8}{'turn_left':>11}{'turn_right':>12}{'stop':>7}"
     print(header)
     print("-" * len(header))
+    for state, v in q_table.items():
+        best = best_action(q_table, state)
+        print(f"{str(state):<26}{v['forward']:>8.2f}{v['turn_left']:>11.2f}"
+              f"{v['turn_right']:>12.2f}{v['stop']:>7.2f}   best: {best}")
 
-    for i, (state, values) in enumerate(q_table.items()):
-        if i >= max_rows:
-            print(f"  ... ({len(q_table) - max_rows} more rows)")
-            break
-        row = (
-            f"{str(state):<35}"
-            f"{values['forward']:>8.2f}"
-            f"{values['turn_left']:>10.2f}"
-            f"{values['turn_right']:>11.2f}"
-            f"{values['stop']:>7.2f}"
-        )
-        print(row)
+
+q_table = make_q_table()
+print(q_table[(0, 0, "north", "far")])      # a brand new state appears with zeros
+
+# Pretend some training has happened by filling in a few values by hand
+q_table[(1, 1, "east", "near")] = {
+    "forward": -4.50, "turn_left": 1.21, "turn_right": 1.19, "stop": 0.05}
+q_table[(1, 0, "east", "far")] = {
+    "forward": 3.21, "turn_left": 0.42, "turn_right": 0.38, "stop": -0.10}
+
+print()
+print_q_table(q_table)
+
+# Saving: JSON keys must be strings, so turn each tuple key into text
+text = json.dumps({str(k): v for k, v in q_table.items()}, indent=2)
+print("\nFirst line of the JSON:", text.splitlines()[1].strip())
+
+# Loading: ast.literal_eval turns "(1, 1, 'east', 'near')" back into a tuple
+loaded = {ast.literal_eval(k): v for k, v in json.loads(text).items()}
+print("Round trip worked:", loaded[(1, 1, "east", "near")] == q_table[(1, 1, "east", "near")])
 ```
 
-After 50 training episodes, a call to `print_q_table(q_table)` might give you something like:
+Output:
 
 ```
-State                               forward  turn_left  turn_right     stop
-------------------------------------------------------------------------
-(0, 0, 'north', 'far')                1.23       0.21        0.19    -0.10
-(0, 1, 'east', 'far')                 2.11       0.15        0.14    -0.10
-(1, 1, 'east', 'near')               -3.10       1.40        1.38     0.02
-...
+{'forward': 0.0, 'turn_left': 0.0, 'turn_right': 0.0, 'stop': 0.0}
+
+State                      forward  turn_left  turn_right   stop
+----------------------------------------------------------------
+(0, 0, 'north', 'far')        0.00       0.00        0.00   0.00   best: forward
+(1, 1, 'east', 'near')       -4.50       1.21        1.19   0.05   best: turn_left
+(1, 0, 'east', 'far')         3.21       0.42        0.38  -0.10   best: forward
+
+First line of the JSON: "(0, 0, 'north', 'far')": {
+Round trip worked: True
 ```
 
-You can see the agent has already learned that going forward when an obstacle is near (-3.10) is a bad idea, while turning is relatively safe.
+Look at the first row. All four values are zero, so `max()` returns the **first** action in the dictionary, `forward`. Early in training that is just a tie, not a decision. Lesson 8 shows a way to break ties fairly.
+
+> **Note:** the numbers in rows two and three are made up to show what a trained table looks like. A real one comes from the training loop in lesson 9.
 
 ---
 
-## Saving and Loading the Q-Table as JSON
+## Saving as JSON
 
-When training finishes, we save the Q-table to disk so it can be loaded by the Pico. The tricky part is that dictionary keys are tuples (not valid JSON keys), so we convert them to strings.
+When training finishes we save the table so another program can use it. JSON keys must be text, so we write `str(k)` for each tuple key and use `ast.literal_eval()` to turn the text back into a tuple. Unlike `eval()`, it only accepts plain Python literals such as tuples and numbers, so it will not run arbitrary code hidden in a file.
 
-```python
-import json
-
-def save_q_table(q_table, filename="q_table.json"):
-    """
-    Save Q-table to a JSON file.
-    Tuple keys (e.g. (1, 2, 'east', 'near')) are serialised as strings.
-    """
-    serialisable = {str(k): v for k, v in q_table.items()}
-    with open(filename, "w") as f:
-        json.dump(serialisable, f, indent=2)
-    print(f"Saved {len(q_table)} states to {filename}")
-
-def load_q_table(filename="q_table.json"):
-    """
-    Load Q-table from a JSON file.
-    String keys are converted back to tuples using eval().
-    """
-    import ast
-    with open(filename, "r") as f:
-        raw = json.load(f)
-    q_table = {ast.literal_eval(k): v for k, v in raw.items()}
-    return q_table
-
-# Usage after training:
-save_q_table(q_table, "q_table.json")   # on the laptop
-# ... copy q_table.json to the Pico ...
-loaded = load_q_table("q_table.json")   # on the laptop to verify
-```
-
-> **Note:** `ast.literal_eval()` safely converts a string representation of a Python tuple back into an actual tuple. We use it instead of `eval()` because it rejects anything that isn't a valid Python literal — so it's safe to use on data you loaded from a file.
+To write to a file instead of a string, use `with open("q_table.json", "w") as f: f.write(text)`. For the real robot we will sidestep tuples altogether and use plain text keys, which keeps the Pico code simple (lesson 13).
 
 ---
 
-## Try It Yourself
+## Try it Yourself
 
-1. Create a Q-table using `make_q_table()` and manually insert Q-values for five different states. Call `best_action()` for each and verify the results make sense.
-
-2. Extend `print_q_table()` to highlight the best action in each row (e.g. surround it with `>>` markers). Verify it correctly identifies the highest value.
-
-3. Write a function `q_table_size_kb(q_table)` that estimates the memory footprint of the Q-table in kilobytes (assume each float is 8 bytes, each string key averages 20 bytes). How big would the table be for a fully explored 5×5 grid with 4 headings and 3 distance bands?
-
----
+1. Add a state of your own to `q_table` with values of your choice, then call `best_action()` on it. Does it pick what you expected?
+2. Add a `">>"` marker beside the best action in `print_q_table()`.
+3. Write `q_table_bytes(q_table)` that returns `len(text.encode())` for the JSON text. How big would a full 7 by 7 table of 588 states be, roughly?
+4. Challenge: make `best_action()` return a random one of the actions that tie for the highest value instead of always the first.
 
 ## Common Issues
 
-**"My Q-table keeps growing without bound."**
-This is normal during training — each new state visited adds a row. On a bounded grid with finite state space, it stabilises once all states have been visited. If it keeps growing on a fixed grid, check that your state representation is deterministic and consistent.
+- **Problem**: `json.dumps` fails with "keys must be str, int, float, bool or None".
+- **Solution**: Convert tuple keys with `{str(k): v for k, v in q_table.items()}` first.
+- **Why**: JSON object keys are always text, and a tuple is not.
 
-**"Q-values are drifting to very large positive or negative numbers."**
-This can happen with an untuned learning rate (lesson 9) or if reward values are very large. Keep reward magnitudes moderate (e.g. ±10 to ±50) and your learning rate between 0.01 and 0.5.
+- **Problem**: The table grows each time I look at a state.
+- **Solution**: That is the `defaultdict` creating rows on first access. Use `state in q_table` to check without creating one.
+- **Why**: Merely reading `q_table[state]` for a new state inserts a row of zeros.
 
-**"json.dump fails with 'keys must be strings'."**
-This is because Python JSON requires string keys. Use `{str(k): v ...}` in `save_q_table()` as shown above. Loading uses `ast.literal_eval()` to convert them back.
+- **Problem**: Q-values drift to huge numbers.
+- **Solution**: Keep rewards moderate, such as -10 to +50, and the learning rate between about 0.05 and 0.5.
+- **Why**: Large rewards and a large learning rate make estimates overshoot, as lesson 9 shows.
+
+## Check your understanding
+
+{% quiz %}
+? What does one Q-table cell store?
+- [ ] The number of times a state was visited
+- [x] An estimate of the total discounted reward for taking an action in a state
+- [ ] The reward from the last step only
+> Q is the estimated quality of an action in a state.
+
+? Why did `best_action` pick `forward` in the all-zero row?
+- [ ] Forward is always best
+- [x] All values tie, so `max()` returns the first one
+- [ ] The state was a goal state
+> With no information yet, ties go to the first action in the dictionary.
+
+? Why do we write `str(k)` when saving to JSON?
+- [x] JSON object keys must be text, not tuples
+- [ ] To make the file smaller
+- [ ] Because tuples are secret
+> Tuples are not valid JSON keys, so we convert them to text.
+{% endquiz %}
 
 ---
 
-Next up: ε-greedy exploration — the strategy that decides when the robot should trust its Q-table and when it should try something random.
-
----
+Next up: epsilon-greedy exploration, the strategy that decides when to trust the table and when to try something new.

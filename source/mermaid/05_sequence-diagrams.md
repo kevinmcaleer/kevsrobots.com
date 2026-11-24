@@ -4,10 +4,15 @@ description: >-
     Show messages passing between a Pico, a sensor and a computer over time with Mermaid sequence diagrams
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/05_sequence-diagrams.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a sequence diagram showing messages passing between a Pico, a sensor and a computer, including loops and choices.
 
 ---
 

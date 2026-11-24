@@ -12,6 +12,7 @@ description: Group nodes with subgraphs, add colour with classes and styles, and
 percent: 30
 duration: 5
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to group nodes with subgraphs, colour them with classes and styles, and avoid the classic flowchart gotchas.
 
 ---
 
