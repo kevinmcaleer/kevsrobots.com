@@ -4,13 +4,31 @@ title: Off-Grid Messaging with MeshCore
 author: Kevin McAleer
 cover: /learn/meshcore/assets/cover.png
 date: 2026-08-05
-description: Build your own off-grid LoRa mesh network with MeshCore and two cheap
-  Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal,
+description: Build your own off-grid LoRa mesh network with MeshCore and two Heltec
+  V3 boards, one as a repeater and one as a client. No internet, no phone signal,
   no subscription.
 level: beginner
-course_duration: 1h 19m
+course_duration: 1h 29m
 lesson_count: 16
 first_lesson: 00_intro.html
+quiz_total: 45
+outcomes:
+- Explain what MeshCore is and what the repeater and companion roles do
+- Describe how spreading factor, bandwidth and coding rate affect range and airtime
+- Flash and configure a MeshCore repeater and a Bluetooth companion with matching
+  radio settings
+- Place and power a repeater sensibly, handling antennas and batteries safely
+- Send messages, use channels, and read RSSI, SNR and paths to diagnose a weak link
+- Administer a repeater over the air and troubleshoot a mesh that will not talk
+prerequisites:
+- No programming or soldering needed, and no earlier course required
+- Helpful but not required, typing commands as in Introduction to Linux
+you_need:
+- Two Heltec WiFi LoRa 32 V3 boards in the frequency variant for your region
+- Two antennas for that band, and a U.FL to SMA pigtail if needed
+- A USB-C data cable and a computer with Chrome or Edge
+- A phone with the MeshCore app, or a laptop to use the web client
+- Optional, a LiPo battery and a weatherproof box for an outdoor repeater
 navigation:
 - name: Off-Grid Messaging with MeshCore
 - content:
@@ -32,7 +50,7 @@ navigation:
     content:
     - name: Flashing the Firmware
       link: 05_flashing.html
-    - name: Radio Settings for the UK
+    - name: Radio Settings for Your Region
       link: 06_radio_settings.html
   - section: Build the Repeater
     content:

@@ -487,14 +487,12 @@
 - author: Kevin McAleer
   cover: /learn/meshcore/assets/cover.png
   date_published: 2026-08-05
-  description: Build your own off-grid LoRa mesh network with MeshCore and two cheap
-    Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal,
+  description: Build your own off-grid LoRa mesh network with MeshCore and two Heltec
+    V3 boards, one as a repeater and one as a client. No internet, no phone signal,
     no subscription.
-  duration: 1h 19m
+  duration: 1h 29m
   groups:
   - electronics
-  - lora
-  - meshcore
   lessons: 16
   level: beginner
   link: /learn/meshcore/00_intro.html

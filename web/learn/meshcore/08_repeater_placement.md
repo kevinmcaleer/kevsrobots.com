@@ -7,9 +7,12 @@ cover: /learn/meshcore/assets/banners/08_repeater_placement.jpg
 date: 2026-08-05
 previous: 07_repeater_setup.html
 next: 09_client_setup.html
-description: Height, power, weatherproofing and solar - turning a dev board into infrastructure
+description: Height, power, weatherproofing and safe battery use for turning a dev
+  board into infrastructure
 percent: 54
-duration: 5
+duration: 6
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Off-Grid Messaging with MeshCore
 - content:
@@ -31,7 +34,7 @@ navigation:
     content:
     - name: Flashing the Firmware
       link: 05_flashing.html
-    - name: Radio Settings for the UK
+    - name: Radio Settings for Your Region
       link: 06_radio_settings.html
   - section: Build the Repeater
     content:
@@ -66,17 +69,17 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to estimate a repeater's radio horizon, choose a good location and power source, and weatherproof it safely.
+
 A repeater is only as good as its view of the world. This lesson is about the unglamorous physical stuff that decides whether your mesh covers a street or a county.
 
 ---
 
 ## Height is everything
 
-At 868MHz you are working with something close to line of sight, softened a little by diffraction. The single biggest thing you control is how high the antenna is.
+At these frequencies you are close to line of sight. The biggest thing you control is how high the antenna is. A rough rule for the radio horizon:
 
-The rough rule of thumb for radio horizon:
-
-> distance in km ≈ 4.12 × (√height_1 + √height_2), with heights in metres
+> distance in km is about 4.12 x (square root of height 1 + square root of height 2), with heights in metres
 
 | Repeater height | Client at 1.5m | Approx. radio horizon |
 |---|---|---|
@@ -86,35 +89,38 @@ The rough rule of thumb for radio horizon:
 | 100m (hilltop) | 1.5m | ~46 km |
 {:class="table table-single"}
 
-Real world results will be a lot less than this - buildings, trees and terrain all take their cut - but the *shape* of the table is right. Doubling your height buys you far more than doubling your transmit power ever will.
+Real results are a lot less: buildings, trees and terrain take their cut. But the *shape* of the table is right, and height buys more than power does.
+
+```mermaid
+flowchart LR
+    H["Height up"] --> LOS["Longer line of sight"]
+    B["Fewer obstructions"] --> LOS
+    A["Vertical antenna<br/>short coax"] --> LOS
+    LOS --> RNG["Better range"]
+```
 
 ---
 
 ## Ranking the locations
 
-**Best:** An external mast or pole above the roofline, antenna vertical, clear of the building.
-
-**Very good:** A loft. Warm, dry, and you only lose a few dB through tiles - unless you have foil-backed insulation or a slate roof, which are brutal at 868MHz.
-
-**Good:** An upstairs window, antenna against the glass. Cheap, easy, surprisingly effective in a direction.
-
-**Poor:** A shelf downstairs, indoors, surrounded by other electronics.
-
-**Worst:** Inside a metal enclosure, next to a router, behind a fridge. You have built a very expensive Faraday cage.
+- **Best:** an external pole above the roofline, antenna vertical, clear of the building
+- **Very good:** a loft, though foil-backed insulation or a metal-covered roof blocks radio badly
+- **Good:** an upstairs window with the antenna near the glass
+- **Poor:** a shelf downstairs next to other electronics
+- **Worst:** inside a metal box, next to a router, or behind a fridge: you have built a Faraday cage
 
 ---
 
 ## Powering it
 
-A repeater wants to run 24/7, and it is a low-power thing - a Heltec V3 idles at a few tens of milliamps and peaks around 120mA while transmitting.
+A repeater runs all the time and draws little, but exact current depends on your board and settings, so measure it if you need to size a battery.
 
-**Mains USB** - a plain 5V phone charger is ideal. Cheapest and most reliable.
+- **Mains USB:** a plain 5V phone charger is the cheapest and most reliable
+- **USB power bank:** fine for temporary use, but many banks switch off when the load is very small, which is what an idle repeater is
+- **LiPo battery:** a single cell on the board's battery connector. Fit a cell only if you can check the polarity, never leave it charging unattended, and keep it out of direct sun and sealed hot boxes
+- **Solar:** possible, but an ESP32-S3 board is not the most frugal choice. The MeshCore FAQ lists boards such as the Heltec T114 that suit low-power builds
 
-**USB power bank** - fine for a temporary or portable repeater, but be aware that many power banks shut down when the load drops too low, which is exactly what a mostly-idle repeater does. Look for one with a "low current" or "always on" mode.
-
-**LiPo battery** - a 3.7V cell on the SH1.25 connector, charged over USB. A 2000mAh cell will typically run a Heltec V3 repeater for a day or two.
-
-**Solar** - a 5-10W panel, a charge controller and a 18650 pack will keep a repeater alive indefinitely in a UK summer and will struggle in a UK December. If you are serious about solar, look at the **Heltec T114** instead - it is nRF52 based and uses a fraction of the power of the ESP32-S3.
+The repeater firmware has `powersaving on` (repeater only, per the docs) for battery nodes.
 
 ---
 
@@ -122,42 +128,38 @@ A repeater wants to run 24/7, and it is a low-power thing - a Heltec V3 idles at
 
 If it goes outside, it needs to survive outside.
 
-- **A cheap IP65 junction box** from a DIY shop is perfect. Drill one hole for an SMA bulkhead connector and one for the cable gland
-- **Put the board inside the box and the antenna outside**, connected through the bulkhead. Do not try to transmit from inside a sealed plastic box with the antenna inside it - it mostly works, and mostly is not good enough
-- **Add a silica gel sachet.** Condensation is what actually kills outdoor electronics, not rain
-- **Face the gland downwards** so water runs away from it, and put a drip loop in the cable
-- **UV matters.** Cheap plastic boxes go brittle after a couple of summers. Black or grey UV-stable boxes last
+- Use a **weatherproof junction box**, with a hole for an antenna connector and a cable gland
+- Put the board in the box and the antenna outside it, through a bulkhead connector. An antenna inside a sealed plastic box is a recipe for lost range
+- Add a **silica gel sachet**, because condensation kills more outdoor electronics than rain
+- Point the gland **downwards** and leave a drip loop in the cable
+- Use a UV-stable box, as cheap plastic goes brittle in sun
+- Keep mains power and cables safe and dry, and ask an adult or electrician for anything beyond a USB charger indoors
+- Work at height with someone holding the ladder, and never climb for a node in bad weather
 
 ---
 
 ## Settings for a fixed repeater
 
-Once it is in place, a few settings are worth revisiting from the console:
-
 ```text
-set tx 20
 set advert.interval 60
 set flood.advert.interval 12
 set flood.max 3
 ```
 
-Full transmit power makes sense for a mains powered fixed node. Modest advert intervals keep you a good neighbour.
-
-If your repeater is battery powered, consider:
+For a battery-powered repeater, also consider:
 
 ```text
 powersaving on
-set tx 17
 ```
 
 ---
 
 ## Being a good mesh citizen
 
-- **Do not run a repeater on a moving vehicle.** Paths break constantly and force the network back to flooding
-- **Do not set aggressive advert intervals.** Every flood advert is rebroadcast by every repeater in the region
-- **Do register your node with your local community** so people know it exists and who owns it
-- **Do set `owner.info`** so someone can find you if your node misbehaves:
+- **Do not run a repeater in a vehicle or anything that moves.** Paths break constantly and force the network back to flooding
+- **Keep flood adverts rare.** Every one is rebroadcast by repeaters in the region
+- **Tell your local community** the node exists and who looks after it
+- **Set contact info** so someone can find you if your node misbehaves:
 
 ```text
 set owner.info Kev - kevsrobots.com
@@ -167,30 +169,48 @@ set owner.info Kev - kevsrobots.com
 
 ## Try it Yourself
 
-1. Walk your client node away from the repeater until messages start failing. Note the distance. Now move the repeater one floor up and repeat.
-2. Run `stats-radio` before and after moving the repeater. How much did the noise floor change?
-3. Challenge: work out the radio horizon for the highest point you can reach, using the formula above.
+1. Walk your client away from the repeater until messages fail and note the distance. Move the repeater up a floor and try again.
+2. Run `stats-radio` on the repeater before and after moving it. Did the noise floor change?
+3. Challenge: use the formula to work out the radio horizon from the highest spot you can reach.
 
 ---
 
 ## Common Issues
 
-**Problem**: My repeater keeps dropping off overnight.
+- **Problem**: My repeater keeps dropping off overnight.
+- **Solution**: Suspect the power supply, especially a power bank.
+- **Why**: Many power banks switch off when the current is very low, and an idle repeater draws very little.
 
-**Solution**: Suspect the power supply, particularly if it is a USB power bank.
+- **Problem**: Range got worse after I put it in a box outside.
+- **Solution**: Move the antenna outside the box and keep the coax short.
+- **Why**: Enclosures, especially damp ones, absorb signal, and thin coax is lossy.
 
-**Why**: Many power banks auto-shutdown below a current threshold, and an idle repeater draws very little.
+- **Problem**: The loft install is poor.
+- **Solution**: Check for foil-backed insulation or metal sheeting.
+- **Why**: Foil acts like a mirror to radio waves and blocks them almost completely.
 
-**Problem**: Range got *worse* after I put it in a box outside.
+> **Teachers**: put classroom repeaters on a desk or window, not outside, and use USB power rather than a LiPo. Anything mounted outdoors or at height should be done by an adult with permission from whoever owns the building. Obtain consent before fixing anything to a school building.
 
-**Solution**: Get the antenna outside the box on a bulkhead connector, and check the coax is short.
+## Check your understanding
 
-**Why**: Enclosures, especially damp ones, detune and absorb. Thin coax at 868MHz is lossy - roughly 1dB per metre for RG174.
+{% quiz %}
+? What is the single biggest thing you control for repeater range?
+- [ ] The node name
+- [x] The antenna height
+- [ ] The advert colour
+> Height extends line of sight, and the lesson's table shows range growing with height.
 
-**Problem**: The loft install performs badly.
+? Why is a metal box a bad place for the antenna?
+- [x] It blocks and absorbs the radio signal
+- [ ] It makes the board too cold
+- [ ] It changes the frequency
+> The lesson calls a metal enclosure a Faraday cage.
 
-**Solution**: Check for foil-backed insulation.
-
-**Why**: Foil-backed insulation board is effectively an RF mirror and will kill 868MHz almost completely.
+? Why might a repeater on a power bank drop off overnight?
+- [ ] Power banks have no USB
+- [x] Many banks switch off when the load is very small
+- [ ] The repeater changes channel
+> An idle repeater draws little current, so some power banks shut down.
+{% endquiz %}
 
 ---

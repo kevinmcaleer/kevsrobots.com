@@ -7,10 +7,12 @@ cover: /learn/meshcore/assets/banners/12_paths_and_routing.jpg
 date: 2026-08-05
 previous: 11_channels.html
 next: 13_remote_admin.html
-description: Flood routing, path routing, hops and trace - how MeshCore stays quiet
-  as it grows
+description: Flood routing, path routing, hops and tracing, and how MeshCore stays
+  quiet as it grows
 percent: 78
-duration: 5
+duration: 6
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Off-Grid Messaging with MeshCore
 - content:
@@ -32,7 +34,7 @@ navigation:
     content:
     - name: Flashing the Firmware
       link: 05_flashing.html
-    - name: Radio Settings for the UK
+    - name: Radio Settings for Your Region
       link: 06_radio_settings.html
   - section: Build the Repeater
     content:
@@ -67,7 +69,9 @@ navigation:
 
 ---
 
-This is the lesson that explains why MeshCore behaves the way it does. Once routing clicks, everything else - why clients do not repeat, why adverts matter, why the network stays usable - falls into place.
+By the end of this lesson you will be able to explain flood and path routing, count hops, and recover a contact whose stored path has broken.
+
+This lesson explains why MeshCore behaves the way it does. Once routing clicks, why clients do not repeat and why adverts matter fall into place.
 
 ---
 
@@ -77,112 +81,120 @@ This is the lesson that explains why MeshCore behaves the way it does. Once rout
 
 ### Flooding
 
-The simple approach: every repeater that hears a packet rebroadcasts it, up to a hop limit. It will definitely find the destination, if a route exists at all.
-
-**The cost:** airtime grows with the *number of repeaters*, not the distance to the destination. Twenty repeaters means twenty transmissions for one message. In a busy region, that is how a mesh strangles itself.
+Every repeater that hears a packet rebroadcasts it, up to a hop limit. It will find the destination if any route exists. **The cost:** airtime grows with the number of repeaters, not the distance. Twenty repeaters means twenty transmissions for one message.
 
 ### Path routing
 
-MeshCore's default: a message carries an explicit list of the repeaters it should travel through. Only those repeaters forward it. Everyone else hears it and ignores it.
-
-**The cost:** you have to know the path first.
+The message carries an explicit list of the repeaters it should pass through. Only those repeaters forward it; everyone else hears it and ignores it. **The cost:** you have to know the path first.
 
 ---
 
-## The hybrid: how MeshCore combines them
+## The hybrid
 
-1. **You send your first message to a new contact.** MeshCore has no path, so the packet **floods**
-2. **The destination receives it** and notes the sequence of repeaters it arrived through
-3. **The reply comes back carrying that path**, and your node stores it against that contact
-4. **Every subsequent message uses that path directly.** No flooding, no wasted airtime
+The MeshCore FAQ describes the sequence:
 
-This is why the first message to someone can feel slow, and every message afterwards is quick. It is not your imagination - the network genuinely did more work the first time.
+1. You send your first message to a new contact. There is no path, so it **floods**
+2. The destination sends back a delivery report listing the repeaters the message passed through
+3. Your node stores that path against the contact
+4. Later messages carry the path, and only the named repeaters retransmit
+
+This is why the first message can feel slow and later ones are quick. The network really did more work the first time.
+
+```mermaid
+stateDiagram-v2
+    [*] --> NoPath
+    NoPath --> Flooding: first message
+    Flooding --> PathStored: delivery report returns the route
+    PathStored --> PathStored: messages follow the stored path
+    PathStored --> Retrying: delivery fails
+    Retrying --> Flooding: last retry resets the path and floods
+```
 
 ---
 
 ## Hops
 
-A **hop** is one repeater forwarding your packet. A path of `A → B → C` is two hops.
+A **hop** is one repeater forwarding your packet. A path of `You to A to B to friend` has two repeater hops.
 
-Fewer hops is better:
-
-- Each hop is a full transmission and takes airtime
-- Each hop adds latency
-- Each hop is another chance for the packet to be lost
-
-MeshCore encodes each repeater in a path as a small hash. The default one-byte mode allows roughly 64 hops in a flood - far more than any real network needs.
+Fewer hops is better, because each hop costs airtime, adds delay and is another chance for loss. The firmware's hop limit is 64 with the default one-byte repeater IDs, according to the FAQ. Firmware v1.14 and later can also use two or three byte IDs, which allow 32 or 21 hops, so repeaters with the same first ID byte are easier to tell apart.
 
 ---
 
 ## Tracing a path
 
-From a client, the app usually exposes a **trace** function on a contact - and from `meshcore-cli` the commands are `trace` and `dtrace`. A trace shows you which repeaters a packet travelled through and the signal quality at each step.
-
-This is your best diagnostic tool. If messages to someone have got slow or unreliable, trace them and see whether the path has grown an extra hop or whether one hop has a terrible SNR.
+Many clients offer a **trace** on a contact. It shows which repeaters a packet used and the signal quality at each step. The Python tool `meshcore-cli` listed in the MeshCore README has similar features, so check its own documentation for the commands. Tracing is your best diagnostic: if messages to someone slow down, trace them and see whether the path grew an extra hop or one hop has a terrible SNR.
 
 ---
 
 ## When paths break
 
-Paths are stored, not negotiated. If the mesh changes underneath one - a repeater is switched off, or somebody moves house - the stored path stops working.
+Paths are stored, not negotiated. If a repeater on the path goes off, the stored path stops working. The FAQ says the client retries along the old path, then on the final retry resets the path and floods, which recovers by itself in most cases. You can also **reset the path** by hand on a contact.
 
-**What happens:** your app retries along the stored path, fails, and on the final attempt falls back to flooding. It usually recovers on its own.
-
-**What you can do:** most clients offer **reset path** or **rediscover path** on a contact. Use it after you or the other node has moved.
-
-**Why mobile repeaters are a bad idea:** a repeater in a car breaks every path that runs through it, constantly, forcing everyone back to flooding. It is the single most antisocial thing you can do to a mesh.
+A repeater in a car breaks every path through it constantly, which is why mobile repeaters are bad for a mesh.
 
 ---
 
 ## Why clients do not repeat
 
-Now it makes sense. If every phone-connected node also forwarded traffic:
-
-- Paths would be built through devices that walk out of range mid-conversation
-- Battery life would collapse
-- Flood traffic would multiply by the number of people, not the number of repeaters
-
-MeshCore separates the roles deliberately. **Infrastructure is infrastructure; clients are clients.**
+If every phone node forwarded traffic, paths would run through devices that walk out of range mid-conversation, batteries would drain, and flood traffic would multiply with the number of people instead of the number of repeaters. MeshCore keeps the roles separate on purpose.
 
 ---
 
 ## Repeaters are selective
 
-A MeshCore repeater does not rebroadcast everything it hears. It forwards when:
+A repeater does not rebroadcast everything. It forwards when:
 
-- The packet is a **flood** that has not exceeded its hop limit and it has not already seen it, or
-- The packet carries a **path** and this repeater is named in it
+- the packet is a flood within its hop limit that it has not already seen, or
+- the packet carries a path and this repeater is named in it
 
-Everything else is heard and dropped. That selectivity is the whole reason a MeshCore mesh scales past a handful of nodes.
+Everything else is heard and dropped. That selectivity is why a MeshCore mesh scales.
 
 ---
 
 ## Try it Yourself
 
-1. Send a first message to a new contact and time it. Send a second message and time that. Note the difference.
+1. Send a first message to a new contact and time it. Send a second and time that.
 2. Run a trace on a distant contact and count the hops.
-3. Challenge: power your repeater off mid-conversation with someone routed through it. Watch the message fail, then recover by flooding. Turn it back on.
+3. Challenge: switch your repeater off mid-conversation with someone routed through it. Watch the message fail, then recover by flooding. Switch it back on.
 
 ---
 
 ## Common Issues
 
-**Problem**: Messages to one specific contact stopped working, but everyone else is fine.
+- **Problem**: Messages to one contact stopped working, but everyone else is fine.
+- **Solution**: Reset the path for that contact.
+- **Why**: A stored path through a repeater that is now offline keeps failing until a new route is found.
 
-**Solution**: Reset the path for that contact.
+- **Problem**: The first message to someone takes ages.
+- **Solution**: Nothing is wrong. It is flooding to find them.
+- **Why**: Hybrid routing works this way, and later messages use the learned path.
 
-**Why**: A stored path through a repeater that is now offline will keep failing until the node rediscovers a route.
+- **Problem**: My repeater has high packet counts but nobody routes through it.
+- **Solution**: Check `stats-packets` and `neighbors`, then consider moving it higher.
+- **Why**: Repeaters hear everything in range, but being used needs being on a path a client discovered, which usually means good placement.
 
-**Problem**: The first message to someone takes ages.
+> **Teachers**: a quick unplugged activity works well with no hardware. Give each learner a card with a repeater name, have the class pass a note by "flooding" (everyone repeats), then by a written path, and count how many handovers each took.
 
-**Solution**: Nothing is wrong - it is flooding to find them.
+## Check your understanding
 
-**Why**: This is the hybrid routing design working as intended. Subsequent messages will be much faster.
+{% quiz %}
+? How does a repeater decide whether to forward a path-routed packet?
+- [ ] It forwards everything
+- [x] It forwards if it is named in the path
+- [ ] It forwards only if the user presses a button
+> Only repeaters named in the stored path retransmit.
 
-**Problem**: My repeater has huge packet counts but nobody routes through it.
+? Why is the first message to a new contact slower?
+- [x] It floods to find the contact, then the path is learned
+- [ ] The phone is warming up
+- [ ] Bluetooth is slow
+> The first message has no path, so it floods and the reply brings the path back.
 
-**Solution**: Check `stats-packets` and `neighbors`, and consider that it may simply be hearing a lot and being chosen by nobody.
-
-**Why**: Repeaters hear everything in range. Being *used* requires being on a path that a client has discovered - which usually means being well placed and well advertised.
+? What happens on the last retry if a stored path has broken?
+- [ ] The message is deleted
+- [x] The path is reset and the message floods
+- [ ] The repeater reboots
+> The FAQ says the app resets the path and sends as flood on the last retry by default.
+{% endquiz %}
 
 ---

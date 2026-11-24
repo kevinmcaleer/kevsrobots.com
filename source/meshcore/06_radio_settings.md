@@ -1,84 +1,72 @@
 ---
-title: Radio Settings for the UK
-description: The EU/UK Narrow preset, what the numbers mean, and why both nodes must match exactly
+title: Radio Settings for Your Region
+description: Pick the right regional preset, set it on the repeater, check transmit power and duty cycle, and see why both nodes must match
 type: page
 layout: lesson
 cover: /learn/meshcore/assets/banners/06_radio_settings.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Both boards are flashed. Now we make sure they can actually hear each other - and that they can hear everybody else in the UK too.
+By the end of this lesson you will be able to set and check the four radio settings on the repeater, and choose power and duty cycle values that suit your region.
+
+Both boards are flashed. Now we make sure they can hear each other, and the other MeshCore nodes near you.
 
 ---
 
 ## The rule that catches everyone
 
-**Frequency, bandwidth, spreading factor and coding rate must match on every node that needs to talk to each other.** There is no negotiation, no auto-detect, no fallback. If one number is different, the nodes are silent strangers.
-
-That applies to your two boards, and it applies to every other MeshCore node in your area. Which is why the community agrees on presets.
+**Frequency, bandwidth and spreading factor must match on every node that needs to talk.** There is no negotiation or fallback. If one is different, the nodes are silent strangers. That includes every other MeshCore node in your area, which is why communities agree on presets.
 
 ---
 
-## The UK/EU preset
+## Regional presets
 
-At the time of writing, the UK and European MeshCore community standard is the **EU/UK (Narrow)** preset:
+MeshCore apps ship with named presets for each region. As I checked them while writing this lesson, the UK and EU preset is **EU/UK (Narrow)**:
 
-| Setting | Value |
+| Setting | EU/UK (Narrow) |
 |---|---|
-| Frequency | **869.618 MHz** |
-| Bandwidth | **62.5 kHz** |
-| Spreading Factor | **8** |
-| Coding Rate | **8** |
+| Frequency | 869.618 MHz |
+| Bandwidth | 62.5 kHz |
+| Spreading Factor | 8 |
+| Coding Rate | 8 |
 {:class="table table-single"}
 
-Some networks run the same settings with **CR5** instead of CR8 for slightly faster transmissions - and usefully, CR5 and CR8 nodes can still hear each other, because coding rate is carried in the packet header. Frequency, bandwidth and spreading factor are the three that absolutely must match.
+For comparison, the USA preset I found was 910.525MHz, SF7, BW62.5, CR5. The MeshCore FAQ says many regions moved to narrow presets from October 2025, and an older EU/UK setting (869.525MHz, SF11, BW250) is now marked deprecated. **Presets change.** Before you commit, look at the preset list in the flasher or app, and ask your local community. Use the preset for *your* country, not the one in this lesson, and never transmit on a frequency your regulator does not allow.
 
-> ## Check before you commit
->
-> Regional conventions do change - the UK moved from an older 869.525MHz / BW250 / SF11 setup to these narrow settings. Before you finalise, check the current preset list in the flasher or app, and check with your local community: [localmesh.co.uk](https://localmesh.co.uk) for Britain.
-
----
-
-## Why these numbers?
-
-**869.618MHz** sits inside the 869.4 - 869.65MHz sub-band, which is the slice that allows 500mW ERP at a 10% duty cycle in the UK. It is the most generous corner of the 868 band.
-
-**62.5kHz bandwidth** is narrow enough to slide between the smart meters, weather stations and doorbells that clutter the band, and it gains about 6dB of sensitivity over a 250kHz channel.
-
-**SF8** keeps airtime down. Combined with the narrow bandwidth it lands at a similar data rate to the old SF11/BW250 setup, but it is far more robust in the presence of interference and it uses a quarter of the spectrum.
-
-**CR8** adds generous error correction, which pays off on the marginal long links that repeaters are there to serve.
+```mermaid
+flowchart TD
+    S["Choose your country's preset"] --> R["Repeater: set radio"]
+    S --> C["Client: pick same preset in the app"]
+    R --> M{"Same freq, BW, SF?"}
+    C --> M
+    M -->|"Yes"| H["Nodes can hear each other"]
+    M -->|"No"| X["Silent strangers"]
+```
 
 ---
 
 ## Setting them on the repeater
 
-If you selected the EU/UK (Narrow) preset in the flasher, this is already done. To check, connect the console and run:
+Connect the console (lesson 5) and check what is there:
 
 ```text
-get freq
 get radio
 ```
 
-To set them explicitly:
+To set them explicitly (UK values shown):
 
 ```text
-set freq 869.618
 set radio 869.618,62.5,8,8
 ```
 
-The `set radio` command takes `frequency,bandwidth,spreading factor,coding rate` in one go. Then confirm:
+The command takes `frequency,bandwidth,spreading factor,coding rate`. Frequency is in **MHz** and bandwidth in **kHz**. Then confirm, and restart so the settings are definitely in use:
 
 ```text
 get radio
-```
-
-Reboot the board to be sure the settings have stuck:
-
-```text
 reboot
 ```
 
@@ -86,56 +74,83 @@ reboot
 
 ## Setting them on the client
 
-The companion node is configured from the app rather than the console. Once you have paired the phone in lesson 9, you will find the radio settings in the app's settings screen - and there is a preset menu there too, usually behind a three-dot icon next to the frequency field. Pick **EU/UK (Narrow)** and apply.
-
-We will walk through this in lesson 9. For now, just know that the same four numbers have to appear on both devices.
+The companion is configured from the app. After pairing in lesson 9, open the app's settings for the node and choose your regional preset from the radio settings. The exact menu names depend on the app version.
 
 ---
 
 ## Transmit power
 
-While we are in the radio settings, check the transmit power:
-
 ```text
 get tx
 ```
 
-The Heltec V3 tops out at around **21** (dBm) - Heltec quote 21 &plusmn;1dBm for this board. Stock firmware usually sets this sensibly. To change it:
+MeshCore accepts a power in dBm (the docs list 1 to 22). Your board has its own hardware limit, around 21dBm on the Heltec V3. To change it:
 
 ```text
 set tx 20
 ```
 
-**Should you always run maximum power?** For a fixed repeater, yes - it is well within the legal ERP limit with a normal antenna. For a battery powered node, dropping to 17dBm roughly halves the transmit current for about 40% of the range, which can be a good trade.
+Lower power uses less battery. Check your region's limit from lesson 4 before raising it.
+
+---
+
+## Duty cycle
+
+Newer firmware (v1.15 and later, per the MeshCore docs) has a duty cycle limit:
+
+```text
+get dutycycle
+set dutycycle 10
+```
+
+The docs say the default is 50%. In the UK and EU the sub-band we use is commonly limited to 10%, so `set dutycycle 10` is the setting to try there. Older firmware used `set af <value>` (airtime factor), which the docs now call deprecated. If `get dutycycle` is not recognised, your firmware is older: update it, or use `af`. Whichever you use, the responsibility for staying legal is yours.
 
 ---
 
 ## Try it Yourself
 
-1. Run `get radio` on your repeater and write the four numbers down. You will want them when you configure the client.
-2. Deliberately set your client to a different spreading factor and try to message the repeater. Confirm that nothing at all happens - it is a useful failure to have seen once.
-3. Challenge: work out the theoretical data rate for SF8/BW62.5 using an online LoRa calculator, then compare it to SF11/BW250.
+1. Run `get radio` on your repeater and write the four numbers down. You need them for the client.
+2. Deliberately set your client to a different spreading factor and try to see the repeater. Confirm that nothing happens, then put it back.
+3. Challenge: calculate the airtime of a 30 byte packet at SF8/BW62.5 and at SF7/BW62.5 with a LoRa calculator. How much airtime does the lower SF save?
 
 ---
 
 ## Common Issues
 
-**Problem**: `set freq 869618` does not work.
+- **Problem**: `set freq 869618` does not work.
+- **Solution**: Frequency is in MHz, so use `869.618`.
+- **Why**: MeshCore expects megahertz with a decimal point.
 
-**Solution**: The value is in **MHz**, so it is `869.618`, not the raw kHz figure.
+- **Problem**: My nodes cannot hear each other even though I believe the settings match.
+- **Solution**: Run `get radio` on the repeater, read the app's settings on the client, and reboot both.
+- **Why**: Assuming is not checking; one digit different is enough to silence a node.
 
-**Why**: MeshCore expects megahertz with a decimal point.
+- **Problem**: I hear my own nodes but not the local community repeaters.
+- **Solution**: Ask your local group which preset they use.
+- **Why**: Regional presets have changed over time and some repeaters run older settings.
 
-**Problem**: My nodes still cannot hear each other with matching settings.
+> **Teachers**: the preset must be legal in your own country, so decide it once and write it on the board, then have every pair copy it. A wrong frequency is the cause of nearly every "it does not work" moment, and a mistyped frequency is also the main way a learner might transmit outside the permitted band.
 
-**Solution**: Reboot both, and check that both are actually running the frequency you think - `get radio` on the repeater, and read the app's settings screen on the client rather than assuming.
+## Check your understanding
 
-**Why**: Settings changes sometimes need a reboot to take effect, and the flasher preset only applies at flash time.
+{% quiz %}
+? Which command shows the repeater's current frequency, bandwidth, SF and CR?
+- [x] `get radio`
+- [ ] `get name`
+- [ ] `advert`
+> `get radio` prints all four values, and `set radio` takes them in the same order.
 
-**Problem**: I can hear my own nodes, but not any of the local community repeaters.
+? In `set radio 869.618,62.5,8,8`, what is 62.5?
+- [ ] Spreading factor
+- [x] Bandwidth in kHz
+- [ ] Transmit power
+> The order is frequency, bandwidth, spreading factor, coding rate.
 
-**Solution**: Ask your local group which preset they are on - some regions still run legacy settings.
-
-**Why**: Regional presets have changed over time, and older repeaters do not always get updated.
+? Why should you check the preset list before copying this lesson's numbers?
+- [ ] Presets never change
+- [x] Regional presets change, and yours must be legal where you live
+- [ ] The app picks a random one
+> The lesson explains that presets have moved over time and rules differ by country.
+{% endquiz %}
 
 ---
