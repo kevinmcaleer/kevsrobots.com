@@ -399,11 +399,10 @@
   description: 'Learn ROS 2, the Robot Operating System, on a Raspberry Pi: run it
     in Docker, write Python nodes that publish and subscribe to topics, and visualise
     LiDAR scans in RViz2.'
-  duration: 0h 46m
+  duration: 1h 21m
   groups:
-  - ros
-  - raspberry pi
-  - robotics
+  - raspberrypi
+  - robots
   lessons: 20
   level: intermediate
   link: /learn/learn_ros/00_intro.html

@@ -4,61 +4,64 @@ title: VSCode setup
 type: page
 description: Install the VSCode extensions so we can remotely connect to the Raspberry Pi and Docker container instances
 cover: /learn/learn_ros/assets/banners/08_vscode_setup.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to connect VS Code on your computer to the Pi over SSH, and open a terminal inside the running ROS 2 container.
+
 ## VSCode Remote connection
 
-Microsoft VSCode can connect to a remote computer, such as our Raspberry Pi, over SSH and then connect to running containers on that remote machine so that we can write, run and debug our ROS2 programs.
+A Raspberry Pi is a fine computer, but it's nicer to write code on your main machine with its big screen and keyboard. VS Code can connect to the Pi over SSH. You edit files on the Pi as if they were local, and the VS Code terminal runs commands on the Pi.
 
-We will need to install some extensions first, then connect to our ROS2 container on the Raspberry Pi.
-
----
+```mermaid
+sequenceDiagram
+    participant PC as Your computer (VS Code)
+    participant Pi as Raspberry Pi
+    participant C as ROS 2 container
+    PC->>Pi: Remote-SSH connect
+    PC->>Pi: Open folder ~/cubie-1
+    PC->>C: docker compose exec ros2 bash
+    C-->>PC: terminal output
+```
 
 ## Install Extensions
 
-Let's install the extensions on our main computer (not the Raspberry Pi), that we will use to write, run and debug code.
+Install these on your main computer (not the Pi):
 
-![VS Code Extensions](assets/vscode_extensions.png){:class="img-fluid w-50 shadow-lg"}
-
-* **Click on the Extensions Icon** - This will list installed and installable extensions
-* **Type `docker` in the search bar** - This will show installable docker extensions
-* **Click Install on the `Docker` extension** - This extension is published by Microsoft
-* **Type `remote` in the search bar** - This will show installable remote extensions
-* **Click Install on the `Remote - SSH` extension** - This extension is published by Microsoft
-* **Click Install on the `Remote Explorer` extension** - This extension is also published by Microsoft
+* **Click on the Extensions icon** - this lists installed and installable extensions
+* **Search for `docker`** and click Install on the `Docker` extension, published by Microsoft
+* **Search for `remote`** and click Install on the `Remote - SSH` extension, also by Microsoft
+* **Install `Remote Explorer`** too, which lists your remote machines
 
 ---
 
 ## Remote connect
 
-We can now connect to the Raspberry Pi 4 running our new docker container by using SSH from our main computer running VSCode.
-
-* **Open Command Palette** - Hold `CTRL + SHIFT + P` to open the command palette
-* **Connect to Host** - Type `connect` in the command palette search and then select Connect
-* **Click `Remote-SSH Connect to Host...`** - Then type `pi@192.168.1.4` where `pi` is the username you selected [earlier](02_pi_setup.html#setup-the-sd-card-using-raspberry-pi-imager) and the `IP Address` is that of your Pi.
+* **Open the Command Palette** - press `CTRL + SHIFT + P` (`CMD + SHIFT + P` on a Mac)
+* **Connect to Host** - type `connect`, and choose `Remote-SSH: Connect to Host...`
+* **Enter the address** - type `pi@192.168.1.4`, where `pi` is the username you chose [earlier](02_pi_setup.html) and the IP address is your Pi's
 
 ![Screenshot of remote-ssh](assets/remote_ssh01.png){:class="img-fluid w-100 shadow-lg"}
 
-> *To find the ip address of your Pi you can type `ip a` from the Raspberry Pi terminal; there will be a list
-> of all the addresses the Pi is using.*
+> *To find your Pi's IP address, type `ip a` in a terminal on the Pi; it lists all the addresses the Pi is using.*
 
-* **Type your Pi's password** - Type the password you created in [Step 2](02_pi_setup.html#setup-the-sd-card-using-raspberry-pi-imager)
+* **Type your Pi's password** - the one you created in the Imager
 
 ![Screenshot of remote-ssh](assets/remote_ssh02.png){:class="img-fluid w-100 shadow-lg"}
 
-* **You are now connected to the Pi remotely** - notice the green connection status at the bottom left of VSCode
+* **You are now connected** - notice the connection status at the bottom left of VS Code
 
 ![Screenshot of remote-ssh](assets/remote_ssh03.png){:class="img-fluid w-100 shadow-lg"}
 
-* **Click on `Open Folder`** -  We can now open a folder; select 'Cubie-1'
+* **Click `Open Folder`** - select `cubie-1`
 
 ![Screenshot of remote-ssh](assets/remote_ssh04.png){:class="img-fluid w-100 shadow-lg"}
 
-*You can browse the remote file system and open the files we downloaded [earlier](05_get_cubie.html#get-cubie-1-files)*
+*You can now browse the files we [downloaded earlier](05_get_cubie.html).*
 
 ![Screenshot of remote-ssh](assets/remote_ssh05.jpg){:class="img-fluid w-100 shadow-lg"}
 
@@ -66,12 +69,10 @@ We can now connect to the Raspberry Pi 4 running our new docker container by usi
 
 ## Connect to the container
 
-We can now connect to the running docker container that we created in [step 7](07_build_container.html#run-the-container). We can create code from the comfort of our main computer running vscode and run code remotely on our robot. This will make the development process much simpler.
+Now connect to the container we started in [lesson 7](07_build_container.html).
 
-To connect to the container:
-
-* **Open a terminal** - with <code>CTRL + SHIFT + `</code>
-* **Connect to the running container** - From the terminal, type:
+* **Open a terminal** - with `CTRL + SHIFT +` backtick
+* **Connect to the running container** - type:
 
 ```bash
 cd ~/cubie-1/docker
@@ -82,9 +83,46 @@ docker compose exec ros2 bash
 
 ![Screenshot of remote-ssh](assets/remote_ssh07.png){:class="img-fluid w-100 shadow-lg"}
 
-> To list all the running containers, type `docker ps` from the terminal
+Your prompt changes to something like `root@raspberrypi:/#`. You're now inside the container, where ROS 2 is installed. Type `exit` to leave it.
 
-> Congratulations, you've now setup ROS2 in a container on the Raspberry Pi and connected to it from another computer running VSCode.
+> Congratulations, you've set up ROS 2 in a container on the Raspberry Pi and connected to it from another computer running VS Code.
 {:class="bg-blue"}
 
 ---
+
+## Try it Yourself
+
+1. Open a second terminal in VS Code (the `+` button) and connect it to the container too. You'll need two for later.
+2. In the container, run `ls /ros2`. Compare it with `ls ~/cubie-1` on the Pi. What do you notice?
+3. Challenge: create a file in `/ros2` in the container, then find it in the VS Code Explorer.
+
+## Common Issues
+
+- **Problem**: VS Code can't connect: "Could not establish connection".
+- **Solution**: Check the IP address with `ip a` on the Pi, that the Pi and your computer are on the same network, and that SSH is enabled.
+- **Why**: The address changes if your router gives the Pi a new one.
+
+- **Problem**: `service "ros2" is not running`.
+- **Solution**: Run `docker compose up -d` in `~/cubie-1/docker` first.
+- **Why**: `exec` only works on a container that is running.
+
+## Check your understanding
+
+{% quiz %}
+? Which VS Code extension lets us edit files on the Pi from another computer?
+- [ ] Docker
+- [x] Remote - SSH
+- [ ] Remote Explorer
+> Remote - SSH makes the connection; Remote Explorer lists the machines.
+
+? How do we open a shell in the running ROS 2 container?
+- [x] `docker compose exec ros2 bash`
+- [ ] `docker build -t ros2 .`
+- [ ] `ssh ros2`
+> `exec` runs a command inside a running container; `bash` gives us a shell.
+
+? Where do we find the Pi's IP address?
+- [ ] In the Docker logs
+- [x] By typing `ip a` in a terminal on the Pi
+- [ ] In `docker-compose.yml`
+{% endquiz %}

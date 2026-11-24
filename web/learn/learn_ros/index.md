@@ -8,11 +8,25 @@ description: 'Learn ROS 2, the Robot Operating System, on a Raspberry Pi: run it
   Docker, write Python nodes that publish and subscribe to topics, and visualise LiDAR
   scans in RViz2.'
 level: intermediate
-course_duration: 0h 46m
+course_duration: 1h 21m
 lesson_count: 20
 first_lesson: 00_intro.html
-quiz_total: 14
+quiz_total: 58
 video: _cTJhCRv858
+outcomes:
+- Set up a 64-bit Raspberry Pi with Docker and a ROS 2 Humble container
+- Build a colcon workspace and run a Python node with rclpy
+- Create a ROS 2 Python package with a publisher and a subscriber
+- Inspect a running system with ros2 topic list, ros2 topic echo and ros2 node list
+- Show live LiDAR data in RViz2 using a TF2 transform
+prerequisites:
+- Linux command line basics (Introduction to the Linux Command Line)
+- Some Python (Python for beginners)
+- Docker basics help, but are not required
+you_need:
+- A Raspberry Pi 4 or 5 (8GB recommended) and a 32GB or larger SD card
+- A second computer running VS Code
+- An RPLidar A1 (only for the last four lessons)
 navigation:
 - name: Learn ROS with me
 - content:
@@ -48,7 +62,7 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
-    - name: Talker ROS2 Program
+    - name: Nodes as Classes
       link: 10_listener.html
   - section: ROS2 Python Packages
     content:

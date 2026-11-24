@@ -1983,9 +1983,8 @@
     "author": "Kevin McAleer",
     "date_published": "2023-01-07",
     "groups": [
-      "ros",
-      "raspberry pi",
-      "robotics"
+      "raspberrypi",
+      "robots"
     ],
     "lessons": [
       {
