@@ -1,128 +1,157 @@
 ---
 title: Installing Docker
-description: Step-by-step guide to installing Docker on various operating systems.
+description: Install Docker Engine and the Compose plugin on Raspberry Pi OS (64-bit) or a Debian-based Linux PC, and run your first container.
 layout: lesson
 type: page
 cover: /learn/docker/assets/banners/02_installing-docker.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Installing Docker on Your Machine
+By the end of this lesson you will be able to install Docker Engine on a Raspberry Pi or Linux PC, run it without `sudo`, and prove it works with `hello-world`.
 
-This lesson guides you through the installation process of Docker on different operating systems including Windows, MacOS, and Linux.
+Everything in this lesson is typed in a terminal **on the Pi or Linux PC** that will run your containers.
 
-### Prerequisites
+## Before you start
 
-Before installing Docker, ensure your system meets the necessary requirements for the Docker edition you're installing. Generally, you need:
-
-- A 64-bit processor with Second Level Address Translation (SLAT)
-- 4GB system RAM
-- BIOS-level hardware virtualization support must be enabled in the BIOS settings. For Windows, Hyper-V and Containers Windows features must be enabled.
-
-### Installing Docker on Windows
-
-To install Docker on Windows, follow these steps:
-
-1. **System Requirements**:
-   - Windows 10 64-bit: Pro, Enterprise, or Education (Build 15063 or later).
-   - Hyper-V and Containers Windows features must be enabled.
-
-2. **Download Docker Desktop for Windows**:
-   - Visit the [Docker Hub](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) and download the Docker Desktop installer.
-
-3. **Installation Process**:
-   - Run the installer and follow the instructions to install Docker Desktop on Windows.
-   - Docker Desktop will start automatically once the installation is complete.
-
-4. **Verifying the Installation**:
-   - Open a command prompt or PowerShell, and run `docker --version` to check the Docker version.
-   - Run `docker run hello-world` to verify that Docker can pull and run images.
-
-### Installing Docker on MacOS
-
-Follow these steps to install Docker on MacOS:
-
-1. **System Requirements**:
-   - Mac hardware must be a 2010 or newer model, with Intel’s hardware support for memory management unit (MMU) virtualization, including Extended Page Tables (EPT) and Unrestricted Mode.
-   - macOS must be version 10.14 or newer.
-
-2. **Downloading Docker Desktop for MacOS**:
-   - Go to the [Docker Hub](https://hub.docker.com/editions/community/docker-ce-desktop-mac/) and download the Docker Desktop installer.
-
-3. **Installation Instructions**:
-   - Open the Docker.dmg file and drag the Docker icon to your Applications folder.
-   - Run Docker from the Applications folder or Launchpad.
-
-4. **How to Verify if Docker is Running Correctly**:
-   - Open a terminal and type `docker --version` to see the installed Docker version.
-   - Run `docker run hello-world` to ensure Docker can create and run containers.
-
-### Installing Docker on Linux
-
-Docker can be installed on various Linux distributions. Here’s a general guide:
-
-1. **Installing Docker on Ubuntu, CentOS, Debian**:
-   - Update your package index using `sudo apt-get update` (Ubuntu/Debian) or `sudo yum check-update` (CentOS).
-   - Install Docker using the package manager with `sudo apt-get install docker-ce` (Ubuntu/Debian) or `sudo yum install docker-ce` (CentOS).
-   - Start the Docker service with `sudo systemctl start docker`.
-
-2. **Setting Up Docker to Run Without sudo**:
-   - Add your user to the 'docker' group with `sudo usermod -aG docker $USER`.
-   - Log out and log back in so that your group membership is re-evaluated.
-
-3. **Verifying Docker Installation and Running a Test Container**:
-   - Verify installation by running `docker --version`.
-   - Test Docker installation by running `docker run hello-world`.
-
----
-
-## How to Set Up Docker to Run Without sudo
-
-The script below can be used to install Docker on a Raspberry Pi and configure it to run without sudo. This is useful for running Docker commands as a non-root user.
-
-**Note** - use the `sudo` command to run the script as a superuser.
+Check that you are running a 64-bit system:
 
 ```bash
-#!/bin/bash
-
-# Define list of packages to install
-pkgstoinstall=(libffi-dev libssl-dev python3 python3-pip)
-
-# Update package cache and install packages
-sudo apt-get update
-sudo apt-get install -y "${pkgstoinstall[@]}"
-
-# Download Docker convenience script if it doesn't exist
-if [ ! -f /home/pi/get-docker.sh ]; then
-    curl -fsSL https://get.docker.com -o /home/pi/get-docker.sh
-fi
-
-# Install Docker if not already installed
-if [ ! -f /usr/bin/docker ]; then
-    sh /home/pi/get-docker.sh
-fi
-
-# Add 'pi' user to the 'docker' group
-sudo usermod -aG docker pi
-
-# Unmask the Docker service
-sudo systemctl unmask docker
-
-# Fix permissions for Docker socket
-sudo chmod 666 /var/run/docker.sock
-
-# Install docker-compose if it doesn't exist
-if [ ! -f /usr/local/bin/docker-compose ]; then
-    sudo pip3 -v install docker-compose
-fi
-
-# Start Docker service
-sudo systemctl start docker
+uname -m
 ```
 
-This script automates the installation of Docker and its components on a Raspberry Pi, along with setting permissions to allow running Docker commands without requiring sudo access.
+On a Raspberry Pi 4 or 5 with the 64-bit Raspberry Pi OS you'll see `aarch64`. On a normal PC you'll see `x86_64`. Either is fine.
 
----
+```mermaid
+flowchart LR
+    A["Add Docker's apt repository"] --> B["Install Engine + Compose plugin"]
+    B --> C["Add yourself to the docker group"]
+    C --> D["Log out and in"]
+    D --> E["hello-world"]
+```
+
+## Option 1: Docker's apt repository (recommended)
+
+This is the method Docker documents for Debian, which is what Raspberry Pi OS is built on. It means `sudo apt upgrade` keeps Docker up to date for you. Type these in order:
+
+```bash
+sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
+
+Those lines fetch Docker's signing key, so your Pi can check that packages really come from Docker. Now add the repository itself:
+
+```bash
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/debian
+Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+```
+
+The `$(...)` parts are filled in for you with your Debian release name (such as `bookworm`) and your CPU type. Finally install:
+
+```bash
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+> If you are on Ubuntu or another distribution, the repository address and steps differ. Pick your system on [docs.docker.com/engine/install](https://docs.docker.com/engine/install/).
+
+## Option 2: the convenience script
+
+Docker also publishes a script that detects your system and does the above for you. It is quicker for a throwaway Pi, though Docker itself recommends the repository method for anything long-lived. It is good habit to read a script before running it as root:
+
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+less get-docker.sh
+sudo sh get-docker.sh
+```
+
+Press `q` to leave `less`. Use **either** option 1 or option 2, not both.
+
+## Run Docker without sudo
+
+By default only root can talk to Docker. Add your user to the `docker` group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+Group changes only apply to new logins, so log out and back in (or reboot). Then check:
+
+```bash
+groups
+```
+
+You should see `docker` in the list.
+
+## Test it
+
+```bash
+docker run hello-world
+```
+
+Docker downloads a tiny image and runs it. Look for "Hello from Docker!" in the output. Now check the Compose plugin, noting the **space** between `docker` and `compose`:
+
+```bash
+docker --version
+docker compose version
+```
+
+Both should print a version number. If so, you're ready.
+
+> Windows and macOS users can install Docker Desktop from [docs.docker.com/desktop](https://docs.docker.com/desktop/), which includes Compose. This course is written and checked for Linux and the Raspberry Pi, so the install steps above are the ones we have covered.
+
+## Common Issues
+
+- **Problem**: `permission denied while trying to connect to the Docker daemon socket`.
+- **Solution**: Make sure you ran `sudo usermod -aG docker $USER`, then log out and back in. In a hurry, prefix the command with `sudo`.
+- **Why**: Group membership is read at login, so the change does not reach your current terminal.
+
+- **Problem**: `docker: command not found`.
+- **Solution**: The install did not finish. Re-run the `apt install` line and read any error messages.
+- **Why**: The `docker` program only exists once the `docker-ce-cli` package is installed.
+
+- **Problem**: Old tutorials tell you to install Compose with pip, or to run `sudo chmod 666 /var/run/docker.sock`.
+- **Solution**: Don't. Compose arrives with the `docker-compose-plugin` package, and the group step above is the safe way to get access.
+- **Why**: The old pip package is the retired version 1 of Compose, and opening the socket to everyone lets any program on the machine control Docker.
+
+> **Teachers**: Installing needs admin (`sudo`) rights, and members of the `docker` group effectively have root on the machine, so only add trusted learners. On a shared Pi, set it up once for everyone. Downloads come from `download.docker.com` and Docker Hub, which some school firewalls block, so test first. Installing takes roughly 5 to 10 minutes per Pi on a decent connection.
+
+## Try it Yourself
+
+1. Run `docker run hello-world` a second time. Is it faster? Why do you think that is?
+2. Run `docker info` and find the line that tells you which version of Docker Engine you have.
+3. Challenge: run `sudo systemctl status docker` and work out what "active (running)" is telling you. Press `q` to quit.
+
+## Check your understanding
+
+{% quiz %}
+? Which command checks that the Compose plugin is installed?
+- [ ] `compose --version`
+- [x] `docker compose version`
+- [ ] `pip show compose`
+> Compose is now a Docker plugin, run as `docker compose` with a space. The old hyphenated form belongs to the retired version 1.
+
+? Why do you log out and back in after `usermod -aG docker $USER`?
+- [ ] To download the Docker images
+- [x] Because group membership is only read at login
+- [ ] To restart the Docker service
+> Your current session still has your old groups. A new login picks up the new `docker` group.
+
+? What does `docker run hello-world` prove?
+- [x] Docker can pull an image from the internet and run a container
+- [ ] Your robot is working
+- [ ] Compose is installed
+> It downloads the small `hello-world` image from Docker Hub and runs it, which exercises the whole chain.
+{% endquiz %}

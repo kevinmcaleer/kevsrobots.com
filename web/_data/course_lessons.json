@@ -827,12 +827,13 @@
   {
     "slug": "docker",
     "name": "Docker",
-    "description": "Learn how to use Docker to build and deploy applications in a containerised environment.",
+    "description": "Learn how to use Docker on a Raspberry Pi or Linux PC. Build a robot status web app, package it in an image, then run it with Redis, a network and a volume using Docker Compose.",
     "cover": "assets/docker.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-01-21",
     "groups": [
-      "docker"
+      "raspberrypi",
+      "python"
     ],
     "lessons": [
       {

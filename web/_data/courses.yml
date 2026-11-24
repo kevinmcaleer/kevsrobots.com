@@ -176,11 +176,13 @@
 - author: Kevin McAleer
   cover: /learn/docker/assets/docker.jpg
   date_published: 2024-01-21
-  description: Learn how to use Docker to build and deploy applications in a containerised
-    environment.
-  duration: 0h 27m
+  description: Learn how to use Docker on a Raspberry Pi or Linux PC. Build a robot
+    status web app, package it in an image, then run it with Redis, a network and
+    a volume using Docker Compose.
+  duration: 0h 54m
   groups:
-  - docker
+  - raspberrypi
+  - python
   lessons: 11
   level: beginner
   link: /learn/docker/00_intro.html
