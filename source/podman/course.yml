@@ -6,8 +6,23 @@
   layout: course
   cover: assets/cover.jpg
   groups:
-    - raspberry pi
-    - docker
+    - raspberrypi
+    - python
+  outcomes:
+    - Explain what daemonless and rootless mean and why they matter
+    - Install Podman on Raspberry Pi OS and run your first container without sudo
+    - Build, run, inspect and clean up images and containers with the Podman CLI
+    - Group containers into a pod and export it as Kubernetes YAML
+    - Run a container as a systemd service that restarts and starts at boot, using Quadlet
+    - Migrate a Docker robot status app to Podman
+  prerequisites:
+    - Docker
+    - Introduction to the Linux Command Line on Raspberry Pi OS
+  you_need:
+    - A Raspberry Pi 4 or 5 running Raspberry Pi OS (64-bit), or another Debian-based Linux PC
+    - An internet connection to pull images
+    - A terminal, on the Pi itself or over SSH
+    - A web browser on any computer on the same network
   description: >-
     Learn how to transition from Docker to Podman and unlock better container workflows 
     with rootless and daemonless architecture. This hands-on course covers everything from 
@@ -18,7 +33,7 @@
     - section:
         name: Getting Started
         content:
-          - 01_intro_to_podman.md
+          - 00_intro.md
           - 01_video.md
           - 02_docker_vs_podman_architecture.md
           - 03_installing_podman.md

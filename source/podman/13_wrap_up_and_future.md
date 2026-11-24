@@ -1,78 +1,89 @@
 ---
 title: Wrap-up and Future Outlook
-description: Review what you’ve learned, explore how Podman fits into the future of containers, and discover next steps for deepening your knowledge.
+description: Review what you built with Podman, check your skills against the course outcomes, and find the next courses and tools to explore.
 layout: lesson
 type: page
 cover: /learn/podman/assets/banners/13_wrap_up_and_future.jpg
-date_updated: 2025-05-24
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Congratulations! You've completed the **From Docker to Podman** course.
+By the end of this lesson you will be able to summarise what makes Podman different from Docker, and choose what to learn next.
 
-You’ve learned how Podman works, why it’s a compelling alternative to Docker, and how to migrate and run your container-based workflows with more flexibility, control, and security.
+Congratulations makers! You started with a Docker habit and finished with a robot status page that runs as a rootless systemd service on a Raspberry Pi. Let's look back at the route.
 
----
+```mermaid
+flowchart LR
+    A["Daemonless and<br/>rootless (lesson 2)"] --> B["Install and<br/>CLI (3, 4)"]
+    B --> C["Build and<br/>manage (6)"]
+    C --> D["Pods, Compose,<br/>Kubernetes YAML (7 to 9)"]
+    D --> E["Quadlet service<br/>(10)"]
+    E --> F["Migration project<br/>(12)"]
+```
 
-## What You’ve Learned
+## What you learned
 
-- **Podman vs Docker architecture** — daemonless, rootless, secure
-- **Installing Podman** across Linux, macOS, and Windows
-- **Using the Podman CLI** to manage containers, images, and volumes
-- **Unique Podman features** like pods, systemd integration, and Kubernetes support
-- **Working with podman-compose** and converting Docker Compose files
-- **Running Podman in production** with systemd and logs
-- **Debugging and troubleshooting** container issues
-- **Migrating a real-world app** from Docker to Podman
+| Lesson | The big idea |
+| --- | --- |
+| 2 to 3 | Podman has no daemon. Containers are normal processes owned by you, and install needs `sudo` only once |
+| 4 | Most Docker commands work with `docker` swapped for `podman`, but image names need the registry, and rootless cannot use ports below 1024 |
+| 5 to 6 | User namespaces map container root to your user. A Containerfile builds an image just like a Dockerfile |
+| 7 to 9 | Pods share a network. Compose needs a provider. `podman kube generate` and `podman kube play` move between Podman and Kubernetes YAML |
+| 10 to 11 | Quadlet runs containers as systemd services, and the debugging routine finds most faults |
+| 12 | A real project migrated in four stages |
+{:class="table table-single"}
 
----
+## Where Podman fits
 
-## Where Podman Fits in the Future
+Podman and Docker follow the same OCI standards, so you are not choosing one forever. Images move freely between them. A sensible rule of thumb:
 
-Podman is part of a broader shift toward:
+- **Use Podman** when you want rootless by default, no always-on daemon, systemd services and pods, or you are on a distribution that ships it
+- **Use Docker** when your team, tools or tutorials already depend on it, or you need its desktop tools
+- **Know both**, because the knowledge transfers and most of the commands match
 
-- **Rootless, user-space containerization**
-- **Kubernetes-native development workflows**
-- **Modular tooling** (e.g., Buildah, Skopeo, CRI-O)
-- **Daemonless security models** for multi-tenant environments
+Podman is developed quickly, so check `podman --version` and the [official Podman documentation](https://docs.podman.io) when something here looks out of date.
 
-As containers evolve, Podman’s lightweight, standards-based approach is likely to become even more relevant.
+## Next steps
 
----
+- **Scale up.** Pods and Kubernetes YAML are a good lead-in to running containers across several Pis with the [K3s course](/learn/k3s/)
+- **Revisit the Docker side.** If you skipped any of it, the [Docker course](/learn/docker/) builds the same app with a daemon and shows you what you gained and gave up
+- **Sharpen the terminal.** The [Linux command line course](/learn/linux_intro/) covers the shell, permissions and processes that make containers easier to understand
+- **Explore the toolbox.** Try Buildah for building images, and Skopeo for inspecting and copying them
+- **Automate updates.** Look up `podman auto-update` and the Quadlet `AutoUpdate=` setting so your robot can pull newer images by itself
 
-## Next Steps
+## Try it Yourself
 
-Want to take your skills further? Here’s what you can explore next:
+1. Write a one-paragraph explanation, in your own words, of why a rootless container is safer than a root one
+2. Take another small project of your own, such as a different Flask or Node app, and run it through the four stages of lesson 12
+3. Challenge: teach someone else. Explain Podman to a friend using the architecture diagram from lesson 2 and see what questions they ask
 
-- **Learn Buildah**: For advanced image building pipelines
-- **Explore Skopeo**: For copying, verifying, and signing container images
-- **Run containers with systemd timers**: Automate periodic jobs
-- ☁️ **Integrate with Kubernetes**: Use `podman generate kube` and `podman play kube`
-- **Transition to CRI-O**: Run production Kubernetes workloads using Podman-compatible infrastructure
+## Common Issues
 
----
+- **Problem**: A tutorial uses `podman generate systemd` or `podman play kube` and you are unsure whether to follow it.
+- **Solution**: Use Quadlet and `podman kube play` instead, and check `podman --version` before copying commands.
+- **Why**: Podman changes quickly, and older tutorials teach commands that are deprecated or renamed.
 
-## Thank You!
+## Check your understanding
 
-Thank you for joining this course. If you found it helpful, consider:
+{% quiz %}
+? What does Podman use instead of a daemon to keep services running at boot?
+- [ ] A background `podmand` service
+- [x] systemd, for example through Quadlet files
+- [ ] Compose restart policies only
+> Lesson 10 uses Quadlet to turn a container into a systemd service.
 
-- Sharing the course with others
-- Reporting issues or suggesting improvements
-- Building and sharing your own Podman-based projects
+? Can a Docker-built image run under Podman?
+- [x] Yes, both use OCI images
+- [ ] No, they use different formats
+- [ ] Only on macOS
+> OCI images are portable between the tools.
 
----
-
-## Stay Connected
-
-- Visit [podman.io](https://podman.io) for official docs and updates
-- Explore GitHub repos: [containers/podman](https://github.com/containers/podman)
-- Join the conversation on Reddit, Mastodon, or your favorite DevOps community
-
----
-
-Happy containerizing!
-
----
+? Which course would you take to run containers across several Raspberry Pis?
+- [ ] The Linux command line course
+- [x] The K3s course
+- [ ] This course again
+> K3s is a small Kubernetes distribution designed for clusters of small machines.
+{% endquiz %}

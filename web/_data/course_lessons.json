@@ -3801,14 +3801,14 @@
     "author": "Kevin McAleer",
     "date_published": "2025-05-24",
     "groups": [
-      "raspberry pi",
-      "docker"
+      "raspberrypi",
+      "python"
     ],
     "lessons": [
       {
-        "file": "01_intro_to_podman.md",
+        "file": "00_intro.md",
         "section": "Getting Started",
-        "url": "/learn/podman/01_intro_to_podman.html"
+        "url": "/learn/podman/00_intro.html"
       },
       {
         "file": "01_video.md",

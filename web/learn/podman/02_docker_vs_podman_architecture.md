@@ -8,17 +8,19 @@ date: 2025-05-24
 previous: 01_video.html
 next: 03_installing_podman.html
 description: Understand the key architectural differences between Docker and Podman,
-  and why Podman's design offers improved security and flexibility.
+  and why a daemonless, rootless design matters on a shared or always-on machine like
+  a robot.
 percent: 21
-duration: 2
-date_updated: 2025-05-24
+duration: 5
+quiz_total: 47
+date_updated: 2026-11-24
 navigation:
 - name: From Docker to Podman
 - content:
   - section: Getting Started
     content:
     - name: Introduction to Podman
-      link: 01_intro_to_podman.html
+      link: 00_intro.html
     - name: 'Video: Podman vs Docker'
       link: 01_video.html
     - name: Docker vs Podman Architecture
@@ -29,7 +31,7 @@ navigation:
     content:
     - name: CLI Compatibility and Basic Commands
       link: 04_cli_compatibility_and_commands.html
-    - name: "Podman Features Docker Doesn\u2019t Have"
+    - name: Podman Features Docker Doesn't Have
       link: 05_podman_unique_features.html
     - name: Managing Containers and Images
       link: 06_managing_containers_and_images.html
@@ -62,92 +64,108 @@ navigation:
 
 ---
 
-To appreciate Podman’s advantages, it’s important to understand how it differs architecturally from Docker. The biggest shift? **No daemon.**
+By the end of this lesson you will be able to explain what a daemon is, how Podman runs containers without one, and what "rootless" protects you from.
 
-> What is a **Daemon?** A daemon is a background service that runs continuously, managing tasks and resources. In Docker, the `dockerd` daemon is responsible for running containers, while Podman operates without a central daemon.
+To see why Podman exists, we need to look at how the two tools are put together. The biggest difference is one word: **daemon**.
 
----
+> A **daemon** is a program that runs in the background all the time, waiting for jobs. Docker's daemon is called `dockerd`. Podman has no equivalent.
 
-Let’s explore the implications of this and what it means for how you work with containers.
+## How Docker works
 
----
+Docker uses a **client and server** design:
 
-## Docker’s Architecture
+- The `docker` command is only a client. It sends your request to the `dockerd` daemon
+- The daemon does the real work: it pulls images, starts containers and manages networks and volumes
+- By default the daemon runs as `root`, and anyone who can talk to it (members of the `docker` group) can effectively act as root on the machine
 
-Docker uses a **client-server** model:
+That is convenient, but it means one long-running, privileged process sits between you and every container.
 
-- The `docker` CLI talks to the `dockerd` daemon
-- The daemon manages containers, images, volumes, and networks
-- The daemon runs as root and controls everything on behalf of the user
+## How Podman works
 
-### Pros:
-- Centralized control
-- Simplifies resource management
+Podman is **daemonless**. When you type `podman run`, the `podman` command itself sets the container up, then hands it to a tiny monitor process called `conmon` and a runtime (`crun` or `runc`) that does the actual starting. Each container is just a normal Linux process owned by *you*.
 
-### Cons:
-- Single point of failure
-- Requires root privileges
-- Difficult to audit individual actions
-
----
-
-## Podman’s Architecture
-
-Podman is **daemonless** and **runs as the user**:
-
-- The `podman` CLI executes commands directly
-- Each container runs under its own system process
-- No root access required by default (rootless)
+```mermaid
+flowchart TB
+    subgraph docker["Docker"]
+        D1["docker CLI"] --> D2["dockerd daemon<br/>(runs as root)"]
+        D2 --> D3["container A"]
+        D2 --> D4["container B"]
+    end
+    subgraph podman["Podman"]
+        P1["podman CLI<br/>(runs as you)"] --> P2["conmon + runtime"]
+        P1 --> P3["conmon + runtime"]
+        P2 --> P4["container A"]
+        P3 --> P5["container B"]
+    end
+```
 
 {% include gallery.html images="/learn/podman/assets/comparison.png" titles="Docker vs Podman" descriptions="Podman has no daemon and can run rootless" noborder=true cols=2 %}
 
----
+## What rootless really means
 
-### Pros:
+Rootless means the container runs without administrator rights on your machine. Inside the container a program may think it is `root`, but Linux **user namespaces** map that "root" to your ordinary user account on the outside. If a program escapes the container, all it gets is your normal user's permissions, not control of the whole Pi.
 
-- No central daemon = fewer security concerns
-- Runs as the current user = better access control
-- Easy to integrate with `systemd` and user services
-- Compatible with container standards (OCI)
+**Real robot example.** Imagine your robot runs a web dashboard in a container, and someone finds a bug in the dashboard. With a root daemon, the attacker may be able to reach the whole system. With a rootless container they can only touch what your user can touch.
 
----
+Docker can also run in rootless mode, but it is an optional extra you set up. In Podman it is the normal way of working.
 
-## Security Implications
+## Side by side
 
-| Feature               | Docker                  | Podman                       |
-|----------------------|:------------------------|:-----------------------------|
-| Rootless Support      | Experimental/limited | Full support               |
-| Daemon Required       | Yes                  | No                         |
-| SELinux Integration   | Limited              | Strong                     |
-| Auditability          | Shared daemon logs   | Per-process/user logging   |
-{:class="table table-striped"}
+| Question | Docker (default install) | Podman |
+| --- | --- | --- |
+| Background daemon needed? | Yes, `dockerd` | No |
+| Runs as | `root` | Your own user |
+| Needs `sudo` or the `docker` group? | Yes | No, for rootless use |
+| Container restarts at boot | Daemon restarts them | You use systemd |
+| Image format | OCI images | The same OCI images |
+{:class="table table-single"}
 
----
+The last row matters: an image built with Docker runs under Podman and the other way round, because both follow the open **OCI** standard.
 
-> **Rootless containers** allow users to run containers without elevated privileges, greatly reducing attack surface.
+## The trade-offs
 
----
+No daemon is not all upside:
 
-## Why It Matters
+- **Nothing brings your containers back after a reboot by itself.** Docker's daemon revives containers with `--restart always`. With Podman you hand that job to `systemd`, which we cover in lesson 10
+- **Rootless containers cannot bind ports below 1024** (such as 80) by default, so we use ports like 8080 or 5000
+- **Rootless networking is a little slower** than the root equivalent, because traffic passes through a user-space helper
 
-Podman’s architecture empowers users and sysadmins to:
+## Try it Yourself
 
-- Run containers without special permissions
-- Avoid the risks of a long-running root daemon
-- Cleanly separate user workloads
-- Better support containers as system services
+1. Write down, in your own words, what a daemon does and why Docker needs one but Podman does not
+2. List two things a rootless container cannot do that a root one could
+3. Challenge: sketch the diagram above from memory, then add where an attacker would have to break in for each tool
 
----
+## Common Issues
 
-## When It Matters
+- **Problem**: You expect `podman` to leave a background service running that you can check with `systemctl status podman`.
+- **Solution**: Run `ps aux | grep podman` instead. You will only see processes for containers that are actually running.
+- **Why**: With no daemon, nothing runs until you start a container. (Podman has an optional API socket service for tools that need one, but you do not need it for day-to-day use.)
 
-- **On servers:** Fewer root processes = safer environment
-- **In dev environments:** No need for `sudo`
-- **With `systemd`:** Map containers directly to services
-- **In shared machines:** Users manage their own containers securely
+## Check your understanding
 
----
+{% quiz %}
+? What is the main architectural difference between Docker and Podman?
+- [ ] Podman can only run on Red Hat systems
+- [x] Podman has no central daemon; each container is started directly by the user's command
+- [ ] Podman uses a different image format that Docker cannot read
+> Docker routes everything through the `dockerd` daemon, while Podman launches containers itself and uses `conmon` to watch each one.
 
-Next up: [Installing Podman](03_installing_podman)
+? In a rootless container, what does "root" inside the container map to on the host?
+- [ ] The real `root` user
+- [x] Your own ordinary user account
+- [ ] A random system service account
+> User namespaces map the container's root to your user, so an escape only gets your permissions.
 
----
+? Why does a rootless container use port 8080 rather than port 80?
+- [ ] Port 80 is reserved for Docker
+- [x] Ordinary users cannot bind ports below 1024 by default
+- [ ] Podman does not support web servers
+> Ports under 1024 are privileged on Linux, so rootless containers use higher numbers.
+
+? Who restarts a Podman container after a reboot?
+- [ ] The Podman daemon
+- [x] systemd, if you set the container up as a service
+- [ ] Nothing, it is impossible
+> There is no daemon, so systemd takes over the job. Lesson 10 shows how.
+{% endquiz %}

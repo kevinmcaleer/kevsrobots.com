@@ -1,24 +1,26 @@
 ---
 layout: lesson
-title: "Podman Features Docker Doesn\u2019t Have"
+title: Podman Features Docker Doesn't Have
 author: Kevin McAleer
 type: page
 cover: /learn/podman/assets/banners/05_podman_unique_features.jpg
 date: 2025-05-24
 previous: 04_cli_compatibility_and_commands.html
 next: 06_managing_containers_and_images.html
-description: "Discover the powerful features that set Podman apart from Docker \u2014\
-  \ including rootless containers, systemd integration, and pods."
+description: See rootless user namespaces and the missing daemon for yourself, then
+  get a map of Podman's extras, including pods, Quadlet and the Buildah and Skopeo
+  tools.
 percent: 42
-duration: 3
-date_updated: 2025-05-24
+duration: 5
+quiz_total: 47
+date_updated: 2026-11-24
 navigation:
 - name: From Docker to Podman
 - content:
   - section: Getting Started
     content:
     - name: Introduction to Podman
-      link: 01_intro_to_podman.html
+      link: 00_intro.html
     - name: 'Video: Podman vs Docker'
       link: 01_video.html
     - name: Docker vs Podman Architecture
@@ -29,7 +31,7 @@ navigation:
     content:
     - name: CLI Compatibility and Basic Commands
       link: 04_cli_compatibility_and_commands.html
-    - name: "Podman Features Docker Doesn\u2019t Have"
+    - name: Podman Features Docker Doesn't Have
       link: 05_podman_unique_features.html
     - name: Managing Containers and Images
       link: 06_managing_containers_and_images.html
@@ -62,108 +64,124 @@ navigation:
 
 ---
 
-While Podman offers strong Docker compatibility, it also introduces **powerful features** that go beyond Docker’s capabilities.
+By the end of this lesson you will be able to prove for yourself that Podman containers are ordinary processes owned by you, and name the main extras that Podman adds beyond Docker's commands.
 
-In this lesson, we’ll explore the unique capabilities of Podman that make it a favorite among developers, sysadmins, and DevOps teams.
+Lesson 2 told you Podman is daemonless and rootless. Let's not take that on trust. We'll look at it from the outside.
 
----
+## See it: your container is your process
 
-## Rootless Containers
-
-Podman was built from the ground up with **rootless** containers in mind:
-
-- Run containers **as your own user**
-- No `sudo`, no elevated permissions
-- Improves security and auditability
-
-> Containers cannot access system-wide files unless explicitly allowed — helping to prevent privilege escalation vulnerabilities.
-
----
-
-## Daemonless Architecture
-
-No long-running daemon process:
-
-- Every container is launched and managed by your shell
-- Easier to understand and debug
-- No single point of failure
-
-> Each Podman container is just a **regular Linux process**, making it more transparent than Docker’s centralized daemon model.
-
----
-
-## Systemd Integration
-
-You can generate native `systemd` unit files from containers or pods:
+Start a container that just sleeps, in the background:
 
 ```bash
-podman generate systemd --name mycontainer --files --restart-policy=always
-````
-
-Then:
-
-```bash
-systemctl --user enable container-mycontainer.service
-systemctl --user start container-mycontainer.service
+podman run -d --name sleeper docker.io/library/alpine sleep 600
 ```
 
-> This makes Podman perfect for running containers **as background services** that survive reboots — especially on servers or IoT devices.
-
----
-
-## Pods: Kubernetes-Style Container Grouping
-
-Podman supports **pods**, just like Kubernetes:
+Now look at it from the host's point of view:
 
 ```bash
-podman pod create --name webpod
-podman run -dt --pod webpod nginx
-podman run -dt --pod webpod redis
+ps -o user,pid,cmd -C sleep
 ```
 
-- Multiple containers share the same network namespace
-- Ideal for colocating services (e.g., app + DB + reverse proxy)
-- Mirrors the Kubernetes model — great for learning
+You will see the `sleep` command listed with **your** username, not `root`. That is the whole trick: a Podman container is a normal process owned by you.
 
----
+Now look from the inside:
 
-## Modular Ecosystem
+```bash
+podman exec sleeper id
+```
 
-Podman is part of a container toolchain that includes:
+Inside, the user is `uid=0(root)`. Same process, two views. Linux **user namespaces** translate between them, and you can print the translation:
 
-- **Buildah** – image building (like `docker build`, but without a daemon)
-- **Skopeo** – image copying and signing
-- **CRI-O** – Kubernetes runtime alternative to Docker
+```bash
+podman unshare cat /proc/self/uid_map
+```
 
-These tools can be combined or used independently for **fine-grained control**.
+The first line says that user 0 inside maps to your real user ID outside, and the following lines map the rest of the container's user IDs onto the block reserved for you in `/etc/subuid`.
 
----
+```mermaid
+flowchart LR
+    subgraph inside["Inside the container"]
+        I0["uid 0 (root)"]
+        I1["uid 1 to 65535"]
+    end
+    subgraph outside["On your Raspberry Pi"]
+        O0["uid 1000 (you)"]
+        O1["uid 100000 and up<br/>(your reserved block)"]
+    end
+    I0 --> O0
+    I1 --> O1
+```
 
-## Enhanced Security with SELinux and AppArmor
+Clean up:
 
-Podman has **first-class support for SELinux and AppArmor**, allowing more robust security profiles:
+```bash
+podman rm -f sleeper
+```
 
-- Containers are isolated using Linux security modules
-- Great for use in hardened or multi-user environments
+## See it: no daemon
 
-> Rootless + SELinux = secure containers with minimal privileges
+Run `podman ps` and then `ps aux | grep -i podman`. With nothing running, there is no Podman process waiting in the background. A busy Docker machine always has `dockerd` listed.
 
----
+## Extras you will meet in this course
 
-## Summary of Unique Features
+| Feature | What it gives you | Lesson |
+| --- | --- | --- |
+| Pods | Groups of containers sharing one network, like Kubernetes | 7 |
+| `podman kube generate` and `podman kube play` | Export and run Kubernetes YAML | 9 |
+| Quadlet | Describe a container as a systemd service in a small file | 10 |
+| `podman unshare` | Open a shell inside your user namespace to fix file ownership | 11 |
+{:class="table table-single"}
 
-| Feature               |  Docker   |  Podman  |
-|-----------------------|:----------|:---------|
-| Rootless by default   |         |        |
-| Daemonless            |         |        |
-| Systemd integration   | Manual | Native |
-| Kubernetes-style pods |         |        |
-| SELinux/AppArmor      |  Limited  |  Full  |
-| OCI toolchain support |         |        |
-{:class="table table-striped"}
+## The wider toolbox
 
----
+Podman is one of a family of tools that all follow the OCI standards:
 
-Next up: [Managing Containers and Images](06_managing_containers_and_images)
+- **Buildah** builds images, with fine control and no daemon. `podman build` uses its code, so you rarely need to call it directly
+- **Skopeo** inspects, copies and signs images without pulling them. For example `skopeo inspect docker://docker.io/library/alpine` shows an image's details from the registry
+- **CRI-O** is a lightweight container runtime for Kubernetes clusters
 
----
+> **Warning**: You may read older tutorials that say Podman generates systemd files with `podman generate systemd`. That command still works in many versions but is **deprecated**. Lesson 10 teaches Quadlet, which replaces it.
+
+## Try it Yourself
+
+1. Repeat the "see it" steps with a different command, such as `sleep 900`, and find it in `ps`
+2. Start the `sleeper` container again, then run `podman top sleeper` to list the processes inside it. Remove it afterwards
+3. Challenge: run `podman run --rm docker.io/library/alpine id` and compare it with your own `id` on the Pi. Explain the difference using the `uid_map` output
+
+## Common Issues
+
+- **Problem**: `podman unshare` or a rootless container complains about `newuidmap` or no mapping.
+- **Solution**: Install the helpers with `sudo apt install -y uidmap` and check `/etc/subuid` has a line for your user.
+- **Why**: User namespaces need the helpers and a reserved block of IDs to build the mapping.
+
+- **Problem**: `skopeo: command not found`.
+- **Solution**: Install it with `sudo apt install -y skopeo`.
+- **Why**: Skopeo is a separate tool, not part of the `podman` package.
+
+## Check your understanding
+
+{% quiz %}
+? Who owns a rootless container's process when you look from the host with `ps`?
+- [ ] root
+- [x] Your own user
+- [ ] A user called podman
+> The container is a normal Linux process started by you.
+
+? What does `podman unshare cat /proc/self/uid_map` show?
+- [ ] A list of running pods
+- [x] How user IDs inside your containers map to user IDs on the host
+- [ ] The container's IP address
+> It prints the user namespace mapping that makes rootless containers work.
+
+? Which tool inspects and copies images without pulling them?
+- [ ] Buildah
+- [ ] CRI-O
+- [x] Skopeo
+> Skopeo works with images in registries directly.
+
+? What replaces the deprecated `podman generate systemd`?
+- [x] Quadlet files
+- [ ] A Docker daemon
+- [ ] `podman machine`
+> Lesson 10 teaches Quadlet, the current way to run containers under systemd.
+{% endquiz %}
