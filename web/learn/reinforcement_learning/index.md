@@ -10,10 +10,33 @@ description: Teach your robot to learn — instead of hardcoding every behaviour
   then export the frozen Q-table as JSON and deploy it to a Pico-powered differential-drive
   robot running MicroPython.
 level: beginner
-course_duration: 1h 45m
+course_duration: 1h 57m
 lesson_count: 16
 first_lesson: 00_intro.html
+quiz_total: 45
 video: epuO7xpz6i4
+outcomes:
+- Explain the reinforcement learning loop (agent, environment, state, action, reward)
+  using a robot as the example
+- Design a reward function and spot reward hacking before it wastes a training run
+- Write tabular Q-learning from scratch in plain Python, using epsilon-greedy exploration
+- Train a policy in a grid-world simulation, read its learning curve and test it with
+  sensor noise
+- Load a trained Q-table onto a Raspberry Pi Pico and run it as a simple obstacle-avoiding
+  robot
+- Say honestly what a toy Q-table does and does not tell you about real robot learning
+prerequisites:
+- Python basics such as functions, loops, dictionaries and classes, for example the
+  Introduction to Python course
+- For the last three lessons, MicroPython motor and ultrasonic sensor basics, for
+  example the MicroPython Robotics Projects course
+you_need:
+- A computer with a recent Python 3 for lessons 1 to 11 (standard library only, no
+  installs)
+- Lessons 12 and 13 only, for the real robot, a Raspberry Pi Pico with MicroPython,
+  an L298N motor driver, two DC gear motors, an HC-SR04 ultrasonic sensor with two
+  resistors (1k and 2k), and a battery pack
+- Everything except the last two lessons works with no hardware at all
 navigation:
 - name: Reinforcement Learning for Beginners
 - content:

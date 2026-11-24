@@ -7,11 +7,13 @@ cover: /learn/reinforcement_learning/assets/banners/05_markov_decision_processes
 date: 2026-06-13
 previous: 04_mapping_the_robots_world.html
 next: 06_looking_into_the_future.html
-description: "Understand why your robot only needs to know where it is right now \u2014\
-  \ and the mathematical idea that makes that claim safe."
+description: Understand why your robot only needs to know where it is right now, and
+  the idea that makes that claim reasonable.
 percent: 36
 duration: 6
-date_updated: 2026-06-13
+quiz_total: 45
+code_target: cpython
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning for Beginners
 - content:
@@ -64,137 +66,158 @@ navigation:
 
 ---
 
-You might have noticed something quietly assumed in the last few lessons: when the agent chooses an action, it only looks at the *current* state — not at the history of states that led here. This seems almost too simple. Surely the robot should remember where it came from?
-
-This lesson explains why that simplification is not just convenient but theoretically justified — and what it means in practice for our robot.
+By the end of this lesson you will be able to describe the Markov property, write a tiny problem as states, actions, transitions and rewards, and follow a policy through it in code.
 
 ---
 
-## The Markov Property
+You may have noticed something quietly assumed so far: when the agent chooses an action, it only looks at the *current* state, not at the history of states that led here. That seems almost too simple. Surely the robot should remember where it came from?
 
-The core idea is called the **Markov property**, named after the Russian mathematician Andrey Markov. In plain English:
+---
+
+## The Markov property
+
+The **Markov property**, named after the mathematician Andrey Markov, says:
 
 > **The future depends only on the present, not on the past.**
 
-More precisely: once you know the current state, knowing the entire history of previous states gives you no additional information about what will happen next.
+More carefully: once you know the current state, knowing the whole history adds nothing about what happens next. For our robot that means "where I am, which way I face and what my sensor reads is all I need". The route I took to get here is already baked into the state.
 
-For a robot, this translates to: "where I am and what my sensors read right now is all I need to decide what to do next." I don't need to remember that I came from the top-left corner via a clockwise spiral three seconds ago. That history is already encoded in my current position and sensor reading.
-
----
-
-## When Is This Actually True?
-
-The Markov property holds cleanly when the state captures everything relevant to the future. For our discretised grid world:
-
-```python
-# State = (row, col, heading, distance_band)
-# This captures:
-#   - WHERE the robot is right now (row, col)
-#   - WHICH WAY it's pointing (heading)
-#   - WHAT it can see directly ahead (distance_band)
-#
-# Given this information, the consequences of any action
-# (forward, turn_left, turn_right) are fully determined.
-# The history of how we got here doesn't change those consequences.
-
-state = (2, 3, "east", "far")  # robot at (2,3), facing east, clear ahead
-
-# Whether the robot got here by turning from the north
-# or by driving straight from the west doesn't matter.
-# The correct action is the same either way.
-```
-
-In practice, the Markov property is approximately true for our robot. A sensor reading plus a grid position usually captures enough to make a good decision. The approximation breaks down in edge cases (e.g. if the robot is slipping on a smooth floor, its physical speed might matter too), but for a learning exercise with discrete states, it's an excellent model.
+This is a *modelling choice*, and it is true only when the state captures everything that matters. In the grid world it holds exactly: position, heading and the layout fully decide what `forward` does. On a real robot it holds only approximately. If the wheels slip or the battery sags, speed matters too, and a state without it is not quite Markov. We will return to that in lesson 11.
 
 ---
 
-## The Full MDP Framework
+## The four parts of an MDP
 
-A **Markov Decision Process (MDP)** is the mathematical framework that formalises everything we've discussed so far. It has four components:
+A **Markov decision process (MDP)** is the framework that formalises everything so far:
 
-| Component | Symbol | Our robot's version |
+| Part | Symbol | Our robot's version |
 |---|---|---|
-| Set of states | S | All (row, col, heading, distance_band) combinations |
-| Set of actions | A | {forward, turn_left, turn_right, stop} |
-| Transition function | T(s, a, s') | Which state follows when you take action a in state s |
-| Reward function | R(s, a, s') | The reward received for that transition |
+| States | S | Every combination of position, heading and distance band |
+| Actions | A | forward, turn_left, turn_right, stop |
+| Transitions | T(s, a) | Which state follows when you take action a in state s |
+| Rewards | R(s, a) | The reward for that step |
 {:class="table table-single"}
 
-In a known environment, T and R are given as tables. In **model-free reinforcement learning** (which is what Q-learning is), the agent doesn't know T or R in advance — it discovers them through experience.
+Q-learning is **model-free**: the agent never gets T or R as tables. It discovers their effects by acting. But writing a tiny MDP out in full is the best way to see what the agent is up against.
+
+```mermaid
+flowchart LR
+    S0["State 0<br/>left wall"] -- "right" --> S1["State 1"]
+    S1 -- "left" --> S0
+    S1 -- "right: +10" --> S2["State 2<br/>GOAL"]
+    S2 -- "left" --> S1
+```
+
+Here is that corridor as code, with a function that follows any policy and reports how it did. The same transition and reward tables could describe a robot in a three-cell hallway.
 
 ```python
-# An MDP in miniature: a corridor with three cells
+import random
 
-# States: positions 0, 1, 2 (left to right)
-# Actions: "left", "right"
-# Goal: reach position 2
-
-S = [0, 1, 2]
+S = [0, 1, 2]                    # positions in the corridor, left to right
 A = ["left", "right"]
 
-# Transition table: T[state][action] = next_state
+# Transition table: T[state][action] = next state
 T = {
-    0: {"left": 0,  "right": 1},   # at left wall; can't go further left
-    1: {"left": 0,  "right": 2},
-    2: {"left": 1,  "right": 2},   # at goal; can't go further right
+    0: {"left": 0, "right": 1},      # at the left wall: cannot go further left
+    1: {"left": 0, "right": 2},
+    2: {"left": 1, "right": 2},      # the goal
 }
 
-# Reward table: R[state][action] = reward
+# Reward table: R[state][action] = reward for taking that action
 R = {
     0: {"left": -0.1, "right": -0.1},
-    1: {"left": -0.1, "right": 10.0},   # reaching goal from state 1 is great!
+    1: {"left": -0.1, "right": 10.0},    # stepping into the goal pays well
     2: {"left": -0.1, "right": -0.1},
 }
+
+GOAL = 2
+
+
+def run_episode(policy, max_steps=100):
+    """Follow a policy from state 0 and return (steps, total reward)."""
+    state, total = 0, 0.0
+    for step in range(1, max_steps + 1):
+        action = policy(state)
+        total += R[state][action]
+        state = T[state][action]
+        if state == GOAL:
+            return step, total
+    return max_steps, total
+
+
+random.seed(5)
+random_policy = lambda s: random.choice(A)
+always_right = lambda s: "right"
+
+steps, total = run_episode(always_right)
+print(f"Always right: {steps} steps, reward {total:.1f}")
+
+results = [run_episode(random_policy) for _ in range(1000)]
+avg_steps = sum(r[0] for r in results) / len(results)
+avg_reward = sum(r[1] for r in results) / len(results)
+print(f"Random policy over 1000 episodes: {avg_steps:.1f} steps, reward {avg_reward:.1f}")
 ```
 
-This tiny MDP is fully specified. An agent can solve it by inspection: always go right until you hit state 2. For a 5×5 grid with obstacles, the correct policy isn't obvious by inspection — that's exactly where Q-learning shines.
+Output:
 
----
-
-## Episodes and Terminal States
-
-An MDP run is divided into **episodes**: sequences of state-action-reward triples that start at an initial state and end at a **terminal state** (the goal, or a dead end like a crash).
-
-```python
-# A simple episode trace
-episode = [
-    # (state,         action,      reward)
-    ((1, 0, "east", "far"),  "forward",     +1.0),
-    ((1, 1, "east", "far"),  "forward",     +1.0),
-    ((1, 2, "east", "near"), "turn_left",   -0.1),
-    ((1, 2, "north","far"),  "forward",     +1.0),
-    ((0, 2, "north","far"),  "forward",    +50.0),  # reached goal!
-]
-# Episode ends. Reset to start for the next episode.
+```
+Always right: 2 steps, reward 9.9
+Random policy over 1000 episodes: 6.1 steps, reward 9.5
 ```
 
-Between episodes, the environment resets (robot back to starting position, obstacles in their original places). The agent keeps its Q-table — the knowledge accumulated across all previous episodes is preserved.
+A **policy** is simply a rule that maps each state to an action. "Always right" solves this corridor in two steps; the random policy needs about six on average (the exact figure wobbles slightly with the seed). On a 7 by 7 grid with obstacles the best policy is not obvious by inspection, and that is where learning earns its keep.
 
 ---
 
-## Try It Yourself
+## Episodes and terminal states
 
-1. Sketch the tiny corridor MDP above on paper. Trace through three episodes starting from state 0 with a random policy (randomly choose "left" or "right" each step). Record the reward each step. Notice how rarely you stumble upon the +10 reward by pure chance.
-
-2. Extend the corridor MDP to five cells with the goal at cell 4. Add a "death trap" at cell 2 (reward -50, episode ends). Write out the state space S, and action-transition table T.
-
-3. For the BurgerBot grid world on a 4×4 grid with 4 headings and 3 distance bands: calculate the total number of states |S| and the total number of state-action pairs |S| × |A|. This is the maximum number of entries in your Q-table.
+An MDP run is split into **episodes**: a sequence of (state, action, reward) steps from a starting state to a **terminal state**, which is the goal or a crash. The environment then resets, but the agent **keeps its Q-table**. Everything learned in earlier episodes carries forward.
 
 ---
+
+## Try it Yourself
+
+1. Change `random.seed(5)` to other numbers and rerun. How much does the random policy's average step count move around? Is it close to 6?
+2. Make the corridor five cells long with the goal at position 4. Update `S`, `T`, `R` and `GOAL`, and compare "always right" with the random policy again.
+3. Add a trap at cell 2 of the five-cell corridor with a reward of -50 for entering it and an episode that ends there. How would a good policy change?
+4. Challenge: for a 4 by 4 grid with 4 headings and 3 distance bands, work out the number of states and the number of state-action pairs. That is the biggest the Q-table can get.
 
 ## Common Issues
 
-**"Does the Markov property mean I can never use memory?"**
-Not exactly. In a Markov-violating environment (partially observable, or where history genuinely matters), you can make the state Markov by including the relevant history *in* the state. For example, if the robot's speed matters, include a discretised speed in the state. The cost is a larger state space.
+- **Problem**: Does the Markov property mean the robot can never use memory?
+- **Solution**: Put whatever memory matters into the state, such as the last action taken.
+- **Why**: If history matters, a state that includes it is Markov again, at the cost of more states.
 
-**"What if my transitions are random? The robot might slip and end up somewhere different."**
-MDPs handle probabilistic transitions fine — T(s, a, s') is technically a probability distribution over next states, not a deterministic mapping. Q-learning still works because it averages over many experiences of the same (s, a) pair. We'll see this implicitly in training.
+- **Problem**: My robot's moves are not always the same, for example the wheels slip.
+- **Solution**: Carry on. MDPs allow random transitions, and Q-learning averages over many tries of the same action.
+- **Why**: The transition is then a probability, not a fixed rule, and repeated experience reveals the typical outcome.
 
-**"Do I need to code the full MDP explicitly before training?"**
-Not with Q-learning! That's the beauty of model-free RL. The agent learns Q-values directly from experience without ever constructing T or R. We'll build the grid-world environment in lesson 10 and the agent will infer everything it needs through interaction.
+- **Problem**: Do I have to write T and R tables before training?
+- **Solution**: No. Q-learning learns from interaction, so the environment simply runs.
+- **Why**: Q-learning is model-free, so the tables above are only for understanding.
+
+## Check your understanding
+
+{% quiz %}
+? What does the Markov property say?
+- [ ] The past is more important than the present
+- [x] Once you know the current state, the history adds no extra information about what happens next
+- [ ] The robot must remember every state it visited
+> The state is supposed to carry everything relevant, so the history is not needed.
+
+? What is a policy?
+- [x] A rule that maps each state to an action
+- [ ] A table of transition probabilities
+- [ ] The reward at the goal
+> A policy tells the agent what to do in each state.
+
+? What is kept between episodes during training?
+- [ ] Nothing, each episode starts blank
+- [x] The agent's Q-table
+- [ ] The robot's position
+> The environment resets, but the knowledge in the Q-table carries over.
+{% endquiz %}
 
 ---
 
-Next up: discount factors and the Bellman idea — why a reward tomorrow is worth slightly less than the same reward today.
-
----
+Next up: discount factors and the Bellman idea, and why a reward tomorrow is worth slightly less than the same reward today.
