@@ -17,7 +17,7 @@ Pods allow you to group containers so they share the same **network namespace**,
 
 ---
 
-## 🧠 What Is a Pod?
+## What Is a Pod?
 
 A **pod** is a group of one or more containers that:
 
@@ -25,11 +25,11 @@ A **pod** is a group of one or more containers that:
 - Communicate over `localhost`
 - Can be managed together
 
-> 📦 This is useful when building applications with tightly coupled components that need to run together — and it mirrors how Kubernetes deploys workloads.
+> This is useful when building applications with tightly coupled components that need to run together — and it mirrors how Kubernetes deploys workloads.
 
 ---
 
-## ➕ Creating a Pod
+## Creating a Pod
 
 Create a new pod:
 
@@ -51,7 +51,7 @@ podman pod inspect webstack
 
 ---
 
-## 🧱 Adding Containers to a Pod
+## Adding Containers to a Pod
 
 Add a container to your pod:
 
@@ -80,11 +80,11 @@ Both containers now share:
 - Same ports
 - `localhost` connectivity
 
-> 🔧 This is very similar to running containers in a `docker-compose` network, but native to the Podman CLI.
+> This is very similar to running containers in a `docker-compose` network, but native to the Podman CLI.
 
 ---
 
-## 🔍 Viewing Pod Details
+## Viewing Pod Details
 
 See what's inside the pod:
 
@@ -107,7 +107,7 @@ podman pod rm webstack
 
 ---
 
-## 🧪 Example: Web App + Database Pod
+## Example: Web App + Database Pod
 
 ```bash
 podman pod create --name blogpod -p 8080:80
@@ -124,7 +124,7 @@ Your `blogweb` container can now talk to `blogdb` over `localhost:5432`.
 
 ---
 
-## ⚠️ Notes and Limitations
+## Notes and Limitations
 
 - Containers in a pod share network, but **not filesystem** by default
 - Each container still needs its own volume or mount
@@ -132,7 +132,7 @@ Your `blogweb` container can now talk to `blogdb` over `localhost:5432`.
 
 ---
 
-## 🧩 Pods and Kubernetes
+## Pods and Kubernetes
 
 Podman’s pod feature is a stepping stone to full Kubernetes deployment. You can even export pods as Kubernetes YAML:
 
@@ -146,7 +146,7 @@ Then replay it later with:
 podman play kube blogpod.yaml
 ```
 
-> 🔄 This makes Podman a great tool for **local development** of Kubernetes apps.
+> This makes Podman a great tool for **local development** of Kubernetes apps.
 
 ---
 

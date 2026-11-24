@@ -22,7 +22,7 @@ You’ll see how to:
 
 ---
 
-## 🎯 Project Goals
+## Project Goals
 
 By the end of this project, you will have:
 
@@ -33,7 +33,7 @@ By the end of this project, you will have:
 
 ---
 
-## 📁 Step 1: Clone the Sample App
+## Step 1: Clone the Sample App
 
 ```bash
 git clone https://github.com/kevinmcaleer/docker-migration-demo.git
@@ -48,7 +48,7 @@ This app contains:
 
 ---
 
-## 🔁 Step 2: Run with Podman Compose
+## Step 2: Run with Podman Compose
 
 Install `podman-compose` if you haven’t already:
 
@@ -76,7 +76,7 @@ podman logs <container-id>
 
 ---
 
-## 🛠 Step 3: Migrate to Native Podman Commands (Optional)
+## Step 3: Migrate to Native Podman Commands (Optional)
 
 Create a pod manually:
 
@@ -93,7 +93,7 @@ podman run -dt --pod myapp --name webapp myapp-image
 
 ---
 
-## ⚙️ Step 4: Add Systemd Integration
+## Step 4: Add Systemd Integration
 
 Generate a systemd unit file:
 
@@ -114,7 +114,7 @@ Repeat for other services as needed.
 
 ---
 
-## 🔐 Step 5: Verify Rootless Configuration
+## Step 5: Verify Rootless Configuration
 
 Ensure no root privileges are required:
 
@@ -127,18 +127,18 @@ You should see your containers running under your user.
 
 ---
 
-## ✅ Project Complete
+## Project Complete
 
 You’ve now fully migrated a Docker-based app to Podman:
 
-* ✅ Replaced Docker CLI
-* ✅ Used `podman-compose` or pods
-* ✅ Enabled rootless containerization
-* ✅ Integrated with systemd for background service management
+* Replaced Docker CLI
+* Used `podman-compose` or pods
+* Enabled rootless containerization
+* Integrated with systemd for background service management
 
 ---
 
-## 🚀 Challenge
+## Challenge
 
 Try deploying another project with:
 

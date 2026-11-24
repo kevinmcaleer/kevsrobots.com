@@ -80,7 +80,7 @@ You don’t need a datacenter — just a few small boards and some good planning
 
 ---
 
-## 🧠 Minimum Recommended Setup
+## Minimum Recommended Setup
 
 | Component                 | Description                              |
 |---------------------------|------------------------------------------|
@@ -93,20 +93,20 @@ You don’t need a datacenter — just a few small boards and some good planning
 
 ---
 
-> ⚠️ Avoid using Wi-Fi for clustering — use **wired Ethernet** for best stability and performance.
+> Avoid using Wi-Fi for clustering — use **wired Ethernet** for best stability and performance.
 
 ---
 
-## 🧱 Cluster Configurations
+## Cluster Configurations
 
-### 🔹 Basic 2-node Dev Cluster
+### Basic 2-node Dev Cluster
 
 - 1x Pi as **master/control-plane**
 - 1x Pi as **worker node**
 
 Great for testing, prototyping, and local workloads.
 
-### 🔹 3–4 Node Homelab Cluster
+### 3–4 Node Homelab Cluster
 
 - 1x Pi as master
 - 2–3x Pi as workers
@@ -116,7 +116,7 @@ Perfect for real-world deployments, CI/CD testing, and microservices projects.
 
 ---
 
-## 💾 Storage Options
+## Storage Options
 
 | Option        | Notes |
 |---------------|-------|
@@ -127,11 +127,11 @@ Perfect for real-world deployments, CI/CD testing, and microservices projects.
 
 ---
 
-> 🧠 K3s includes **local-path-provisioner** for simple storage, but you can configure NFS or longhorn later for better performance.
+> K3s includes **local-path-provisioner** for simple storage, but you can configure NFS or longhorn later for better performance.
 
 ---
 
-## 🌐 Networking Checklist
+## Networking Checklist
 
 - All Pis must be on the **same subnet**
 - Each Pi should have a **static IP** or DHCP reservation
@@ -140,7 +140,7 @@ Perfect for real-world deployments, CI/CD testing, and microservices projects.
 
 ---
 
-## 🛠 Optional (But Helpful)
+## Optional (But Helpful)
 
 - External USB SSDs or NVMe adapters
 - UPS (uninterruptible power supply)
@@ -149,7 +149,7 @@ Perfect for real-world deployments, CI/CD testing, and microservices projects.
 
 ---
 
-## 📦 Example BOM (Bill of Materials)
+## Example BOM (Bill of Materials)
 
 | Item                    | Qty | Link Example |
 |-------------------------|-----|---------------|
@@ -162,7 +162,7 @@ Perfect for real-world deployments, CI/CD testing, and microservices projects.
 
 ---
 
-## 🧪 Next Step
+## Next Step
 
 Once you’ve gathered your hardware, the next step is to install the OS and prepare the nodes for Kubernetes.
 

@@ -31,7 +31,7 @@ It's finally time to visualise the laser scan data.
 
 ---
 
-🥳 you should now be able to see the Lidar Data in the middle panel
+you should now be able to see the Lidar Data in the middle panel
 
 ![Create Display](assets/rviz2.jpg){:class="img-fluid w-100 shadow-lg"}
 

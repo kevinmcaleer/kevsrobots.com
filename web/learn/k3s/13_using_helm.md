@@ -80,7 +80,7 @@ Helm is a **package manager for Kubernetes** — like apt for Ubuntu or pip for 
 
 ---
 
-## 🎯 Why Use Helm?
+## Why Use Helm?
 
 | Feature       | Benefit                      |
 |---------------|------------------------------|
@@ -92,7 +92,7 @@ Helm is a **package manager for Kubernetes** — like apt for Ubuntu or pip for 
 
 ---
 
-## 🛠 Step 1: Install Helm
+## Step 1: Install Helm
 
 On your **development machine** or master node:
 
@@ -108,7 +108,7 @@ helm version
 
 ---
 
-## 📦 Step 2: Add a Helm Repository
+## Step 2: Add a Helm Repository
 
 Helm charts are hosted in repositories like Docker images.
 
@@ -121,7 +121,7 @@ helm repo update
 
 ---
 
-## 🚀 Step 3: Install an App with Helm
+## Step 3: Install an App with Helm
 
 Let’s install **WordPress** as an example:
 
@@ -143,7 +143,7 @@ kubectl get all
 
 ---
 
-## ⚙️ Step 4: Customize the Install
+## Step 4: Customize the Install
 
 You can pass custom values inline:
 
@@ -157,7 +157,7 @@ Or create a `values.yaml` file for reproducible installs.
 
 ---
 
-## 🔄 Step 5: Upgrade and Rollback
+## Step 5: Upgrade and Rollback
 
 Update your chart:
 
@@ -179,7 +179,7 @@ helm list
 
 ---
 
-## 🧹 Uninstall a Release
+## Uninstall a Release
 
 ```bash
 helm uninstall my-blog
@@ -189,7 +189,7 @@ All resources created by the chart will be removed.
 
 ---
 
-## 🧠 Common Use Cases for Helm
+## Common Use Cases for Helm
 
 * Deploying **Dashboards**, **Monitoring** (e.g. Prometheus, Grafana)
 * Managing **Databases**, **Message Queues**
@@ -198,7 +198,7 @@ All resources created by the chart will be removed.
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 

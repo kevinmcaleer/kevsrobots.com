@@ -67,7 +67,7 @@ In this course, we’ll go beyond blinking LEDs and dive into the world of **mot
 
 ---
 
-## 🤖 What You’ll Learn
+## What You’ll Learn
 
 In this course, you’ll build your own simple, programmable robot and learn how to:
 
@@ -81,7 +81,7 @@ In this course, you’ll build your own simple, programmable robot and learn how
 
 ---
 
-## 🔧 What You’ll Need
+## What You’ll Need
 
 To get the most out of this course, we recommend having:
 
@@ -99,7 +99,7 @@ If you’re using the **Pico W**, you’ll also need a 2.4GHz Wi-Fi network for 
 
 ---
 
-## 🧠 Why Learn Robotics with MicroPython?
+## Why Learn Robotics with MicroPython?
 
 Learning robotics with MicroPython is a great way to:
 
