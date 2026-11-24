@@ -136,7 +136,7 @@ You just:
 * Uploaded the binary to your Pico
 * Saw real-time output using USB serial
 
-🎉 Congratulations — you're now officially writing C code on the Raspberry Pi Pico!
+Congratulations — you're now officially writing C code on the Raspberry Pi Pico!
 
 ---
 

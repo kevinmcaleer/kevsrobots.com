@@ -9,7 +9,7 @@ description: Learn how to bring characters and props to life using Bottango, a p
   course walks you through installing Bottango, wiring servos, programming boards,
   and creating expressive motion sequences.
 level: beginner
-course_duration: 0h 35m
+course_duration: 0h 33m
 lesson_count: 11
 first_lesson: 00_intro.html
 navigation:

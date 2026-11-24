@@ -99,7 +99,7 @@
     no-code motion tool for animating servos and creating interactive scenes.  This
     course walks you through installing Bottango, wiring servos, programming boards,
     and creating expressive motion sequences.
-  duration: 0h 35m
+  duration: 0h 33m
   groups:
   - animation
   - robotics
@@ -381,7 +381,7 @@
     \ networking, persistent storage, and deploying real workloads \u2014 all on affordable\
     \ single-board computers. Ideal for homelabbers, IoT developers, and anyone curious\
     \ about Kubernetes at the edge."
-  duration: 0h 44m
+  duration: 0h 41m
   groups:
   - docker
   - raspberry pi

@@ -9,7 +9,7 @@ previous: 05_create_motion.html
 next: 07_sync_music.html
 description: Learn how to add interactivity to your animations using triggers in Bottango.
 percent: 63
-duration: 4
+duration: 3
 date_updated: 2025-05-03
 navigation:
 - name: Bottango Basics
@@ -59,7 +59,7 @@ So far, you've created animations that play back on their own. But what if you w
 
 ---
 
-## 🔔 What Are Triggers?
+## What Are Triggers?
 
 Triggers let you **start animations based on events**.
 
@@ -74,7 +74,7 @@ Triggers are powerful for creating **interactive props, puppets, and characters*
 
 ---
 
-## 🛠️ Step 1: Add a Trigger
+## Step 1: Add a Trigger
 
 1. Go to the **Triggers** panel (usually on the right side).
 2. Click **Add Trigger**.
@@ -83,7 +83,7 @@ Triggers are powerful for creating **interactive props, puppets, and characters*
 
 ---
 
-## 🎬 Step 2: Assign an Action
+## Step 2: Assign an Action
 
 1. Under **Trigger Action**, choose **Play Animation**.
 2. Select the animation or servo motion you want to play.
@@ -93,7 +93,7 @@ Now, when the trigger is activated, your animation will play instantly.
 
 ---
 
-## 💡 Example: Press a Key to Wave
+## Example: Press a Key to Wave
 
 Let’s say you’ve created a servo animation called `Wave`.
 
@@ -105,7 +105,7 @@ Now every time you press the `W` key, your servo will wave!
 
 ---
 
-## 🎮 Gamepad Triggers
+## Gamepad Triggers
 
 Bottango supports USB gamepads. You can:
 
@@ -113,11 +113,11 @@ Bottango supports USB gamepads. You can:
 - Combine triggers with servo control
 - Use for remote-controlled puppetry or performances
 
-> 🧪 Connect your gamepad before launching Bottango to ensure it’s recognized.
+> Connect your gamepad before launching Bottango to ensure it’s recognized.
 
 ---
 
-## 🔌 Digital Triggers (GPIO)
+## Digital Triggers (GPIO)
 
 If your board supports it, you can trigger actions from a physical input like:
 
@@ -129,7 +129,7 @@ In the **Trigger Source**, choose a pin (e.g., D7), and define it as HIGH or LOW
 
 ---
 
-## 🧠 Pro Tips
+## Pro Tips
 
 - You can chain triggers together for complex behaviors
 - Triggers can also **stop animations**, **switch scenes**, or **send signals** to other boards

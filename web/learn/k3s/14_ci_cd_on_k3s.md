@@ -80,7 +80,7 @@ In this lesson, you’ll learn how to automate deployment to your K3s cluster us
 
 ---
 
-## 🔄 CI/CD Overview
+## CI/CD Overview
 
 A typical CI/CD pipeline for K3s:
 
@@ -93,9 +93,9 @@ A typical CI/CD pipeline for K3s:
 
 ---
 
-## 🛠 Option 1: GitHub Actions + kubectl
+## Option 1: GitHub Actions + kubectl
 
-### 🧱 Step 1: Set Up Kubeconfig Access
+### Step 1: Set Up Kubeconfig Access
 
 To allow GitHub Actions to deploy, save your `~/.kube/config` from your master node, base64-encode it:
 
@@ -107,7 +107,7 @@ Add it as a **GitHub Secret** (e.g., `KUBECONFIG_B64`).
 
 ---
 
-### 📄 Step 2: Sample GitHub Actions Workflow
+### Step 2: Sample GitHub Actions Workflow
 
 ```yaml
 name: Deploy to K3s
@@ -139,17 +139,17 @@ Your repo should have a `k8s/` folder with Kubernetes manifests.
 
 ---
 
-## 🚀 Option 2: GitOps with ArgoCD or Flux
+## Option 2: GitOps with ArgoCD or Flux
 
 GitOps tools automatically sync your cluster with a Git repository.
 
-### 📦 Benefits:
+### Benefits:
 
 - Full version control of deployments
 - Rollbacks via Git history
 - Auto-syncing of environments
 
-### 🧰 Getting Started with ArgoCD:
+### Getting Started with ArgoCD:
 
 ```bash
 kubectl create namespace argocd
@@ -176,7 +176,7 @@ Connect your Git repo and ArgoCD will deploy automatically on changes.
 
 ---
 
-## 📋 Summary
+## Summary
 
 You now know how to:
 

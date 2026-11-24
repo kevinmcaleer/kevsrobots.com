@@ -15,17 +15,17 @@ Bluetooth is great, but with the **Pico W**, you can control your robot over **W
 
 ---
 
-## 📡 What You’ll Need
+## What You’ll Need
 
 - Raspberry Pi Pico W (instead of the standard Pico)
 - A 2.4GHz Wi-Fi network
 - Smartphone or computer with a modern browser
 
-> ⚠️ This lesson requires the `rp2-pico-w` MicroPython firmware (with networking support).
+> This lesson requires the `rp2-pico-w` MicroPython firmware (with networking support).
 
 ---
 
-## 🔌 Basic Setup
+## Basic Setup
 
 Update your Pico W with the latest MicroPython firmware, then connect it to Wi-Fi:
 
@@ -48,7 +48,7 @@ print('Connected, IP:', wlan.ifconfig()[0])
 
 ---
 
-## 🌐 Serve a Web Page for Control
+## Serve a Web Page for Control
 
 This example creates a web server that lets you send movement commands by clicking buttons:
 
@@ -105,7 +105,7 @@ Make sure to define forward(), backward(), etc., from earlier lessons.
 
 ---
 
-## 🧪 Test It Out
+## Test It Out
 
 - Connect the Pico W to Wi-Fi
 - Open the IP address shown in the REPL on your phone’s browser
@@ -113,7 +113,7 @@ Make sure to define forward(), backward(), etc., from earlier lessons.
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 - Add more buttons (e.g., for speed control)
 - Style the interface with CSS

@@ -17,11 +17,11 @@ This lesson will walk you through essential security best practices, including *
 
 ---
 
-## 🛡️ 1. Role-Based Access Control (RBAC)
+## 1. Role-Based Access Control (RBAC)
 
 RBAC controls **who can do what** in your cluster.
 
-### 📄 Example: Read-Only User
+### Example: Read-Only User
 
 Create a read-only role and binding:
 
@@ -53,11 +53,11 @@ roleRef:
 
 Apply it with `kubectl apply -f`.
 
-> 🔐 Use service accounts and OIDC for tighter control.
+> Use service accounts and OIDC for tighter control.
 
 ---
 
-## 🔑 2. Secrets Management
+## 2. Secrets Management
 
 Use `Secret` resources to manage credentials, API tokens, or sensitive configs.
 
@@ -84,7 +84,7 @@ kubectl create secret generic my-secret \
 
 ---
 
-## 🔐 3. Enable TLS (with Ingress)
+## 3. Enable TLS (with Ingress)
 
 If you use Traefik or another ingress controller, enable TLS for encrypted connections:
 
@@ -101,7 +101,7 @@ Then create an `Ingress` resource with `tls:` and a `Certificate` resource.
 
 ---
 
-## 🧱 4. Secure the K3s API
+## 4. Secure the K3s API
 
 ### Best practices:
 
@@ -115,7 +115,7 @@ Then create an `Ingress` resource with `tls:` and a `Certificate` resource.
 
 ---
 
-## 🔍 5. Audit & Monitoring
+## 5. Audit & Monitoring
 
 * Enable **audit logging** in K3s
 * Use **Falco** or **Sysdig** for runtime security monitoring
@@ -127,7 +127,7 @@ Then create an `Ingress` resource with `tls:` and a `Certificate` resource.
 
 ---
 
-## 🧠 Bonus Tips
+## Bonus Tips
 
 | Task                     | Recommendation                             |
 | ------------------------ | ------------------------------------------ |
@@ -140,7 +140,7 @@ Then create an `Ingress` resource with `tls:` and a `Certificate` resource.
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 
