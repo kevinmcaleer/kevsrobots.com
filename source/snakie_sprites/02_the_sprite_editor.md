@@ -4,12 +4,14 @@ description: Find Snakie's Sprite editor and learn what its tools, size presets 
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/02_the_sprite_editor.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find Snakie's Sprite editor and say what its tools, size presets and filmstrip do.
 
 ## Finding it
 

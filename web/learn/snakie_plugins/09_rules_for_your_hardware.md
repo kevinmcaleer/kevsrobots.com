@@ -12,7 +12,7 @@ description: Teach your Snakie linter about the Raspberry Pi Pico's reserved pin
 percent: 70
 duration: 6
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to teach your linter about the Pico's reserved pins, ignore comments, and decide what deserves an error.
 
 ## Rules a general linter can't know
 

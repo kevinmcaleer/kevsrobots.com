@@ -12,7 +12,7 @@ description: Scale the eyes up to fill the screen and make the robot face react 
 percent: 77
 duration: 6
 quiz_total: 39
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to scale the eyes up to fill the screen and make the face react to a light sensor.
 
 ## Small eyes on a big screen
 

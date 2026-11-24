@@ -9,6 +9,19 @@
       - robots
       - robotarms
       - micropython
+  outcomes:
+    - "Build a jointed robot model in Snakie from boxes, tubes and balls"
+    - "Choose the right joint type, axis and limits for each moving part"
+    - "Save named poses and play them back as a looping motion"
+    - "Bind servo pins to joints and drive the 3-D robot from MicroPython"
+    - "Export a motion as MicroPython code and the robot as a URDF file"
+    - "Render a short video of your robot moving"
+  prerequisites:
+    - "Getting Started with Snakie"
+    - "Wire It Up - Electronics in Snakie (helpful if you plan to wire real servos)"
+  you_need:
+    - "Snakie, in Chrome or Edge at app.snakie.org or as the desktop app"
+    - "Optional: three hobby servos and a Raspberry Pi Pico"
   description: >-
     Build a robot in 3-D inside Snakie, then make it move. Stack blocks into a three-joint desk arm, add hinges, save poses, build an animation, bind servos and drive the model from MicroPython on the simulator.
   content:

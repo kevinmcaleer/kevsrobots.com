@@ -4,12 +4,14 @@ description: Package a Snakie plugin for a club or class, write install instruct
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/11_sharing_your_plugin.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to package a plugin for a club or class, write install instructions and decide whether a plugin is safe to trust.
 
 ## One plugin, many computers
 
@@ -103,6 +105,8 @@ And when you're the author:
 - Never run a command or change a file the user didn't ask you to
 
 Blocks are the exception to the worry. As you saw in the last lesson, a block can only produce text. The Python in the same plugin file is still Python, though, so the plugin as a whole needs the same care.
+
+> **Teachers**: Plugins run with no sandbox, as the person using them. Set a simple class rule: learners only install plugins they or their teacher wrote or trust, and read the code first using the four trust questions in this lesson. A zip file or a Git repository both work for handing a plugin out to a class.
 
 ---
 

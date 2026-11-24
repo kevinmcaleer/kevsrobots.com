@@ -999,7 +999,7 @@
   description: Build a robot in 3-D inside Snakie, then make it move. Stack blocks
     into a three-joint desk arm, add hinges, save poses, build an animation, bind
     servos and drive the model from MicroPython on the simulator.
-  duration: 1h 14m
+  duration: 1h 17m
   groups:
   - robots
   - robotarms
@@ -1099,7 +1099,7 @@
     for a robot club, with commands that read and change code, a linter with one-click
     fixes that catches MicroPython mistakes as you type, and custom blocks for your
     own robot.
-  duration: 1h 9m
+  duration: 1h 10m
   groups:
   - micropython
   - python
@@ -1116,7 +1116,7 @@
     Snakie's Sprite editor, learn how pixels become bytes, then use MicroPython's
     framebuf to make a pair of eyes blink, glance around and react to light on a simulated
     OLED, before moving the same code to a real SSD1306 screen.
-  duration: 1h 11m
+  duration: 1h 13m
   groups:
   - micropython
   - robots

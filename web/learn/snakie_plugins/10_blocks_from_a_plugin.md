@@ -12,7 +12,7 @@ description: Add your own blocks to the Snakie Blocks workspace from a Python pl
 percent: 77
 duration: 7
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add your own blocks to the Blocks workspace from a plugin, with number inputs, dropdowns and value blocks.
 
 ## Blocks for your own robot
 

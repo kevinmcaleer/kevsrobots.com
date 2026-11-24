@@ -12,7 +12,7 @@ description: Wire an SSD1306 OLED to a Raspberry Pi Pico and run the same robot 
 percent: 91
 duration: 6
 quiz_total: 39
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wire an SSD1306 OLED to a Raspberry Pi Pico and run the same robot face on real hardware.
 
 ## From pretend to real
 
@@ -166,6 +168,8 @@ To make the face start by itself when the robot is switched on:
 3. Upload `main.py`, `myscreen.py`, `simscreen.py` and `eye.py` to the Pico
 
 MicroPython runs `main.py` automatically at power-up. Unplug the Pico from your computer, power it from a battery pack or a USB charger, and the face wakes up.
+
+> **Teachers**: This lesson is the only one that needs hardware: a Pico with MicroPython and an SSD1306 OLED. If you have only a few sets, run it as a group activity. Learners without the kit can still finish the rest of the course on the simulated device, and the face program falls back to the simulated screen when no OLED answers.
 
 ---
 

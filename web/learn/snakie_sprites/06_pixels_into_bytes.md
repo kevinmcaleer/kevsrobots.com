@@ -12,7 +12,7 @@ description: See how a row of pixels is packed into bytes and decode a sprite fr
 percent: 49
 duration: 5
 quiz_total: 39
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how a row of pixels is packed into bytes and decode a sprite frame by hand in MicroPython.
 
 ## What's in those strange lines?
 

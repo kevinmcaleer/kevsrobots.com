@@ -12,7 +12,7 @@ description: Switch Snakie to Animate mode and pose the robot with joint sliders
 percent: 42
 duration: 4
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to switch to Animate mode and pose the robot with the joint sliders or by dragging it in 3-D.
 
 ## From building to moving
 

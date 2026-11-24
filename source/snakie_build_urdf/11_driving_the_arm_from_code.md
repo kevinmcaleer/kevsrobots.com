@@ -4,12 +4,14 @@ description: Write MicroPython that moves servos and watch the 3-D robot in Snak
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/11_driving_the_arm_from_code.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write MicroPython that moves servos and watch the 3-D robot follow it on the simulated device.
 
 ## Your code, your robot
 

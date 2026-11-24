@@ -4,7 +4,7 @@ description: Draw sprites and animations in Snakie and bring a blinking robot fa
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/00_intro.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -89,3 +89,5 @@ for row in rows:
 Press **Run**. Then change some `.` to `#` and run it again. You've just edited a sprite by hand. The Sprite editor makes that a lot more comfortable.
 
 The code boxes show text. To see sprites on the simulated screen you'll use the full Snakie app, and we'll walk through that step by step.
+
+> **Teachers**: This course suits beginners who have met a little MicroPython. Each lesson is roughly 30 to 45 minutes of drawing or coding. Snakie runs in the browser at app.snakie.org with nothing to install (or as the desktop app), and everything up to the last two lessons runs on the simulated device, so no hardware is needed. A Raspberry Pi Pico and an SSD1306 OLED are optional for the final lesson and cost a few pounds, so one set per group is enough. Sprites are saved into a project folder, so on shared computers give each learner or pair their own folder.
