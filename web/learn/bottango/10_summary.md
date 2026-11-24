@@ -51,6 +51,10 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
 Congratulations — you’ve completed the **Bottango Basics** course!
 
 You’ve learned how to install Bottango, connect and configure servos, design animations, add interactivity, and even run projects without a computer.

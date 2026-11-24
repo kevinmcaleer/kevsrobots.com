@@ -7,6 +7,10 @@ cover: /learn/bottango/assets/banners/10_summary.jpg
 date_updated: 2025-05-03
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
 Congratulations — you’ve completed the **Bottango Basics** course!
 
 You’ve learned how to install Bottango, connect and configure servos, design animations, add interactivity, and even run projects without a computer.
