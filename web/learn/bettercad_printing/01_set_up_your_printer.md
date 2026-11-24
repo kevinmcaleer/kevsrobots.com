@@ -12,7 +12,7 @@ description: Pick your printer in BetterCad, see its bed around your model, chec
 percent: 16
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Print It Right with BetterCad
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to pick your printer in BetterCad, check that a model fits its bed, and save your settings as your own printer.
 
 Every check in the Print panel depends on knowing what you're printing on. So the first job is to tell BetterCad about your printer.
 
@@ -125,6 +127,8 @@ If you change a setting later, the panel offers **Save to** that printer.
 
 ---
 
+> **Teachers**: saved printers are kept in the browser, and in an account too if the learner signs in. On shared or wiped computers a saved printer will not follow the learner, so write your printer's numbers on the wall or share them as a handout and let learners re-enter them. Agree one name for each school printer so the class picks the right one.
+
 ## Try it Yourself
 
 1. Pick your own printer, or enter it as Custom, and save it with a name.
@@ -133,17 +137,17 @@ If you change a setting later, the panel offers **Save to** that printer.
 
 ## Common Issues
 
-**Problem**: The bed isn't drawn.
-**Solution**: Tick **Show the build volume**.
-**Why**: The setting is remembered by your browser, and it may have been switched off earlier.
+- **Problem**: The bed isn't drawn.
+- **Solution**: Tick **Show the build volume**.
+- **Why**: The setting is remembered by your browser, and it may have been switched off earlier.
 
-**Problem**: My model is nowhere near the bed.
-**Solution**: Click **Centre on bed**.
-**Why**: Models are built around the origin, which for a corner-origin printer is the front-left of the plate.
+- **Problem**: My model is nowhere near the bed.
+- **Solution**: Click **Centre on bed**.
+- **Why**: Models are built around the origin, which for a corner-origin printer is the front-left of the plate.
 
-**Problem**: I set up my printer but a new model doesn't have it.
-**Solution**: Choose it from **My printers**.
-**Why**: Settings live in each model. A saved printer copies them in when you pick it.
+- **Problem**: I set up my printer but a new model doesn't have it.
+- **Solution**: Choose it from **My printers**.
+- **Why**: Settings live in each model. A saved printer copies them in when you pick it.
 
 ## Check your understanding
 

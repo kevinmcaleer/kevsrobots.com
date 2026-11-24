@@ -12,7 +12,7 @@ description: Find the parts of a model that would print in mid-air with the Bett
 percent: 24
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Print It Right with BetterCad
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to run the overhang check, explain the 45 degree rule, and design overhangs away.
 
 A 3D printer builds from the bed upwards, and every layer needs something to sit on. Where there's nothing underneath, you get an **overhang**. Small ones print fine. Large ones sag, string or fail unless the slicer adds **supports**, which cost time and plastic and leave a rough surface behind.
 
@@ -126,17 +128,17 @@ Faces within 0.2 mm of the bed are never flagged. They're the first layer.
 
 ## Common Issues
 
-**Problem**: I can't see the tinted area.
-**Solution**: Click **Show** beside it in the list, or turn the view to look from underneath.
-**Why**: Overhangs face downwards, away from the usual viewpoint.
+- **Problem**: I can't see the tinted area.
+- **Solution**: Click **Show** beside it in the list, or turn the view to look from underneath.
+- **Why**: Overhangs face downwards, away from the usual viewpoint.
 
-**Problem**: The check flags the top of every horizontal hole.
-**Solution**: Ignore them on holes smaller than about 8 mm.
-**Why**: The roof of a small hole is a very short bridge.
+- **Problem**: The check flags the top of every horizontal hole.
+- **Solution**: Ignore them on holes smaller than about 8 mm.
+- **Why**: The roof of a small hole is a very short bridge.
 
-**Problem**: The check says no support is needed but my print still drooped.
-**Solution**: Lower **Steepest** to 40° or 35° and check again.
-**Why**: 45° is typical, but your printer, speed and material set the real limit.
+- **Problem**: The check says no support is needed but my print still drooped.
+- **Solution**: Lower **Steepest** to 40° or 35° and check again.
+- **Why**: 45° is typical, but your printer, speed and material set the real limit.
 
 ## Check your understanding
 

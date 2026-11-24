@@ -12,7 +12,7 @@ description: Use the BetterCad thin wall check to find parts of a model that are
 percent: 32
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Print It Right with BetterCad
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to run the thin wall check and choose a wall thickness that suits your nozzle.
 
 A printer draws with a line of molten plastic about as wide as its nozzle. Ask it for a wall thinner than that and the slicer has two choices: skip it, or make it thicker than you drew. Neither is what you wanted. The thin wall check finds those places.
 
@@ -135,17 +137,17 @@ Your slicer's preview is the final word. If a wall looks hollow or missing there
 
 ## Common Issues
 
-**Problem**: The check takes a moment to answer.
-**Solution**: Wait. You can keep working while it runs.
-**Why**: It measures the whole surface in the background.
+- **Problem**: The check takes a moment to answer.
+- **Solution**: Wait. You can keep working while it runs.
+- **Why**: It measures the whole surface in the background.
 
-**Problem**: A wall passes the check but my slicer leaves it out.
-**Solution**: Turn on your slicer's "detect thin walls" option, or make the wall a multiple of the nozzle width.
-**Why**: A 1.0 mm wall with a 0.4 mm nozzle is two lines and an awkward 0.2 mm gap.
+- **Problem**: A wall passes the check but my slicer leaves it out.
+- **Solution**: Turn on your slicer's "detect thin walls" option, or make the wall a multiple of the nozzle width.
+- **Why**: A 1.0 mm wall with a 0.4 mm nozzle is two lines and an awkward 0.2 mm gap.
 
-**Problem**: Several thin spots are listed as one area.
-**Solution**: Click **Show** and inspect the whole region.
-**Why**: Thin patches that touch, or nearly touch, are grouped together.
+- **Problem**: Several thin spots are listed as one area.
+- **Solution**: Click **Show** and inspect the whole region.
+- **Why**: Thin patches that touch, or nearly touch, are grouped together.
 
 ## Check your understanding
 

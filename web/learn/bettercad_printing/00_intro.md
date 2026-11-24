@@ -9,9 +9,9 @@ next: 01_set_up_your_printer.html
 description: Use the BetterCad Print panel to check, calibrate and export parts that
   print cleanly and fit first time
 percent: 8
-duration: 4
+duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Print It Right with BetterCad
 - content:
@@ -108,6 +108,8 @@ To open the Print panel, click the account menu at the top right and choose **Pr
 ## Prerequisites
 
 You should be able to find your way around BetterCad and make a simple part. [Learn BetterCad](/learn/bettercad/) covers everything you need, and lesson 10 of that course is a quick preview of this one.
+
+> **Teachers**: this course suits learners who have finished Learn BetterCad, and it pays off most when a printer is available. Calibration describes a printer, not a person, so run the two test plates once per printer and let the class share the numbers. The lesson budgets about 10 g of filament and under an hour of printing for the two calibration prints. Without a printer, the Print panel checks still work on screen, but the calibration lessons only pay off when you print the test pieces. Each learner needs only a computer with a recent browser, with no install and no account. Printers have hot nozzles and heated beds, so supervise them as you would any workshop tool.
 
 ## Try it Yourself
 
