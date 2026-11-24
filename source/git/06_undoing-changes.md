@@ -4,6 +4,11 @@ description: >-
     Throw away edits with git restore, unstage files, fix your last commit with --amend, and undo commits safely with git revert
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/06_undoing-changes.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Mistakes are fine

@@ -3,7 +3,11 @@ title: Packages
 description: Learn about packages in MicroPython and how they help organize and reuse code.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/08_packages.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Packages

@@ -2,6 +2,11 @@
 title: Assemble Feet
 description: Mount the foot on the servo holder
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_10.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 10 Mount the foot on the servo holder

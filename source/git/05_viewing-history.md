@@ -4,6 +4,11 @@ description: >-
     Explore your project's past with git log, git show and git diff
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/05_viewing-history.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Your project's diary

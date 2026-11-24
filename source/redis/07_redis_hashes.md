@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Hashes
 type: page
 description: Learn about Redis hashes and how to use them with Python.
+cover: /learn/redis/assets/banners/07_redis_hashes.jpg
 ---
 
-<!-- ![Cover photo of Redis hashes](assets/redis-hashes.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

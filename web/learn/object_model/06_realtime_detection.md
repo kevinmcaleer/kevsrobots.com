@@ -3,7 +3,7 @@ layout: lesson
 title: Real-Time Object Detection
 author: Kevin McAleer
 type: page
-cover: /learn/object_model/assets/cover.jpg
+cover: /learn/object_model/assets/banners/06_realtime_detection.jpg
 date: 2025-12-04
 previous: 05_deployment.html
 next: 07_troubleshooting.html
@@ -44,6 +44,10 @@ navigation:
       link: 08_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

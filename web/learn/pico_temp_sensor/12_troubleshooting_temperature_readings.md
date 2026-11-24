@@ -3,7 +3,7 @@ layout: lesson
 title: Troubleshooting Temperature Readings
 author: Kevin McAleer
 type: page
-cover: /learn/pico_temp_sensor/assets/cover.jpg
+cover: /learn/pico_temp_sensor/assets/banners/12_troubleshooting_temperature_readings.jpg
 date: 2024-11-22
 previous: 11_project_ideas_and_extensions.html
 description: Learn how to diagnose and fix common issues with your Raspberry Pi Pico
@@ -49,6 +49,10 @@ navigation:
       link: 12_troubleshooting_temperature_readings.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

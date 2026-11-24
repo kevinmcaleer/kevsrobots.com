@@ -4,6 +4,11 @@ description: >-
     Keep your copies in sync with git fetch and git pull, and learn how pull requests let people work together
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/11_pulling-and-collaborating.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Keeping copies in sync

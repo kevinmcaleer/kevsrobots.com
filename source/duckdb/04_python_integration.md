@@ -3,6 +3,11 @@ title: Python Integration
 description: "Use DuckDB from Python to query DataFrames, return results as DataFrames, and power notebooks."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/04_python_integration.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 DuckDB integrates tightly with Pandas and Polars. You can query DataFrames directly using SQL and get results back as DataFrames.

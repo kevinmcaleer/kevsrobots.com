@@ -3,7 +3,7 @@ layout: lesson
 title: Joining a Room
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/06_joining_a_room.jpg
 date: 2026-08-05
 previous: 05_room_server_config.html
 next: 07_permissions.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The server is configured. Now let's use it - from the companion client you built in part one.
 

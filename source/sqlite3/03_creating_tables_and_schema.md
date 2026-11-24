@@ -3,6 +3,11 @@ title: Creating Tables and Schema Design
 description: >-
    Creating tables in SQLite databases and understanding the principles of schema design. We will explore how to define table structure, data types, constraints, and primary keys
 layout: lesson
+cover: /learn/sqlite3/assets/banners/03_creating_tables_and_schema.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Module 3 focuses on creating tables in SQLite databases and understanding the principles of schema design. We will explore how to define table structure, data types, constraints, and primary keys.

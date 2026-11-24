@@ -3,6 +3,11 @@ title: Building Your First Docker Image
 description: Learn how to create a Docker image using a Dockerfile.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/04_building.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Creating a Custom Docker Image

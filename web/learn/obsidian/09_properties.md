@@ -3,7 +3,7 @@ layout: lesson
 title: Properties in Obsidian
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/09_properties.jpg
 date: 2025-08-24
 previous: 08_dataview_and_bases.html
 next: 12_graph_view.html
@@ -51,6 +51,10 @@ navigation:
       link: 11_markdown_course_link.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Properties in Obsidian
 

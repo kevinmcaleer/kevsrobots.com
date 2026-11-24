@@ -4,6 +4,11 @@ description: >-
     Show messages passing between a Pico, a sensor and a computer over time with Mermaid sequence diagrams
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/05_sequence-diagrams.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What's a sequence diagram?

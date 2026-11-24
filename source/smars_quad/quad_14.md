@@ -2,6 +2,11 @@
 title: Make it walk
 description: Install SMARSLab on the Raspberry Pi and bring your SMARS Quad to life
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_14.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the video

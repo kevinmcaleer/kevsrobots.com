@@ -3,6 +3,11 @@ title: Unpowered wheel stub profile
 description: Create a wheel stub profile
 layout: lesson
 redirect_from: /learn/smars_fusion360/24_stub.html
+cover: /learn/smars_fusion360_part2/assets/banners/08_stub.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The unpowered wheel stub profile is sketched next.

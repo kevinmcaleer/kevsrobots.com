@@ -3,6 +3,11 @@ title: Tools
 description: >-
     Desktop Apps for managing SQlite3 databases
 layout: lesson
+cover: /learn/sqlite3/assets/banners/17_tools.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## SQLite3 Tools for macOS, Windows and Linux

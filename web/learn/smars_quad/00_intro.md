@@ -3,7 +3,7 @@ layout: lesson
 title: SMARS Quad robot Overview
 author: Kevin McAleer
 type: page
-cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
+cover: /learn/smars_quad/assets/banners/00_intro.jpg
 date: 2023-03-04
 next: quad_01.html
 description: Learn how to build your own SMARS Quad robot
@@ -54,7 +54,9 @@ navigation:
 ---
 
 
-![How to build a SMARS Quad](assets/how_to_build_a_quad.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the videos
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Setting Up the Repeater
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/07_repeater_setup.jpg
 date: 2026-08-05
 previous: 06_radio_settings.html
 next: 08_repeater_placement.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Node 1 has repeater firmware on it. Now we give it an identity, a location, a password, and a sensible advertising schedule. This is all done through the command line.
 

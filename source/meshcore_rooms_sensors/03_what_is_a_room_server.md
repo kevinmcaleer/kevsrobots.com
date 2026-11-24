@@ -3,6 +3,11 @@ title: What is a Room Server?
 description: How store-and-forward messaging works, and what a room server does that a channel cannot
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/03_what_is_a_room_server.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 A room server is the closest thing MeshCore has to an inbox. It is a node that keeps recent posts and hands them over to people who were not around when they were made.

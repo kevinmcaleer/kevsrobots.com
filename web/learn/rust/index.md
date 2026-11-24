@@ -10,6 +10,7 @@ level: intermediate
 course_duration: 0h 33m
 lesson_count: 13
 first_lesson: 01_intro.html
+video: M9LekkoQyf0
 navigation:
 - name: Introduction to Rust
 - content:

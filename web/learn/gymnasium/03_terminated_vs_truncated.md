@@ -3,7 +3,7 @@ layout: lesson
 title: Terminated vs Truncated
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/03_terminated_vs_truncated.jpg
 date: 2026-06-14
 previous: 02_first_environment.html
 next: 04_spaces.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

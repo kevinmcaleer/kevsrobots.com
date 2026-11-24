@@ -3,11 +3,11 @@ title: Designing the Reward Function
 description: Craft rewards that teach the right behaviour — and discover the sneaky ways a poorly designed reward can backfire.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/03_designing_the_reward_function.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

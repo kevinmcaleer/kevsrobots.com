@@ -3,26 +3,30 @@ title: Syncing Animations to Music
 description: Learn how to sync your servo movements to music and audio tracks in Bottango.
 layout: lesson
 type: page
-cover: assets/bottango_sync_music.png
+cover: /learn/bottango/assets/banners/07_sync_music.jpg
 date_updated: 2025-05-03
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 One of Bottango’s most powerful features is the ability to **synchronize your animations with music or sound effects**. This is perfect for building animatronics that lip-sync, dance, or react to music in time.
 
 ---
 
-## 🎵 Step 1: Add an Audio Track
+## Step 1: Add an Audio Track
 
 1. Open your Bottango project.
 2. In the timeline view, click **Add Audio**.
 3. Choose a `.mp3` or `.wav` file from your computer.
 4. The audio waveform will appear in the timeline.
 
-> 📝 Tip: Use short, high-quality audio clips for best results.
+> Tip: Use short, high-quality audio clips for best results.
 
 ---
 
-## 🕒 Step 2: Align Keyframes with the Beat
+## Step 2: Align Keyframes with the Beat
 
 1. Play the audio using the timeline preview.
 2. Use the waveform as a visual guide to **place keyframes** at musical beats or lyric changes.
@@ -32,7 +36,7 @@ This makes it easy to time head nods, arm waves, or jaw movements with music.
 
 ---
 
-## 🗝️ Step 3: Lip-Syncing Basics
+## Step 3: Lip-Syncing Basics
 
 To create a simple lip-sync effect:
 
@@ -44,7 +48,7 @@ For more realism, try animating multiple mouth positions (visemes) using multipl
 
 ---
 
-## 🎛️ Optional: Use Audio Triggers
+## Optional: Use Audio Triggers
 
 If you want animations to start **when audio begins**, create a trigger:
 
@@ -56,7 +60,7 @@ You can also sync lighting, gamepad actions, or other animations using audio eve
 
 ---
 
-## 🔊 Output Options
+## Output Options
 
 - Bottango plays audio **on your computer**, not on the microcontroller.
 - If you’re using a Bluetooth speaker or need tight timing, test playback latency.
@@ -64,7 +68,7 @@ You can also sync lighting, gamepad actions, or other animations using audio eve
 
 ---
 
-## 🎭 Example: Dancing Robot
+## Example: Dancing Robot
 
 1. Load a short music clip (e.g. 10–30 seconds).
 2. Add servo keyframes to match the beat.

@@ -3,7 +3,7 @@ layout: lesson
 title: Querying data lakes (HTTP/S3)
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/06_datalakes.jpg
 date: 2025-09-04
 previous: 05_data_analysis.html
 next: 07_parquet.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 DuckDB can read remote files over HTTPS and S3 without running a server.
 

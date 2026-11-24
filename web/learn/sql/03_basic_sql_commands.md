@@ -3,7 +3,7 @@ layout: lesson
 title: Basic SQL Commands and Syntax
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/03_basic_sql_commands.jpg
 date: 2024-11-01
 previous: 02_setting_up_environment.html
 next: 04_working_with_tables.html
@@ -56,6 +56,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll cover the essential SQL commands used for managing data in databases. These commands—SELECT, INSERT, UPDATE, and DELETE—form the basis of SQL’s ability to interact with and manipulate data.
 

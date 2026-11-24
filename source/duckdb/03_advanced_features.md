@@ -3,6 +3,11 @@ title: Advanced Features
 description: Use CTEs, views, persistence, COPY, and extensions to build a tidy local analytics workflow.
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/03_advanced_features.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Advanced Features

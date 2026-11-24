@@ -3,6 +3,11 @@ title: Docker Networking Basics
 description: Understanding the fundamentals of networking in Docker.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/06_networking.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Navigating Docker Networking

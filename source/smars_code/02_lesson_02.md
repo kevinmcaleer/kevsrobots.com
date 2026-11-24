@@ -2,8 +2,12 @@
 title: Lesson 02 - Turning
 description: Learn how to make your robot turn left and right
 layout: lesson
+cover: /learn/smars_code/assets/banners/02_lesson_02.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What you'll learn
 

@@ -2,10 +2,12 @@
 title: Introduction to Git
 description: Learn the basics of Git, a version control system, and how to set it up on Raspberry Pi OS.
 layout: lesson
-cover: /learn/linux_intro/assets/git.jpg
+cover: /learn/linux_intro/assets/banners/14_intro_git.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

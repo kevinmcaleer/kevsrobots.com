@@ -3,7 +3,7 @@ layout: lesson
 title: Add Motor Shield
 author: Kevin McAleer
 type: page
-cover: /learn/smars/assets/how_to_build_a_smars.jpg
+cover: /learn/smars/assets/banners/smars09.jpg
 date: 2023-02-19
 previous: smars08.html
 next: smars10.html
@@ -58,6 +58,10 @@ navigation:
       link: summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Add Motor Shield
 

@@ -2,6 +2,11 @@
 title: Lesson 05 - Bluetooth
 description: Learn how to connect a Bluetooth module to your Arduino and then use that to pair to an iOS or Android phone
 layout: lesson
+cover: /learn/smars_code/assets/banners/05_lesson_05.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the livestream

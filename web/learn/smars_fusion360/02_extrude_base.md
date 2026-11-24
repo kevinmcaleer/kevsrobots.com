@@ -3,7 +3,7 @@ layout: lesson
 title: Extrude the Base
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/02_extrude_base.jpg
 date: 2023-07-20
 previous: 01_base.html
 next: 03_shell.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The base is then extruded up:
 

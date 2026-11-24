@@ -3,6 +3,11 @@ title: Line Following Code
 description: Learn how to make BurgerBot follow a line using a line sensor.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/08_line_following_code.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Wiring up the Line sensor

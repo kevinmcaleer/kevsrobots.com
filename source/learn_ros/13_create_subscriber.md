@@ -3,6 +3,11 @@ layout: lesson
 title: Create a ROS2 Python Subscriber
 type: page
 description: Let's create a new Python Subscriber program
+cover: /learn/learn_ros/assets/banners/13_create_subscriber.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Create a new Python file called sub.py

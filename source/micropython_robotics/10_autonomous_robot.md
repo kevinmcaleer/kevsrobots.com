@@ -3,11 +3,11 @@ title: Creating Simple Autonomous Behavior
 description: Combine motor control and sensors to give your robot autonomous movement and basic decision-making.
 layout: lesson
 type: page
-cover: assets/autonomous_robot.jpg
+cover: /learn/micropython_robotics/assets/banners/10_autonomous_robot.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/04.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -15,7 +15,7 @@ You’ve learned how to control your robot manually. Now it’s time to **make i
 
 ---
 
-## 🤔 What Is Autonomous Behavior?
+## What Is Autonomous Behavior?
 
 Autonomous robots make decisions based on sensor data instead of waiting for human input. This can be as simple as:
 
@@ -27,7 +27,7 @@ We’ll build a basic robot that explores its environment and avoids crashing in
 
 ---
 
-## 🧠 Basic Decision-Making Logic
+## Basic Decision-Making Logic
 
 Here’s a simple behavior loop:
 
@@ -40,7 +40,7 @@ Here’s a simple behavior loop:
 
 ---
 
-## 🧪 Example: Obstacle-Avoiding Explorer
+## Example: Obstacle-Avoiding Explorer
 
 This example assumes:
 
@@ -86,10 +86,11 @@ def explore():
 # Run the loop
 explore()
 ```
+{: .no-snakie }
 
 ---
 
-## 💡 Optional: Scan for Best Direction
+## Optional: Scan for Best Direction
 
 If your sensor is on a servo, sweep left and right, then turn toward the direction with more space:
 
@@ -109,7 +110,7 @@ def scan_and_choose():
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 - Add timed turns for corners
 - Combine line following and obstacle avoidance

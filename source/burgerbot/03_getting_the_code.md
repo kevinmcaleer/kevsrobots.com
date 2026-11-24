@@ -3,6 +3,11 @@ title: Getting the code
 description: Learn how to use the BurgerBot MicroPython library to control the robotic vehicle.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/03_getting_the_code.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## BurgerBot MicroPython library

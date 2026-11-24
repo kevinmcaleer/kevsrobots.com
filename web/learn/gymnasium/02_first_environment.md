@@ -3,7 +3,7 @@ layout: lesson
 title: Your First Gymnasium Environment
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/02_first_environment.jpg
 date: 2026-06-14
 previous: 01_from_handbuilt_to_standard.html
 next: 03_terminated_vs_truncated.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

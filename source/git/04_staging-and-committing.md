@@ -4,6 +4,11 @@ description: >-
     Learn Git's three areas, stage changes with git add, save them with git commit, and write good commit messages
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/04_staging-and-committing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Saving a snapshot takes two steps

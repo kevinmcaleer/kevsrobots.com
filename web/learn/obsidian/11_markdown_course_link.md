@@ -3,7 +3,7 @@ layout: lesson
 title: 'Learn More: Markdown Course'
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/11_markdown_course_link.jpg
 date: 2025-08-24
 previous: 10_markdown_in_obsidian.html
 description: Link to the full Markdown course for advanced Markdown skills.
@@ -50,6 +50,10 @@ navigation:
       link: 11_markdown_course_link.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Learn More: Markdown Course
 

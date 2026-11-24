@@ -3,7 +3,7 @@ layout: lesson
 title: Viewing History
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/05_viewing-history.jpg
 date: 2026-11-04
 previous: 04_staging-and-committing.html
 next: 06_undoing-changes.html
@@ -56,6 +56,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Your project's diary
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Installing DuckDB
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/01_installing.jpg
 date: 2025-09-04
 previous: troubleshooting.html
 next: 02_basic_queries.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Installing DuckDB
 

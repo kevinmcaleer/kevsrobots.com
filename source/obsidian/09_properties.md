@@ -3,6 +3,11 @@ title: Properties in Obsidian
 description: Learn how to use properties (frontmatter) for metadata and organization.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/09_properties.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Properties in Obsidian

@@ -3,6 +3,11 @@ layout: lesson
 title: Ultrasonic Range Finders
 type: page
 description: Learn how ultrasonic range finders work and how to use them with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/15_ultrasonic_range_finders.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

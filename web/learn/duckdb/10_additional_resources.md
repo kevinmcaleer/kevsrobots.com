@@ -3,7 +3,7 @@ layout: lesson
 title: Additional Resources
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/10_additional_resources.jpg
 date: 2025-09-04
 previous: 09_conclusion.html
 next: 11_mini_capstone.html
@@ -53,6 +53,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Additional Resources
 

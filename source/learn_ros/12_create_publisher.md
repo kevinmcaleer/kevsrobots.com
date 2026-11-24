@@ -3,6 +3,11 @@ layout: lesson
 title: Create a ROS2 Python Publisher
 type: page
 description: Let's create a new Python Publisher program
+cover: /learn/learn_ros/assets/banners/12_create_publisher.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Create a new Python file called pub.py

@@ -2,10 +2,12 @@
 title: Control Flow in Python
 description: Understand how to control the flow of your Python programs using conditional statements, loops, and functions.
 layout: lesson
-cover: /learn/python/assets/4.png
+cover: /learn/python/assets/banners/04_flow.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

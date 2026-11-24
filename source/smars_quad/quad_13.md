@@ -2,6 +2,11 @@
 title: Wiring
 description: Wiring the SMARS Quad robot
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_13.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![wiring](assets/wiring01.jpg){:class="img-fluid w-100"}

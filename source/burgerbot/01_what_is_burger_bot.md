@@ -4,6 +4,11 @@ description: >-
     Learn about BurgerBot, a Raspberry Pi Pico-powered robot that is quick and easy to print and assemble, with a low build cost.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/01_what_is_burger_bot.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 `BurgerBot`, as the name suggests, is a Burger-shaped robot. BurgerBot is quick and easy to print and assemble, with a low build cost and is designed for education and hobbyists. The Raspberry Pi Pico and Pico W board power the robot making it easy to program with MicroPython.

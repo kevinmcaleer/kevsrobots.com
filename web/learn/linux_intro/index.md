@@ -11,6 +11,7 @@ level: beginner
 course_duration: 0h 55m
 lesson_count: 21
 first_lesson: 01_intro_terminal.html
+video: UDo6tvoOQHg
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
 - content:

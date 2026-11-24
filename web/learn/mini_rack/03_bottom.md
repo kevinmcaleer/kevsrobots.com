@@ -3,7 +3,7 @@ layout: lesson
 title: Create the Bottom Corner
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/03_bottom.jpg
 date: 2025-02-16
 previous: 02_2u_design.html
 next: 04_top.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Bottom Design](assets/bottom_design.png){:class="img-fluid w-100"}
 

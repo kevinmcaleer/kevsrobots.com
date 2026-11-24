@@ -3,7 +3,7 @@ layout: lesson
 title: Battery and Solar Telemetry
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/12_battery_telemetry.jpg
 date: 2026-08-05
 previous: 11_environment_sensor.html
 next: 13_contact_and_level.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The most useful sensor on a remote node is not a thermometer. It is the battery gauge. A node that tells you it is at 3.4V and falling gives you a week's warning; a node that just goes quiet gives you a mystery and a walk up a hill.
 

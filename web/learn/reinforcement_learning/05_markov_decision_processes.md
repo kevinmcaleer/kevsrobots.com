@@ -3,7 +3,7 @@ layout: lesson
 title: Markov Decision Processes
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/05_markov_decision_processes.jpg
 date: 2026-06-13
 previous: 04_mapping_the_robots_world.html
 next: 06_looking_into_the_future.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

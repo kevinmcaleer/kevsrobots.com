@@ -3,11 +3,11 @@ title: Setting Up Your Board
 description: Connect and configure your Arduino or ESP32 board so it can talk to Bottango.
 layout: lesson
 type: page
-cover: assets/bottango_setup_board.png
+cover: /learn/bottango/assets/banners/02_setup_board.jpg
 date_updated: 2025-05-03
 ---
 
-![Cover](assets/intro.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -15,7 +15,7 @@ To make Bottango control servos or other actuators, you need to connect a compat
 
 ---
 
-## ✅ Supported Boards
+## Supported Boards
 
 Bottango currently supports:
 
@@ -27,7 +27,7 @@ These boards connect to your computer via USB and communicate directly with the 
 
 ---
 
-## 🔌 Step 1: Connect Your Board
+## Step 1: Connect Your Board
 
 Use a USB cable to connect your microcontroller to your computer.
 
@@ -38,7 +38,7 @@ Make sure:
 
 ---
 
-## ⚙️ Step 2: Upload the Bottango Firmware
+## Step 2: Upload the Bottango Firmware
 
 Bottango needs to upload a small firmware sketch to your board. This allows the app to control it in real-time.
 
@@ -50,7 +50,7 @@ Bottango needs to upload a small firmware sketch to your board. This allows the 
 4. Click **Install Firmware**.
 5. Bottango will detect the correct COM port and upload the firmware automatically.
 
-> 💡 If the board isn’t found, check your cable and USB port, then restart Bottango.
+> If the board isn’t found, check your cable and USB port, then restart Bottango.
 
 ### Manually (Advanced Option):
 
@@ -63,7 +63,7 @@ If automatic setup fails, you can upload the firmware using the Arduino IDE:
 
 ---
 
-## 🟢 Step 3: Verify Connection
+## Step 3: Verify Connection
 
 Once the firmware is installed:
 
@@ -73,7 +73,7 @@ Once the firmware is installed:
 
 ---
 
-## 🧪 Troubleshooting
+## Troubleshooting
 
 - **Board not detected?** Try a different USB cable or port.
 - **Upload fails?** Make sure no other software is using the COM port (e.g. Arduino IDE).

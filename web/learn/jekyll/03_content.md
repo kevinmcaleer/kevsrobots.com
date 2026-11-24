@@ -3,7 +3,7 @@ layout: lesson
 title: Content Management in Jekyll
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/03_content.jpg
 date: 2024-01-24
 previous: 02_install.html
 next: 04_customizing.html
@@ -38,6 +38,10 @@ navigation:
       link: 08_bonus.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

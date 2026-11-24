@@ -3,6 +3,11 @@ title: Drawing with a Pen
 description: Add a pen to BurgerBot and make it draw shapes.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/08_pen.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the video

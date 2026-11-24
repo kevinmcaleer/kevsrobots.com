@@ -3,7 +3,7 @@ layout: lesson
 title: Reading Telemetry
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/14_reading_telemetry.jpg
 date: 2026-08-05
 previous: 13_contact_and_level.html
 next: 15_troubleshooting.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The sensor is built and wired. Now let's ask it something from the other end of the mesh.
 

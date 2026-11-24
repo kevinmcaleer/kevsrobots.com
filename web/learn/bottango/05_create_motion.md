@@ -3,7 +3,7 @@ layout: lesson
 title: Creating Motion Sequences
 author: Kevin McAleer
 type: page
-cover: assets/bottango_motion.png
+cover: /learn/bottango/assets/banners/05_create_motion.jpg
 date: 2025-05-10
 previous: 04_configure_bottango.html
 next: 06_triggers.html
@@ -52,11 +52,15 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
 Now that your servos are configured, let’s bring your project to life by creating motion sequences using Bottango’s timeline editor.
 
 ---
 
-## 🎬 Step 1: Understanding the Timeline
+## Step 1: Understanding the Timeline
 
 The Bottango timeline is similar to animation software:
 
@@ -68,7 +72,7 @@ You can create smooth, lifelike motion by placing multiple keyframes along the t
 
 ---
 
-## ➕ Step 2: Add Your First Keyframe
+## Step 2: Add Your First Keyframe
 
 1. Select a servo from the left panel.
 2. Move the timeline cursor to the 1-second mark.
@@ -79,7 +83,7 @@ A keyframe will appear on the timeline — this marks the servo’s position at 
 
 ---
 
-## 🌀 Step 3: Add More Keyframes
+## Step 3: Add More Keyframes
 
 Move the timeline cursor forward, adjust the servo’s position, and add more keyframes. For example:
 
@@ -93,7 +97,7 @@ This will create a simple back-and-forth movement.
 
 ---
 
-## 🧰 Step 4: Fine-Tune the Motion
+## Step 4: Fine-Tune the Motion
 
 - **Drag keyframes** left or right to change timing.
 - **Right-click a keyframe** to delete or change easing.
@@ -101,7 +105,7 @@ This will create a simple back-and-forth movement.
 
 ---
 
-## 🧠 Best Practices for Animations
+## Best Practices for Animations
 
 - Start with slow, wide movements — fine-tune later.
 - Use easing to create more natural, lifelike motion.
@@ -109,7 +113,7 @@ This will create a simple back-and-forth movement.
 
 ---
 
-## 🔄 Looping & Playback
+## Looping & Playback
 
 You can loop the animation by enabling the **Loop Playback** option.
 
@@ -120,7 +124,7 @@ To play the full sequence:
 
 ---
 
-## 🎉 You're Animating!
+## You're Animating!
 
 At this point, your project is moving based on the keyframes you created — no code required. Bottango takes care of the hard work.
 

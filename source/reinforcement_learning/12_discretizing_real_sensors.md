@@ -3,11 +3,11 @@ title: Discretising Real Sensors
 description: Read the HC-SR04 reliably in MicroPython, filter out noise with a median-of-three approach, and map live readings into the same state bins used during training.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/12_discretizing_real_sensors.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

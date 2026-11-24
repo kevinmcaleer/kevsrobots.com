@@ -4,6 +4,11 @@ description: >-
     Learn how to collect, annotate, and organize images to create a high-quality custom object detection dataset
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/02_dataset_prep.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

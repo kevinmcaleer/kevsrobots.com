@@ -3,13 +3,15 @@ title: Introduction to Reinforcement Learning for Beginners
 description: Discover how to teach a Pico-powered robot to learn obstacle avoidance through trial and error — no machine-learning PhD required.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/00_intro.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+{% include youtubeplayer.html id="epuO7xpz6i4" %}
 
 Ahoy there makers! What if your robot could figure things out on its own?
 

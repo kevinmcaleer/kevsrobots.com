@@ -2,7 +2,11 @@
 title: Summary and Next Steps
 description: Review what you've learned and explore where to go next
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/10_summary.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Congratulations, Robot Designer!

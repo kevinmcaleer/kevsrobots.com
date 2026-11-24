@@ -3,11 +3,11 @@ title: Train, Evaluate, and Export
 description: The capstone lesson — train PPO on BurgerBotEnv, evaluate the policy, save and load the model, and export a lookup table that runs on a Pico.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/13_train_evaluate_export.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

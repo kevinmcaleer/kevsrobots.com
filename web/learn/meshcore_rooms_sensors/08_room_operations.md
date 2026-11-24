@@ -3,7 +3,7 @@ layout: lesson
 title: Running a Room Server
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/08_room_operations.jpg
 date: 2026-08-05
 previous: 07_permissions.html
 next: 09_what_is_a_sensor_node.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 A room server is infrastructure. Once your group depends on it, the interesting problems stop being about firmware and start being about electricity.
 

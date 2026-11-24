@@ -3,6 +3,11 @@ layout: lesson
 title: Using Temperature Sensors
 type: page
 description: Learn how to use temperature sensors with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/10_temperature_sensors.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

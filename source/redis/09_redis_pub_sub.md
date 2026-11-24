@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Pub/Sub
 type: page
 description: Learn about Redis pub/sub and how to use it with Python.
+cover: /learn/redis/assets/banners/09_redis_pub_sub.jpg
 ---
 
-<!-- ![Cover photo of Redis pub/sub](assets/redis-pubsub.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

@@ -4,4 +4,10 @@ description: "Learn what Podman is, why it's a powerful alternative to Docker, a
 layout: lesson
 type: video
 video_id:  zwn2mXlYwis
+cover: /learn/podman/assets/banners/01_video.jpg
 ---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+

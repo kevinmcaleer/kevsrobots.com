@@ -3,6 +3,11 @@ title: Setting Up the Repeater
 description: Configure node 1 as a repeater over the serial console - name, location, password and adverts
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/07_repeater_setup.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Node 1 has repeater firmware on it. Now we give it an identity, a location, a password, and a sensible advertising schedule. This is all done through the command line.

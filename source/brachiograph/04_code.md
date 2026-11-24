@@ -3,7 +3,11 @@ title: Code
 description: Learn how to code the BrachioGraph
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/04_code.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Creating a BrachioGraph

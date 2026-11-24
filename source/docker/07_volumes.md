@@ -3,6 +3,11 @@ title: Docker Volumes and Persistent Data
 description: Learn how to use Docker volumes for managing persistent data.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/07_volumes.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Handling Data Persistence in Docker

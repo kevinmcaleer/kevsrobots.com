@@ -3,11 +3,11 @@ title: Introduction to Podman
 description: Learn what Podman is, why it's a powerful alternative to Docker, and how it's changing the container landscape.
 layout: lesson
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/01_intro_to_podman.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ If you've used Docker, you're already familiar with how containers can revolutio
 
 ---
 
-## 📦 What You’ll Learn
+## What You’ll Learn
 
 In this lesson, you’ll:
 
@@ -28,7 +28,7 @@ In this lesson, you’ll:
 
 ---
 
-## 🔍 Why Podman?
+## Why Podman?
 
 Podman is part of a modern container toolkit built to address many limitations of Docker, including:
 
@@ -39,7 +39,7 @@ Podman is part of a modern container toolkit built to address many limitations o
 
 ---
 
-## 🧠 A Bit of Background
+## A Bit of Background
 
 Podman was created by Red Hat as a more secure and flexible alternative to Docker, and it works well with other tools like:
 
@@ -51,7 +51,7 @@ Together, these form a robust, modular container toolchain.
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 Before you start, you should:
 

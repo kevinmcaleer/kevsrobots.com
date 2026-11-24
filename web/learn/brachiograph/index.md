@@ -12,6 +12,7 @@ level: beginner
 course_duration: 0h 30m
 lesson_count: 8
 first_lesson: 00_intro.html
+video: tkAv3HIw3CY
 navigation:
 - name: BrachioGraph Tutorial
 - content:

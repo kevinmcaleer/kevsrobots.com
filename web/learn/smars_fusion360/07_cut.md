@@ -3,7 +3,7 @@ layout: lesson
 title: Front Back Cut
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/07_cut.jpg
 date: 2023-07-20
 previous: 06_front.html
 next: 08_side.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The profile [created previously](06_front.html) is now used to extrude a cut all the way through the body.
 

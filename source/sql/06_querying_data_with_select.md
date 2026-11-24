@@ -3,6 +3,11 @@ title: Querying Data with SELECT
 description: >-
     Retrieve data from tables using SELECT and basic filtering techniques
 layout: lesson
+cover: /learn/sql/assets/banners/06_querying_data_with_select.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll cover the `SELECT` statement, which is the cornerstone of querying data in SQL. You’ll learn how to retrieve data from tables, apply basic filters, and sort your results.

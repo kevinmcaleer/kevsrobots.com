@@ -3,7 +3,7 @@ layout: lesson
 title: Docker Networking Basics
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/06_networking.jpg
 date: 2024-01-21
 previous: 05_managing.html
 next: 07_volumes.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Navigating Docker Networking
 

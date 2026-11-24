@@ -3,7 +3,7 @@ layout: lesson
 title: Building the Plotter
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/01_build.jpg
 date: 2024-07-26
 previous: 00_intro.html
 next: 02_wire.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Assembling the BrachioGraph
 

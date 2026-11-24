@@ -3,7 +3,7 @@ layout: lesson
 title: Robot Project - Simple Motor Control
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/10_robot_project.jpg
 date: 2025-11-20
 previous: 09_iot_project.html
 next: 11_next_steps.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Building a Simple Robot
 

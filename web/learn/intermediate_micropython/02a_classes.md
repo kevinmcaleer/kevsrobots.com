@@ -3,7 +3,7 @@ layout: lesson
 title: Classes and Objects
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/02a_classes.jpg
 date: 2024-07-07
 previous: 02_oop.html
 next: 03_abstraction.html
@@ -63,6 +63,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

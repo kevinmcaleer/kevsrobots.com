@@ -3,6 +3,11 @@ title: Flashing the Room Server
 description: Load room server firmware, set the UK radio settings, and confirm first boot
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/04_flashing_the_room_server.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 This will feel familiar - it is the same flasher and the same process you used in part one, with a different firmware variant selected.

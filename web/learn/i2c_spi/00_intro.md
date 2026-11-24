@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to I2C and SPI Communication
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/00_intro.jpg
 date: 2026-01-15
 next: 13_course-video.html
 description: Learn how to make your Raspberry Pi Pico talk to sensors and devices
@@ -55,6 +55,10 @@ navigation:
       link: 12_final-project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Course Cover](/learn/i2c_spi/assets/cover.jpg){:class="cover"}
 

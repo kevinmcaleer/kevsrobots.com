@@ -2,6 +2,11 @@
 title: Assemble arms
 description: 6 Mount the servo holder in the servo arm
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_06.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 6 Mount the servo holder in the servo arm

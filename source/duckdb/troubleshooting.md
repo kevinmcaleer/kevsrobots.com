@@ -3,6 +3,11 @@ title: Troubleshooting DuckDB
 description: "Common issues and quick fixes for CLI, Python, httpfs, exports, and performance."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/troubleshooting.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Export and file paths

@@ -3,7 +3,7 @@ layout: lesson
 title: Vectorised Environments
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/11_vectorized_envs.jpg
 date: 2026-06-14
 previous: 10_wrappers.html
 next: 12_meet_stable_baselines3.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

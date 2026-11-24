@@ -3,6 +3,10 @@ title: Cloning Raspberry Pi OS
 description: Learn how to clone the Raspberry Pi OS across multiple devices to quickly set up your Raspberry Pi 5 cluster.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/02_cloning-raspberry-pi-os.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

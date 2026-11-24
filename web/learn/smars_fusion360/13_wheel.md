@@ -3,7 +3,7 @@ layout: lesson
 title: Chassis Wheel hole profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/13_wheel.jpg
 date: 2023-07-20
 previous: 12_back.html
 next: 14_cut.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The profile for the wheel holes is created next. This has 2 dimensions:
 

@@ -3,14 +3,14 @@ layout: lesson
 title: 'Video: Working with I2C'
 author: Kevin McAleer
 type: video
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/13_course-video.jpg
 date: 2026-01-15
 previous: 00_intro.html
 next: 01_what-is-i2c.html
 description: Watch the full video walkthrough covering I2C communication on the Raspberry
   Pi Pico - part of the From Code to Creation series.
 percent: 14
-duration: 0
+duration: 1
 video_id: lthSloWM3Fk
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -53,5 +53,10 @@ navigation:
       link: 11_common-issues.html
     - name: Final Project - Environmental Monitoring Station
       link: 12_final-project.html
+---
+
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 

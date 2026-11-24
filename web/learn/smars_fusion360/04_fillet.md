@@ -3,7 +3,7 @@ layout: lesson
 title: Fillet the Shell
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/04_fillet.jpg
 date: 2023-07-20
 previous: 03_shell.html
 next: 05_thin.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The Chassis is now given a fillet around the bottom edges and each of the corners, to make it pleasing to the eye.
 

@@ -4,6 +4,11 @@ description: >-
     Group nodes with subgraphs, add colour with classes and styles, and avoid the classic flowchart gotchas
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/04_flowcharts-in-depth.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Grouping with subgraphs

@@ -3,6 +3,11 @@ layout: lesson
 title: Skills and Knowledge
 description: What you’ll need to know to build robots and bring them to life
 type: page
+cover: /learn/robotics_101/assets/banners/lesson_03.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Skills and Knowledge Venn diagram](assets/skills_and_knowledge.jpg){:class="img-fluid w-50"}

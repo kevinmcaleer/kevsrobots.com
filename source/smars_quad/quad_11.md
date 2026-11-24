@@ -2,6 +2,11 @@
 title: Check Rotation
 description: Check the servo rotation
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_11.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 11 Check the servo rotation

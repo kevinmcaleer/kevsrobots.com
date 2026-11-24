@@ -3,8 +3,12 @@ title: Installing the Software
 description: Guide to installing the necessary software for the wall drawing robot.
 layout: lesson
 type: page
-cover: assets/software.png
+cover: /learn/scrawly_wally/assets/banners/06_software.jpg
 date_updated: 2024-08-02
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Installing the Software

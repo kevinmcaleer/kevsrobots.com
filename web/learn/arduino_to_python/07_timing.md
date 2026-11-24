@@ -3,7 +3,7 @@ layout: lesson
 title: Timing and Delays - Seconds vs Milliseconds!
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/07_timing.jpg
 date: 2025-11-20
 previous: 06_analog_pwm.html
 next: 08_serial_basics.html
@@ -49,6 +49,10 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
 ## Timing: The Most Important Difference
 
 Here's the **single biggest gotcha** when moving from Arduino to MicroPython:
@@ -79,6 +83,7 @@ while True:
     led.off()
     time.sleep(0.5)    # Wait 0.5 seconds
 ```
+{: .no-snakie }
 
 **Critical differences:**
 - **`delay(1000)`** in Arduino = **`time.sleep(1)`** in MicroPython

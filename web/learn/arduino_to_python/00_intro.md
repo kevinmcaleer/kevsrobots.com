@@ -49,6 +49,8 @@ navigation:
 
 ![Introduction cover image](assets/banner01.jpg){:class="cover"}
 
+{% include youtubeplayer.html id="A7ZJ5TC-zUk" %}
+
 ## Welcome!
 
 You already know how to make LEDs blink, read sensors, and control motors with Arduino C++. Now it's time to learn MicroPython - a powerful alternative that can make your projects faster to develop and easier to maintain.

@@ -2,6 +2,11 @@
 title: Servo Frame
 description: Fit the servo holders into the frame
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_04.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 4 Fit the servo holders into the frame

@@ -3,9 +3,12 @@ title: Introduction
 description: Build an off-grid LoRa mesh network with MeshCore and two cheap Heltec V3 boards
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/00_intro.jpg
 ---
 
-![MeshCore course cover](assets/cover.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Ahoy there makers! Imagine sending a text message to a friend three miles away with no mobile signal, no WiFi, no internet, and no monthly bill. That is exactly what we are going to build in this course - and the whole thing costs about £30.
 

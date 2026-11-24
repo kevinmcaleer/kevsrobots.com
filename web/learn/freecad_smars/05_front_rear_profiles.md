@@ -3,7 +3,7 @@ layout: lesson
 title: Front and Rear Profiles
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/05_front_rear_profiles.jpg
 date: 2025-12-12
 previous: 04_sides_and_holes.html
 next: 06_arduino_slots.html
@@ -45,6 +45,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What We're Building
 
@@ -245,6 +249,7 @@ Click `OK`. You now have a cable routing slot at the top of the rear (and front)
 |------------|--------------|-------------|
 | **Coincident** | Two points must be at same location | Centering on a single reference point |
 | **Symmetric** | A point is exactly between two others | Centering between two edges/corners |
+{:class="table table-single"}
 
 Both achieve centering, but Symmetric is powerful when you have two reference points you want to center between.
 

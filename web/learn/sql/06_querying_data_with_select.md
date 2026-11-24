@@ -3,7 +3,7 @@ layout: lesson
 title: Querying Data with SELECT
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/06_querying_data_with_select.jpg
 date: 2024-11-01
 previous: 05_data_insertion_and_modification.html
 next: 07_advanced_filtering.html
@@ -55,6 +55,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll cover the `SELECT` statement, which is the cornerstone of querying data in SQL. You’ll learn how to retrieve data from tables, apply basic filters, and sort your results.
 

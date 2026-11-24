@@ -3,6 +3,11 @@ layout: lesson
 title: Introduction to UART
 type: page
 description: Learn about UART communication protocol and how to use it with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/11_uart.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

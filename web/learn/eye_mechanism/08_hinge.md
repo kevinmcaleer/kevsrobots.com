@@ -3,7 +3,7 @@ layout: lesson
 title: Create Hinge from Profile
 author: Kevin McAleer
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/08_hinge.jpg
 date: 2023-01-29
 previous: 07_create_lower_sketch.html
 next: 09_joint_and_export.html
@@ -46,6 +46,10 @@ navigation:
       link: 09_joint_and_export.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Lower Hinge
 

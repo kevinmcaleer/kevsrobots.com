@@ -3,7 +3,7 @@ layout: lesson
 title: Code
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/04_code.jpg
 date: 2024-07-26
 previous: 03_setup_pi.html
 next: 05_draw.html
@@ -39,6 +39,10 @@ navigation:
       link: 07_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Creating a BrachioGraph
 

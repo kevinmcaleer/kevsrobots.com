@@ -3,7 +3,7 @@ layout: lesson
 title: Serial Communication and REPL - No More Serial.begin!
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/08_serial_basics.jpg
 date: 2025-11-20
 previous: 07_timing.html
 next: 09_iot_project.html
@@ -49,6 +49,10 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
 ## Serial Communication: Simpler in Python
 
 Arduino requires you to initialize serial communication with `Serial.begin()`. MicroPython's `print()` function just works - no setup required. And the REPL (Read-Eval-Print Loop) gives you an interactive Python console on your microcontroller!
@@ -78,6 +82,7 @@ while True:
     print(f"Temperature: {temperature}")
     time.sleep(1)
 ```
+{: .no-snakie }
 
 Key differences:
 - **No initialization needed** - `print()` just works

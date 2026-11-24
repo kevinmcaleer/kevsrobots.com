@@ -4,7 +4,11 @@ title: Abstraction
 description: Learn about abstraction in MicroPython and how it simplifies code interaction by hiding complexity.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/03_abstraction.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Abstraction

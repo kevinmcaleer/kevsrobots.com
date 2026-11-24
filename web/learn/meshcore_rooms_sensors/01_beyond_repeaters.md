@@ -3,7 +3,7 @@ layout: lesson
 title: Beyond Repeaters and Clients
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/01_beyond_repeaters.jpg
 date: 2026-08-05
 previous: 00_intro.html
 next: 02_hardware.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 A repeater and a client give you a working network. So why add anything else? Because a plain mesh has two blind spots, and each of these roles fixes one of them.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Merging and Conflicts
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/09_merging-and-conflicts.jpg
 date: 2026-11-04
 previous: 08_branches.html
 next: 10_github-and-remotes.html
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Merging a branch
 

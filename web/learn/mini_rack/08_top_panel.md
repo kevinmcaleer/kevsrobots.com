@@ -3,7 +3,7 @@ layout: lesson
 title: Create the Top Panel
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/08_top_panel.jpg
 date: 2025-02-16
 previous: 07_pi_tray.html
 next: 07_print.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## How to create the top Panel for the Mini-Rack
 

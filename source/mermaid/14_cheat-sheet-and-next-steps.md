@@ -4,6 +4,11 @@ description: >-
     A quick reference for every Mermaid diagram type in the course, plus ideas for where to go next
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/14_cheat-sheet-and-next-steps.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Well done!

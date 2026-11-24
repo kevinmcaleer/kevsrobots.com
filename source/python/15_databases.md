@@ -2,10 +2,12 @@
 title: Python and Databases
 description: Learn how Python can be used to interact with databases, including creating, reading, updating, and deleting data.
 layout: lesson
-cover: /learn/python/assets/1.png
+cover: /learn/python/assets/banners/15_databases.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

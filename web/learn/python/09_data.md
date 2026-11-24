@@ -3,7 +3,7 @@ layout: lesson
 title: Working with Data in Python
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/2.png
+cover: /learn/python/assets/banners/09_data.jpg
 date: 2023-07-20
 previous: 08_oop.html
 next: 10_webscraping.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

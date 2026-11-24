@@ -78,6 +78,8 @@ navigation:
 
 ![cover image]({{page.cover}}){:class="cover"}
 
+{% include youtubeplayer.html id="UDo6tvoOQHg" %}
+
 ## Introduction
 
 The `command line`, also known as the terminal, is a powerful tool for interacting with your Raspberry Pi. It allows you to perform tasks more efficiently and gives you greater control over your system. In this lesson, you'll learn what the command line is, why it's useful, and how to open the terminal on Raspberry Pi OS.

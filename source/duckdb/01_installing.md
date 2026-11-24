@@ -3,6 +3,11 @@ title: Installing DuckDB
 description: Install the DuckDB CLI and Python package, verify the setup, and create your first local analytics database.
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/01_installing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Installing DuckDB

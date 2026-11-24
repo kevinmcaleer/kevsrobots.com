@@ -3,11 +3,11 @@ title: Training in Simulation
 description: Build a complete grid-world simulator, train your Q-learning agent over hundreds of episodes, and watch the policy improve — all in plain Python.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/10_training_in_simulation.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -397,7 +397,7 @@ if __name__ == "__main__":
 
 ---
 
-## ▶️ Running the Trainer
+## Running the Trainer
 
 ```bash
 python3 train.py

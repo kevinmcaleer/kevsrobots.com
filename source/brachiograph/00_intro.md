@@ -3,13 +3,15 @@ title: BrachioGraph Pen Plotter
 description: Build and program a BrachioGraph; a simple and fun drawing robot that can be controlled using Python.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/00_intro.jpg
 date_updated: 2024-07-30
 ---
 
-![Cover](assets/cover.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+{% include youtubeplayer.html id="tkAv3HIw3CY" %}
 
 ## Overview
 

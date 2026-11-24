@@ -2,7 +2,11 @@
 title: Side Holes
 description: Create the iconic SMARS side profile and motor shaft holes using sketches and pockets
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/04_sides_and_holes.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What We're Building

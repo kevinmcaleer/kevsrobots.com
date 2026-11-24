@@ -2,6 +2,11 @@
 title: Learn MicroPython Introduction Video
 description: Watch the MicroPython Introduction Video
 layout: lesson
+cover: /learn/micropython/assets/banners/00_videos.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## YouTube Series

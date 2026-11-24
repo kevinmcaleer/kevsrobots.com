@@ -125,5 +125,6 @@ navigation:
 | `exit`      | Closes the terminal session. | `exit` |
 | `raspi-config` | Raspberry Pi Configuration Tool for system settings. | `raspi-config` |
 | `vdir`      | Alias for `ls` command. | `vdir` |
+{:class="table table-single"}
 
 ---

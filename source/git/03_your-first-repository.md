@@ -4,6 +4,11 @@ description: >-
     Create a Git repository with git init, look inside the .git folder, and learn to read git status
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/03_your-first-repository.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Make a project folder

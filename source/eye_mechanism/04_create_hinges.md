@@ -3,6 +3,11 @@ title: Create Hinge Sketch
 description: Create the hinge profile
 layout: lesson
 type: page
+cover: /learn/eye_mechanism/assets/banners/04_create_hinges.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 * **Create new Sketch** - Create a new sketch on the edge of the eyelid by clicking the `CONSTRUCT` Menu and selecting the `offset plane` option.

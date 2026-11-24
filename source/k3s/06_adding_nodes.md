@@ -3,11 +3,11 @@ title: Adding Nodes
 description: Join additional Raspberry Pi nodes to your K3s cluster using the shared token and master node address.
 layout: lesson
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/06_adding_nodes.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ In this lesson, you’ll SSH into each worker Pi and join it to the K3s cluster 
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 Worker nodes use:
 
@@ -27,7 +27,7 @@ Worker nodes use:
 
 ---
 
-## 🔑 Step 1: Copy Your Cluster Token
+## Step 1: Copy Your Cluster Token
 
 On your **master node**, run:
 
@@ -45,7 +45,7 @@ Copy this token to use on all worker nodes.
 
 ---
 
-## 🔧 Step 2: Install K3s Agent on Each Worker Node
+## Step 2: Install K3s Agent on Each Worker Node
 
 On each worker Pi:
 
@@ -66,7 +66,7 @@ On each worker Pi:
    - The IP address of your master node (e.g. `192.168.1.100`)
    - The token you copied earlier
 
-> ✅ Example:
+> Example:
 >
 > ```bash
 > curl -sfL https://get.k3s.io | K3S_URL=https://192.168.1.100:6443 K3S_TOKEN=K108f0... sh -
@@ -74,7 +74,7 @@ On each worker Pi:
 
 ---
 
-## 🧪 Step 3: Verify Node Joined the Cluster
+## Step 3: Verify Node Joined the Cluster
 
 Back on the master node:
 
@@ -93,7 +93,7 @@ pi-node2    Ready    <none>                 1m      v1.29.2+k3s1
 
 ---
 
-## 🛠 Additional Notes
+## Additional Notes
 
 - You can repeat this process for as many worker nodes as you want.
 - The install script automatically sets up and starts the `k3s-agent` systemd service.
@@ -101,7 +101,7 @@ pi-node2    Ready    <none>                 1m      v1.29.2+k3s1
 
 ---
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 | Issue                     | Fix                                                              |
 | ------------------------- | ---------------------------------------------------------------- |
@@ -113,7 +113,7 @@ pi-node2    Ready    <none>                 1m      v1.29.2+k3s1
 
 ---
 
-🎉 Your K3s cluster is now multi-node and ready to deploy workloads!
+Your K3s cluster is now multi-node and ready to deploy workloads!
 
 Next up: [Troubleshooting Installation](07_troubleshooting_install)
 

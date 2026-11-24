@@ -3,6 +3,11 @@ title: Create the 2U Corner
 description: Learn how to create the 2U corner piece for the mini-rack
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/02_2u_design.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson we'll create the 2U corner piece for the mini-rack.

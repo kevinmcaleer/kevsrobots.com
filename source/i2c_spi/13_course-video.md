@@ -4,4 +4,10 @@ description: "Watch the full video walkthrough covering I2C communication on the
 layout: lesson
 type: video
 video_id: lthSloWM3Fk
+cover: /learn/i2c_spi/assets/banners/13_course-video.jpg
 ---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+

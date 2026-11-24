@@ -3,11 +3,11 @@ title: Troubleshooting Installation
 description: Solve common problems when installing or joining K3s on Raspberry Pi, including networking, tokens, and service errors.
 layout: lesson
 type: page
-cover: assets/k3s06.jpg
+cover: /learn/k3s/assets/banners/07_troubleshooting_install.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,13 +17,13 @@ This lesson walks you through **common issues** and how to troubleshoot them eff
 
 ---
 
-## 🧪 Problem: Node Doesn’t Join Cluster
+## Problem: Node Doesn’t Join Cluster
 
-### ❌ Symptom:
+### Symptom:
 
 Worker node installs, but doesn't show up with `kubectl get nodes`.
 
-### ✅ Solution:
+### Solution:
 
 - Ensure you're using the correct master IP:
 
@@ -40,13 +40,13 @@ Worker node installs, but doesn't show up with `kubectl get nodes`.
 
 ---
 
-## 🔐 Problem: Token Rejected
+## Problem: Token Rejected
 
-### ❌ Symptom:
+### Symptom:
 
 Worker node fails to join with error about invalid token.
 
-### ✅ Solution:
+### Solution:
 
 - Re-check token syntax:
 
@@ -63,13 +63,13 @@ Worker node fails to join with error about invalid token.
 
 ---
 
-## 🛑 Problem: k3s.service or k3s-agent.service Won’t Start
+## Problem: k3s.service or k3s-agent.service Won’t Start
 
-### ❌ Symptom:
+### Symptom:
 
 K3s or agent fails to start on boot.
 
-### ✅ Solution:
+### Solution:
 
 Check logs:
 
@@ -101,13 +101,13 @@ Common fixes:
 
 ---
 
-## 🌐 Problem: Hostname/IP Confusion
+## Problem: Hostname/IP Confusion
 
-### ❌ Symptom:
+### Symptom:
 
 Worker tries to join but fails due to DNS or unreachable host.
 
-### ✅ Solution:
+### Solution:
 
 - Always use the master’s **IP address**, not its hostname (unless you have proper DNS).
 - Confirm static IPs are in place.
@@ -115,9 +115,9 @@ Worker tries to join but fails due to DNS or unreachable host.
 
 ---
 
-## 🧹 Problem: You Want to Reinstall from Scratch
+## Problem: You Want to Reinstall from Scratch
 
-### ✅ Solution:
+### Solution:
 
 **On master:**
 
@@ -135,7 +135,7 @@ Then reinstall as per earlier lessons.
 
 ---
 
-## ✅ General Troubleshooting Checklist
+## General Troubleshooting Checklist
 
 | Step                       | Command                         |
 | -------------------------- | ------------------------------- |

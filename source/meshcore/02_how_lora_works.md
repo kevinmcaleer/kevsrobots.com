@@ -3,6 +3,11 @@ title: How LoRa Works
 description: Spreading factor, bandwidth and coding rate - the three dials that decide your range
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/02_how_lora_works.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Before we buy anything, it is worth five minutes understanding what LoRa actually does, because three settings decide whether your mesh reaches the end of the street or the next town.

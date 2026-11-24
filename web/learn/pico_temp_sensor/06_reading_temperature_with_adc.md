@@ -3,7 +3,7 @@ layout: lesson
 title: Converting ADC Values to Temperature
 author: Kevin McAleer
 type: page
-cover: /learn/pico_temp_sensor/assets/cover.jpg
+cover: /learn/pico_temp_sensor/assets/banners/06_reading_temperature_with_adc.jpg
 date: 2024-11-22
 previous: 05_how_the_temperature_sensor_works.html
 next: 07_displaying_temperature_in_thonny_console.html
@@ -50,6 +50,10 @@ navigation:
       link: 12_troubleshooting_temperature_readings.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Encrypt
 author: Kevin McAleer
 type: page
-cover: /learn/octapi/assets/octapi.jpg
+cover: /learn/octapi/assets/banners/01_lesson01.jpg
 date: 2024-02-18
 previous: 00_intro.html
 next: 02_lesson02.html
@@ -37,6 +37,10 @@ navigation:
       link: 06_octapi.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is `Py-Engima`?
 

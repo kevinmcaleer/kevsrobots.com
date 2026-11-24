@@ -3,6 +3,11 @@ title: Battery and Solar Telemetry
 description: Report cell voltage and charge state from a remote node, and calibrate the ADC
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/12_battery_telemetry.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The most useful sensor on a remote node is not a thermometer. It is the battery gauge. A node that tells you it is at 3.4V and falling gives you a week's warning; a node that just goes quiet gives you a mystery and a walk up a hill.

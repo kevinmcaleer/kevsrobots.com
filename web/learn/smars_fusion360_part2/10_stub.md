@@ -3,7 +3,7 @@ layout: lesson
 title: Stub extrude
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/10_stub.jpg
 date: 2023-07-20
 previous: 09_cut.html
 next: 11_stub.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The [Stub extrude profile](09_cut.html) is extruded into the chassis body.
 The dimensions are:

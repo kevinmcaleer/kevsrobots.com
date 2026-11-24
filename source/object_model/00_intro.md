@@ -4,10 +4,14 @@ description: >-
     Learn how to build custom object detection models using the Raspberry Pi AI Camera and PyTorch. Train models to detect your own objects in real-time.
 type: page
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/object_model/assets/banners/00_intro.jpg
 ---
 
-![Raspberry Pi AI Camera](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+{% include youtubeplayer.html id="ARCtzjHfyMg" %}
 
 ## Overview
 

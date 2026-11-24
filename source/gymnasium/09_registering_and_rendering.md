@@ -3,11 +3,11 @@ title: Registering and Rendering
 description: Register BurgerBotEnv with gym.register so it can be created with gym.make, and learn how render modes work in Gymnasium.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/09_registering_and_rendering.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

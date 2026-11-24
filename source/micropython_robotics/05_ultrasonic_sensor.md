@@ -3,11 +3,11 @@ title: Obstacle Avoidance with Ultrasonic Sensors
 description: Use an ultrasonic sensor to detect obstacles and prevent your robot from crashing into things.
 layout: lesson
 type: page
-cover: assets/ultrasonic_sensor.jpg
+cover: /learn/micropython_robotics/assets/banners/05_ultrasonic_sensor.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/03.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -15,7 +15,7 @@ Your robot needs to be aware of its surroundings. With an **ultrasonic sensor** 
 
 ---
 
-## 📏 How the Ultrasonic Sensor Works
+## How the Ultrasonic Sensor Works
 
 The **HC-SR04** sends out a burst of ultrasound and listens for the echo. By measuring the time it takes for the echo to return, it can calculate distance.
 
@@ -27,9 +27,9 @@ The **HC-SR04** sends out a burst of ultrasound and listens for the echo. By mea
 
 ---
 
-## 🔌 Wiring the HC-SR04 to the Pico
+## Wiring the HC-SR04 to the Pico
 
-![HC-SR04](assets/hc-sr04.jpg){:class="w-100 rounded-3"}
+![HC-SR04](assets/hcsr04.jpg){:class="w-100 rounded-3"}
 
 - **VCC** → 3.3V (The Pico needs the 3.3v versino of the HC-SR04)  
 - **GND** → GND  
@@ -48,7 +48,7 @@ ECHO → 1kΩ → Pico GP9
 
 ---
 
-## 🧪 Reading Distance with MicroPython
+## Reading Distance with MicroPython
 
 ```python
 from machine import Pin, time_pulse_us
@@ -76,7 +76,7 @@ while True:
 
 ---
 
-## 🧠 Avoiding Obstacles
+## Avoiding Obstacles
 
 You can use the measured distance to decide what your robot should do:
 
@@ -95,7 +95,7 @@ else:
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 Adjust the threshold to make your robot more or less cautious.
 

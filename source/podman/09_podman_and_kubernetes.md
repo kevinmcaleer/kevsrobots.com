@@ -3,11 +3,11 @@ title: Podman and Kubernetes
 description: Learn how to use Podman with Kubernetes — including generating Kubernetes YAML files, running them locally, and preparing workloads for production.
 layout: lesson
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/09_podman_and_kubernetes.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ This makes it easy to develop container workloads locally and then **export them
 
 ---
 
-## 📄 Generating Kubernetes YAML from Podman
+## Generating Kubernetes YAML from Podman
 
 You can create containers or pods with Podman and then export them as Kubernetes-compatible YAML.
 
@@ -32,11 +32,11 @@ This includes:
 * Ports and volumes
 * Restart policies (as annotations)
 
-> 🧠 The output is structured as a `Pod` definition — ready to use with `kubectl` or `podman play kube`.
+> The output is structured as a `Pod` definition — ready to use with `kubectl` or `podman play kube`.
 
 ---
 
-## ▶️ Running Kubernetes YAML with Podman
+## Running Kubernetes YAML with Podman
 
 Test Kubernetes manifests locally using:
 
@@ -52,7 +52,7 @@ This will:
 
 ---
 
-## 📦 Example Workflow
+## Example Workflow
 
 ```bash
 # Create a pod manually
@@ -73,7 +73,7 @@ This lets you build your apps locally and **deploy using the same manifests** yo
 
 ---
 
-## 🔄 Integration with Kubernetes Clusters
+## Integration with Kubernetes Clusters
 
 While Podman is not a Kubernetes runtime itself (like `CRI-O`), it plays a key role in:
 
@@ -81,11 +81,11 @@ While Podman is not a Kubernetes runtime itself (like `CRI-O`), it plays a key r
 * Validating configurations before deploying to the cloud
 * Generating boilerplate YAML for clusters
 
-> 🧰 Podman works well alongside Kubernetes tools like `kubectl`, `minikube`, or `kind`.
+> Podman works well alongside Kubernetes tools like `kubectl`, `minikube`, or `kind`.
 
 ---
 
-## 🧪 Use Case: Local Dev + Cloud Deployment
+## Use Case: Local Dev + Cloud Deployment
 
 1. Develop and test containers with Podman
 2. Use `generate kube` to export configuration
@@ -95,18 +95,18 @@ This simplifies **testing and CI/CD pipelines**, and bridges local workflows wit
 
 ---
 
-## ⚠️ Caveats
+## Caveats
 
 * `podman play kube` only supports basic `Pod`, `Deployment`, and `Service` objects
 * More complex Kubernetes features (e.g., Ingress, ConfigMaps, secrets) require manual YAML editing or use of Kubernetes CLI
 
 ---
 
-## 🧩 Podman + CRI-O
+## Podman + CRI-O
 
 In Kubernetes environments, Podman’s sibling tool — **CRI-O** — serves as the container runtime. It uses the same container libraries and OCI standards.
 
-> 🔗 If you’re comfortable with Podman, transitioning to **CRI-O + Kubernetes** will feel very familiar.
+> If you’re comfortable with Podman, transitioning to **CRI-O + Kubernetes** will feel very familiar.
 
 ---
 

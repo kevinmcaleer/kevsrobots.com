@@ -4,6 +4,11 @@ description: >-
     Set up Jupyter Lab and create a Python virtual environment for training custom object detection models with PyTorch
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/01_setup.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

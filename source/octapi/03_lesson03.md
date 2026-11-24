@@ -2,6 +2,11 @@
 title: Encrypt longer messages
 description:
 layout: lesson
+cover: /learn/octapi/assets/banners/03_lesson03.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Learn how to encrypt messages like the one below using the Enigma machine and Py-Engima.

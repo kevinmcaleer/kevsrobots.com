@@ -3,7 +3,7 @@ layout: lesson
 title: Permissions and Moderation
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/07_permissions.jpg
 date: 2026-08-05
 previous: 06_joining_a_room.html
 next: 08_room_operations.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The moment more than two people use your room, you are running shared infrastructure. This lesson is about the controls MeshCore gives you, and the fact that some of the problem is social rather than technical.
 

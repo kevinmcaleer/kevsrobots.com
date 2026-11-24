@@ -3,6 +3,11 @@ title: Project Ideas and Extensions
 description: Explore exciting project ideas and advanced extensions to take your Raspberry Pi Pico temperature monitoring system to the next level.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/11_project_ideas_and_extensions.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

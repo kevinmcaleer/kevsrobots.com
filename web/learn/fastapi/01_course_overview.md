@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to FastAPI and User Authentication Basics
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/fastapi/assets/banners/01_course_overview.jpg
 date: 2024-03-28
 next: 02_setting_up_the_environment.html
 description: Learn the basics of FastAPI and the principles of user authentication
@@ -42,7 +42,9 @@ navigation:
 ---
 
 
-![FastAPI cover image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is FastAPI?
 

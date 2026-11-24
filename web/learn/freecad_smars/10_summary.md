@@ -3,7 +3,7 @@ layout: lesson
 title: Summary and Next Steps
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/10_summary.jpg
 date: 2025-12-12
 previous: 09_save_as_stl.html
 description: Review what you've learned and explore where to go next
@@ -44,6 +44,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Congratulations, Robot Designer!
 

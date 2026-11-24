@@ -3,6 +3,11 @@ title: Create the Top Corner
 description: Learn how to create the top corner piece for the mini-rack
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/04_top.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Top Design](assets/top_design.png){:class="img-fluid w-100"}

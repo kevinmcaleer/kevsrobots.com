@@ -4,6 +4,11 @@ description: >-
     Put everything together and write a README for a Pico W robot, with a block diagram, a flowchart, a state diagram, a sequence diagram and a class diagram
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/13_project-document-a-robot.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## The project

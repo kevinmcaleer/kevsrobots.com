@@ -3,6 +3,11 @@ title: First Contact
 description: Adverts, contacts and sending your first message across your own mesh
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/10_first_contact.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Two boards, two roles, matching settings. This is the lesson where it becomes a network.

@@ -3,7 +3,7 @@ layout: lesson
 title: Summary and Review
 author: Kevin McAleer
 type: page
-cover: /learn/micropython/assets/micropython.jpg
+cover: /learn/micropython/assets/banners/18_summary.jpg
 date: 2022-12-04
 previous: 17_modules.html
 description: A summary of what you have learned so far
@@ -66,6 +66,10 @@ navigation:
       link: 18_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Picture of a group high-five](assets/summary.jpg){:.cover}
 

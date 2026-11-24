@@ -3,7 +3,7 @@ layout: lesson
 title: Wheel hole extrude cut
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/14_cut.jpg
 date: 2023-07-20
 previous: 13_wheel.html
 next: 15_slots.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The [wheel hole profile](13_wheel.html) is used to extrude a cut all the way through the body.
 

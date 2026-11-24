@@ -3,11 +3,11 @@ title: Controlling DC Motors with the Raspberry Pi Pico
 description: Learn how to connect and control DC motors using MicroPython and the L298N motor driver.
 layout: lesson
 type: page
-cover: assets/dc_motors.jpg
+cover: /learn/micropython_robotics/assets/banners/02_dc_motors.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -15,7 +15,7 @@ DC motors are the core of many robotics projects — they provide movement for w
 
 ---
 
-## 🔌 What You’ll Need
+## What You’ll Need
 
 To follow along, gather the following components:
 
@@ -30,7 +30,7 @@ Wires             | Breadboard and jumper wires                                 
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 The Raspberry Pi Pico can't drive a motor directly — it doesn't output enough current. Instead, we use an **L298N H-bridge motor driver**, which allows the Pico to control the motor’s speed and direction using:
 
@@ -42,7 +42,7 @@ The Raspberry Pi Pico can't drive a motor directly — it doesn't output enough 
 
 ---
 
-## 🛠️ Wiring the Circuit
+## Wiring the Circuit
 
 Here’s how to connect a single motor to the L298N and Pico:
 
@@ -54,11 +54,11 @@ Here’s how to connect a single motor to the L298N and Pico:
 - Battery pack – → L298N GND  
 - Pico GND → L298N GND  
 
-> ⚠️ Important: Do **not** connect motor power (VCC) directly to the Pico!
+> Important: Do **not** connect motor power (VCC) directly to the Pico!
 
 ---
 
-## 🧪 Writing the Code
+## Writing the Code
 
 Here's a simple MicroPython script to control motor direction and speed:
 
@@ -99,7 +99,7 @@ You can adjust the speed by changing the speed parameter (range: 0–65535).
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 * Reverse the motor direction.
 * Slow the motor down by reducing PWM.

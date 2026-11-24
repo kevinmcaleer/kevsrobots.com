@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Sets
 type: page
 description: Learn about Redis sets and how to use them with Python.
+cover: /learn/redis/assets/banners/06_redis_sets.jpg
 ---
 
-<!-- ![Cover photo of Redis sets](assets/redis-sets.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

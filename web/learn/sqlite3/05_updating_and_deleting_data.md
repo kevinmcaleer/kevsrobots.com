@@ -3,7 +3,7 @@ layout: lesson
 title: Updating and Deleting Data
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: /learn/sqlite3/assets/banners/05_updating_and_deleting_data.jpg
 date: 2023-07-15
 previous: 04.inserting_and_retrieving_data.html
 next: 06_querying_and_joining_tables.html
@@ -62,6 +62,10 @@ navigation:
       link: 17_tools.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Module 5 focuses on modifying data in SQLite tables. You will learn how to update existing records and delete data from tables using SQL statements.
 

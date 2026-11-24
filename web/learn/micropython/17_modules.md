@@ -3,7 +3,7 @@ layout: lesson
 title: Modules
 author: Kevin McAleer
 type: page
-cover: /learn/micropython/assets/micropython.jpg
+cover: /learn/micropython/assets/banners/17_modules.jpg
 date: 2022-12-04
 previous: 16_repl.html
 next: 18_summary.html
@@ -68,6 +68,10 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
 ![Picture of a honeycomb close up](assets/modules.jpg){:.cover}
 
 ## Modules
@@ -126,6 +130,7 @@ From the `REPL` type:
 ```python
 dir(machine)
 ```
+{: .no-snakie }
 
 In the example above you'll discover a list of all the functions, classes and Constants in the module named `machine`.
 

@@ -3,6 +3,11 @@ title: Installing Obsidian
 description: Learn how to install Obsidian on your computer.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/01_installing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 # Installing Obsidian

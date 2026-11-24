@@ -3,10 +3,12 @@ title: Course Introduction
 description: Learn about the exciting journey ahead as we explore the Raspberry Pi Pico's built-in temperature sensor and learn how to use it with MicroPython.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/pico_temp_sensor/assets/banners/01_course_introduction.jpg
 ---
 
-![cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Welcome to the Course
 

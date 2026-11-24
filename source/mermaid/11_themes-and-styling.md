@@ -4,6 +4,11 @@ description: >-
     Change the look of a whole Mermaid diagram with built-in themes, config settings and your own theme colours
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/11_themes-and-styling.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Styling the whole diagram

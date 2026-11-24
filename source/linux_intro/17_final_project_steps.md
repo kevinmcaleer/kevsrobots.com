@@ -2,10 +2,12 @@
 title: Final Project Steps
 description: Step-by-step guide to coding, testing, and finalizing your command-line tool project.
 layout: lesson
-cover: /learn/linux_intro/assets/project.jpg
+cover: /learn/linux_intro/assets/banners/17_final_project_steps.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

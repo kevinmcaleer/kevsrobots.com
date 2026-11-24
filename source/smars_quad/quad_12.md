@@ -2,6 +2,11 @@
 title: Code
 description: Download the python code
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_12.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 12 Download the python code

@@ -3,6 +3,11 @@ title: Create Hinge from Profile
 description: Let's create the lower eyelid hinge from the new profile
 layout: lesson
 type: page
+cover: /learn/eye_mechanism/assets/banners/08_hinge.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Lower Hinge

@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Lists
 type: page
 description: Learn about Redis lists and how to use them with Python.
+cover: /learn/redis/assets/banners/05_redis_lists.jpg
 ---
 
-<!-- ![Cover photo of Redis lists](assets/redis-lists.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

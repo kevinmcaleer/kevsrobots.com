@@ -2,7 +2,11 @@
 title: Print the Parts
 description: Build Instructions for standard SMARS
 layout: lesson
-cover: /learn/smars/assets/how_to_build_a_smars.jpg
+cover: /learn/smars/assets/banners/smars01.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the video

@@ -4,6 +4,11 @@ description: >-
     Find 33 body landmarks with CVZone's PoseDetector and measure the angles between them
 layout: lesson
 type: page
+cover: /learn/cvzone/assets/banners/04_posture.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Pose detection

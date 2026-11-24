@@ -3,6 +3,11 @@ title: "Mini capstone: local analytics project"
 description: "Plan and build a tiny analytics project end-to-end with DuckDB, Parquet, and Python."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/11_mini_capstone.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Goal

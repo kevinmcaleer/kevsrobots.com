@@ -3,7 +3,7 @@ layout: lesson
 title: Entity Relationship Diagrams
 author: Kevin McAleer
 type: page
-cover: /learn/mermaid/assets/cover.jpg
+cover: /learn/mermaid/assets/banners/08_entity-relationship-diagrams.jpg
 date: 2026-11-04
 previous: 07_class-diagrams.html
 next: 09_gantt-and-timeline.html
@@ -61,6 +61,10 @@ navigation:
       link: 14_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Planning a database
 

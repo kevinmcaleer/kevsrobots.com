@@ -3,6 +3,11 @@ title: Summary and Key Takeaways
 description: Review the key concepts and skills learned in the BrachioGraph course.
 layout: lesson
 type: page
+cover: /learn/brachiograph/assets/banners/07_summary.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Summary and Key Takeaways

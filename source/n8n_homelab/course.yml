@@ -1,0 +1,58 @@
+- name: Homelab Automation with n8n
+  author: Kevin McAleer
+  date_created: 2026-11-24
+  date_published: 2026-11-24
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  video: Yds3_vQR5xM
+  groups:
+      - raspberrypi
+      - productivity
+  description: >-
+    Turn a Raspberry Pi into an automation hub with n8n and Docker. Build a homelab robot butler that
+    checks your services on a schedule, listens for readings from a Pico W, tidies the data with a
+    little JavaScript, and tells you when something is wrong.
+  outcomes:
+    - Run n8n on a Raspberry Pi with Docker Compose, with your data kept safe in a volume
+    - Build, test and publish a workflow with a trigger, nodes and branches
+    - Check a homelab service on a schedule and get a message when it fails
+    - Receive data from a Pico W with a Webhook node and protect it with a key
+    - Reshape data with the Code node, using JavaScript
+    - Keep secrets in credentials, debug past executions, and update and back up n8n
+  prerequisites:
+    - Docker
+    - Introduction to the Linux Command Line on Raspberry Pi OS
+  you_need:
+    - A Raspberry Pi 4 or newer (a Pi 5 or Pi 500 is more comfortable), running Raspberry Pi OS
+    - Docker and Docker Compose installed on the Pi
+    - A computer on the same network, with a web browser
+    - A Raspberry Pi Pico W, for lessons 6 and 7
+    - An email account you can send from (SMTP details), for lesson 5
+  content:
+    - section:
+        name: Meet n8n
+        content:
+          - 00_intro.md
+          - 01_what_is_n8n.md
+          - 02_install_n8n_with_docker_compose.md
+          - 03_the_editor_and_your_first_workflow.md
+    - section:
+        name: Watching your homelab
+        content:
+          - 04_a_scheduled_health_check.md
+          - 05_if_the_service_is_down.md
+    - section:
+        name: Listening to your devices
+        content:
+          - 06_a_webhook_for_the_pico.md
+          - 07_pico_w_sends_a_reading.md
+          - 08_tidy_data_with_the_code_node.md
+    - section:
+        name: Running it for real
+        content:
+          - 09_credentials_and_secrets.md
+          - 10_executions_and_debugging.md
+          - 11_updates_and_backups.md
+          - 12_troubleshooting.md
+          - 13_summary.md
