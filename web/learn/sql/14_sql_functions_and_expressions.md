@@ -7,17 +7,19 @@ cover: /learn/sql/assets/banners/14_sql_functions_and_expressions.jpg
 date: 2024-11-01
 previous: 13_views_and_indexes.html
 next: 15_wrap_up_and_final_project.html
-description: Learn to use SQL functions and expressions to manipulate and analyze
-  data in queries
+description: Tidy text, round numbers, handle NULL with COALESCE and work with dates
+  using SQLite's built-in string, numeric and date functions.
 percent: 90
 duration: 6
+quiz_total: 46
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with SQL
 - content:
   - section: Introduction
     content:
     - name: Course Overview
-      link: 00_course_overview.html
+      link: 00_intro.html
   - section: SQL Basics
     content:
     - name: Introduction to SQL and Relational Databases
@@ -61,204 +63,257 @@ navigation:
 
 ---
 
-In this lesson, we’ll explore **SQL functions and expressions** that enhance your ability to manipulate, analyze, and transform data. SQL provides a variety of functions, including string, numeric, date, and aggregate functions, that make it easier to handle different types of data efficiently.
+By the end of this lesson you will be able to build labels from text, do arithmetic in a query, replace `NULL` with a fallback, and group robots by year using date functions.
 
 ---
 
-## 1. What are SQL Functions?
+A **function** takes a value, does something to it and hands back a new one. We already met `COUNT` and `AVG`. This lesson covers the everyday ones that work on each row. An **expression** is anything that produces a value: a column, a calculation, a function call, or a mixture.
 
-SQL functions are built-in commands that perform specific operations on data and return a single result. Functions can be applied to columns in your database to manipulate or calculate values directly within your queries.
+These are SQLite's functions. Other databases have most of the same ideas under similar names, but not always the same spelling.
 
-### Types of SQL Functions
+## Text functions
 
-- **Aggregate Functions**: SUM, COUNT, AVG, MIN, MAX
-- **String Functions**: CONCAT, LENGTH, UPPER, LOWER
-- **Numeric Functions**: ROUND, CEIL, FLOOR
-- **Date Functions**: NOW, DATE, YEAR, MONTH, DAY
+```sql
+SELECT name, UPPER(name), LENGTH(name) FROM robots ORDER BY robot_id;
+```
 
----
+```text
+name         UPPER(name)  LENGTH(name)
+-----------  -----------  ------------
+Smars        SMARS        5
+Pico Walker  PICO WALKER  11
+Arm Buddy    ARM BUDDY    9
+Line Chaser  LINE CHASER  11
+Mystery Bot  MYSTERY BOT  11
+```
 
-## 2. Aggregate Functions
+| Function | What it does | Example result |
+|----------|--------------|----------------|
+| `UPPER(x)`, `LOWER(x)` | Change case | `'smars'` becomes `'SMARS'` |
+| `LENGTH(x)` | Number of characters | `LENGTH('Smars')` is 5 |
+| `SUBSTR(x, start, len)` | Part of the text, counting from 1 | `SUBSTR('Smars', 1, 3)` is `Sma` |
+| `REPLACE(x, old, new)` | Swap text | `REPLACE('Arm Buddy', ' ', '_')` is `Arm_Buddy` |
+| `TRIM(x)` | Remove spaces at both ends | `TRIM('  hi ')` is `hi` |
+| `INSTR(x, y)` | Position of `y` in `x`, or 0 | `INSTR('Pico Walker', ' ')` is 5 |
+{:class="table table-single"}
 
-Aggregate functions operate on a set of values and return a single result. They are commonly used in conjunction with the `GROUP BY` clause.
+Join pieces of text with the `||` operator to build a label:
 
-### Common Aggregate Functions
+```sql
+SELECT name || ' (' || kind || ')' AS label FROM robots ORDER BY robot_id;
+```
 
-Function | Description                            | Example
----------|----------------------------------------|------------------------------
-`COUNT`  | Counts the number of rows              | `SELECT COUNT(*) FROM users;`
-`SUM`    | Calculates the sum of a numeric column | `SELECT SUM(salary) FROM employees;`
-`AVG`    | Calculates the average value           | `SELECT AVG(salary) FROM employees;`
-`MIN`    | Returns the minimum value              | `SELECT MIN(salary) FROM employees;`
-`MAX`    | Returns the maximum value              | `SELECT MAX(salary) FROM employees;`
-{:class="table table-striped"}
+```text
+label
+--------------------
+Smars (rover)
+Pico Walker (walker)
+Arm Buddy (arm)
+Line Chaser (rover)
+Mystery Bot (rover)
+```
 
-- **Example**: Find the total salary and average salary of employees.
+Handy for web-friendly names too: `REPLACE(LOWER(name), ' ', '_')` turns `Pico Walker` into `pico_walker`.
 
-    ```sql
-    SELECT SUM(salary) AS total_salary, AVG(salary) AS average_salary
-    FROM employees;
-    ```
+## NULL and COALESCE
 
----
+Join text to a `NULL` and the whole result becomes `NULL`:
 
-## 3. String Functions
+```sql
+SELECT name || ' (' || battery_mah || ' mAh)' AS label FROM robots ORDER BY robot_id;
+```
 
-String functions allow you to manipulate text data. These functions are useful for formatting, concatenating, and altering strings.
+```text
+label
+----------------------
+Smars (2000 mAh)
+Pico Walker (1500 mAh)
 
-### Common String Functions
+Line Chaser (1200 mAh)
 
-Function       | Description                               | Example
----------------|-------------------------------------------|---------------------------------------
-`CONCAT`       | Concatenates two or more strings          | `SELECT CONCAT(first_name, ' ', last_name) FROM users;`
-`LENGTH`       | Returns the length of a string            | `SELECT LENGTH(name) FROM users;`
-`UPPER`        | Converts text to uppercase                | `SELECT UPPER(name) FROM users;`
-`LOWER`        | Converts text to lowercase                | `SELECT LOWER(name) FROM users;`
-`SUBSTRING`    | Extracts a substring from a string        | `SELECT SUBSTRING(name, 1, 3) FROM users;`
-{:class="table table-striped"}
+```
 
-- **Example**: Retrieve employee names in uppercase and show the length of each name.
+Arm Buddy and Mystery Bot come out blank. `COALESCE(x, fallback)` returns the first value that isn't `NULL`, which fixes it:
 
-    ```sql
-    SELECT UPPER(name) AS upper_name, LENGTH(name) AS name_length
-    FROM employees;
-    ```
+```sql
+SELECT name, COALESCE(battery_mah, 0) AS battery FROM robots ORDER BY robot_id;
+```
 
----
+```text
+name         battery
+-----------  -------
+Smars        2000
+Pico Walker  1500
+Arm Buddy    0
+Line Chaser  1200
+Mystery Bot  0
+```
 
-## 4. Numeric Functions
+It works for text too:
 
-Numeric functions are used to perform mathematical operations on numeric data.
+```sql
+SELECT name, COALESCE(built_on, 'not built yet') AS built FROM robots ORDER BY robot_id;
+```
 
-### Common Numeric Functions
+```text
+name         built
+-----------  -------------
+Smars        2024-03-10
+Pico Walker  2024-06-21
+Arm Buddy    2024-09-02
+Line Chaser  2025-01-15
+Mystery Bot  not built yet
+```
 
-Function      | Description                                   | Example
---------------|-----------------------------------------------|-----------------------------------
-`ROUND`       | Rounds a number to a specified number of decimals | `SELECT ROUND(salary, 2) FROM employees;`
-`CEIL`        | Rounds a number up to the nearest integer         | `SELECT CEIL(salary) FROM employees;`
-`FLOOR`       | Rounds a number down to the nearest integer       | `SELECT FLOOR(salary) FROM employees;`
-`ABS`         | Returns the absolute value of a number            | `SELECT ABS(salary - 50000) FROM employees;`
-{:class="table table-striped"}
+## Number functions and arithmetic
 
-- **Example**: Round each employee’s salary to the nearest hundred.
+You can calculate right in the `SELECT`. How long would each battery last at a steady 500 mA draw?
 
-    ```sql
-    SELECT name, ROUND(salary, -2) AS rounded_salary
-    FROM employees;
-    ```
+```sql
+SELECT name, battery_mah,
+       ROUND(battery_mah / 500.0, 1) AS hours_at_500ma
+FROM robots
+WHERE battery_mah IS NOT NULL
+ORDER BY robot_id;
+```
 
----
+```text
+name         battery_mah  hours_at_500ma
+-----------  -----------  --------------
+Smars        2000         4.0
+Pico Walker  1500         3.0
+Line Chaser  1200         2.4
+```
 
-## 5. Date Functions
+That is a rough estimate, because real draw changes as the robot moves. Note the `500.0`. Two whole numbers divide as whole numbers:
 
-Date functions allow you to manipulate and extract information from date and time data.
+```sql
+SELECT 7 / 2, 7 / 2.0, 7 % 2;
+```
 
-### Common Date Functions
+```text
+7 / 2  7 / 2.0  7 % 2
+-----  -------  -----
+3      3.5      1
+```
 
-Function      | Description                                         | Example
---------------|-----------------------------------------------------|-----------------------------------
-`NOW`         | Returns the current date and time                   | `SELECT NOW();`
-`CURDATE`     | Returns the current date                            | `SELECT CURDATE();`
-`YEAR`        | Extracts the year from a date                       | `SELECT YEAR(birth_date) FROM users;`
-`MONTH`       | Extracts the month from a date                      | `SELECT MONTH(birth_date) FROM users;`
-`DAY`         | Extracts the day from a date                        | `SELECT DAY(birth_date) FROM users;`
-`DATEDIFF`    | Returns the difference in days between two dates    | `SELECT DATEDIFF(NOW(), hire_date) FROM employees;`
-{:class="table table-striped"}
+`ROUND(x, places)` rounds, `ABS(x)` drops the minus sign, and `%` gives the remainder. The `MAX(a, b, c)` and `MIN(a, b, c)` forms with several values compare them within one row, unlike the one-argument aggregates from lesson 9.
 
-- **Example**: Find the number of days each employee has been with the company, based on their hire date.
+## Date functions
 
-    ```sql
-    SELECT name, DATEDIFF(NOW(), hire_date) AS days_with_company
-    FROM employees;
-    ```
+Dates stored as `YYYY-MM-DD` text can be handled by `date()`, `strftime()` and `julianday()`. Add days to a date, or find the end of a month:
 
----
+```sql
+SELECT date('2025-03-01', '+7 days'),
+       date('2025-03-01', 'start of month', '+1 month', '-1 day');
+```
 
-## 6. Using Expressions for Calculations
+```text
+date('2025-03-01', '+7 days')  date('2025-03-01', 'start of month', '+1 month', '-1 day')
+-----------------------------  ----------------------------------------------------------
+2025-03-08                     2025-03-31
+```
 
-Expressions in SQL allow you to perform calculations or manipulate data directly in queries.
+`strftime(format, date)` picks parts out of a date: `%Y` is the year, `%m` the month, `%d` the day, and `%H:%M` the hour and minute. Here is how many robots were built in each year:
 
-### Example: Calculating a 10% Bonus
+```mermaid
+flowchart LR
+    A["built_on: 2024-06-21"] --> B["strftime('%Y', built_on)"]
+    B --> C["2024"]
+    C --> D["GROUP BY year, COUNT(*)"]
+```
 
-- **Example**: Calculate a 10% bonus for each employee based on their current salary.
+```sql
+SELECT strftime('%Y', built_on) AS year, COUNT(*) AS robots_built
+FROM robots
+WHERE built_on IS NOT NULL
+GROUP BY year
+ORDER BY year;
+```
 
-    ```sql
-    SELECT name, salary, salary * 0.10 AS bonus
-    FROM employees;
-    ```
+```text
+year  robots_built
+----  ------------
+2024  3
+2025  1
+```
 
-### Example: Combining Columns with CONCAT
+`julianday()` turns a date into a day count, so subtracting two gives the days between them. How old was each robot on 1 March 2025?
 
-- **Example**: Combine `first_name` and `last_name` into a single `full_name` column.
+```sql
+SELECT name,
+       CAST(julianday('2025-03-01') - julianday(built_on) AS INTEGER) AS days_old
+FROM robots
+WHERE built_on IS NOT NULL
+ORDER BY built_on;
+```
 
-    ```sql
-    SELECT CONCAT(first_name, ' ', last_name) AS full_name
-    FROM employees;
-    ```
+```text
+name         days_old
+-----------  --------
+Smars        356
+Pico Walker  253
+Arm Buddy    180
+Line Chaser  45
+```
 
-### Example: Date Arithmetic
+`CAST(x AS INTEGER)` converts the value to a whole number. For today's date, use `date('now')`, which gives a different answer every day, so our examples use fixed dates.
 
-- **Example**: Calculate each employee’s next anniversary by adding one year to their `hire_date`.
+## Formatting numbers
 
-    ```sql
-    SELECT name, hire_date, DATE_ADD(hire_date, INTERVAL 1 YEAR) AS next_anniversary
-    FROM employees;
-    ```
+`printf` works like the format strings in many programming languages:
 
----
+```sql
+SELECT printf('%s: %.2f', model, price) FROM sensors WHERE sensor_id <= 2;
+```
 
-## Practice Exercise: Using SQL Functions and Expressions
+```text
+printf('%s: %.2f', model, price)
+--------------------------------
+HC-SR04: 2.50
+TCRT5000: 1.20
+```
 
-1. **Calculate Total and Average Salary**: Find the total and average salary of all employees.
+## Try it Yourself
 
-    ```sql
-    SELECT SUM(salary) AS total_salary, AVG(salary) AS average_salary
-    FROM employees;
-    ```
+1. Show each robot's name in lower case with spaces replaced by hyphens.
+2. Show each sensor's `price` with 20 percent added, rounded to two places, under the heading `price_with_vat`.
+3. Challenge: show each reading's time as `HH:MM` (using `strftime`) with its value, for sensor 1 only, in time order.
 
-2. **String Manipulation**: Retrieve the first three letters of each employee’s name and display it in uppercase.
+## Common Issues
 
-    ```sql
-    SELECT UPPER(SUBSTRING(name, 1, 3)) AS name_prefix
-    FROM employees;
-    ```
+- **Problem**: A label built with `||` is blank for some rows.
+- **Solution**: Wrap the possibly-`NULL` column in `COALESCE(column, 'unknown')`.
+- **Why**: Any text joined to `NULL` gives `NULL`.
 
-3. **Round Salaries**: Display each employee’s salary rounded to the nearest thousand.
+- **Problem**: `7 / 2` gives 3, not 3.5.
+- **Solution**: Make one number a decimal, `7 / 2.0`, or multiply by `1.0` first.
+- **Why**: Dividing two integers gives a whole number in SQLite.
 
-    ```sql
-    SELECT name, ROUND(salary, -3) AS rounded_salary
-    FROM employees;
-    ```
+- **Problem**: `no such function: CONCAT` or `no such function: DATE_SUB`.
+- **Solution**: Use `||` for joining text, and `date(x, '-7 days')` for date arithmetic. `CONCAT` exists in SQLite only from version 3.44.
+- **Why**: Many tutorials show MySQL functions. SQLite has its own set, so check the SQLite function list when copying.
 
-4. **Date Difference**: Calculate the number of days each employee has worked at the company based on their hire date.
+## Check your understanding
 
-    ```sql
-    SELECT name, DATEDIFF(NOW(), hire_date) AS days_with_company
-    FROM employees;
-    ```
+{% quiz %}
+? What is the result of `7 / 2` in SQLite?
+- [x] 3
+- [ ] 3.5
+- [ ] 4
+> Two integers divide as integers. Use `7 / 2.0` to get 3.5.
 
-5. **Calculate Bonuses**: Calculate a 5% bonus for each employee based on their salary.
+? What does `COALESCE(battery_mah, 0)` return for a robot whose battery is `NULL`?
+- [ ] `NULL`
+- [x] 0
+- [ ] An error
+> `COALESCE` returns the first value that isn't `NULL`.
 
-    ```sql
-    SELECT name, salary, salary * 0.05 AS bonus
-    FROM employees;
-    ```
+? Which function pulls the year out of a date such as `2024-06-21`?
+- [ ] `YEAR(built_on)`
+- [x] `strftime('%Y', built_on)`
+- [ ] `SUBSTR(built_on, 1)`
+> `strftime` with `%Y` gives the year as text. SQLite has no `YEAR()` function.
+{% endquiz %}
 
----
-
-## Summary of SQL Functions and Expressions
-
-Here’s a summary of the SQL functions and expressions covered in this lesson:
-
-Function Category | Common Functions                            | Purpose
-------------------|---------------------------------------------|-------------------------------------------------
-Aggregate         | COUNT, SUM, AVG, MIN, MAX                  | Operate on sets of values to return a single result
-String            | CONCAT, LENGTH, UPPER, LOWER, SUBSTRING    | Manipulate text data in queries
-Numeric           | ROUND, CEIL, FLOOR, ABS                    | Perform mathematical operations on numeric data
-Date              | NOW, CURDATE, YEAR, MONTH, DATEDIFF        | Work with date and time data in queries
-Expressions       | Basic arithmetic operations (`+`, `-`, `*`, `/`) | Perform calculations directly in queries
-{:class="table table-striped"}
-
-With these SQL functions and expressions, you can perform a wide range of data manipulations directly within your queries. In the next lesson, we’ll wrap up the course with a final project to apply everything you’ve learned.
-
----
+You now have every ingredient. Time to build something with them.

@@ -7,16 +7,19 @@ cover: /learn/sql/assets/banners/05_data_insertion_and_modification.jpg
 date: 2024-11-01
 previous: 04_working_with_tables.html
 next: 06_querying_data_with_select.html
-description: How to perform CRUD operations (Create, Read, Update, Delete) in SQL
+description: Fill the workshop database with robots and sensors, change rows safely
+  with UPDATE and DELETE, and undo mistakes with transactions.
 percent: 36
-duration: 5
+duration: 6
+quiz_total: 46
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with SQL
 - content:
   - section: Introduction
     content:
     - name: Course Overview
-      link: 00_course_overview.html
+      link: 00_intro.html
   - section: SQL Basics
     content:
     - name: Introduction to SQL and Relational Databases
@@ -60,211 +63,225 @@ navigation:
 
 ---
 
-In this lesson, we’ll explore how to insert, modify, and delete data in SQL tables. These operations are commonly referred to as **CRUD** operations: **Create**, **Read**, **Update**, and **Delete**.
+By the end of this lesson you will be able to insert many rows at once, update and delete rows with confidence, and use a transaction to undo a mistake before it is saved.
 
 ---
 
-## 1. Inserting Data with `INSERT INTO`
-
-The `INSERT INTO` statement allows you to add new records (rows) to a table. It specifies the table to insert data into, as well as the values for each column.
-
-### Basic `INSERT` Syntax
+This lesson loads the data we'll use for the rest of the course. You need the `robots` and `sensors` tables from lesson 4 (both empty). If you skipped ahead, here is the whole setup in one go:
 
 ```sql
-INSERT INTO table_name (column1, column2, ...)
-VALUES (value1, value2, ...);
+CREATE TABLE robots (
+    robot_id    INTEGER PRIMARY KEY,
+    name        TEXT NOT NULL UNIQUE,
+    kind        TEXT NOT NULL DEFAULT 'rover',
+    battery_mah INTEGER,
+    built_on    TEXT
+);
+CREATE TABLE sensors (
+    sensor_id INTEGER PRIMARY KEY,
+    robot_id  INTEGER REFERENCES robots (robot_id),
+    model     TEXT NOT NULL,
+    kind      TEXT NOT NULL,
+    price     REAL
+);
 ```
 
-- **Example**: Adding a new user to the `users` table.
+## Inserting many rows at once
 
-    ```sql
-    INSERT INTO users (name, age, email)
-    VALUES ('Alice', 30, 'alice@example.com');
-    ```
-
-- **Example**: Adding multiple users at once.
-
-    ```sql
-    INSERT INTO users (name, age, email)
-    VALUES ('Bob', 25, 'bob@example.com'),
-           ('Charlie', 28, 'charlie@example.com');
-    ```
-
-### Inserting Data without Specifying All Columns
-
-If some columns have default values, you can omit them in the `INSERT` statement.
-
-- **Example**: Inserting only `name` and `email`, letting `age` default to `NULL` or a specified default value.
-
-    ```sql
-    INSERT INTO users (name, email)
-    VALUES ('David', 'david@example.com');
-    ```
-
----
-
-## 2. Reading Data with `SELECT`
-
-To verify your data, you can use the `SELECT` statement to retrieve rows from a table.
-
-- **Example**: View all users in the `users` table.
-
-    ```sql
-    SELECT * FROM users;
-    ```
-
-This command retrieves every column for each row in the table.
-
----
-
-## 3. Modifying Data with `UPDATE`
-
-The `UPDATE` statement is used to modify existing data in a table. It specifies the table, the columns to change, and conditions to filter the rows to update.
-
-### Basic `UPDATE` Syntax
+One `INSERT` can carry many rows, separated by commas. It is faster and tidier than one statement per row:
 
 ```sql
-UPDATE table_name
-SET column1 = value1, column2 = value2, ...
-WHERE condition;
+INSERT INTO robots (name, kind, battery_mah, built_on) VALUES
+    ('Smars',       'rover',  2000, '2024-03-10'),
+    ('Pico Walker', 'walker', 1500, '2024-06-21'),
+    ('Arm Buddy',   'arm',    NULL, '2024-09-02'),
+    ('Line Chaser', 'rover',  1200, '2025-01-15'),
+    ('Mystery Bot', 'rover',  NULL, NULL);
 ```
 
-> **Note**: It’s essential to use the `WHERE` clause to target specific rows. Omitting it will update every row in the table.
+Two things to notice. `NULL` (no quotes) means "we don't know", so Arm Buddy has no battery figure yet. And the dates are text in `YYYY-MM-DD` form.
 
-### Example: Updating a User’s Age
-
-- **Example**: Change the age of the user with `id` 1 to 35.
-
-    ```sql
-    UPDATE users
-    SET age = 35
-    WHERE id = 1;
-    ```
-
-### Example: Updating Multiple Columns
-
-- **Example**: Change both the age and email of a specific user.
-
-    ```sql
-    UPDATE users
-    SET age = 32, email = 'alice.johnson@example.com'
-    WHERE name = 'Alice';
-    ```
-
----
-
-## 4. Deleting Data with `DELETE`
-
-The `DELETE` statement is used to remove rows from a table. Similar to `UPDATE`, it’s critical to include a `WHERE` clause to specify which rows to delete.
-
-### Basic `DELETE` Syntax
+Now the sensors. The first number is the `robot_id` each one is fitted to:
 
 ```sql
-DELETE FROM table_name
-WHERE condition;
+INSERT INTO sensors (robot_id, model, kind, price) VALUES
+    (1, 'HC-SR04',  'distance', 2.50),
+    (1, 'TCRT5000', 'line',     1.20),
+    (2, 'HC-SR04',  'distance', 2.50),
+    (2, 'MPU6050',  'motion',   3.80),
+    (4, 'TCRT5000', 'line',     1.20),
+    (4, 'TCRT5000', 'line',     1.20),
+    (NULL, 'VL53L0X', 'distance', 6.00);
 ```
 
-> **Warning**: Omitting the `WHERE` clause deletes all rows in the table.
+The prices are made-up sample figures, not real shop prices. The last sensor has `NULL` for `robot_id`: it is sitting in the parts drawer, not fitted to anything. Check your work:
 
-### Example: Deleting a Specific User
+```sql
+SELECT * FROM robots;
+```
 
-- **Example**: Delete the user with the email "bob@example.com".
+```text
+robot_id  name         kind    battery_mah  built_on
+--------  -----------  ------  -----------  ----------
+1         Smars        rover   2000         2024-03-10
+2         Pico Walker  walker  1500         2024-06-21
+3         Arm Buddy    arm                  2024-09-02
+4         Line Chaser  rover   1200         2025-01-15
+5         Mystery Bot  rover
+```
 
-    ```sql
-    DELETE FROM users
-    WHERE email = 'bob@example.com';
-    ```
+If you inserted rows twice by accident, delete the table contents with `DELETE FROM sensors;` and `DELETE FROM robots;`, then insert again.
 
-### Example: Deleting All Rows in a Table
+## When a row already exists
 
-- **Example**: Remove all data from the `users` table (use with caution).
+Inserting `Smars` again fails, because `name` is `UNIQUE`:
 
-    ```sql
-    DELETE FROM users;
-    ```
+```sql
+INSERT INTO robots (name) VALUES ('Smars');
+```
 
-This command empties the table but retains its structure, so you can still insert new data later.
+```text
+UNIQUE constraint failed: robots.name
+```
 
----
+If you'd rather skip duplicates quietly, say so:
 
-## 5. Using Transactions for Data Integrity
+```sql
+INSERT OR IGNORE INTO robots (name) VALUES ('Smars');
+```
 
-When performing multiple `INSERT`, `UPDATE`, or `DELETE` statements, it’s often beneficial to use **transactions**. A transaction groups multiple changes, which are only saved if all operations are successful.
+No error, and no new row. `INSERT OR IGNORE` is SQLite's wording. MySQL uses `INSERT IGNORE`.
 
-### Starting and Committing a Transaction
+## Updating rows
 
-1. **Start a Transaction**:
-    ```sql
-    BEGIN TRANSACTION;
-    ```
+Fit the spare VL53L0X to Arm Buddy (robot 3):
 
-2. **Execute Multiple Statements**:
-    ```sql
-    INSERT INTO users (name, age, email) VALUES ('Eve', 29, 'eve@example.com');
-    UPDATE users SET age = 30 WHERE name = 'Eve';
-    ```
+```sql
+UPDATE sensors SET robot_id = 3 WHERE model = 'VL53L0X';
+```
 
-3. **Commit the Transaction**:
-    ```sql
-    COMMIT;
-    ```
+You can also set a column back to `NULL` to say "not fitted to anything":
 
-If any part of the transaction fails, you can use `ROLLBACK` to undo all changes:
+```sql
+UPDATE sensors SET robot_id = NULL WHERE model = 'VL53L0X';
+```
+
+An `UPDATE` can use the old value too. This raises every `line` sensor price by 10 percent:
+
+```sql
+UPDATE sensors SET price = price * 1.1 WHERE kind = 'line';
+```
+
+Check it, then put it back so your numbers match the rest of the course:
+
+```sql
+SELECT sensor_id, model, price FROM sensors WHERE kind = 'line';
+UPDATE sensors SET price = 1.20 WHERE kind = 'line';
+```
+
+## Deleting rows
+
+Add a throwaway sensor, then remove it using its unique ID:
+
+```sql
+INSERT INTO sensors (robot_id, model, kind, price) VALUES (NULL, 'Test', 'test', 0);
+SELECT sensor_id FROM sensors WHERE model = 'Test';
+DELETE FROM sensors WHERE sensor_id = 8;
+```
+
+Use the `sensor_id` the `SELECT` shows you. It should be 8 if you've followed along.
+
+## Transactions: an undo button
+
+What if you make a mistake with no `WHERE`? A **transaction** groups statements so they are saved together, or not at all. `BEGIN` starts one, `COMMIT` keeps the changes and `ROLLBACK` throws them away.
+
+```mermaid
+flowchart LR
+    A["BEGIN"] --> B["Run your changes"]
+    B --> C{"Happy with the result?"}
+    C -->|yes| D["COMMIT: saved"]
+    C -->|no| E["ROLLBACK: undone"]
+```
+
+Try a disaster safely:
+
+```sql
+BEGIN;
+UPDATE robots SET battery_mah = 0;
+SELECT name, battery_mah FROM robots;
+```
+
+```text
+name         battery_mah
+-----------  -----------
+Smars        0
+Pico Walker  0
+Arm Buddy    0
+Line Chaser  0
+Mystery Bot  0
+```
+
+Every battery is zero. Whoops. Undo it:
 
 ```sql
 ROLLBACK;
+SELECT name, battery_mah FROM robots;
 ```
 
-Transactions help ensure data integrity, especially in cases where multiple related changes must either all succeed or fail together.
+```text
+name         battery_mah
+-----------  -----------
+Smars        2000
+Pico Walker  1500
+Arm Buddy
+Line Chaser  1200
+Mystery Bot
+```
 
----
+Everything is back. Get in the habit of typing `BEGIN;` before any risky change, and `COMMIT;` only once the `SELECT` looks right.
 
-## Practice Exercise: Performing CRUD Operations
+> **Teachers**: let students practise destructive commands freely, but first have each one copy their database (`cp workshop.db workshop_backup.db`, or copy the file in a file manager). A broken table then costs a minute, not the lesson. Remind them that `DELETE` without `WHERE` does not ask for confirmation.
 
-1. **Insert** three new records into the `users` table with the following data:
+## Try it Yourself
 
-   - (John, 40, 'john@example.com')
-   - (Diana, 35, 'diana@example.com')
-   - (Sophia, 22, 'sophia@example.com')
+1. Insert two more robots in a single statement, then remove one with a `DELETE` that uses its `robot_id`.
+2. Use `UPDATE` to give `Arm Buddy` a battery of 2500, check it with a `SELECT`, then set it back to `NULL`.
+3. Challenge: in a transaction, delete all sensors with `price < 2`, look at what is left, then `ROLLBACK` and confirm they came back.
 
-   ```sql
-   INSERT INTO users (name, age, email)
-   VALUES ('John', 40, 'john@example.com'),
-          ('Diana', 35, 'diana@example.com'),
-          ('Sophia', 22, 'sophia@example.com');
-   ```
+## Common Issues
 
-2. **Update** John’s age to 41.
+- **Problem**: `table sensors has 5 columns but 4 values were supplied`.
+- **Solution**: List the columns you're filling in after the table name, and give exactly one value for each.
+- **Why**: Without a column list, SQL expects a value for every column, including the auto-numbered ID.
 
-   ```sql
-   UPDATE users
-   SET age = 41
-   WHERE name = 'John';
-   ```
+- **Problem**: `FOREIGN KEY constraint failed` on a sensor insert.
+- **Solution**: Check that the `robot_id` really exists in `robots`, or use `NULL`.
+- **Why**: Foreign keys only accept an existing parent row (when `PRAGMA foreign_keys = ON;` is set).
 
-3. **Delete** the user "Sophia".
+- **Problem**: I ran `ROLLBACK` but my changes stayed.
+- **Solution**: Check that you typed `BEGIN;` first. Without it, each statement is saved the moment it runs.
+- **Why**: Outside a transaction, SQLite saves every statement automatically.
 
-   ```sql
-   DELETE FROM users
-   WHERE name = 'Sophia';
-   ```
+## Check your understanding
 
-4. Verify each step by using `SELECT * FROM users;` to check your results.
+{% quiz %}
+? What does `NULL` mean in a column?
+- [ ] The number zero
+- [ ] An empty piece of text
+- [x] There is no value, because it is unknown or not filled in
+> `NULL` is different from `0` and from `''`. Arm Buddy's missing battery is `NULL` until we know the figure.
 
----
+? Which command undoes the changes made since `BEGIN`?
+- [x] `ROLLBACK`
+- [ ] `COMMIT`
+- [ ] `UNDO`
+> `COMMIT` saves the changes, `ROLLBACK` discards them. There is no `UNDO` in SQL.
 
-## Summary of CRUD Commands
+? How can one `INSERT` add several rows?
+- [ ] You can't. Each row needs its own statement
+- [x] List several sets of values in parentheses, separated by commas
+- [ ] Use `INSERT ALL`
+> `VALUES (...), (...), (...)` adds all the rows in one statement.
+{% endquiz %}
 
-Here’s a recap of the CRUD commands and their usage:
-
-Command      | Description                                           | Example
--------------|-------------------------------------------------------|--------------------------------
-`INSERT`     | Adds new data into a table                            | `INSERT INTO users (name) VALUES ('Alice');`
-`SELECT`     | Retrieves data from a table                           | `SELECT * FROM users;`
-`UPDATE`     | Modifies existing data in a table                     | `UPDATE users SET age = 35 WHERE id = 1;`
-`DELETE`     | Removes data from a table                             | `DELETE FROM users WHERE name = 'Bob';`
-{:class="table table-striped"}
-
-With these CRUD operations, you now have the foundational skills to manage data within your SQL database. In the next lesson, we’ll dive deeper into querying data and using `SELECT` statements with filters.
-
----
+With data in place, we can finally start asking it questions.

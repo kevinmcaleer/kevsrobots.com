@@ -7,17 +7,19 @@ cover: /learn/sql/assets/banners/03_basic_sql_commands.jpg
 date: 2024-11-01
 previous: 02_setting_up_environment.html
 next: 04_working_with_tables.html
-description: Introduction to essential SQL commands such as SELECT, INSERT, UPDATE,
-  DELETE
+description: Practise the four everyday SQL commands, SELECT, INSERT, UPDATE and DELETE,
+  on the robots table, and learn why WHERE matters.
 percent: 24
-duration: 4
+duration: 5
+quiz_total: 46
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with SQL
 - content:
   - section: Introduction
     content:
     - name: Course Overview
-      link: 00_course_overview.html
+      link: 00_intro.html
   - section: SQL Basics
     content:
     - name: Introduction to SQL and Relational Databases
@@ -61,168 +63,157 @@ navigation:
 
 ---
 
-In this lesson, we’ll cover the essential SQL commands used for managing data in databases. These commands—SELECT, INSERT, UPDATE, and DELETE—form the basis of SQL’s ability to interact with and manipulate data.
+By the end of this lesson you will be able to read, add, change and remove rows with `SELECT`, `INSERT`, `UPDATE` and `DELETE`, and explain why `UPDATE` and `DELETE` need a `WHERE`.
 
 ---
 
-## Core SQL Commands
+Almost everything you do with data comes down to four jobs: look at it, add to it, change it and remove it. Each has its own SQL command, and together they are often called **CRUD** (Create, Read, Update, Delete).
 
-In SQL, commands are structured as statements. Each statement has a specific purpose, and together, they enable us to create, modify, retrieve, and delete data within a database.
-
----
-
-## 1. SELECT: Retrieving Data
-
-The `SELECT` statement is used to retrieve data from one or more tables. It’s one of the most commonly used SQL commands and provides a range of options for filtering and sorting data.
-
-### Basic SELECT Syntax
-
-```sql
-SELECT column1, column2, ...
-FROM table_name;
+```mermaid
+flowchart LR
+    I["INSERT adds rows"] --> T[("robots table")]
+    U["UPDATE changes rows"] --> T
+    D["DELETE removes rows"] --> T
+    T --> S["SELECT reads rows"]
 ```
 
-- **Example**: Retrieving all columns from a table named `users`.
-    ```sql
-    SELECT * FROM users;
-    ```
-- **Example**: Retrieving only specific columns (e.g., `id` and `name`).
-    ```sql
-    SELECT id, name FROM users;
-    ```
+Open your database with `sqlite3 workshop.db` (and `.headers on`, `.mode column` if you like tidy output). It should still hold the three robots from the last lesson: Smars, Pico Walker and Arm Buddy.
 
-### Filtering Results with WHERE
+## SELECT: look at the data
 
-You can filter results to retrieve only specific data using the `WHERE` clause.
-
-- **Example**: Retrieve all users named "Alice".
-    ```sql
-    SELECT * FROM users WHERE name = 'Alice';
-    ```
-
----
-
-## 2. INSERT: Adding New Data
-
-The `INSERT` statement is used to add new rows (records) into a table. It specifies the table to add data to, along with the columns and values.
-
-### Basic INSERT Syntax
+`SELECT` chooses columns, `FROM` says which table:
 
 ```sql
-INSERT INTO table_name (column1, column2, ...)
-VALUES (value1, value2, ...);
+SELECT name FROM robots;
 ```
 
-- **Example**: Inserting a new user into the `users` table.
-    ```sql
-    INSERT INTO users (name) VALUES ('David');
-    ```
-- **Example**: Inserting multiple columns of data.
-    ```sql
-    INSERT INTO users (id, name) VALUES (4, 'Eve');
-    ```
+```text
+name
+-----------
+Smars
+Pico Walker
+Arm Buddy
+```
 
-> **Note**: If a column has a default value or is auto-incremented (like `id`), you may omit it from the `INSERT` statement.
-
----
-
-## 3. UPDATE: Modifying Existing Data
-
-The `UPDATE` statement allows you to modify existing data in a table. It specifies the table, the columns to update, and a condition to filter the rows to update.
-
-### Basic UPDATE Syntax
+`SELECT *` means "every column". Add a `WHERE` to keep only the rows that match a condition:
 
 ```sql
-UPDATE table_name
-SET column1 = value1, column2 = value2, ...
-WHERE condition;
+SELECT * FROM robots WHERE name = 'Smars';
 ```
 
-- **Example**: Changing the name of the user with `id` 1 to "Alice Johnson".
-    ```sql
-    UPDATE users
-    SET name = 'Alice Johnson'
-    WHERE id = 1;
-    ```
+```text
+robot_id  name
+--------  -----
+1         Smars
+```
 
-> **Important**: Always use the `WHERE` clause in `UPDATE` statements to avoid updating all rows in the table.
+Notice that text goes in **single quotes**. `'Smars'` is a value, whereas `name` (no quotes) is a column.
 
----
-
-## 4. DELETE: Removing Data
-
-The `DELETE` statement is used to remove rows from a table. Like `UPDATE`, it’s critical to use a `WHERE` clause to specify the rows to delete.
-
-### Basic DELETE Syntax
+## INSERT: add a row
 
 ```sql
-DELETE FROM table_name
-WHERE condition;
+INSERT INTO robots (name) VALUES ('Line Chaser');
 ```
 
-- **Example**: Deleting a user named "Charlie".
-    ```sql
-    DELETE FROM users
-    WHERE name = 'Charlie';
-    ```
+You list the columns, then the values in the same order. Columns you leave out get their default, and `robot_id` fills itself in.
 
-- **Example**: Deleting all users (use with caution).
-    ```sql
-    DELETE FROM users;
-    ```
+## UPDATE: change rows
 
-> **Warning**: The above example will delete all rows in the `users` table. Always ensure your `DELETE` statements are precise.
+Suppose Smars gets an upgrade and becomes the Mk2:
 
----
+```sql
+UPDATE robots SET name = 'Smars Mk2' WHERE robot_id = 1;
+SELECT * FROM robots;
+```
 
-## Putting It All Together
+```text
+robot_id  name
+--------  -----------
+1         Smars Mk2
+2         Pico Walker
+3         Arm Buddy
+4         Line Chaser
+```
 
-Here’s a quick scenario to illustrate the use of these commands.
+We matched on `robot_id` because it is unique, so exactly one row changed.
 
-1. **Insert Data**:
-    ```sql
-    INSERT INTO users (name) VALUES ('Alice'), ('Bob'), ('Charlie');
-    ```
+## DELETE: remove rows
 
-2. **Retrieve Data**:
-    ```sql
-    SELECT * FROM users;
-    ```
+Arm Buddy has been taken apart for spares:
 
-3. **Update Data**:
-    ```sql
-    UPDATE users SET name = 'Charlie Brown' WHERE name = 'Charlie';
-    ```
+```sql
+DELETE FROM robots WHERE name = 'Arm Buddy';
+SELECT * FROM robots;
+```
 
-4. **Delete Data**:
-    ```sql
-    DELETE FROM users WHERE name = 'Bob';
-    ```
+```text
+robot_id  name
+--------  -----------
+1         Smars Mk2
+2         Pico Walker
+4         Line Chaser
+```
 
-After each command, you can run `SELECT * FROM users;` to see the changes applied in the `users` table.
+Look at `robot_id`: 3 is now missing. The other IDs don't shuffle down to fill the gap, so never rely on IDs forming an unbroken sequence.
 
----
+## The golden rule: always use WHERE
 
-## Additional Tips for Writing SQL
+`UPDATE` and `DELETE` without a `WHERE` act on **every row**. This runs happily and wipes the table, with no "are you sure?":
 
-- **End Each Command with a Semicolon**: This tells the database that the command is complete and ready to be executed.
-- **Use Descriptive Column Names**: When creating tables, use column names that clearly represent the data they store.
-- **Test Commands Carefully**: Particularly with `UPDATE` and `DELETE` commands, always verify your `WHERE` clause to avoid unintended changes or deletions.
+```sql
+DELETE FROM robots;
+```
 
----
+{: .no-snakie }
 
-## Recap of Core SQL Commands
+Here is a safe habit. Before you run an `UPDATE` or `DELETE`, run the same `WHERE` as a `SELECT` first and check the rows it finds are the ones you meant:
 
-Here’s a summary of the four main SQL commands you’ve learned in this lesson:
+```sql
+SELECT * FROM robots WHERE name = 'Line Chaser';
+```
 
-Command      | Description                                           | Example
--------------|-------------------------------------------------------|--------------------------------
-`SELECT`     | Retrieves data from a table                           | `SELECT * FROM users;`
-`INSERT`     | Adds new data into a table                            | `INSERT INTO users (name) VALUES ('Alice');`
-`UPDATE`     | Modifies existing data in a table                     | `UPDATE users SET name = 'Alice Johnson' WHERE id = 1;`
-`DELETE`     | Removes data from a table                             | `DELETE FROM users WHERE name = 'Charlie';`
-{:class="table table-striped"}
+If that shows the right row, swap `SELECT *` for `DELETE` and run it.
 
-By mastering these fundamental commands, you’ve built a strong foundation for working with SQL databases. In the next lesson, we’ll explore how to structure your database using tables and data types.
+## Try it Yourself
 
----
+1. Insert a new robot called `Mystery Bot`, then update its name to `Mystery Bot v2`.
+2. Use `SELECT` with a `WHERE` to check what you're about to delete, then delete `Mystery Bot v2`.
+3. Challenge: write a `SELECT` that returns only the robots whose `robot_id` is greater than 1. Hint: `>` works in a `WHERE` just like `=`.
+
+## Common Issues
+
+- **Problem**: `Error: near "FROM": syntax error` or the statement never finishes.
+- **Solution**: Check for a missing comma between columns, an unclosed quote, or a missing semicolon.
+- **Why**: SQL is strict about punctuation. The error names the word where SQLite got confused, which is usually just after the real mistake.
+
+- **Problem**: My `UPDATE` ran but `SELECT` shows nothing changed.
+- **Solution**: Check the spelling and case in the `WHERE` text. `WHERE name = 'smars'` will not match `Smars`.
+- **Why**: Comparing text with `=` is case-sensitive in SQLite. A `WHERE` that matches nothing is not an error, it simply changes zero rows.
+
+- **Problem**: I deleted every row by forgetting `WHERE`.
+- **Solution**: If you've not closed SQLite, you can't undo it in this lesson. Lesson 5 shows transactions, which let you roll back. For now, re-insert the rows.
+- **Why**: SQL does exactly what you ask. It cannot know you meant only one row.
+
+## Check your understanding
+
+{% quiz %}
+? What happens if you run `UPDATE robots SET kind = 'rover';` with no `WHERE`?
+- [ ] SQLite asks which row you mean
+- [ ] Only the first row changes
+- [x] Every row in the table is changed
+> Without a `WHERE`, `UPDATE` and `DELETE` affect all rows, with no warning.
+
+? Which statement adds a row to the `robots` table?
+- [ ] `ADD robots (name) VALUES ('Smars');`
+- [x] `INSERT INTO robots (name) VALUES ('Smars');`
+- [ ] `SELECT INTO robots (name) VALUES ('Smars');`
+> `INSERT INTO table (columns) VALUES (values)` is the form to remember.
+
+? Why is it good practice to run a `SELECT` with your `WHERE` before an `UPDATE` or `DELETE`?
+- [x] It shows exactly which rows would be affected
+- [ ] It makes the later statement run faster
+- [ ] It is required by SQL
+> Previewing the rows costs nothing and catches a wrong condition before it does damage.
+{% endquiz %}
+
+In the next lesson we'll stop using the bare-bones table and design one properly.

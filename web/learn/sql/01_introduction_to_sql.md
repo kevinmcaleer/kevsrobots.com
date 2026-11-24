@@ -5,18 +5,21 @@ author: Kevin McAleer
 type: page
 cover: /learn/sql/assets/banners/01_introduction_to_sql.jpg
 date: 2024-11-01
-previous: 00_course_overview.html
+previous: 00_intro.html
 next: 02_setting_up_environment.html
-description: Overview of SQL, its importance, and foundational database concepts
+description: Find out what SQL is, how a relational database stores robot data in
+  linked tables, and what primary and foreign keys do.
 percent: 12
-duration: 5
+duration: 6
+quiz_total: 46
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with SQL
 - content:
   - section: Introduction
     content:
     - name: Course Overview
-      link: 00_course_overview.html
+      link: 00_intro.html
   - section: SQL Basics
     content:
     - name: Introduction to SQL and Relational Databases
@@ -60,171 +63,134 @@ navigation:
 
 ---
 
-In this lesson, we’ll explore the fundamentals of `SQL` (Structured Query Language) and relational databases. SQL is the standard language for interacting with databases, and relational databases are widely used to store, organize, and manage data in a structured way.
+By the end of this lesson you will be able to explain what a table, a row, a primary key and a foreign key are, and say why a database keeps robots and sensors in separate tables.
 
 ---
 
-## 1. What is SQL?
+## Why not just use a spreadsheet?
 
-**SQL (Structured Query Language)** is a standardized language used for querying and managing data in a database. SQL enables you to perform essential tasks such as:
+Imagine you have built a few robots, and you keep a spreadsheet of them. One row per robot, with a column for each sensor. It works until Smars needs a third sensor and you have to add a column for every robot, or until you want to ask "which robots have an ultrasonic sensor?" across fifty rows.
 
-- Retrieving data from tables
-- Inserting, updating, and deleting data
-- Creating and modifying database structures
-- Managing database access and security
+A **database** keeps data in an organised, checkable form, and **SQL** (Structured Query Language, often said "sequel" or "S-Q-L") is the language you use to talk to it. You describe *what* you want, and the database works out *how* to get it.
 
-SQL is widely supported by major relational database systems like MySQL, PostgreSQL, SQLite, Oracle, and Microsoft SQL Server.
+## Tables, rows and columns
 
-### Why Learn SQL?
+A **relational database** stores everything in **tables**. A table is like one sheet of a spreadsheet, but stricter:
 
-SQL is an essential skill for anyone working with data. Here’s why SQL is so valuable:
+- A **column** is one kind of fact, such as `name` or `battery_mah`. Every row has the same columns.
+- A **row** is one thing, such as one robot.
+- A **table** holds one kind of thing: robots in one table, sensors in another.
 
-- **Universal Language for Data**: SQL is the standard for working with databases and is widely used across many industries.
-- **Data Manipulation**: SQL enables you to retrieve, modify, and analyze data efficiently.
-- **Highly In-Demand**: SQL skills are sought after by employers in data science, software development, business intelligence, and more.
+Here is the `robots` table we'll build in this course:
 
----
+| robot_id | name        | kind   | battery_mah |
+|----------|-------------|--------|-------------|
+| 1        | Smars       | rover  | 2000        |
+| 2        | Pico Walker | walker | 1500        |
+| 3        | Arm Buddy   | arm    | (empty)     |
+{:class="table table-single"}
 
-## 2. Introduction to Relational Databases
+## Keys link tables together
 
-A **relational database** is a type of database that organizes data into tables with rows and columns. Relational databases store data in a structured format and establish relationships between tables, allowing for efficient data retrieval and management.
+Each robot can carry several sensors, so sensors get their own table. How does a sensor say which robot it belongs to?
 
-### Key Concepts in Relational Databases
+- A **primary key** is a column whose value is different for every row, like `robot_id`. It is how you point at exactly one row.
+- A **foreign key** is a column in one table that holds the primary key of a row in another. A sensor's `robot_id` says "I am fitted to robot number 1".
 
-- **Table**: A table represents an entity (e.g., "Customers" or "Orders") and organizes data into rows and columns.
-- **Row**: Also known as a record, a row represents a single entry in the table (e.g., a specific customer or order).
-- **Column**: A column represents a specific attribute of the table (e.g., "Name" or "Date").
-- **Primary Key**: A unique identifier for each row in a table, ensuring that each record can be uniquely identified.
-- **Foreign Key**: A reference to a primary key in another table, establishing relationships between tables.
-
-### Example: Customers and Orders
-
-Suppose we have two tables, `customers` and `orders`, with a relationship between them:
-
-**customers**
-
-```plaintext
-| customer_id | name     | email             |
-|-------------|----------|-------------------|
-| 1           | Alice    | alice@example.com |
-| 2           | Bob      | bob@example.com   |
+```mermaid
+erDiagram
+    ROBOTS ||--o{ SENSORS : "carries"
+    ROBOTS {
+        int robot_id PK
+        text name
+        text kind
+        int battery_mah
+    }
+    SENSORS {
+        int sensor_id PK
+        int robot_id FK
+        text model
+        text kind
+        real price
+    }
 ```
 
-**orders**
+Read the line between the boxes as "one robot carries zero or more sensors". The sensor table does not repeat the robot's name, only its number. If you rename Smars, you change it in one place and every sensor still points at the right robot.
 
-```plaintext
-| order_id | customer_id | order_date |
-|----------|-------------|------------|
-| 101      | 1           | 2023-01-15 |
-| 102      | 2           | 2023-01-16 |
-```
+## What SQL can do
 
-In this example:
+SQL has a small set of verbs, and we'll meet them all:
 
-- Each `customer_id` in `customers` uniquely identifies a customer.
-- Each `order_id` in `orders` uniquely identifies an order.
-- The `customer_id` in `orders` is a foreign key referencing `customers`, creating a relationship between the two tables.
+| You want to... | SQL words |
+|----------------|-----------|
+| Build a new table | `CREATE TABLE` |
+| Add rows | `INSERT` |
+| Look at rows | `SELECT` |
+| Change rows | `UPDATE` |
+| Remove rows | `DELETE` |
+| Combine tables | `JOIN` |
+| Count, add up, average | `GROUP BY`, `COUNT`, `SUM`, `AVG` |
+{:class="table table-single"}
 
----
-
-## 3. Why Use Relational Databases?
-
-Relational databases offer several advantages:
-
-- **Data Organization**: Tables with structured rows and columns make data easy to organize and query.
-- **Data Integrity**: Using primary and foreign keys enforces data consistency and reduces redundancy.
-- **Scalability**: Relational databases handle large volumes of data efficiently and are widely used in applications of all sizes.
-- **Complex Querying**: SQL allows for powerful queries to retrieve and analyze data, even from multiple tables at once.
-
----
-
-## 4. Basic SQL Operations
-
-Here’s an overview of the basic SQL operations you’ll learn throughout this course:
-
-Operation      | SQL Command       | Description
----------------|-------------------|-----------------------------------------------
-Create         | `CREATE TABLE`    | Define a new table and specify its columns.
-Read           | `SELECT`          | Retrieve data from one or more tables.
-Update         | `UPDATE`          | Modify existing data in a table.
-Delete         | `DELETE`          | Remove data from a table.
-Insert         | `INSERT INTO`     | Add new rows to a table.
-Join           | `JOIN`            | Combine data from multiple tables based on relationships.
-Group and Aggregate | `GROUP BY`, `SUM`, `COUNT` | Summarize and aggregate data based on specified criteria.
-{:class="table table-striped"}
-
-These commands form the core of SQL and enable you to perform a wide range of data operations.
-
----
-
-## 5. A Simple SQL Query
-
-To give you a taste of SQL, let’s look at a simple query that retrieves all data from a `customers` table:
+Here is a taste. This asks the sensors table for every distance sensor, cheapest first:
 
 ```sql
-SELECT * FROM customers;
+SELECT model, price
+FROM sensors
+WHERE kind = 'distance'
+ORDER BY price;
 ```
 
-- **`SELECT`**: Specifies which columns to retrieve (the `*` symbol selects all columns).
-- **`FROM`**: Specifies the table from which to retrieve data (`customers`).
+{: .no-snakie }
 
-This query retrieves all rows and columns from the `customers` table, showing each customer’s details.
+Read it almost like English: select the model and price from sensors, where the kind is distance, ordered by price. You can't run it yet, because there is no database. In the next lesson we'll make one.
 
-### Filtering with `WHERE`
+## Which database?
 
-The `WHERE` clause allows you to filter results based on specific conditions. For example, to retrieve only customers named "Alice":
+SQL is a standard, and many systems speak it: SQLite, MySQL, PostgreSQL, Microsoft SQL Server and Oracle. Each adds its own extras and has small differences. We use **SQLite** because it is a single file with no server to install, and the basics you learn carry straight over to the others.
 
-```sql
-SELECT * FROM customers
-WHERE name = 'Alice';
-```
+## Try it Yourself
 
-This query selects only the rows where the `name` column matches "Alice."
+1. On paper, draw a table for your own robots or projects with at least four columns. Which column could be the primary key?
+2. Sketch a second table for the motors or sensors on those robots. Which column would be the foreign key?
+3. Challenge: a robot can have many sensors, and one sensor model (such as an HC-SR04) can be fitted to many robots. Can you work out why that needs a third table in between? (We'll meet it in lesson 10.)
 
----
+## Common Issues
 
-## Practice Exercise: Getting Started with SQL
+- **Problem**: I put the sensor names into the robots table as a comma-separated list, and now I can't search it properly.
+- **Solution**: Give sensors their own table, one row per sensor, with a foreign key back to the robot.
+- **Why**: A column should hold one fact. A list inside one cell can't be counted, sorted or checked by the database.
 
-1. **Select All Data**: Write a query to select all data from a table called `products`.
+- **Problem**: Two robots have the same name, so I used the name as the key and got confused.
+- **Solution**: Use a number column like `robot_id` as the primary key.
+- **Why**: Names change and repeat. A key must never change or repeat.
 
-    ```sql
-    SELECT * FROM products;
-    ```
+## Check your understanding
 
-2. **Filter Data**: Write a query to select all data from the `customers` table where the name is "Bob."
+{% quiz %}
+? What does a foreign key do?
+- [ ] It makes a column impossible to change
+- [x] It holds the primary key of a row in another table, linking the two
+- [ ] It encrypts the data in a column
+> A sensor's `robot_id` is a foreign key: it stores the primary key of the robot the sensor is fitted to.
 
-    ```sql
-    SELECT * FROM customers
-    WHERE name = 'Bob';
-    ```
+? In a relational database, what is a row?
+- [ ] One kind of fact, such as `name`
+- [ ] A whole collection of related tables
+- [x] One record, such as one robot
+> Columns are the kinds of fact, a row is one thing described by those facts, and a table is a collection of rows.
 
-3. **Create Your First Table**: Define a table called `employees` with columns for `employee_id`, `name`, and `position`.
+? Why do sensors get their own table instead of extra columns on robots?
+- [x] A robot can have any number of sensors, and renaming a robot then only needs changing in one place
+- [ ] SQL cannot store more than five columns in one table
+- [ ] Tables with fewer columns are always faster
+> One table per kind of thing keeps each fact in a single place, so there is nothing to keep in step.
 
-    ```sql
-    CREATE TABLE employees (
-        employee_id INT PRIMARY KEY,
-        name VARCHAR(100),
-        position VARCHAR(50)
-    );
-    ```
+? Which of these is the SQL word for looking at rows?
+- [ ] `INSERT`
+- [x] `SELECT`
+- [ ] `JOIN`
+> `SELECT` reads rows. `INSERT` adds them, and `JOIN` combines tables.
+{% endquiz %}
 
----
-
-## Summary of SQL and Relational Database Concepts
-
-Here’s a quick summary of the key concepts we covered in this lesson:
-
-Concept           | Description
-------------------|-----------------------------------------------------------
-SQL               | Structured Query Language, used for querying and managing data
-Relational Database | A database organized into tables with rows and columns
-Table             | An entity in a database representing a collection of data
-Row               | A record in a table, representing a single entry
-Column            | An attribute of a table, representing a specific data point
-Primary Key       | A unique identifier for each row in a table
-Foreign Key       | A reference to a primary key in another table, creating relationships
-{:class="table table-striped"}
-
-In the next lesson, we’ll dive deeper into setting up your SQL environment and creating your first database. Let’s get started!
-
----
+Next, let's set up SQLite and make our first database.

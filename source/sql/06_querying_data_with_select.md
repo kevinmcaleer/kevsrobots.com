@@ -1,257 +1,208 @@
 ---
 title: Querying Data with SELECT
-description: >-
-    Retrieve data from tables using SELECT and basic filtering techniques
+description: Choose columns, rename them, sort, limit and pattern-match robot data with SELECT, ORDER BY, LIMIT, DISTINCT and LIKE, and learn how NULL behaves.
 layout: lesson
+type: page
 cover: /learn/sql/assets/banners/06_querying_data_with_select.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, we’ll cover the `SELECT` statement, which is the cornerstone of querying data in SQL. You’ll learn how to retrieve data from tables, apply basic filters, and sort your results.
+By the end of this lesson you will be able to pick columns, sort and limit results, remove duplicates, search text with `LIKE`, and test for missing values with `IS NULL`.
 
 ---
 
-## 1. The Basics of `SELECT`
+`SELECT` is the command you'll use most, so let's give it a proper workout on the five robots from lesson 5. If your database isn't in that state, rerun the setup from lesson 5.
 
-The `SELECT` statement is used to retrieve specific data from one or more tables. You can use `SELECT` to display specific columns, filter rows, sort results, and perform calculations.
+## Picking and renaming columns
 
-### Basic `SELECT` Syntax
+List only the columns you need, and use `AS` to give a column a friendlier heading:
 
 ```sql
-SELECT column1, column2, ...
-FROM table_name;
+SELECT name AS robot, battery_mah AS battery FROM robots;
 ```
 
-- **Example**: Display all columns from the `users` table.
+```text
+robot        battery
+-----------  -------
+Smars        2000
+Pico Walker  1500
+Arm Buddy
+Line Chaser  1200
+Mystery Bot
+```
 
-    ```sql
-    SELECT * FROM users;
-    ```
+The blanks are `NULL`: we don't know those batteries yet.
 
-- **Example**: Display only the `name` and `email` columns.
+## Sorting with ORDER BY
 
-    ```sql
-    SELECT name, email FROM users;
-    ```
-
-The `*` symbol selects all columns in the table, while specifying individual columns limits the output to just those columns.
-
----
-
-## 2. Filtering Data with `WHERE`
-
-The `WHERE` clause allows you to filter rows based on specified conditions. It’s used to retrieve only the data that meets certain criteria.
-
-### Basic `WHERE` Syntax
+Rows come back in no promised order unless you ask for one. `ORDER BY` sorts, and `DESC` reverses it:
 
 ```sql
-SELECT column1, column2, ...
-FROM table_name
-WHERE condition;
+SELECT name, battery_mah FROM robots ORDER BY battery_mah DESC;
 ```
 
-- **Example**: Retrieve all users with the name "Alice".
+```text
+name         battery_mah
+-----------  -----------
+Smars        2000
+Pico Walker  1500
+Line Chaser  1200
+Arm Buddy
+Mystery Bot
+```
 
-    ```sql
-    SELECT * FROM users
-    WHERE name = 'Alice';
-    ```
-
-- **Example**: Retrieve users who are 30 years old or older.
-
-    ```sql
-    SELECT * FROM users
-    WHERE age >= 30;
-    ```
-
-### Common Operators with `WHERE`
-
-Operator  | Description                    | Example
-----------|--------------------------------|--------------------------------
-`=`       | Equal to                       | `WHERE age = 30`
-`<>` or `!=` | Not equal to                | `WHERE name != 'Alice'`
-`<`       | Less than                      | `WHERE age < 25`
-`<=`      | Less than or equal to          | `WHERE age <= 30`
-`>`       | Greater than                   | `WHERE age > 25`
-`>=`      | Greater than or equal to       | `WHERE age >= 30`
-`BETWEEN` | Within a range                 | `WHERE age BETWEEN 20 AND 30`
-`LIKE`    | Pattern matching               | `WHERE name LIKE 'A%'`
-`IN`      | Matches any value in a list    | `WHERE age IN (25, 30, 35)`
-{:class="table table-striped"}
-
-> **Tip**: Use `LIKE` with wildcards (`%` and `_`) for flexible pattern matching. `%` matches any sequence of characters, while `_` matches a single character.
-
----
-
-## 3. Sorting Results with `ORDER BY`
-
-The `ORDER BY` clause sorts the result set by one or more columns in ascending (`ASC`) or descending (`DESC`) order.
-
-### Basic `ORDER BY` Syntax
+In SQLite, `NULL` counts as smaller than any number, so with `DESC` the unknowns drop to the bottom (and with the default ascending order they would come first). You can sort by several columns. This groups robots by kind and puts each group in name order:
 
 ```sql
-SELECT column1, column2, ...
-FROM table_name
-ORDER BY column1 [ASC|DESC], column2 [ASC|DESC], ...;
+SELECT name, kind FROM robots ORDER BY kind, name;
 ```
 
-- **Example**: List all users, sorted by age in ascending order.
+```text
+name         kind
+-----------  ------
+Arm Buddy    arm
+Line Chaser  rover
+Mystery Bot  rover
+Smars        rover
+Pico Walker  walker
+```
 
-    ```sql
-    SELECT * FROM users
-    ORDER BY age ASC;
-    ```
+## LIMIT and OFFSET
 
-- **Example**: List all users, sorted by age in descending order.
-
-    ```sql
-    SELECT * FROM users
-    ORDER BY age DESC;
-    ```
-
-- **Example**: Sort by age, and then by name within each age group.
-
-    ```sql
-    SELECT * FROM users
-    ORDER BY age ASC, name ASC;
-    ```
-
----
-
-## 4. Limiting Results with `LIMIT`
-
-The `LIMIT` clause restricts the number of rows returned by the query. This is especially useful when testing queries or when only the top results are needed.
-
-### Basic `LIMIT` Syntax
+`LIMIT` keeps only the first few rows, which is perfect for "top 2" questions:
 
 ```sql
-SELECT column1, column2, ...
-FROM table_name
-LIMIT number_of_rows;
+SELECT name, battery_mah FROM robots
+WHERE battery_mah IS NOT NULL
+ORDER BY battery_mah DESC
+LIMIT 2;
 ```
 
-- **Example**: Retrieve the first 5 users.
+```text
+name         battery_mah
+-----------  -----------
+Smars        2000
+Pico Walker  1500
+```
 
-    ```sql
-    SELECT * FROM users
-    LIMIT 5;
-    ```
+`OFFSET` skips rows first, which is how websites build "page 2" of results: `LIMIT 3 OFFSET 3` gives the second page of three.
 
-### Combining `LIMIT` with `ORDER BY`
+## DISTINCT: no repeats
 
-`LIMIT` can be used with `ORDER BY` to retrieve the top or bottom values.
+```sql
+SELECT DISTINCT kind FROM robots;
+```
 
-- **Example**: Retrieve the 3 oldest users.
+```text
+kind
+------
+rover
+walker
+arm
+```
 
-    ```sql
-    SELECT * FROM users
-    ORDER BY age DESC
-    LIMIT 3;
-    ```
+Three kinds, though five robots. Add `ORDER BY kind` if you want them sorted.
 
----
+## LIKE: searching text
 
-## 5. Combining Conditions with `AND` and `OR`
+`LIKE` matches patterns. `%` stands for "any number of characters", and `_` for exactly one:
 
-You can combine multiple conditions in the `WHERE` clause using `AND` and `OR` operators to refine your queries.
+```sql
+SELECT name FROM robots WHERE name LIKE 'S%';
+SELECT name FROM robots WHERE name LIKE '%bot%';
+```
 
-- **`AND`**: All conditions must be true.
-- **`OR`**: At least one condition must be true.
+```text
+name
+-----
+Smars
 
-### Example: Using `AND`
+name
+-----------
+Mystery Bot
+```
 
-- **Example**: Retrieve users who are over 25 years old and whose name starts with "A".
+The second query found `Mystery Bot` even though we typed `bot` in lower case. In SQLite, `LIKE` ignores upper and lower case for ordinary English letters, whereas `=` does not. So `WHERE kind = 'Rover'` finds nothing, because the data says `rover`.
 
-    ```sql
-    SELECT * FROM users
-    WHERE age > 25 AND name LIKE 'A%';
-    ```
+## NULL needs special handling
 
-### Example: Using `OR`
+This looks right but returns **nothing**:
 
-- **Example**: Retrieve users whose name is "Alice" or who are 30 years old.
+```sql
+SELECT name FROM robots WHERE battery_mah = NULL;
+```
 
-    ```sql
-    SELECT * FROM users
-    WHERE name = 'Alice' OR age = 30;
-    ```
+`NULL` means unknown, and "is this unknown thing equal to another unknown thing?" is itself unknown, never true. Use `IS NULL` instead:
 
----
+```sql
+SELECT name FROM robots WHERE battery_mah IS NULL;
+```
 
-## 6. Using Aliases with `AS`
+```text
+name
+-----------
+Arm Buddy
+Mystery Bot
+```
 
-Aliases give temporary names to columns or tables for easier readability. They do not change the actual column or table names in the database.
+## The order SQL really reads your query
 
-### Example: Aliasing Columns
+You write `SELECT` first, but the database works in a different order, which explains why some things behave as they do:
 
-- **Example**: Display user names with the alias "User Name".
+```mermaid
+flowchart LR
+    A["FROM: pick the table"] --> B["WHERE: keep matching rows"]
+    B --> C["SELECT: choose columns"]
+    C --> D["ORDER BY: sort"]
+    D --> E["LIMIT: trim"]
+```
 
-    ```sql
-    SELECT name AS "User Name"
-    FROM users;
-    ```
+That is why `ORDER BY` can use a nickname you made with `AS`, but `WHERE` cannot: `WHERE` runs before `SELECT` has created the nickname.
 
-### Example: Aliasing Tables
+## Try it Yourself
 
-- **Example**: Use an alias for the `users` table to shorten query syntax.
+1. List the `name` and `built_on` of every robot, newest first. Where do the robots with no build date appear?
+2. Find robots whose name contains the letter `r`, using `LIKE`.
+3. Challenge: list the single robot with the biggest battery, using only `ORDER BY` and `LIMIT`. Then explain why you need `WHERE battery_mah IS NOT NULL` if you sort ascending instead.
 
-    ```sql
-    SELECT u.name, u.age
-    FROM users AS u
-    WHERE u.age > 25;
-    ```
+## Common Issues
 
----
+- **Problem**: My `WHERE battery_mah = NULL` returns no rows, with no error.
+- **Solution**: Write `WHERE battery_mah IS NULL`, or `IS NOT NULL` for the opposite.
+- **Why**: Comparing with `NULL` using `=` is never true, so no row passes.
 
-## Practice Exercise: Writing `SELECT` Queries
+- **Problem**: `LIKE` finds more than I expected, or the case seems ignored.
+- **Solution**: Remember `%` and `_` are wildcards, and SQLite's `LIKE` is case-insensitive for English letters. Use `=` for an exact, case-sensitive match.
+- **Why**: `LIKE` is designed for fuzzy searching, and `=` for exact matching.
 
-1. Retrieve all users from the `users` table, displaying only the `name` and `email` columns.
+- **Problem**: `no such column: robot` when I use my `AS` nickname in `WHERE`.
+- **Solution**: Repeat the original column name in the `WHERE`, or use the nickname only in `ORDER BY`.
+- **Why**: `WHERE` is evaluated before `SELECT` creates the nickname.
 
-    ```sql
-    SELECT name, email FROM users;
-    ```
+## Check your understanding
 
-2. Retrieve all users whose age is between 20 and 30.
+{% quiz %}
+? Which query correctly finds robots with no battery figure?
+- [ ] `WHERE battery_mah = NULL`
+- [ ] `WHERE battery_mah = 0`
+- [x] `WHERE battery_mah IS NULL`
+> `= NULL` never matches anything. `IS NULL` is the test for a missing value, and zero is a real number, not "missing".
 
-    ```sql
-    SELECT * FROM users
-    WHERE age BETWEEN 20 AND 30;
-    ```
+? What does `LIMIT 2` do?
+- [x] Returns at most the first two rows of the result
+- [ ] Deletes all but two rows from the table
+- [ ] Shows only two columns
+> `LIMIT` trims the result, not the table. Pair it with `ORDER BY` so you know which rows count as "first".
 
-3. Retrieve the top 3 users by age, in descending order.
+? What does `LIKE 'S%'` match?
+- [ ] Text that is exactly `S%`
+- [x] Text that starts with S
+- [ ] Text that ends with S
+> `%` stands for any run of characters, so `'S%'` means "S followed by anything".
+{% endquiz %}
 
-    ```sql
-    SELECT * FROM users
-    ORDER BY age DESC
-    LIMIT 3;
-    ```
-
-4. Retrieve users whose name starts with "A" and display their names as "User".
-
-    ```sql
-    SELECT name AS "User" FROM users
-    WHERE name LIKE 'A%';
-    ```
-
----
-
-## Summary of `SELECT` Query Techniques
-
-Here’s a recap of the techniques covered in this lesson:
-
-Command       | Description                                           | Example
---------------|-------------------------------------------------------|--------------------------------
-`SELECT`      | Retrieves data from a table                           | `SELECT * FROM users;`
-`WHERE`       | Filters results based on conditions                   | `WHERE age > 25`
-`ORDER BY`    | Sorts results by specified columns                    | `ORDER BY age DESC`
-`LIMIT`       | Limits the number of rows returned                    | `LIMIT 5`
-`AND` / `OR`  | Combines multiple conditions                          | `WHERE age > 25 AND name LIKE 'A%'`
-`AS`          | Provides an alias for columns or tables               | `SELECT name AS "User Name"`
-{:class="table table-striped"}
-
-With these querying techniques, you’re now equipped to retrieve and filter data from your tables effectively. In the next lesson, we’ll expand on filtering techniques and introduce conditional logic for more powerful queries.
-
----
+So far we've looked at everything. Next, let's get choosier with more powerful filters.

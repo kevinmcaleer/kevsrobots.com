@@ -1,254 +1,249 @@
 ---
 title: Introduction to Database Normalization
-description: >-
-    Understanding database normalization and the first three normal forms (1NF, 2NF, 3NF)
+description: Turn a messy build log into clean linked tables by applying first, second and third normal form, and see the problems each step prevents.
 layout: lesson
+type: page
 cover: /learn/sql/assets/banners/10_introduction_to_normalization.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, we’ll discuss **database normalization**, a process that organizes data to reduce redundancy and improve data integrity. You’ll learn about the first three normal forms (1NF, 2NF, and 3NF), which are essential for creating efficient and well-structured databases.
+By the end of this lesson you will be able to spot repeated and tangled data in a table, and split it into tables that satisfy first, second and third normal form.
 
 ---
 
-## 1. What is Database Normalization?
+So far we've been handed sensible tables. Now let's see what happens when you design them badly. **Normalisation** is the habit of organising tables so each fact is stored **once**. It saves space, but the real prize is that your data can't contradict itself.
 
-**Normalization** is a technique used in database design to structure tables and their relationships, minimizing duplicate data and ensuring data integrity. The goal is to create a database that:
+## A messy build log
 
-- Reduces data redundancy (i.e., avoids storing the same data in multiple places)
-- Ensures data consistency and accuracy
-- Makes it easier to update, insert, and delete data
+Imagine you keep a log of which parts went into each robot, and who built it, all in one table:
 
-Normalization organizes data into a series of tables and establishes relationships based on defined rules, known as **normal forms**.
+```sql
+CREATE TABLE build_log_messy (
+    log_id        INTEGER PRIMARY KEY,
+    robot_name    TEXT,
+    builder_name  TEXT,
+    builder_email TEXT,
+    parts         TEXT
+);
 
----
-
-## 2. The First Normal Form (1NF)
-
-A table is in **First Normal Form (1NF)** if:
-
-1. Each column contains only atomic (indivisible) values.
-2. Each row is unique.
-
-### Example: 1NF Violations and Corrections
-
-Consider the following table that stores a customer’s order and items:
-
-```plaintext
-| order_id | customer_name | items          |
-|----------|---------------|----------------|
-| 1        | Alice         | Laptop, Tablet |
-| 2        | Bob           | Smartphone     |
+INSERT INTO build_log_messy (robot_name, builder_name, builder_email, parts) VALUES
+    ('Smars',       'Kev', 'kev@example.com', 'motor, wheel, battery'),
+    ('Pico Walker', 'Kev', 'kev@example.com', 'servo, battery'),
+    ('Line Chaser', 'Sam', 'sam@example.com', 'motor, wheel');
 ```
 
-This table is not in 1NF because the `items` column contains multiple values (e.g., "Laptop, Tablet"). To bring it into 1NF, we need to split the items so that each row contains only one item per order:
-
-```plaintext
-| order_id | customer_name | item       |
-|----------|---------------|------------|
-| 1        | Alice         | Laptop     |
-| 1        | Alice         | Tablet     |
-| 2        | Bob           | Smartphone |
+```text
+log_id  robot_name   builder_name  builder_email    parts
+------  -----------  ------------  ---------------  ---------------------
+1       Smars        Kev           kev@example.com  motor, wheel, battery
+2       Pico Walker  Kev           kev@example.com  servo, battery
+3       Line Chaser  Sam           sam@example.com  motor, wheel
 ```
 
-Now, each column contains only atomic values, meeting the criteria for 1NF.
+It looks fine, until you try to use it. Kev's email is written twice, and "which robots used a wheel?" means searching inside a text list with `LIKE '%wheel%'`, which also matches `wheelbase` and can't be counted properly.
 
----
+## First normal form (1NF): one value per cell
 
-## 3. The Second Normal Form (2NF)
+**Rule**: every cell holds a single value, with no lists and no repeating columns like `part1`, `part2`.
 
-A table is in **Second Normal Form (2NF)** if it:
+The fix is one row per part. The key is now the pair (`log_id`, `part_name`), because neither alone is unique:
 
-1. Is already in 1NF.
-2. Has no partial dependencies, meaning that non-key columns depend on the entire primary key, not just part of it.
+```sql
+CREATE TABLE build_parts_1nf (
+    log_id        INTEGER,
+    part_name     TEXT,
+    robot_name    TEXT,
+    builder_name  TEXT,
+    builder_email TEXT,
+    part_price    REAL,
+    PRIMARY KEY (log_id, part_name)
+);
 
-### Example: 2NF Violations and Corrections
-
-Consider an `orders` table that includes customer information:
-
-```plaintext
-| order_id | customer_id | customer_name | item       |
-|----------|-------------|---------------|------------|
-| 1        | 101         | Alice         | Laptop     |
-| 1        | 101         | Alice         | Tablet     |
-| 2        | 102         | Bob           | Smartphone |
+INSERT INTO build_parts_1nf VALUES
+    (1, 'motor',   'Smars',       'Kev', 'kev@example.com', 3.50),
+    (1, 'wheel',   'Smars',       'Kev', 'kev@example.com', 0.80),
+    (1, 'battery', 'Smars',       'Kev', 'kev@example.com', 8.00),
+    (2, 'servo',   'Pico Walker', 'Kev', 'kev@example.com', 2.20),
+    (2, 'battery', 'Pico Walker', 'Kev', 'kev@example.com', 8.00),
+    (3, 'motor',   'Line Chaser', 'Sam', 'sam@example.com', 3.50),
+    (3, 'wheel',   'Line Chaser', 'Sam', 'sam@example.com', 0.80);
 ```
 
-This table is not in 2NF because `customer_name` depends only on `customer_id`, which is part of the primary key (`order_id, customer_id`). To normalize it, we can separate customer information into its own table.
+Now we can count and search, but there is a lot of repetition. Watch what happens when the battery price changes in just one row:
 
-**orders**:
+```sql
+UPDATE build_parts_1nf SET part_price = 9.00
+WHERE log_id = 1 AND part_name = 'battery';
 
-```plaintext
-| order_id | customer_id | item       |
-|----------|-------------|------------|
-| 1        | 101         | Laptop     |
-| 1        | 101         | Tablet     |
-| 2        | 102         | Smartphone |
+SELECT part_name, part_price FROM build_parts_1nf WHERE part_name = 'battery';
 ```
 
-**customers**:
-
-```plaintext
-| customer_id | customer_name |
-|-------------|---------------|
-| 101         | Alice         |
-| 102         | Bob           |
+```text
+part_name  part_price
+---------  ----------
+battery    9.0
+battery    8.0
 ```
 
-Now, the `orders` table only contains data related to the order, and the `customers` table holds information specific to customers. This structure meets 2NF requirements.
+The database now says a battery costs 9.00 **and** 8.00. This is an **update anomaly**, and normalisation exists to prevent it.
 
----
+## Second normal form (2NF): depend on the whole key
 
-## 4. The Third Normal Form (3NF)
+**Rule**: be in 1NF, and every non-key column depends on the **whole** key, not just part of it.
 
-A table is in **Third Normal Form (3NF)** if it:
+Our key is (`log_id`, `part_name`). But `part_price` depends only on `part_name`, and `robot_name`, `builder_name` and `builder_email` depend only on `log_id`. Those are partial dependencies. The fix is to give each idea its own table: one for parts (with their price), and one for builds.
 
-1. Is already in 2NF.
-2. Has no transitive dependencies, meaning that non-key columns are dependent only on the primary key, not on other non-key columns.
+## Third normal form (3NF): no hopping through other columns
 
-### Example: 3NF Violations and Corrections
+**Rule**: be in 2NF, and no non-key column depends on another non-key column.
 
-Consider an `orders` table with additional customer location information:
+Look at the builds. `builder_email` is really a fact about the **builder**, not about the build. It depends on `builder_name`, which in turn depends on the build, a chain called a **transitive dependency**. The fix is a `builders` table. The rule of thumb: every column should depend on "the key, the whole key, and nothing but the key".
 
-```plaintext
-| order_id | customer_id | customer_name | city     | item       |
-|----------|-------------|---------------|----------|------------|
-| 1        | 101         | Alice         | New York | Laptop     |
-| 2        | 102         | Bob           | Chicago  | Smartphone |
+## The tidy design
+
+```mermaid
+erDiagram
+    BUILDERS ||--o{ BUILDS : "makes"
+    ROBOTS ||--o{ BUILDS : "is made in"
+    BUILDS ||--o{ BUILD_PARTS : "uses"
+    PARTS ||--o{ BUILD_PARTS : "appears in"
+    BUILDERS {
+        int builder_id PK
+        text name
+        text email
+    }
+    PARTS {
+        int part_id PK
+        text name
+        real unit_price
+    }
+    BUILDS {
+        int build_id PK
+        int robot_id FK
+        int builder_id FK
+    }
+    BUILD_PARTS {
+        int build_id FK
+        int part_id FK
+        int quantity
+    }
 ```
 
-This table is not in 3NF because `city` depends on `customer_id` through `customer_name`, rather than directly on the primary key (`order_id`). To bring it into 3NF, we should split `city` into the `customers` table.
+`build_parts` is a **link table**. A build uses many parts and a part goes into many builds, so a table in the middle holds one row per pair, plus the quantity. Create the tables, reusing the `robots` table we already have:
 
-**orders**:
+```sql
+CREATE TABLE builders (
+    builder_id INTEGER PRIMARY KEY,
+    name       TEXT NOT NULL,
+    email      TEXT NOT NULL UNIQUE
+);
+CREATE TABLE parts (
+    part_id    INTEGER PRIMARY KEY,
+    name       TEXT NOT NULL UNIQUE,
+    unit_price REAL NOT NULL
+);
+CREATE TABLE builds (
+    build_id   INTEGER PRIMARY KEY,
+    robot_id   INTEGER NOT NULL REFERENCES robots (robot_id),
+    builder_id INTEGER NOT NULL REFERENCES builders (builder_id)
+);
+CREATE TABLE build_parts (
+    build_id INTEGER NOT NULL REFERENCES builds (build_id),
+    part_id  INTEGER NOT NULL REFERENCES parts (part_id),
+    quantity INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (build_id, part_id)
+);
 
-```plaintext
-| order_id | customer_id | item       |
-|----------|-------------|------------|
-| 1        | 101         | Laptop     |
-| 2        | 102         | Smartphone |
+INSERT INTO builders (name, email) VALUES
+    ('Kev', 'kev@example.com'),
+    ('Sam', 'sam@example.com');
+INSERT INTO parts (name, unit_price) VALUES
+    ('motor', 3.50), ('wheel', 0.80), ('battery', 8.00), ('servo', 2.20);
+INSERT INTO builds (robot_id, builder_id) VALUES (1, 1), (2, 1), (4, 2), (3, 2);
+INSERT INTO build_parts (build_id, part_id, quantity) VALUES
+    (1, 1, 2), (1, 2, 4), (1, 3, 1),
+    (2, 4, 6), (2, 3, 1),
+    (3, 1, 2), (3, 2, 2),
+    (4, 4, 4), (4, 3, 1);
 ```
 
-**customers**:
+A four-table join puts the full picture back together:
 
-```plaintext
-| customer_id | customer_name | city     |
-|-------------|---------------|----------|
-| 101         | Alice         | New York |
-| 102         | Bob           | Chicago  |
+```sql
+SELECT r.name AS robot, b.name AS builder, p.name AS part, bp.quantity
+FROM builds AS bd
+JOIN robots AS r ON r.robot_id = bd.robot_id
+JOIN builders AS b ON b.builder_id = bd.builder_id
+JOIN build_parts AS bp ON bp.build_id = bd.build_id
+JOIN parts AS p ON p.part_id = bp.part_id
+ORDER BY bd.build_id, p.part_id;
 ```
 
-Now, each non-key column depends only on the primary key in each table, meeting 3NF requirements.
+```text
+robot        builder  part     quantity
+-----------  -------  -------  --------
+Smars        Kev      motor    2
+Smars        Kev      wheel    4
+Smars        Kev      battery  1
+Pico Walker  Kev      battery  1
+Pico Walker  Kev      servo    6
+Line Chaser  Sam      motor    2
+Line Chaser  Sam      wheel    2
+Arm Buddy    Sam      battery  1
+Arm Buddy    Sam      servo    4
+```
 
----
+Now a battery's price lives in one row, so changing it once changes it everywhere. Finally, tidy up the practice tables:
 
-## 5. Benefits of Normalization
+```sql
+DROP TABLE build_log_messy;
+DROP TABLE build_parts_1nf;
+```
 
-Normalization provides several advantages:
+## Try it Yourself
 
-- **Data Integrity**: Reduces redundancy and ensures data consistency.
-- **Efficient Storage**: Minimizes duplicate data, saving storage space.
-- **Improved Maintenance**: Simplifies updates, deletions, and insertions by eliminating duplicated data.
-- **Enhanced Query Performance**: Structured relationships improve query efficiency and make complex queries easier to manage.
+1. Add a new part, `ultrasonic sensor`, to `parts`, then record that build 3 (Line Chaser) used one.
+2. Change Sam's email in one `UPDATE`, then run the four-table join to see it change for every row.
+3. Challenge: write a query that gives the total parts cost per robot (quantity times unit price, summed). Lesson 9 and the join above are all you need.
 
----
+## Common Issues
 
-## 6. Practice Exercise: Normalizing Data
+- **Problem**: `FOREIGN KEY constraint failed` when I insert into `builds` or `build_parts`.
+- **Solution**: Insert the parent rows first (builders, parts, robots), then the rows that point at them, and set `PRAGMA foreign_keys = ON;`.
+- **Why**: A foreign key must point at a row that already exists.
 
-1. **Convert to 1NF**: Consider the following table and make it 1NF compliant.
+- **Problem**: I normalised everything and now every query needs five joins.
+- **Solution**: That's normal. Wrap the common joins in a view (lesson 13) and add indexes.
+- **Why**: Normalisation trades a few extra joins for data that can't contradict itself, and views hide the joins.
 
-    ```plaintext
-    | order_id | customer_name | items          |
-    |----------|---------------|----------------|
-    | 1        | Alice         | Laptop, Tablet |
-    | 2        | Bob           | Smartphone     |
-    ```
+- **Problem**: Should I store `quantity * unit_price` in a column as well?
+- **Solution**: No, calculate it in the query.
+- **Why**: A stored total is a copy that can drift out of step when the inputs change.
 
-    **Solution**:
+## Check your understanding
 
-    ```plaintext
-    | order_id | customer_name | item       |
-    |----------|---------------|------------|
-    | 1        | Alice         | Laptop     |
-    | 1        | Alice         | Tablet     |
-    | 2        | Bob           | Smartphone |
-    ```
+{% quiz %}
+? Which of these breaks first normal form?
+- [ ] A `robot_id` column
+- [x] A `parts` column holding the text `motor, wheel, battery`
+- [ ] A column that allows `NULL`
+> 1NF wants one value per cell. A comma-separated list should be one row per item.
 
-2. **Convert to 2NF**: Consider the following table and make it 2NF compliant.
+? A table has the key (`log_id`, `part_name`), and `part_price` depends only on `part_name`. Which form is broken?
+- [ ] First normal form
+- [x] Second normal form
+- [ ] Third normal form
+> `part_price` depends on only part of the key, which is a partial dependency and breaks 2NF.
 
-    ```plaintext
-    | order_id | customer_id | customer_name | item       |
-    |----------|-------------|---------------|------------|
-    | 1        | 101         | Alice         | Laptop     |
-    | 1        | 101         | Alice         | Tablet     |
-    | 2        | 102         | Bob           | Smartphone |
-    ```
+? What is the job of the `build_parts` table?
+- [ ] It stores the name of each part
+- [x] It links builds to parts, since each can have many of the other
+- [ ] It replaces the primary key of `builds`
+> A link table holds one row per (build, part) pair, with the quantity.
+{% endquiz %}
 
-    **Solution**:
-    Separate customer information into a new table:
-
-    **orders**:
-
-    ```plaintext
-    | order_id | customer_id | item       |
-    |----------|-------------|------------|
-    | 1        | 101         | Laptop     |
-    | 1        | 101         | Tablet     |
-    | 2        | 102         | Smartphone |
-    ```
-
-    **customers**:
-
-    ```plaintext
-    | customer_id | customer_name |
-    |-------------|---------------|
-    | 101         | Alice         |
-    | 102         | Bob           |
-    ```
-
-3. **Convert to 3NF**: Consider the following table and make it 3NF compliant.
-
-    ```plaintext
-    | order_id | customer_id | customer_name | city     | item       |
-    |----------|-------------|---------------|----------|------------|
-    | 1        | 101         | Alice         | New York | Laptop     |
-    | 2        | 102         | Bob           | Chicago  | Smartphone |
-    ```
-
-    **Solution**:
-    Move `city` to the `customers` table:
-
-    **orders**:
-
-    ```plaintext
-    | order_id | customer_id | item       |
-    |----------|-------------|------------|
-    | 1        | 101         | Laptop     |
-    | 2        | 102         | Smartphone |
-    ```
-
-    **customers**:
-
-    ```plaintext
-    | customer_id | customer_name | city     |
-    |-------------|---------------|----------|
-    | 101         | Alice         | New York |
-    | 102         | Bob           | Chicago  |
-    ```
-
----
-
-## Summary of Normalization Concepts
-
-Normal Form  | Description                                                                                      | Goal
--------------|--------------------------------------------------------------------------------------------------|---------------------------
-1NF          | Each column contains only atomic values, and each row is unique                                  | Eliminate repeating groups
-2NF          | Table is in 1NF, and non-key columns depend on the entire primary key                            | Remove partial dependencies
-3NF          | Table is in 2NF, and non-key columns depend only on the primary key                              | Remove transitive dependencies
-{:class="table table-striped"}
-
-By following normalization principles, you can create efficient, scalable, and consistent databases. In the next lesson, we’ll go further into Boyce-Codd Normal Form (BCNF) for advanced normalization techniques.
-
----
+There is one more normal form worth knowing, a stricter version of the third. Let's meet Boyce-Codd.

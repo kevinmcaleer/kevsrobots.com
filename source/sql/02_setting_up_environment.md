@@ -1,168 +1,172 @@
 ---
 title: Setting Up Your SQL Environment
-description: >-
-    How to install and set up SQL tools, and create your first database
+description: Install SQLite (or use Python's built-in copy), create workshop.db and run your first CREATE TABLE, INSERT and SELECT.
 layout: lesson
+type: page
 cover: /learn/sql/assets/banners/02_setting_up_environment.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, we’ll guide you through setting up a SQL environment on your computer, so you’re ready to start creating and managing databases.
+By the end of this lesson you will be able to start SQLite, create a database file called `workshop.db`, and create, fill and read a first table.
 
 ---
 
-## 1. Choosing Your SQL Database System
+Let's get our hands on a real database. We'll use **SQLite**, which keeps a whole database in one ordinary file. There is no server to start, no password and no account.
 
-There are various SQL database systems available, but for simplicity, we’ll focus on **SQLite** due to its lightweight, serverless nature and ease of use. However, the setup instructions for **MySQL** are also included if you prefer a more powerful, server-based database.
+```mermaid
+flowchart LR
+    A["You type SQL at the sqlite3 prompt"] --> B["SQLite checks and runs it"]
+    B --> C[("workshop.db file on disk")]
+    C --> B
+    B --> D["Results appear on screen"]
+```
 
----
+## Route A: the sqlite3 command
 
-## 2. Installing SQLite
+1. Open a terminal (Command Prompt or PowerShell on Windows).
+2. Type `sqlite3 --version` and press Enter. If you see a version number, you're done.
+3. If not, install it:
+   - **Windows**: download the `sqlite-tools` zip for Windows from [sqlite.org/download.html](https://www.sqlite.org/download.html), unzip it to a folder such as `C:\sqlite`, and add that folder to your PATH so `sqlite3` works from any window.
+   - **macOS**: `sqlite3` is normally already there. If not, `brew install sqlite` works if you use Homebrew.
+   - **Linux and Raspberry Pi OS**: `sudo apt install sqlite3`.
 
-SQLite is an excellent choice for beginners because it doesn’t require a server installation. You’ll interact with SQLite directly through a command-line interface or graphical tool.
+Now create the database. Move to a folder where you want to keep your work, then run:
 
-### Step-by-Step Installation for SQLite
+```bash
+sqlite3 workshop.db
+```
 
-1. **Download SQLite**:
-   - Go to the [SQLite download page](https://www.sqlite.org/download.html).
-   - Download the `sqlite-tools` package for your operating system (Windows, Mac, or Linux).
+{: .no-snakie }
 
-2. **Install SQLite**:
-   - **Windows**: Extract the downloaded zip file to a folder (e.g., `C:\sqlite\`). Add this folder to your system’s PATH to run `sqlite3` from any command prompt window.
-   - **Mac**: SQLite is usually pre-installed on macOS. You can check by opening Terminal and typing `sqlite3`. If it’s not installed, use Homebrew (`brew install sqlite`) to install it.
-   - **Linux**: Most distributions have SQLite installed. If not, you can install it using your package manager (e.g., `sudo apt install sqlite3`).
+SQLite creates `workshop.db` the first time you save something to it, and shows a `sqlite>` prompt. Switch on tidier output with two **dot commands**. These start with a full stop, belong to the `sqlite3` tool rather than SQL, and need no semicolon:
 
-3. **Verify the Installation**:
-   - Open a terminal or command prompt.
-   - Type `sqlite3` and press Enter. You should see a welcome message and a `sqlite>` prompt, indicating SQLite is ready to use.
+```text
+.headers on
+.mode column
+```
 
-### Graphical Interface for SQLite
+## Route B: Python, no install needed
 
-While SQLite’s command-line interface is powerful, you may prefer a graphical tool to view and edit data. A few popular tools are:
-- **DB Browser for SQLite** (free): Downloadable at [sqlitebrowser.org](https://sqlitebrowser.org/).
-- **DBeaver** (free/community version): A multi-database tool with support for SQLite, available at [dbeaver.io](https://dbeaver.io/).
+Python ships with SQLite. If you can run Python 3 but have no `sqlite3` command, save this as `sql_shell.py` and run it with `python3 sql_shell.py`. It gives you a simple `sql>` prompt that works on `workshop.db`:
 
----
+```python
+import sqlite3
 
-## 3. Setting Up MySQL (Optional)
+# A tiny SQL prompt for when the sqlite3 command is not installed.
+# isolation_level=None means every statement runs exactly as you type it.
+db = sqlite3.connect("workshop.db", isolation_level=None)
+print("Type SQL ending with a semicolon. Type quit on its own line to leave.")
 
-If you want to learn SQL in a more traditional, server-based environment, MySQL is a popular choice and more complex than SQLite. Here’s how to set it up.
+buffer = ""
+while True:
+    line = input("sql> " if buffer == "" else "...> ")
+    if buffer == "" and line.strip().lower() in ("quit", "exit"):
+        break
+    buffer += line + "\n"
+    if sqlite3.complete_statement(buffer):
+        try:
+            cursor = db.execute(buffer)
+            if cursor.description:
+                print([column[0] for column in cursor.description])
+                for row in cursor.fetchall():
+                    print(row)
+        except sqlite3.Error as error:
+            print("Error:", error)
+        buffer = ""
 
----
+db.close()
+```
 
-### Step-by-Step Installation for MySQL
+On this route, results print as Python tuples, such as `(1, 'Smars')`, instead of neat columns, and the dot commands don't exist. Use the SQL equivalents the lessons mention instead.
 
-1. **Download MySQL**:
+## Create, fill and read a table
 
-   - Go to the [MySQL download page](https://dev.mysql.com/downloads/installer/) and download the installer for your operating system.
+Type each statement and press Enter. SQL statements end with a semicolon, and may run over several lines.
 
-2. **Install MySQL**:
+```sql
+CREATE TABLE robots (
+    robot_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+```
 
-   - Run the installer and follow the instructions. Choose a simple setup (Developer Default or Server Only) if you’re a beginner.
-   - During installation, you’ll be prompted to set up a root password and configure the server. Write down your password securely.
+Nothing is printed. In SQLite, silence means success. Now add three robots and read them back:
 
-3. **Start MySQL Server**:
+```sql
+INSERT INTO robots (name) VALUES ('Smars');
+INSERT INTO robots (name) VALUES ('Pico Walker'), ('Arm Buddy');
+SELECT * FROM robots;
+```
 
-   - On Windows, MySQL should start automatically. You can manage it from the MySQL Workbench or Services.
-   - On macOS, you may need to start the MySQL server manually from System Preferences or with `brew services start mysql` if installed via Homebrew.
-   - On Linux, start MySQL with `sudo systemctl start mysql`.
+You should see:
 
-4. **Accessing MySQL**:
-   - Open MySQL Workbench or use the command line by typing `mysql -u root -p` and entering your password to connect.
+```text
+robot_id  name
+--------  -----------
+1         Smars
+2         Pico Walker
+3         Arm Buddy
+```
 
----
+We never gave a `robot_id`. A column declared `INTEGER PRIMARY KEY` fills itself in with the next free number, which is why Smars got 1.
 
-## 4. Connecting to a Database in SQLite
+Two more dot commands let you look around:
 
-### Creating Your First Database
+```text
+.tables
+.schema
+```
 
-Once SQLite is installed, let’s create a simple database.
+`.tables` lists the tables (here just `robots`) and `.schema` shows the `CREATE TABLE` text each was made with. To leave, type `.quit`. Everything is already saved in `workshop.db`. Start again later with `sqlite3 workshop.db` and `SELECT * FROM robots;` to see your robots waiting for you.
 
-1. **Start SQLite**:
+If you use Route B, `SELECT name FROM sqlite_master WHERE type = 'table';` lists your tables.
 
-   - Open a terminal or command prompt.
-   - Type `sqlite3 my_database.db` and press Enter. This command creates a new SQLite database file named `my_database.db` in the current directory.
+> **Teachers**: a locked-down school machine may not allow installing `sqlite3`, but Python usually works, so Route B avoids needing admin rights. Give each learner their own folder and database file. Two people opening the same `.db` file on a network drive causes "database is locked" errors. If students use a browser-based SQLite tool instead, check that your school allows it and that nothing personal is typed in.
 
-2. **Verify the Database Creation**:
+## Try it Yourself
 
-   - You should now see the `sqlite>` prompt, meaning you’re connected to `my_database.db`.
-   - You can list all tables in this database by typing:
-     ```sql
-     .tables
-     ```
+1. Add a fourth robot called `Line Chaser`, then run `SELECT * FROM robots;` again. What `robot_id` does it get?
+2. Quit SQLite, start it again with `sqlite3 workshop.db`, and check your robots survived.
+3. Challenge: run `SELECT * FROM robots` without the semicolon and press Enter. What does the prompt change to, and how do you finish the statement?
 
-3. **Creating a Simple Table**:
+## Common Issues
 
-   - Let’s create a table called `users` with two columns: `id` and `name`.
-     ```sql
-     CREATE TABLE users (
-         id INTEGER PRIMARY KEY,
-         name TEXT NOT NULL
-     );
-     ```
-   - After executing the command, you won’t see any output, which is normal. You can verify that the table was created by typing:
-     ```sql
-     .tables
-     ```
+- **Problem**: The prompt changes to `...>` and nothing happens.
+- **Solution**: SQLite is waiting for the end of your statement. Type `;` and press Enter.
+- **Why**: A statement only runs when SQLite sees the semicolon. Without it, it assumes you're still typing.
 
-4. **Inserting Data**:
+- **Problem**: `Error: no such table: robots`.
+- **Solution**: You probably started `sqlite3` without the file name, which opens a temporary empty database. Quit and run `sqlite3 workshop.db`.
+- **Why**: A database is just a file. Opening a different file, or none, means opening a different database.
 
-   - Add a sample record to your `users` table:
-     ```sql
-     INSERT INTO users (name) VALUES ('Alice');
-     ```
-   - You can add multiple records if desired:
-     ```sql
-     INSERT INTO users (name) VALUES ('Bob'), ('Charlie');
-     ```
+- **Problem**: `Error: table robots already exists`.
+- **Solution**: You've already created it. Carry on to the `INSERT`, or run `DROP TABLE robots;` to start over.
+- **Why**: Table names must be unique in a database, so SQLite refuses to create a second one.
 
-5. **Querying Data**:
-   - To see the data in your table, use:
-     ```sql
-     SELECT * FROM users;
-     ```
-   - This command retrieves all records in the `users` table and displays the `id` and `name` columns.
+## Check your understanding
 
----
+{% quiz %}
+? Where does SQLite keep your data?
+- [ ] On a server that must be started first
+- [x] In a single file, such as `workshop.db`
+- [ ] In the terminal window until you close it
+> SQLite is serverless: the whole database is one file, which is why it needs no installation of a database server.
 
-## 5. Saving and Closing the Database
+? Why did Smars get `robot_id` 1 without us typing it?
+- [x] The column is `INTEGER PRIMARY KEY`, so SQLite fills in the next free number
+- [ ] SQL always numbers rows from 1 in the first column
+- [ ] The `name` column is `NOT NULL`
+> An `INTEGER PRIMARY KEY` column automatically takes the next unused number when you leave it out.
 
-SQLite automatically saves changes, so you don’t need to worry about manually saving. To close the database:
+? What does `.tables` do?
+- [ ] It creates a new table
+- [x] It lists the tables in the database (a `sqlite3` tool command, not SQL)
+- [ ] It deletes empty tables
+> Dot commands belong to the `sqlite3` program. They need no semicolon.
+{% endquiz %}
 
-1. At the `sqlite>` prompt, type:
-   ```sql
-   .exit
-   ```
-   This exits SQLite and returns you to your command prompt or terminal.
-
-2. The `my_database.db` file now exists in your current directory, and it contains all the data and structure you defined.
-
----
-
-## Recap and Additional Tips
-
-### Summary of Commands Used
-
-Command      | Description
--------------|-------------------------------------------------------------
-`.tables`    | Lists all tables in the current database.
-`CREATE TABLE` | Creates a new table in the database.
-`INSERT INTO` | Adds new data to a specified table.
-`SELECT *`   | Retrieves all data from a table.
-`.exit`      | Exits SQLite and saves changes.
-{:class="table"}
-
----
-
-### Additional Tips
-
-- **Organize your SQL files**: As your work with databases grows, consider creating `.sql` files to store SQL commands for easier management.
-- **Back up your database**: Regularly copy your `.db` file to a backup location.
-- **Practice frequently**: The more you work with SQLite and SQL commands, the more comfortable you’ll become.
-
-Now you have a fully functional SQL environment and can connect to databases, create tables, insert data, and retrieve data. Great job setting up your SQL workspace!
-
----
+Now that we have a table, let's look properly at the four commands you'll use every day.

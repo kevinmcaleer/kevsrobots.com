@@ -5587,18 +5587,18 @@
   {
     "slug": "sql",
     "name": "Getting Started with SQL",
-    "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management.",
+    "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management, by building a Robot Workshop database in SQLite.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-11-01",
     "groups": [
-      "databases"
+      "python"
     ],
     "lessons": [
       {
-        "file": "00_course_overview.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/sql/00_course_overview.html"
+        "url": "/learn/sql/00_intro.html"
       },
       {
         "file": "01_introduction_to_sql.md",

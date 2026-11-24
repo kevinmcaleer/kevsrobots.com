@@ -1073,13 +1073,13 @@
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
   description: Learn the fundamentals of SQL, relational database theory, and essential
-    skills for database management.
-  duration: 1h 22m
+    skills for database management, by building a Robot Workshop database in SQLite.
+  duration: 1h 37m
   groups:
-  - databases
+  - python
   lessons: 16
   level: beginner
-  link: /learn/sql/00_course_overview.html
+  link: /learn/sql/00_intro.html
   name: Getting Started with SQL
 - author: Kevin McAleer
   cover: /learn/sqlite3/assets/database.png
