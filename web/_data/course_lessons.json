@@ -3955,7 +3955,7 @@
   {
     "slug": "python",
     "name": "Python for beginners",
-    "description": "Get started with Python programming, learn why you should  learn Python and how to setup your Python environment.",
+    "description": "Get started with Python programming. Install Python, learn the core language (variables, data structures, loops, functions, files, errors, modules and classes), then take a guided tour of what Python does in the real world: web scraping, charts, machine learning, automation and databases. You finish by building a small quiz application.",
     "cover": "assets/python.png",
     "author": "Kevin McAleer",
     "date_published": "2023-07-20",
@@ -3964,9 +3964,9 @@
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/python/01_intro.html"
+        "url": "/learn/python/00_intro.html"
       },
       {
         "file": "02_basics.md",

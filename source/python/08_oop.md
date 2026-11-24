@@ -1,117 +1,162 @@
 ---
 title: Python Object-Oriented Programming (OOP)
-description: Introduction to object-oriented programming in Python, including classes, objects, methods, and inheritance.
+description: Learn classes, objects, methods and inheritance by building a Robot class and a flying robot that extends it.
 layout: lesson
+type: page
 cover: /learn/python/assets/banners/08_oop.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Introduction
-
-In this lesson, we will explore the principles of `object-oriented programming` (OOP) in Python. Python is an object-oriented language, and OOP concepts provide a clear structure for writing code which makes it easier to create complex applications.
+By the end of this lesson you will be able to define a class, create objects from it, add methods, and use inheritance to build a new class from an existing one.
 
 ---
 
-## Learning Objectives
+Once a robot has a name, a battery level, some sensors and a handful of things it can do, you end up with lots of related variables and functions floating around. **Object-oriented programming** (OOP) bundles the data and the behaviour together into one neat package.
 
-- Understand what `classes` and `objects` are.
-- Know how to define a `class` and create an `object`.
-- Understand what `methods` are and how to define them.
-- Understand the concept of `inheritance`.
+## Classes and objects
 
----
+A **class** is a blueprint. An **object** (also called an instance) is a thing built from that blueprint. Every robot built from a `Robot` blueprint has its own name and battery.
 
-### Classes and Objects
+```mermaid
+classDiagram
+    class Robot {
+        name
+        battery
+        drive()
+        status()
+    }
+    class FlyingRobot {
+        fly()
+    }
+    Robot <|-- FlyingRobot
+```
 
-In Python, almost everything is an `object`, with its `properties` and `methods`. A Class is like an object constructor, or a blueprint for creating objects.
+The special `__init__` method runs when you create an object and sets up its **attributes**. `self` is the object being built.
 
 {% capture snakie_code %}
-# Define a class
-class Car:
-    def __init__(self, color, brand):
-        self.color = color
-        self.brand = brand
+class Robot:
+    def __init__(self, name, battery):
+        self.name = name
+        self.battery = battery
 
-# Create an object
-my_car = Car('red', 'Toyota')
-print(my_car.color)  # Prints 'red'
-print(my_car.brand)  # Prints 'Toyota'
+chip = Robot("Chip", 100)
+bolt = Robot("Bolt", 60)
+
+print(chip.name, chip.battery)   # Chip 100
+print(bolt.name, bolt.battery)   # Bolt 60
 {% endcapture %}
 {% include snakie.html code=snakie_code name="oop_1.py" engine="pyodide" %}
 
----
+`chip` and `bolt` are two separate objects. Changing one never changes the other.
 
-### Methods
+## Methods
 
-`Methods` are functions defined inside the body of a class. They are used to perform operations with the attributes of our objects.
+**Methods** are functions defined inside a class. They do things with the object's own data, which they reach through `self`.
 
 {% capture snakie_code %}
-class Car:
-    def __init__(self, color, brand):
-        self.color = color
-        self.brand = brand
+class Robot:
+    def __init__(self, name, battery):
+        self.name = name
+        self.battery = battery
 
-    # Define a method
-    def honk(self):
-        return "Beep beep!"
+    def drive(self):
+        if self.battery >= 10:
+            self.battery -= 10
+            print(f"{self.name} drives. Battery: {self.battery}")
+        else:
+            print(f"{self.name} is too tired to drive")
 
-my_car = Car('red', 'Toyota')
-print(my_car.honk())  # Prints 'Beep beep!'
+chip = Robot("Chip", 20)
+chip.drive()
+chip.drive()
+chip.drive()
 {% endcapture %}
 {% include snakie.html code=snakie_code name="oop_2.py" engine="pyodide" %}
 
----
+**Why this matters:** the rule "driving costs 10 battery, and you cannot drive when it is low" lives in one place, with the data it protects.
 
-### Inheritance
+## Inheritance
 
-`Inheritance` is a powerful feature in object-oriented programming. It refers to defining a new class with little or no modification to an existing class. The new class is called `derived` (or child) class and the one from which it inherits is called the `base` (or parent) class.
+**Inheritance** lets you make a new class from an existing one, adding or changing only what is different. The new class is the **child** (or derived) class and the one it inherits from is the **parent** (or base) class.
 
 {% capture snakie_code %}
-class Vehicle:
-    def __init__(self, color):
-        self.color = color
+class Robot:
+    def __init__(self, name, battery):
+        self.name = name
+        self.battery = battery
 
-    def honk(self):
-        return "Honk honk!"
+    def drive(self):
+        self.battery -= 10
+        print(f"{self.name} drives. Battery: {self.battery}")
 
-# Car class inherits from Vehicle
-class Car(Vehicle):
-    def __init__(self, color, brand):
-        super().__init__(color)
-        self.brand = brand
+class FlyingRobot(Robot):
+    def __init__(self, name, battery, max_height):
+        super().__init__(name, battery)   # let Robot set up name and battery
+        self.max_height = max_height
 
-my_car = Car('red', 'Toyota')
-print(my_car.honk())  # Prints 'Honk honk!'
+    def fly(self):
+        self.battery -= 25
+        print(f"{self.name} flies up to {self.max_height} m. Battery: {self.battery}")
+
+sky = FlyingRobot("Sky", 100, 30)
+sky.drive()   # inherited from Robot
+sky.fly()     # its own method
 {% endcapture %}
 {% include snakie.html code=snakie_code name="oop_3.py" engine="pyodide" %}
 
+`super()` gives you the parent class, so `FlyingRobot` can reuse `Robot`'s setup without copying it.
+
 ---
 
-## Try it yourself
+## Try it Yourself
 
-Create a `Robot` class with a `name` and a `battery` level, and a `drive()` method that reduces the battery by 10 and prints a message. Then make a `FlyingRobot` that inherits from `Robot` and adds a `fly()` method.
+1. Create a `Robot` class with a `name` and a `battery` level, and a `drive()` method that reduces the battery by 10 and prints a message. Make two robots and drive one of them.
+1. Add a `charge()` method that sets the battery back to 100.
+1. Make a `FlyingRobot` that inherits from `Robot` and adds a `fly()` method.
+1. Challenge: add a `status()` method to `Robot` that returns a string like `"Chip: 80% battery"`, then check that `FlyingRobot` can use it too.
+
+## Common Issues
+
+- **Problem**: `TypeError: Robot.drive() takes 1 positional argument but 2 were given`.
+- **Solution**: Every method needs `self` as its first parameter, and you call it without passing `self` yourself: `chip.drive()`.
+- **Why**: Python passes the object in automatically as the first argument.
+
+- **Problem**: `AttributeError: 'Robot' object has no attribute 'battery'`.
+- **Solution**: Write `self.battery = battery` in `__init__`, and use `self.battery` (not just `battery`) inside methods.
+- **Why**: Plain variable names inside a method vanish when it ends. Attributes on `self` stay with the object.
+
+- **Problem**: The child class says an attribute is missing, such as `name`.
+- **Solution**: Call `super().__init__(...)` inside the child's `__init__`.
+- **Why**: If a child defines its own `__init__`, the parent's one does not run unless you call it.
+
+## Check your understanding
 
 {% quiz %}
 ? What does `self` refer to inside a method?
 - [ ] The class itself
 - [x] The particular object the method was called on
 - [ ] The parent class
-> `self` is the instance, so `self.color` is that object's own colour.
+> `self` is the instance, so `self.battery` is that object's own battery.
 
-? What does `super().__init__(color)` do in the `Car` class?
-- [x] Runs the parent class's `__init__` so the `color` is set up
-- [ ] Creates a new `Vehicle` object
+? What does `super().__init__(name, battery)` do in the `FlyingRobot` class?
+- [x] Runs the parent class's `__init__` so the name and battery are set up
+- [ ] Creates a new `Robot` object
 - [ ] Deletes the parent class
-> `super()` gives you access to the parent class, so `Car` can reuse `Vehicle`'s setup.
+> `super()` gives you access to the parent class, so `FlyingRobot` can reuse `Robot`'s setup.
+
+? What is the difference between a class and an object?
+- [ ] There is none
+- [x] A class is a blueprint, an object is a thing built from it
+- [ ] An object is a blueprint, a class is a thing built from it
+> `Robot` is the class; `chip` and `bolt` are objects made from it.
 {% endquiz %}
 
 ---
 
 ## Summary
 
-In this lesson, you've learned about object-oriented programming in Python. We've covered the basic principles of OOP, including classes, objects, methods, and inheritance. These concepts provide a clear structure for writing code and make it easier to develop complex Python applications.
-
----
+You can now model a robot with a class, give it methods and extend it with inheritance. This finishes the core language. From the next lesson we go on a tour of what Python can do in the real world, starting with data.

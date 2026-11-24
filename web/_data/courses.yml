@@ -752,14 +752,17 @@
 - author: Kevin McAleer
   cover: /learn/python/assets/python.png
   date_published: 2023-07-20
-  description: Get started with Python programming, learn why you should  learn Python
-    and how to setup your Python environment.
-  duration: 0h 54m
+  description: 'Get started with Python programming. Install Python, learn the core
+    language (variables, data structures, loops, functions, files, errors, modules
+    and classes), then take a guided tour of what Python does in the real world: web
+    scraping, charts, machine learning, automation and databases. You finish by building
+    a small quiz application.'
+  duration: 1h 44m
   groups:
   - python
   lessons: 18
   level: beginner
-  link: /learn/python/01_intro.html
+  link: /learn/python/00_intro.html
   name: Python for beginners
   video: uRNsqHZEzUM
 - author: Kevin McAleer
