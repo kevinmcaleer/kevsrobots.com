@@ -765,15 +765,16 @@
 - author: Kevin McAleer
   cover: /learn/redis/assets/redis-cover.jpg
   date_published: 2023-04-12
-  description: Learn how to use Redis with Python to build fast, scalable applications.
-  duration: 0h 37m
+  description: Learn how to use Redis with Python to share robot sensor readings,
+    queue jobs, count visitors, rank scores and send live messages, then build a robot
+    telemetry hub with a live dashboard.
+  duration: 1h 9m
   groups:
-  - redis
   - python
-  - databases
-  lessons: 10
+  - raspberrypi
+  lessons: 12
   level: intermediate
-  link: /learn/redis/01_introduction.html
+  link: /learn/redis/00_intro.html
   name: Using Redis with Python
 - author: Kevin McAleer
   cover: /learn/reinforcement_learning/assets/cover.jpg

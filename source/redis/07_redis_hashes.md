@@ -2,94 +2,158 @@
 layout: lesson
 title: Redis Hashes
 type: page
-description: Learn about Redis hashes and how to use them with Python.
+description: Store a robot's latest state as a Redis hash, update single fields, and let stale state disappear on its own.
 cover: /learn/redis/assets/banners/07_redis_hashes.jpg
+code_target: cpython
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-### Overview
-
-In this lesson, we will cover Redis hashes and how to use them with Python. Redis hashes are a data type that can be used to store key-value pairs. We will cover how to add, retrieve, and manipulate hash elements in Redis, and how to use hashes in Python.
+By the end of this lesson you will be able to store a robot's latest readings in one Redis hash, read or update a single field, and make the hash expire when the robot goes quiet.
 
 ---
 
-## Lesson Content
+## Overview
 
-In this lesson, we will cover:
+A robot has many facts about it at once: its mode, battery voltage, distance reading and how many times it has booted. You could store each as its own string (`robot:1:mode`, `robot:1:battery`, and so on), but a **hash** keeps them together under one key, like a small Python dictionary living inside Redis.
 
-* [Redis hashes](#redis-hashes)
-* [Adding and retrieving hash elements](#adding-and-retrieving-hash-elements)
-* [Manipulating hash elements](#manipulating-hash-elements)
-* [Using Redis hashes with Python](#using-redis-hashes-with-python)
-
----
-
-### Redis Hashes
-
-Redis hashes are a data type that can be used to store key-value pairs. Hashes in Redis are implemented as a hash table, which means that adding, removing, and retrieving hash elements is very fast.
-
----
-
-### Adding and Retrieving Hash Elements
-
-To add a key-value pair to a hash in Redis, you can use the `hset` command. To retrieve the value of a key in a hash, you can use the `hget` command. Here are some examples of adding and retrieving elements from a Redis hash:
-
-```redis
-hset myhash key1 "value1"
-(integer) 1
-hset myhash key2 "value2"
-(integer) 1
-hget myhash key1
-"value1"
+```mermaid
+flowchart TD
+    K["robot:1:state"] --> M["mode = explore"]
+    K --> B["battery = 7.3"]
+    K --> D["distance = 42.5"]
+    K --> C["boots = 2"]
 ```
 
----
+That is tidy, and it has a practical benefit. You can read the whole thing with one command, change one field without touching the rest, and delete or expire the whole robot's state in one go.
 
-### Manipulating Hash Elements
+## Reading and writing fields
 
-In addition to adding and retrieving hash elements, Redis provides several commands for manipulating hash elements. Here are some examples of manipulating hash elements in Redis:
+```
+127.0.0.1:6379> hset robot:1:state mode explore battery 7.4 distance 42.5
+(integer) 3
+127.0.0.1:6379> hget robot:1:state battery
+"7.4"
+127.0.0.1:6379> hset robot:1:state battery 7.3
+(integer) 0
+127.0.0.1:6379> hgetall robot:1:state
+1) "mode"
+2) "explore"
+3) "battery"
+4) "7.3"
+5) "distance"
+6) "42.5"
+127.0.0.1:6379> hmget robot:1:state mode battery
+1) "explore"
+2) "7.3"
+```
 
-* `hdel`: Delete one or more keys from a hash
-* `hexists`: Check if a key exists in a hash
-* `hkeys`: Get all keys in a hash
-* `hvals`: Get all values in a hash
-* `hgetall`: Get every key and value
-* `hincrby`: Add a number to a value, handy for counters
+- `hset` sets one or more fields, and replies with how many fields were **new**. Updating `battery` replied `0` because the field already existed, but the value did change
+- `hget` reads one field, `hmget` reads several, and `hgetall` reads them all
+- Every value is text. `7.3` is stored as the characters `7.3`
 
----
+A few more commands are handy:
 
-### Using Redis Hashes with Python
+```
+127.0.0.1:6379> hincrby robot:1:state boots 1
+(integer) 1
+127.0.0.1:6379> hincrby robot:1:state boots 1
+(integer) 2
+127.0.0.1:6379> hexists robot:1:state mode
+(integer) 1
+127.0.0.1:6379> hdel robot:1:state distance
+(integer) 1
+127.0.0.1:6379> hkeys robot:1:state
+1) "mode"
+2) "battery"
+3) "boots"
+127.0.0.1:6379> hlen robot:1:state
+(integer) 3
+```
 
-To use Redis hashes in Python, you can use the hash methods of the Redis Python library, which all start with `h`. Here's an example of how to use Redis hashes in Python:
+`hincrby` adds a whole number to a field and creates the field if needed, so it is a counter that lives inside the hash. `hdel` deletes a field, `hkeys` lists field names, `hvals` lists values and `hlen` counts fields.
+
+## A robot and a dashboard
+
+A hash can also **expire**. If your robot writes its state every second and the hash is set to expire after a few seconds, then a robot that crashes or loses power simply vanishes from the dashboard. No "last seen" code is needed.
+
+Save this as `robot_state.py`. It plays both parts, the robot and the dashboard:
 
 ```python
+import time
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r.delete('robot:1:state')
 
-# Add key-value pairs to a hash, one at a time or several at once
-redis_client.hset('myhash', 'key1', 'value1')
-redis_client.hset('myhash', mapping={'key2': 'value2', 'key3': 'value3'})
+def robot_reports(battery, distance):
+    """What the robot does every second."""
+    with r.pipeline() as pipe:
+        pipe.hset('robot:1:state', mapping={
+            'mode': 'explore',
+            'battery': battery,
+            'distance': distance,
+        })
+        pipe.expire('robot:1:state', 2)      # vanish after 2 seconds of silence
+        pipe.execute()
 
-# Get the value of a key in a hash
-value = redis_client.hget('myhash', 'key1')
+def dashboard_shows():
+    """What the dashboard does."""
+    state = r.hgetall('robot:1:state')
+    if not state:
+        print('Robot offline')
+        return
+    print('Battery', float(state['battery']), 'V, distance', float(state['distance']), 'cm')
 
-# Delete one or more keys from a hash
-redis_client.hdel('myhash', 'key2')
+robot_reports(7.4, 42.5)
+dashboard_shows()
 
-# Get all keys in a hash
-keys = redis_client.hkeys('myhash')
+r.hincrbyfloat('robot:1:state', 'battery', -0.1)    # one field changes
+print('Battery now', r.hget('robot:1:state', 'battery'))
 
-# Get all values in a hash
-values = redis_client.hvals('myhash')
+time.sleep(3)    # the robot goes quiet...
+dashboard_shows()
 ```
 
-In this example, we use the Redis Python library to add key-value pairs to a hash using the `hset` method, retrieve the value of a key in a hash using the `hget` method, delete one or more keys from a hash using the `hdel` method, get all keys in a hash using the `hkeys` method, and get all values in a hash using the `hvals` method.
+Run it and you will see:
 
----
+```
+Battery 7.4 V, distance 42.5 cm
+Battery now 7.3
+Robot offline
+```
+
+Three things to notice:
+
+- `hset(..., mapping={...})` stores a whole dictionary in one call. This is the modern spelling, replacing the old `hmset`
+- A pipeline sends `hset` and `expire` together, so the hash can never exist without its timer
+- `hincrbyfloat` changes one field by a decimal amount. The last `dashboard_shows()` finds nothing because the hash expired
+
+## Try it Yourself
+
+1. In `redis-cli`, create `robot:2:state` with a `mode` and `battery`, then use `hmget` to read just the battery
+2. Change `robot_reports` to also store a `timestamp` field using `time.time()`
+3. Lengthen the `expire` time to 10 seconds, shorten the `sleep`, and check the dashboard still reports the robot online
+4. Challenge: make the dashboard print "Battery low" in red text when the battery falls below 6.8
+
+## Common Issues
+
+- **Problem**: `hgetall` returns an empty dictionary `{}` for a robot you just set up.
+- **Solution**: Check the key name for typos, and check whether you set an `expire` that has already passed.
+- **Why**: A missing or expired hash looks the same as an empty one.
+
+- **Problem**: `float(state['battery'])` raises `KeyError`.
+- **Solution**: Use `state.get('battery')` and handle `None`, or check the robot has written the field.
+- **Why**: A field that was never set does not exist in the dictionary.
+
+- **Problem**: An older tutorial tells you to use `hmset`.
+- **Solution**: Use `hset(key, mapping={...})` instead.
+- **Why**: `hset` has accepted several fields since Redis 4.0, and the Redis documentation lists `hmset` as deprecated.
+
+## Check your understanding
 
 {% quiz %}
 ? Which method returns a whole hash as a Python dictionary?
@@ -97,23 +161,17 @@ In this example, we use the Redis Python library to add key-value pairs to a has
 - [x] `hgetall()`
 - [ ] `hkeys()`
 > `hgetall()` returns every field and value. `hkeys()` only returns the field names.
+
+? Why does `robot_reports` send `hset` and `expire` in a pipeline?
+- [x] So the hash and its timer are set together
+- [ ] Because `expire` needs a pipeline to work
+- [ ] To make the battery value a number
+> Sent together, the hash can never exist without its timer.
+
+? A hash holds `battery` with the value `7.3`. What type does Python receive from `hget`?
+- [ ] `float`
+- [x] `str`
+> Redis stores text, so you convert with `float()` yourself.
 {% endquiz %}
 
----
-
-### Key Takeaways
-
-After completing this lesson, you should be able to:
-
-* Describe Redis hashes and their implementation in Redis
-* Add and retrieve key-value pairs in Redis hashes
-* Manipulate key-value pairs in Redis hashes
-* Use Redis hashes in Python
-
----
-
-### Conclusion
-
-In this lesson, we covered Redis hashes and how to use them with Python. We described Redis hashes and their implementation in Redis, and demonstrated how to add, retrieve, and manipulate key-value pairs in Redis hashes, and how to use Redis hashes in Python using the Redis Python library. In the next lesson, we will cover Redis sorted sets.
-
----
+> **Teachers**: the expiry trick is a neat way to show "heartbeat" monitoring with no extra code. If your students share one Redis server, a hash is a good unit to teach key prefixes with: `team3:robot:1:state`. If a group's laptop sleeps during the lesson, its robot will appear offline after the expiry time, which is a useful talking point, not a fault.
