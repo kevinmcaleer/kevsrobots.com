@@ -4,9 +4,14 @@ title: Visualization with Pandas and Matplotlib
 type: page
 description: Learn how to use Pandas in conjunction with Matplotlib for effective data visualization, enabling you to present data insights visually.
 cover: /learn/pandas_and_numpy/assets/pandas09.png
+date_updated: 2026-11-24
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw line, bar, histogram and scatter charts from a Data Frame with `.plot()` and Matplotlib.
 
 ## Overview
 
@@ -62,8 +67,6 @@ plt.show()
 ```
 
 ## Time Series Plotting
-
-Time series data can be visualized effectively:
 
 When the index holds dates, `plot()` puts them along the x-axis automatically:
 
@@ -194,12 +197,53 @@ This creates a pie chart showing the relative sizes of different items.
 
 ---
 
+## Try it Yourself
+
+1. Run the first example, then change `df['SMARS'].plot()` to `df['Quad'].plot()`. Which robot's line is more jumpy?
+2. Make a bar chart of both robots with `df.plot(x='day', y=['SMARS', 'Quad'], kind='bar')`, and add a title.
+3. Add `plt.ylabel('Distance (m)')` before `plt.show()` so the chart explains itself.
+4. Challenge: save a chart as a picture with `plt.savefig('distance.png')` placed before `plt.show()`, then find the file in your folder.
+
+---
+
+## Common Issues
+
+- **Problem**: `ModuleNotFoundError: No module named 'matplotlib'`
+- **Solution**: Run `pip install matplotlib`.
+- **Why**: Pandas draws charts through Matplotlib, but does not install it for you.
+
+- **Problem**: Your script runs but no chart window appears, or it appears blank.
+- **Solution**: Make sure `plt.show()` comes after your plot lines. On a computer with no screen (such as a Raspberry Pi over SSH) use `plt.savefig('chart.png')` instead.
+- **Why**: In a script, nothing is drawn on screen until `plt.show()` runs, and a machine with no display has nowhere to show it.
+
+- **Problem**: A bar chart has numbers along the bottom instead of day names.
+- **Solution**: Tell Pandas which column to use with `x='day'`.
+- **Why**: Without `x`, Pandas uses the row numbers.
+
+> **Teachers**: notebooks and scripts behave differently. In a Jupyter notebook or Colab the chart appears under the cell on its own, while a script needs `plt.show()` and opens a separate window that can be hidden behind other windows on a busy desktop. Decide which you will use before the lesson, and make sure everyone is using the same one.
+
+---
+
+## Check your understanding
+
 {% quiz %}
 ? Which plot shows how values are distributed across ranges?
 - [ ] Pie chart
 - [x] Histogram
 - [ ] Line plot
 > A histogram groups values into bins and shows how many fall in each.
+
+? In a script (not a notebook), which line makes the chart appear?
+- [ ] `plt.draw_chart()`
+- [x] `plt.show()`
+- [ ] `df.display()`
+> Pandas draws on a Matplotlib figure, and `plt.show()` opens it.
+
+? What does `df.plot(x='day', kind='bar')` do?
+- [ ] Draws a pie chart
+- [x] Draws a bar chart with the `day` column along the bottom
+- [ ] Sorts the table by day
+> `kind` picks the type of chart and `x` picks the column for the horizontal axis.
 {% endquiz %}
 
 ---

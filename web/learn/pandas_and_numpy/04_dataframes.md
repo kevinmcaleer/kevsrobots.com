@@ -10,15 +10,16 @@ next: 05_basics.html
 description: Dive into the world of Data Frames in Pandas, learn how to create, manipulate,
   and extract information from these powerful data structures.
 percent: 32
-duration: 5
-quiz_total: 17
+duration: 7
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
   - section: Overview
     content:
     - name: About this course
-      link: 01_overview.html
+      link: 00_intro.html
   - section: Introduction to Pandas
     content:
     - name: Pandas and NumPy
@@ -53,6 +54,10 @@ navigation:
 
 
 ![Cover photo]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to create a Data Frame from a dictionary, check its shape, and add, change and delete columns.
 
 ## Overview
 
@@ -138,7 +143,7 @@ data = {
 df = pd.DataFrame(data)
 print(df)
 {% endcapture %}
-{% include snakie.html code=snakie_code name="first_dataframe.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="first_dataframe.py" engine="pyodide" packages="numpy,pandas" %}
 
 ---
 
@@ -254,6 +259,33 @@ print(df)
 
 ---
 
+## Try it Yourself
+
+1. Change the playground data to describe three robots: `'Robot'` (SMARS, BurgerBot, Quad), `'Wheels'` (4, 2, 0) and `'Battery'` (64, 87, 92). Print the shape.
+2. Add a `'Charging'` column holding `True` or `False` for each robot, then delete the `'Wheels'` column.
+3. Use `loc` to change Quad's battery to 55, then print `df.iloc[2]` to check.
+4. Challenge: print the first two rows with `df.head(2)`, and explain why `df.tail(2)` shows different rows.
+
+---
+
+## Common Issues
+
+- **Problem**: `ValueError: Length of values (2) does not match length of index (3)` when adding a column.
+- **Solution**: Give the new column exactly one value per row, or a single value like `df['Charging'] = False` to fill every row.
+- **Why**: Pandas lines the new values up with the rows, so the counts must match.
+
+- **Problem**: `KeyError: 'Age'` after running the cell twice.
+- **Solution**: Run the code from the top again, or check a column exists first with `'Age' in df.columns`.
+- **Why**: `del df['Age']` really removes the column, so the second time there is nothing to delete.
+
+- **Problem**: A dictionary with lists of different lengths will not make a Data Frame.
+- **Solution**: Make every list the same length, using `None` for unknown values.
+- **Why**: Each column is the same length because it is a table.
+
+---
+
+## Check your understanding
+
 {% quiz %}
 ? A Data Frame has 10 rows and 4 columns. What does `df.shape` return?
 - [ ] `(4, 10)`
@@ -265,6 +297,12 @@ print(df)
 - [ ] Axis 0
 - [x] Axis 1
 > Axis 0 is the rows (the index) and axis 1 is the columns.
+
+? How do you add a new column called `Salary` to `df`?
+- [ ] `df.add('Salary')`
+- [x] `df['Salary'] = [70000, 80000, 90000]`
+- [ ] `df.Salary.new()`
+> Assigning to a new column name creates it, as long as you supply one value per row.
 {% endquiz %}
 
 ---
