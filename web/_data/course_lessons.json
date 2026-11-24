@@ -3415,14 +3415,13 @@
   {
     "slug": "octapi",
     "name": "OctaPi",
-    "description": "Learn how to use Crack the Enigma code using a Cluster of Raspberry Pis and Python.",
+    "description": "Build a cluster of Raspberry Pis and use Python and dispy to share out the work of cracking an Enigma message. Start with py-enigma on one computer, then scale up.",
     "cover": "assets/octapi.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-02-18",
     "groups": [
-      "octapi",
       "python",
-      "clusters"
+      "raspberrypi"
     ],
     "lessons": [
       {

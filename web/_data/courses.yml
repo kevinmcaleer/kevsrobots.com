@@ -642,17 +642,18 @@
 - author: Kevin McAleer
   cover: /learn/octapi/assets/octapi.jpg
   date_published: 2024-02-18
-  description: Learn how to use Crack the Enigma code using a Cluster of Raspberry
-    Pis and Python.
-  duration: 0h 21m
+  description: Build a cluster of Raspberry Pis and use Python and dispy to share
+    out the work of cracking an Enigma message. Start with py-enigma on one computer,
+    then scale up.
+  duration: 0h 40m
   groups:
-  - octapi
   - python
-  - clusters
+  - raspberrypi
   lessons: 7
   level: intermediate
   link: /learn/octapi/00_intro.html
   name: OctaPi
+  video: cIq2AEbYotA
 - author: Kevin McAleer
   cover: /learn/openclaw_raspberry_pi/assets/openclaw.jpg
   date_published: 2026-01-31
