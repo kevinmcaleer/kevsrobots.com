@@ -55,6 +55,10 @@ navigation:
 
 By the end of this lesson you will be able to explain what FreeCAD and parametric modeling are, and name the main parts of the FreeCAD window.
 
+In this video I design a SMARS robot chassis in FreeCAD. It shows where this course is heading.
+
+{% include youtubeplayer.html id="S7EoZHd03FY" %}
+
 Ahoy there makers! If you want to build robots, you need to design the parts. FreeCAD is a free, open-source way to do exactly that, and in this course we'll learn it step by step.
 
 > **Teachers**: This course suits ages 11 and up, working alone or in pairs. Each lesson takes about 45 to 60 minutes, so plan one lesson per session. Each learner needs a computer that can run FreeCAD and a mouse with a scroll wheel. If installing is not allowed on your machines, ask IT early (see the installing lesson). Without any software, learners can still read the lessons and sketch designs on paper. A 3D printer is only needed for the optional last step of the exporting lesson.

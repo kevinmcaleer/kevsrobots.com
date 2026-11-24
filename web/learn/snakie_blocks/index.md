@@ -13,7 +13,7 @@ course_duration: 1h 6m
 lesson_count: 13
 first_lesson: 00_intro.html
 quiz_total: 36
-video: QVe9meIHZtk
+video: HJYdGICcw0k
 outcomes:
 - Build working MicroPython programs for a Raspberry Pi Pico from blocks
 - Explain what each block writes in Python

@@ -63,6 +63,12 @@ navigation:
 
 ---
 
+Watch this first: a MuJoCo pendulum learns to balance with Stable-Baselines3 and a reward, the same tools this course uses.
+
+{% include youtubeplayer.html id="epuO7xpz6i4" %}
+
+---
+
 ## Overview
 
 In the [Reinforcement Learning for Beginners](/learn/reinforcement_learning/) course you built everything by hand: a `GridWorld` class, a Q-table stored in a plain Python dictionary, an epsilon-greedy action selector and a reward function tuned for the BurgerBot maze. That was the right place to start, because understanding every line of a hand-rolled environment is how the ideas stick.

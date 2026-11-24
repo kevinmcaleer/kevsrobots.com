@@ -11,7 +11,9 @@ date_updated: 2026-11-24
 
 ---
 
-{% include youtubeplayer.html id="QVe9meIHZtk" %}
+{% include youtubeplayer.html id="HJYdGICcw0k" %}
+
+In that video a real robot dodges obstacles using a program made only from blocks. For a tour of the whole app, watch [Meet Snakie](https://www.youtube.com/watch?v=QVe9meIHZtk).
 
 ## Overview
 

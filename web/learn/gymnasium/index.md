@@ -13,6 +13,7 @@ course_duration: 1h 44m
 lesson_count: 15
 first_lesson: 00_intro.html
 quiz_total: 56
+video: epuO7xpz6i4
 outcomes:
 - Use the current Gymnasium API (reset, step with terminated and truncated, spaces,
   seeding) with standard environments

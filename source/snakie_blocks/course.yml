@@ -5,6 +5,7 @@
   level: beginner
   layout: course
   cover: assets/cover.jpg
+  video: HJYdGICcw0k
   groups:
       - micropython
       - pico

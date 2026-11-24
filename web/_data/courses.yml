@@ -309,6 +309,7 @@
   level: beginner
   link: /learn/freecad/00_intro.html
   name: Introduction to FreeCAD for Beginners
+  video: S7EoZHd03FY
 - author: Kevin McAleer
   cover: /learn/freecad_smars/assets/cover.jpg
   date_published: 2025-12-12
@@ -356,6 +357,7 @@
   level: intermediate
   link: /learn/gymnasium/00_intro.html
   name: Reinforcement Learning with Gymnasium
+  video: epuO7xpz6i4
 - author: Kevin McAleer
   cover: /learn/how_to_install_micropython/assets/cover.jpg
   date_published: 2024-08-10
@@ -1034,7 +1036,7 @@
   level: beginner
   link: /learn/snakie_blocks/00_intro.html
   name: Snakie Blocks - From Blocks to Python
-  video: QVe9meIHZtk
+  video: HJYdGICcw0k
 - author: Kevin McAleer
   cover: /learn/snakie_build_urdf/assets/cover.jpg
   date_published: 2026-11-21

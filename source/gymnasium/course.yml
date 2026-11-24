@@ -5,6 +5,7 @@
   level: intermediate
   layout: course
   cover: assets/cover.jpg
+  video: epuO7xpz6i4
   outcomes:
     - Use the current Gymnasium API (reset, step with terminated and truncated, spaces, seeding) with standard environments
     - Explain why terminated and truncated are separate and use each correctly in a Q-learning update

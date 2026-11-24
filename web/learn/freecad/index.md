@@ -12,6 +12,7 @@ course_duration: 0h 43m
 lesson_count: 11
 first_lesson: 00_intro.html
 quiz_total: 33
+video: S7EoZHd03FY
 outcomes:
 - Find your way around the FreeCAD interface and move around a 3D model
 - Build simple models from Part primitives such as boxes, cylinders, spheres and cones

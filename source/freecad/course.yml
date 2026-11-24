@@ -5,6 +5,7 @@
   level: beginner
   layout: course
   cover: assets/cover.png
+  video: S7EoZHd03FY
   outcomes:
     - Find your way around the FreeCAD interface and move around a 3D model
     - Build simple models from Part primitives such as boxes, cylinders, spheres and cones
