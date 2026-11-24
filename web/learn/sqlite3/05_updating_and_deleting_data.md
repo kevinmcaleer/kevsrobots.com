@@ -9,8 +9,9 @@ previous: 04.inserting_and_retrieving_data.html
 next: 06_querying_and_joining_tables.html
 description: 'Module 5 focuses on modifying data in SQLite tables. '
 percent: 30
-duration: 4
-quiz_total: 24
+duration: 6
+quiz_total: 60
+date_updated: 2026-11-24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -67,6 +68,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to change and remove rows safely with `UPDATE` and `DELETE`, and use foreign keys with `ON DELETE CASCADE`.
+
 Module 5 focuses on modifying data in SQLite tables. You will learn how to update existing records and delete data from tables using SQL statements.
 
 ### Updating Data
@@ -79,7 +82,7 @@ with connection:
     connection.execute("UPDATE books SET title = ? WHERE id = ?", ("New Title", 1))
 ```
 
-In this example, we update the title of a book with an ID of 1 in the "books" table.
+In this example, we update the title of a book with an ID of 1 in the "books" table. The cursor that `execute()` returns has a `rowcount`, which tells you how many rows were changed, so `cursor.rowcount` of `0` means your `WHERE` matched nothing.
 
 ### Deleting Data
 
@@ -114,6 +117,20 @@ In this example, we perform a batch update on the "books" table, updating the ti
 
 SQLite supports referential integrity, which means that you can define relationships between tables using foreign keys. When a record in a parent table is deleted, you can specify the desired behavior for associated records in child tables.
 
+```mermaid
+erDiagram
+    ARTISTS ||--o{ ALBUMS : "has"
+    ARTISTS {
+        int id PK
+        text name
+    }
+    ALBUMS {
+        int id PK
+        text title
+        int artist_id FK
+    }
+```
+
 SQLite only enforces foreign keys when you switch them on, once per connection:
 
 ```python
@@ -143,7 +160,32 @@ In this example, we create two tables: "artists" and "albums." The "albums" tabl
 
 By understanding how to update and delete data, as well as handle cascading deletes and referential integrity, you will have the tools to effectively modify and manage data in SQLite tables.
 
+## Try it Yourself
+
+1. Update the year of one book and use `rowcount` to confirm that exactly one row changed.
+2. Before running a `DELETE`, run the same `WHERE` as a `SELECT` and read the rows it would remove. Then delete them.
+3. Create the `artists` and `albums` tables, switch on `PRAGMA foreign_keys = ON`, add an artist with two albums, delete the artist and count the albums.
+4. Challenge: comment out the `PRAGMA` line and repeat. What changes, and why?
+
+## Common Issues
+
+- **Problem**: Every row in the table has changed or vanished.
+- **Solution**: You left off the `WHERE`. Restore from a backup (see lesson 10) and always test the `WHERE` with a `SELECT` first.
+- **Why**: Without `WHERE`, `UPDATE` and `DELETE` apply to the whole table.
+
+- **Problem**: The albums are still there after you delete their artist.
+- **Solution**: Run `PRAGMA foreign_keys = ON` on every new connection, before you create or delete anything.
+- **Why**: Foreign keys are off by default in SQLite and the setting isn't saved in the file.
+
+- **Problem**: `sqlite3.IntegrityError: FOREIGN KEY constraint failed` when adding an album.
+- **Solution**: Add the artist first, or use the right `artist_id`.
+- **Why**: With foreign keys on, an album must point at an artist that exists.
+
+> **Teachers**: `DELETE` and `UPDATE` without a `WHERE` on a shared database file removes everyone's work at once. Have each learner work on their own copy of the `.db` file, and show them the backup method from lesson 10 before this lesson's exercises.
+
 ---
+
+## Check your understanding
 
 {% quiz %}
 ? What does `DELETE FROM books` (with no WHERE) do?
@@ -157,6 +199,12 @@ By understanding how to update and delete data, as well as handle cascading dele
 - [ ] SQLite doesn't support foreign keys
 - [ ] It only works on tables with fewer than 100 rows
 > SQLite checks foreign keys only when they're switched on for the connection.
+
+? How can you check how many rows an `UPDATE` changed?
+- [ ] `connection.count()`
+- [x] Read `cursor.rowcount` from the cursor that `execute()` returned
+- [ ] Call `fetchall()` on the update
+> A `rowcount` of 0 usually means the `WHERE` matched nothing.
 {% endquiz %}
 
 ---

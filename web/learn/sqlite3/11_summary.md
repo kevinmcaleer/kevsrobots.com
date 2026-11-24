@@ -10,8 +10,9 @@ next: 13_1nf.html
 description: Throughout this course, you have gained a solid foundation in working
   with databases using Python and SQLite3
 percent: 60
-duration: 3
-quiz_total: 24
+duration: 5
+quiz_total: 60
+date_updated: 2026-11-24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -68,6 +69,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to recall the main ideas of the course and choose a project to practise them on.
+
 Congratulations! You have completed the `Create Databases with Python and SQLite3` course. Throughout this course, you have gained a solid foundation in working with databases using Python and SQLite3. Let's summarize what we have covered:
 
 ### Module 1: Introduction to Databases
@@ -115,7 +118,7 @@ Congratulations! You have completed the `Create Databases with Python and SQLite
 ### Module 8: Database Transactions and Error Handling
 
 - Understanding database transactions and ACID properties
-- Working with transactions: beginning, committing, rolling back
+- Working with transactions: committing, rolling back and the `with` block
 - Catching and handling SQLite errors
 
 ### Module 9: Working with Indexes and Performance Optimization
@@ -155,5 +158,45 @@ Best of luck with your future endeavors in database development!
 - [Getting Started with SQL](/learn/sql/) - more practice with the SQL language
 - [Using Redis with Python](/learn/redis/) - a super-fast in-memory data store for caching and messaging
 - [Data Manipulation with Pandas and Numpy](/learn/pandas_and_numpy/) - analyse your data. `pandas.read_sql()` can load a query straight into a DataFrame
+
+---
+
+## Try it Yourself
+
+Pick one project and build it with everything you've learned:
+
+1. A parts inventory for your robot box: a `parts` table with constraints, a script to add parts with `?` placeholders, and a query for parts running low.
+2. A sensor log: a table with a timestamp and a reading, a function that inserts a reading, and a query for the average of the last 10 readings.
+3. A library with authors, genres and books, and a view that joins them.
+4. Challenge: add an index, time a query before and after, and write a `backup()` script that you run each time you finish.
+
+## Common Issues
+
+- **Problem**: Your project works once, then fails the second time you run it.
+- **Solution**: Use `CREATE TABLE IF NOT EXISTS`, and think about what should happen to rows that are already there (`INSERT OR IGNORE`, or a `UNIQUE` column).
+- **Why**: A database file keeps its data between runs, unlike the variables in your program.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which two habits protect you from lost changes and from SQL injection?
+- [x] Committing (or using `with connection:`) and passing values with `?` placeholders
+- [ ] Closing the connection and using f-strings
+- [ ] Adding an index and running `ANALYZE`
+> Placeholders keep data out of the SQL text, and committing saves the changes.
+
+? When would you reach for `connection.backup()`?
+- [x] To copy a database safely while a program is using it
+- [ ] To speed up a query
+- [ ] To encrypt the file
+> It takes a consistent copy even while the database is in use.
+
+? Which course would you take to practise SQL further?
+- [ ] Getting Started with Python
+- [x] Getting Started with SQL
+> The next steps below link to it.
+{% endquiz %}
 
 ---

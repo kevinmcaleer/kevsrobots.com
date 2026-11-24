@@ -2,16 +2,32 @@
 title: Advanced SQL Queries
 description: Module 7 delves into advanced SQL queries in SQLite
 layout: lesson
+type: page
 cover: /learn/sqlite3/assets/banners/07_advanced_queries.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to summarise data with `GROUP BY` and `HAVING`, and use subqueries, views, CTEs and window functions.
+
 Module 7 delves into advanced SQL queries in SQLite. You will learn about aggregating data, using grouping and filtering conditions, and working with subqueries and nested queries.
 
 The examples use the `library.db` tables from the previous module.
+
+SQL doesn't run a query in the order you write it. This is the order SQLite works in, and it explains why `WHERE` can't see totals but `HAVING` can:
+
+```mermaid
+flowchart LR
+    A["FROM / JOIN"] --> B["WHERE"]
+    B --> C["GROUP BY"]
+    C --> D["HAVING"]
+    D --> E["SELECT"]
+    E --> F["ORDER BY"]
+    F --> G["LIMIT"]
+```
 
 ### Aggregating Data with GROUP BY
 
@@ -30,7 +46,7 @@ result = connection.execute(query)
 data = result.fetchall()
 ```
 
-In this example, we group books based on their genre and use the `COUNT()` function to count the number of books in each genre.
+In this example, we group books based on their genre and use the `COUNT()` function to count the number of books in each genre. With our sample data it returns `[(1, 3), (2, 1)]`: three science fiction books and one non-fiction.
 
 ### Filtering Grouped Data with HAVING
 
@@ -68,7 +84,7 @@ result = connection.execute(query)
 data = result.fetchall()
 ```
 
-In this example, we calculate the average, maximum, and minimum prices of books using the `AVG()`, `MAX()`, and `MIN()` functions.
+In this example, we calculate the average, maximum, and minimum prices of books using the `AVG()`, `MAX()`, and `MIN()` functions. For our four books that gives `[(9.49, 12.99, 5.99)]`.
 
 ### Subqueries and Nested Queries
 
@@ -143,7 +159,32 @@ Unlike `GROUP BY`, a window function keeps every row and adds the calculated val
 
 By mastering advanced SQL queries and techniques, you will have the skills to perform complex data analysis and manipulation within SQLite databases.
 
+## Try it Yourself
+
+All of these use the `library.db` tables.
+
+1. Count how many books each author has written with `GROUP BY author_id`.
+2. Show only the authors with more than one book using `HAVING`.
+3. List the books that cost less than the average price, using a subquery.
+4. Challenge: use `ROW_NUMBER() OVER (ORDER BY year)` to number the books from oldest to newest.
+
+## Common Issues
+
+- **Problem**: `sqlite3.OperationalError: misuse of aggregate function COUNT()`.
+- **Solution**: Move the condition from `WHERE` to `HAVING`.
+- **Why**: `WHERE` runs before the groups exist, so it can't see `COUNT(*)`.
+
+- **Problem**: A syntax error near `(` when you use `RANK() OVER (...)`.
+- **Solution**: Check `sqlite3.sqlite_version`. Window functions need SQLite 3.25 (2018) or newer.
+- **Why**: Older SQLite versions don't know the `OVER` syntax.
+
+- **Problem**: `CREATE VIEW` says the view already exists.
+- **Solution**: Write `CREATE VIEW IF NOT EXISTS`, or `DROP VIEW` first.
+- **Why**: The view is saved in the database file, so it's still there on the next run.
+
 ---
+
+## Check your understanding
 
 {% quiz %}
 ? What's the difference between `WHERE` and `HAVING`?
@@ -157,6 +198,17 @@ By mastering advanced SQL queries and techniques, you will have the skills to pe
 - [x] `RANK() OVER (ORDER BY price DESC)`
 - [ ] `MAX(price)`
 > Window functions keep every row and add the calculated value.
+
+? A `WHERE` clause can't use `COUNT(*)`. Why?
+- [ ] `COUNT` is not allowed in SQLite
+- [x] `WHERE` filters rows before groups are made, so the count doesn't exist yet
+- [ ] `WHERE` only works on numbers
+> Use `HAVING` to filter on aggregates.
+
+? What does a view store?
+- [ ] A copy of the data
+- [x] A saved query that behaves like a virtual table
+> Each time you query the view, SQLite runs the saved `SELECT`.
 {% endquiz %}
 
 ---

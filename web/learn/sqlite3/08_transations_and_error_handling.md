@@ -10,8 +10,9 @@ next: 09_indexes_and_performance.html
 description: Module 8 covers the important topics of database transactions and error
   handling in SQLite
 percent: 45
-duration: 4
-quiz_total: 24
+duration: 7
+quiz_total: 60
+date_updated: 2026-11-24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -68,6 +69,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to make a group of changes all-or-nothing with transactions, and catch SQLite errors in Python.
+
 Module 8 covers the important topics of database transactions and error handling in SQLite. You will learn how to work with transactions to ensure data integrity and handle errors effectively in your Python code.
 
 ### Understanding Database Transactions
@@ -86,6 +89,15 @@ Transactions in databases follow the ACID properties:
 - **Durability**: Once a transaction is committed, its changes are permanent and survive any subsequent system failures.
 
 ---
+
+```mermaid
+flowchart TD
+    A["INSERT / UPDATE / DELETE"] --> B["Transaction starts automatically"]
+    B --> C["More changes"]
+    C --> D{"Did everything work?"}
+    D -->|yes| E["commit(): saved to the file"]
+    D -->|no| F["rollback(): all changes undone"]
+```
 
 ### How Python's sqlite3 handles transactions
 
@@ -132,7 +144,7 @@ transfer(connection, 'bob', 'alice', 500)
 print(connection.execute("SELECT * FROM accounts").fetchall())
 ```
 
-Bob doesn't have 500, so the second `UPDATE` breaks the `CHECK (balance >= 0)` constraint. The `with` block rolls back, and Alice doesn't get money that never left Bob's account.
+Bob doesn't have 500, so the second `UPDATE` breaks the `CHECK (balance >= 0)` constraint. The `with` block rolls back, and Alice doesn't get money that never left Bob's account. This prints `Transfer cancelled: not enough money`, and the balances stay as they were. Try `transfer(connection, 'bob', 'alice', 20)` and it prints `Transfer complete`.
 
 ---
 
@@ -145,7 +157,7 @@ Exception | When it happens
 `sqlite3.IntegrityError` | A constraint is broken, such as `UNIQUE`, `NOT NULL`, `CHECK` or a foreign key
 `sqlite3.OperationalError` | Something's wrong with the query or the database, such as a missing table or a locked file
 `sqlite3.Error` | The parent of all of them, so catching it catches every SQLite error
-{:class="table table-striped"}
+{:class="table table-single"}
 
 ```python
 try:
@@ -166,7 +178,36 @@ The `finally` block makes sure the connection is closed whatever happens.
 
 By understanding database transactions and error handling in SQLite, you will have the knowledge to manage data changes effectively, maintain data integrity, and handle errors in your Python code.
 
+## Try it Yourself
+
+1. Run the bank example, then call `transfer()` with an amount Bob can afford, and print both balances.
+2. Make a transfer fail on purpose, and check that Alice's balance did not change.
+3. Add a `log` table and insert a row into it inside the same `with` block as the transfer. Cancel a transfer and check the log row was rolled back too.
+4. Challenge: catch `sqlite3.IntegrityError` for a failed transfer and `sqlite3.OperationalError` for a missing table, with a different message for each.
+
+## Common Issues
+
+- **Problem**: Your changes are missing from the file after the program ends.
+- **Solution**: Call `commit()`, or wrap the changes in `with connection:`.
+- **Why**: Until you commit, the changes live in an open transaction.
+
+- **Problem**: `sqlite3.OperationalError: cannot start a transaction within a transaction`.
+- **Solution**: Remove your own `execute("BEGIN")` and let the module manage transactions.
+- **Why**: The module has already started one for you as soon as you ran an `UPDATE`.
+
+- **Problem**: `sqlite3.OperationalError: database is locked`.
+- **Solution**: Commit or close the other connection that has unsaved changes, then try again.
+- **Why**: Only one connection can write at a time, and an open transaction holds the lock.
+
+- **Problem**: `sqlite3.ProgrammingError: Cannot operate on a closed database.`
+- **Solution**: Don't use a connection after `close()`. Open a new one.
+- **Why**: A closed connection can't run any more SQL.
+
+> **Teachers**: SQLite on a network drive or a synced folder (a school share, a cloud-synced folder) can give `database is locked` errors when several learners open the same file. Keep each learner's `.db` file on the local disk of their own machine.
+
 ---
+
+## Check your understanding
 
 {% quiz %}
 ? What does a `with connection:` block do if an error happens inside it?
@@ -180,6 +221,18 @@ By understanding database transactions and error handling in SQLite, you will ha
 - [ ] `sqlite3.OperationalError`
 - [ ] `ValueError`
 > Integrity errors are about the data breaking the rules you set on the table.
+
+? In the bank example, the transfer fails halfway. What state is the database in?
+- [ ] Alice has the money and Bob still has it too
+- [x] Unchanged, because the `with` block rolled everything back
+- [ ] Half the transfer is saved
+> That's atomicity: all of the changes happen, or none of them do.
+
+? Why should you avoid running `BEGIN` yourself with Python's `sqlite3`?
+- [x] The module already starts transactions for you, so it can fail with "cannot start a transaction within a transaction"
+- [ ] `BEGIN` isn't valid SQL
+- [ ] It deletes the data
+> Use `commit()`, `rollback()` or a `with` block instead.
 {% endquiz %}
 
 ---
