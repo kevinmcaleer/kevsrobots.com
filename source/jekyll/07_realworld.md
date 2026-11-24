@@ -1,98 +1,177 @@
 ---
 title: Real-World Applications of Jekyll
-description: Explore how Jekyll can be used to build various types of websites such as blogs, portfolios, and small business websites.
+description: Use collections, front matter defaults and a custom layout to add a projects portfolio to Maker's Log.
 layout: lesson
 type: page
 cover: /learn/jekyll/assets/banners/07_realworld.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Introduction
-
-Jekyll isn't just for personal blogs; it's a versatile tool that can be used for a wide range of web projects. In this lesson, we'll explore how Jekyll can be adapted for different types of websites.
+By the end of this lesson you will be able to create a collection, give it a layout with front matter defaults, and list its items on an index page.
 
 ---
 
-## Part 1: Blogging with Jekyll
+## One tool, three kinds of site
 
-Jekyll is a popular choice for bloggers due to its simplicity and ease of content management.
+Jekyll's three main building blocks cover most small sites. Which one you reach for depends on what you are showing.
 
+```mermaid
+flowchart TD
+    J["Jekyll site"] --> B["Blog: dated posts in _posts"]
+    J --> P["Portfolio: a collection such as _projects"]
+    J --> D["Club or business site: pages plus data files"]
+    B --> E1["Build log entries"]
+    P --> E2["One page per robot"]
+    D --> E3["Parts list, events, prices"]
+```
+
+We already have the blog (lesson 3) and a data-driven page (the parts list). Now let's add a portfolio of robots using a **collection**: a group of related documents that are not dated posts.
+
+## Build a projects collection
+
+**Step 1: declare it** in `_config.yml`. `output: true` tells Jekyll to make a page for each item, and `permalink` sets the address:
+
+```yaml
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: "projects"
+    values:
+      layout: project
+```
+
+The `defaults` block gives every item in the collection `layout: project` automatically, so you never have to repeat it in front matter.
+
+**Step 2: write the layout**, `_layouts/project.html`. It sits inside our `default` layout and shows a status from front matter, falling back to `idea` if none is set:
+
+{% raw %}
+```html
 ---
-
-### Setting Up a Blog
-
-- Utilize Jekyll’s built-in support for blog structures.
-- Create posts in the `_posts` directory.
-- Use front matter to manage post metadata like dates and categories.
-
+layout: default
 ---
+<h1>{{ page.title }}</h1>
+<p><strong>Status:</strong> {{ page.status | default: "idea" }}</p>
+{{ content }}
+```
+{% endraw %}
 
-### Customizing the Blog Layout
+**Step 3: add items** in a folder named after the collection, with an underscore: `_projects/smars.md` and `_projects/line-follower.md`.
 
-- Choose or customize a theme that suits your blogging style.
-- Use layouts and includes to design your blog’s appearance.
-
+```markdown
 ---
-
-## Part 2: Creating a Portfolio Site
-
-A portfolio site showcases your work and is crucial for artists, designers, and developers.
-
+title: SMARS tracked robot
+status: building
 ---
+A small 3D printed tracked robot with a Pico brain.
+```
 
-### Building a Portfolio
+The second one only has a `title` and a one-line description, so its status will show as `idea`.
 
-- Organize your work in a clear and visually appealing 
-way.
-- Use Jekyll collections to manage your portfolio items.
+**Step 4: list them** on a page, `projects.html`:
 
+{% raw %}
+```html
 ---
-
-### Integrating Media
-
-- How to include images, videos, and other media types in your portfolio.
-- Optimizing media for web performance.
-
+layout: default
+title: Projects
+permalink: /projects/
 ---
+<h1>Projects</h1>
+<ul>
+{% for project in site.projects %}
+  <li><a href="{{ project.url | relative_url }}">{{ project.title }}</a> ({{ project.status | default: "idea" }})</li>
+{% endfor %}
+</ul>
+```
+{% endraw %}
 
-## Part 3: Building a Small Business Website
+`site.projects` holds every document in the collection. When we built this, the output included `_site/projects/index.html`, `_site/projects/smars/index.html` and `_site/projects/line-follower/index.html`.
 
-Jekyll can also be used for small business websites, offering a simple way to manage and update content.
+## Filtering posts on a page
 
+You can also pick posts out of the blog. This page, `log.html`, shows only posts in the `robots` category, with a one-line excerpt and every tag in the site:
+
+{% raw %}
+```html
 ---
-
-### Creating Service Pages
-
-- Structure your site to highlight your services or products.
-- Use Jekyll data files to manage service information.
-
+layout: default
+title: Build log
+permalink: /log/
 ---
+<h1>Build log</h1>
+{% assign robot_posts = site.posts | where: "categories", "robots" %}
+{% for post in robot_posts %}
+<h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+<p>{{ post.date | date: "%-d %B %Y" }}: {{ post.excerpt | strip_html | strip }}</p>
+{% else %}
+<p>No posts yet.</p>
+{% endfor %}
 
-### Contact Forms and Local SEO
+<h2>Tags</h2>
+<ul>
+{% for tag in site.tags %}
+  <li>{{ tag[0] }} ({{ tag[1].size }})</li>
+{% endfor %}
+</ul>
+```
+{% endraw %}
 
-- Integrate contact forms using third-party services like Formspree.
-- Implement local SEO best practices to target your business location.
+The `where` filter keeps posts whose categories include `robots`. The `else` branch inside a `for` loop runs when the list is empty. The excerpt is the first paragraph of each post by default. Our build printed "24 November 2026: Today I printed the chassis for my first SMARS robot." and the tags `smars (1)` and `3d-printing (1)`.
 
----
+## A word about forms
 
-## Conclusion
+A static site has no server code, so it cannot receive a submitted contact form by itself. If you need one, you point the form at a separate form-handling service, or simply publish an email address. Keep this in mind before promising a "contact us" box on a business site.
 
-Jekyll's flexibility makes it an excellent choice for a variety of web projects, from personal blogs to professional portfolios and business websites.
+> **Teachers**: this makes a good small assessed project: each learner or group builds a three-page portfolio of their own robot builds. Agree beforehand what is allowed on a public page. Photos of people, full names and anything identifying a school should be left out. Group work is easier if one person owns the repository and others submit changes through Git.
 
----
+## Try it Yourself
 
-## Additional Resources
+1. Add a third project file and check it appears on the Projects page without touching `projects.html`.
+2. Give one project a `status: finished` and one `status: building`. Change the list to show finished robots first, or only finished ones, with an `if`.
+3. Add a link to Projects in your `nav.html` include.
+4. Challenge: create a second collection called `parts`, with one page per part, and link each part in your parts list.
 
-- [Jekyll Themes](https://jekyllthemes.org/)
-- [Formspree for Contact Forms](https://formspree.io/)
+## Common Issues
 
----
+- **Problem**: A collection item gives a 404.
+- **Solution**: Check `output: true` is set, the folder name starts with an underscore, and you restarted the server after editing `_config.yml`.
+- **Why**: Without `output: true`, Jekyll reads the files but never writes pages for them.
 
-## Assignment
+- **Problem**: `site.projects` is empty.
+- **Solution**: The folder must be named exactly `_projects`, matching the collection name in the config.
+- **Why**: Jekyll finds a collection's documents through its name.
 
-Choose an application – a blog, portfolio, or business site. Start building it using Jekyll, focusing on the specific needs of your chosen application.
+- **Problem**: Items have no layout and display as bare text.
+- **Solution**: Check the `defaults` block: `type` must match the collection name and be indented correctly.
+- **Why**: The defaults only apply to files that fit the scope.
 
----
+## Check your understanding
+
+{% quiz %}
+? What does `output: true` do for a collection?
+- [ ] Hides the collection from the site
+- [x] Makes Jekyll write a page for each item
+- [ ] Sorts the items by date
+> Without it, the documents exist in `site.projects` but have no pages of their own.
+
+? Why use front matter `defaults` for a collection?
+- [x] So every item gets the same layout without repeating it
+- [ ] To speed up the build
+- [ ] To change the file names
+> One default saves writing the layout line in every file.
+
+? Why can't a static site handle a contact form by itself?
+- [ ] Static sites cannot contain HTML forms
+- [x] There is no server code to receive the submitted data
+- [ ] Forms are only allowed in posts
+> A form needs something to receive it, so you use an outside service or publish an email address.
+{% endquiz %}

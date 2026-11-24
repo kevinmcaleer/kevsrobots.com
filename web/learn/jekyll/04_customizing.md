@@ -7,17 +7,19 @@ cover: /learn/jekyll/assets/banners/04_customizing.jpg
 date: 2024-01-24
 previous: 03_content.html
 next: 05_advanced.html
-description: Learn how to personalize your Jekyll site with themes, custom CSS/HTML,
-  and JavaScript.
+description: Configure the site, write your own layout and include, add CSS and JavaScript,
+  and override a theme.
 percent: 48
-duration: 3
+duration: 6
+quiz_total: 24
+date_updated: 2026-11-24
 navigation:
 - name: Building Websites with Jekyll
 - content:
   - section: Introduction to Jekyll and Static Sites
     content:
     - name: Overview
-      link: 01_intro.html
+      link: 00_intro.html
     - name: Installation and Setup
       link: 02_install.html
     - name: Content Management in Jekyll
@@ -32,10 +34,10 @@ navigation:
       link: 06_deploy.html
     - name: Real-World Applications of Jekyll
       link: 07_realworld.html
-  - section: Bonus
+  - section: Summary
     content:
-    - name: Advanced Tips and Productivity Hacks for Jekyll
-      link: 08_bonus.html
+    - name: Summary, Tips and Where Next
+      link: 08_summary.html
 ---
 
 
@@ -43,99 +45,148 @@ navigation:
 
 ---
 
-## Introduction
-
-Welcome to Lesson 4. In this lesson, we'll explore the various ways you can customize your Jekyll site to make it truly your own. We'll look at themes, layouts, and how to add custom CSS and JavaScript for more personalized functionality.
+By the end of this lesson you will be able to set site-wide options in `_config.yml`, write your own layout and include, and link a stylesheet and a script from them.
 
 ---
 
-## Part 1: Themes and Layouts
+## Settings: _config.yml
 
-Jekyll themes provide a quick way to style your site. But, they are also fully customizable.
+`_config.yml` is where site-wide facts live. Anything in it is available to every page as `site.<name>`. Replace the generated file with this smaller one:
 
----
+```yaml
+title: Maker's Log
+description: >-
+  A build log for my robots: what worked, what melted.
+baseurl: ""
+url: "https://example.com"
 
-### Choosing and Applying a Theme
+theme: minima
+plugins:
+  - jekyll-feed
+```
 
-- You can find themes on sites like [jekyllthemes.org](https://jekyllthemes.org/).
-- To apply a theme, modify the `theme` setting in your `_config.yml` file.
+`title` and `description` are yours to use in templates. `url` is your domain, and `baseurl` is a sub-folder if your site lives in one (we need that in lesson 6). The `theme` line chooses the look. `minima` is the default theme that `jekyll new` installs from the Gemfile. Remember to stop and restart `jekyll serve` after editing this file.
 
-> ## _config.yml
->
-> The `_config.yml` file is the main configuration file for your Jekyll site. It contains settings like the site's title, description, and theme. It's written in YAML, a human-readable data serialization language.
->
-> Here is an example `_config.yml` file:
->
-> ```yaml
-> title: My Jekyll Site
-> description: A site about Jekyll
-> theme: jekyll-theme-minimal
->```
+## Where Jekyll looks for a layout
 
----
+A **layout** is an HTML template with a `{% raw %}{{ content }}{% endraw %}` placeholder where each page's body goes. A theme ships with its own layouts, but Jekyll always checks **your** site first. That is how you override a theme without touching its files.
 
-### Customizing Layouts
+```mermaid
+flowchart TD
+    P["Page says: layout: page"] --> A{"Is there _layouts/page.html in your site?"}
+    A -->|Yes| Y["Use your file"]
+    A -->|No| T["Use the theme's file"]
+    Y --> D["Page layout wraps its content in layout: default"]
+    T --> D
+    D --> O["Final HTML"]
+```
 
-- Layouts define the structure of your pages.
-- Found in the `_layouts` directory, you can edit them to change how pages and posts are structured.
+Let's use that. We'll write our own `default.html`, the outer shell that every other layout is wrapped in.
 
----
+## Your own layout
 
-## Part 2: Customizing CSS and HTML
+Create `_layouts/default.html`:
 
-Jekyll allows you to alter the CSS and HTML for finer control over your site’s appearance.
+{% raw %}
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/robot.css' | relative_url }}">
+</head>
+<body>
+  {% include nav.html %}
+  <main>
+    {{ content }}
+  </main>
+  <footer>Built with Jekyll on {{ site.time | date: "%d %B %Y" }}</footer>
+</body>
+</html>
+```
+{% endraw %}
 
----
+There are four Liquid ideas in there. `page.title` is the page's own front matter. `site.title` comes from `_config.yml`. `site.time` is when the build ran, and the `date` filter formats it. `relative_url` adds the `baseurl` to a path, so links keep working if the site moves into a sub-folder.
 
-### Modifying CSS
+## An include
 
-- CSS files are usually found in the `assets/css` directory.
-- You can add your own styles or override existing ones to change the look and feel of your site.
+The navigation will be the same on every page, so we put it in one place. Create `_includes/nav.html`:
 
----
+{% raw %}
+```html
+<nav>
+  <a href="{{ '/' | relative_url }}">Home</a>
+  <a href="{{ '/parts/' | relative_url }}">Parts</a>
+  <a href="{{ '/about/' | relative_url }}">About</a>
+</nav>
+```
+{% endraw %}
 
-### Changing HTML Templates
+The `{% raw %}{% include nav.html %}{% endraw %}` line in the layout pulls it in. Now one edit changes the menu everywhere.
 
-- HTML templates are located in the `_layouts` and `_includes` directories.
-- By modifying these files, you can change the structure of your site's pages.
+## CSS and JavaScript
 
----
+A file with no front matter is copied to `_site` exactly as it is, so a stylesheet is just a file. Create `assets/css/robot.css`:
 
-## Part 3: Adding JavaScript and Interactive Elements
+```css
+body { font-family: sans-serif; max-width: 40rem; margin: 0 auto; padding: 1rem; }
+nav a { margin-right: 1rem; color: #d6336c; }
+footer { margin-top: 2rem; color: #666; font-size: 0.8rem; }
+```
 
-Enhance your site's interactivity and functionality with JavaScript.
+JavaScript works the same way: put a file such as `assets/js/site.js` in the folder and link it from the layout with a `<script src="{% raw %}{{ '/assets/js/site.js' | relative_url }}{% endraw %}"></script>` tag before `</body>`.
 
----
+We built this exactly. After the build, `_site/about/index.html` started with our own `<head>`, then the nav links `/`, `/parts/` and `/about/`, then the minima `page` layout's article, and finally the footer. The about page still used `layout: page` from the theme, and our `default.html` wrapped it, because local files win over the theme.
 
-### Integrating JavaScript
+On this site, kevsrobots.com, the same idea is used at a bigger scale: `web/_layouts/default.html` holds the shared page shell, and it pulls in pieces from `web/_includes/` such as the top bar, navigation and footer.
 
-- Add custom JavaScript files in the `assets/js` directory.
-- Include them in your site's HTML templates for global use.
+> **Teachers**: learners can easily break a layout and then see every page broken at once, which is a great, safe lesson in why layouts matter. Ask them to commit working versions with Git (see the [Git course](/learn/git/)) so they can roll back. Remind them that colours and fonts should stay readable, including for classmates with colour-vision differences.
 
----
+## Try it Yourself
 
-### Adding Interactive Elements
+1. Change the nav link colour in `robot.css`, save, and refresh. Do you need to restart the server?
+2. Add a link to Projects in `nav.html`. Where does it appear?
+3. Add `<p>Built by YOUR NAME</p>` to the footer in the layout, then check two different pages.
+4. Challenge: create `_includes/footer.html`, move the footer markup into it and replace it in the layout with an include tag.
 
-- Examples include contact forms, image sliders, or dynamic content loading.
-- Ensure you test these elements for performance and compatibility.
+## Common Issues
 
----
+- **Problem**: Your CSS changes do nothing.
+- **Solution**: Hard refresh the browser (Ctrl+Shift+R) and check the stylesheet path in the page source.
+- **Why**: Browsers cache stylesheets, and a wrong path means the file never loads.
 
-## Conclusion
+- **Problem**: The page shows an include error such as a missing file.
+- **Solution**: Check the file is in `_includes/` and the name in the tag matches exactly.
+- **Why**: Jekyll only looks for includes in the `_includes` folder.
 
-You now have the tools to customize your Jekyll site, making it not only functional but also unique in design and interactivity.
+- **Problem**: Your edit to `_config.yml` has no effect.
+- **Solution**: Stop the server with Ctrl+C and run `bundle exec jekyll serve` again.
+- **Why**: The configuration is read once when the server starts.
 
----
+- **Problem**: Links and the stylesheet break when the site is published in a sub-folder.
+- **Solution**: Wrap paths in the `relative_url` filter, as the examples above do.
+- **Why**: A path starting with `/` points at the root of the domain, not the folder your site lives in.
 
-## Additional Resources
+## Check your understanding
 
-- [Jekyll Themes](https://jekyllthemes.org/)
-- [W3Schools for HTML/CSS](https://www.w3schools.com/)
+{% quiz %}
+? You create `_layouts/default.html` while using the minima theme. Which file does Jekyll use?
+- [ ] The theme's, always
+- [x] Yours, because local files take priority over the theme's
+- [ ] Both, merged together
+> Jekyll checks your site's folders before the theme's.
 
----
+? What does the content placeholder do in a layout?
+- [ ] It names the page
+- [x] It marks where each page's body is inserted
+- [ ] It loads the stylesheet
+> The layout is a shell, and each page's rendered body fills the content slot.
 
-## Assignment
-
-Customize the theme of your Jekyll site. Try modifying the CSS to change the color scheme and add a simple JavaScript function, like a dynamic date display.
-
----
+? Why use the `relative_url` filter on links?
+- [x] So links keep working if the site is hosted under a sub-folder
+- [ ] To make links open in a new tab
+- [ ] To make pages load faster
+> It adds the `baseurl` to the path.
+{% endquiz %}

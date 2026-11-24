@@ -1932,19 +1932,18 @@
   {
     "slug": "jekyll",
     "name": "Building Websites with Jekyll",
-    "description": "Learn how to build static websites using Jekyll, from basic setup to advanced features.",
+    "description": "Learn how to build static websites using Jekyll, from basic setup to advanced features. Along the way you build Maker's Log, a robot build-log site with posts, a parts list, your own layouts, plugins and a projects portfolio, then publish it on GitHub Pages.",
     "cover": "assets/jekyll.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-01-24",
     "groups": [
-      "jekyll",
-      "website development"
+      "productivity"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction to Jekyll and Static Sites",
-        "url": "/learn/jekyll/01_intro.html"
+        "url": "/learn/jekyll/00_intro.html"
       },
       {
         "file": "02_install.md",
@@ -1977,9 +1976,9 @@
         "url": "/learn/jekyll/07_realworld.html"
       },
       {
-        "file": "08_bonus.md",
-        "section": "Bonus",
-        "url": "/learn/jekyll/08_bonus.html"
+        "file": "08_summary.md",
+        "section": "Summary",
+        "url": "/learn/jekyll/08_summary.html"
       }
     ]
   },

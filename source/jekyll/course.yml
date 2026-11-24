@@ -6,15 +6,31 @@
   layout: course
   cover: assets/jekyll.jpg
   groups:
-    - jekyll
-    - website development
+    - productivity
   description: >-
     Learn how to build static websites using Jekyll, from basic setup to advanced features.
+    Along the way you build Maker's Log, a robot build-log site with posts, a parts list, your own
+    layouts, plugins and a projects portfolio, then publish it on GitHub Pages.
+  outcomes:
+    - Install Ruby, Bundler and Jekyll, then create and preview a site locally
+    - Write posts and pages with front matter, and show data files with Liquid loops
+    - Build your own layouts and includes, and override a theme
+    - Add the feed, SEO and sitemap plugins and check what they produce
+    - Create a collection and list its items on a portfolio page
+    - Build for production and publish the site on GitHub Pages with the right baseurl
+  prerequisites:
+    - Mastering Markdown for Documentation with Jekyll
+    - Helpful but not required, Git for Beginners
+  you_need:
+    - A Windows, macOS or Linux computer where you can install software
+    - Ruby and Jekyll, which lesson 2 installs
+    - A text editor such as VS Code
+    - A free GitHub account for lesson 6, optional
   content:
   - section:
       name: Introduction to Jekyll and Static Sites
       content:
-      - 01_intro.md
+      - 00_intro.md
       - 02_install.md
       - 03_content.md
       - 04_customizing.md
@@ -26,6 +42,6 @@
       - 07_realworld.md
 
   - section:
-      name: Bonus
+      name: Summary
       content:
-      - 08_bonus.md
+      - 08_summary.md

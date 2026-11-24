@@ -1,146 +1,151 @@
 ---
 title: Content Management in Jekyll
-description: Learn how to effectively manage content in Jekyll, including writing posts, using Markdown, and understanding front matter.
+description: Write posts and pages, use front matter, and loop over a data file with Liquid to build a parts list.
 layout: lesson
 type: page
 cover: /learn/jekyll/assets/banners/03_content.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Introduction
-
-In this lesson, we'll delve into the heart of managing content in Jekyll. You'll learn how to create and organize posts and pages, use Markdown for easy content creation, and leverage Jekyll's front matter and data files for advanced content management.
+By the end of this lesson you will be able to write a post and a page with front matter, and use a data file and a Liquid loop to show a parts list.
 
 ---
 
-## Part 1: Writing Posts and Pages
+## Posts, pages and the file name rules
 
-Jekyll simplifies the process of creating posts and pages. Here's how you can start:
+Jekyll treats two kinds of file differently. **Posts** are dated entries that live in `_posts/` and must be named `YYYY-MM-DD-title.md`. **Pages** are anything else with front matter, such as `about.markdown`, and can sit anywhere. Let's write both for Maker's Log.
 
+Create `_posts/2026-11-24-first-robot.md` and delete the welcome post:
+
+```markdown
+---
+layout: post
+title: "My First Robot Build"
+date: 2026-11-24
+categories: robots
+tags: smars 3d-printing
+---
+Today I printed the chassis for my first **SMARS** robot.
+
+## Parts used
+
+- 2 x N20 motors
+- 1 x Raspberry Pi Pico
+```
+
+The block between the two `---` lines is **front matter**: settings written in YAML that Jekyll reads before it processes the rest. `layout: post` picks a template, `categories` becomes part of the URL, and `tags` can be a space-separated list. The part below is ordinary Markdown.
+
+Here is what that file turns into, which we checked by building it:
+
+| Source file | Built file | URL |
+| --- | --- | --- |
+| `_posts/2026-11-24-first-robot.md` | `_site/robots/2026/11/24/first-robot.html` | `/robots/2026/11/24/first-robot.html` |
+| `about.markdown` (has `permalink: /about/`) | `_site/about/index.html` | `/about/` |
+{:class="table table-single"}
+
+```mermaid
+flowchart LR
+    F["Front matter: layout, title, categories"] --> J["Jekyll"]
+    M["Markdown body"] --> J
+    D["_data/parts.yml"] --> J
+    J --> H["HTML page in _site"]
+```
+
+Notice the category `robots` became the first part of the post's address. That is Jekyll's default post permalink, `/:categories/:year/:month/:day/:title:output_ext`.
+
+## Markdown in a minute
+
+Markdown is plain text with light marks: `#` for headings, `**bold**`, `*italic*`, `[text](url)` for links and `![alt text](url)` for images. If you want the full tour, the [Markdown course](/learn/markdown/) covers it. For now, it is enough that you write posts the way you would write notes.
+
+## Data files and Liquid
+
+Some information is better as a list than as prose. Our parts list is a good example. Create `_data/parts.yml`:
+
+```yaml
+- name: Raspberry Pi Pico
+  qty: 1
+  used_in: Brain
+- name: N20 motor
+  qty: 2
+  used_in: Drive
+- name: TB6612 motor driver
+  qty: 1
+  used_in: Drive
+```
+
+Jekyll reads every file in `_data/` and exposes it as `site.data.<filename>`. Now make a page, `parts.md`, that loops over it with **Liquid**, the template language Jekyll uses:
+
+{% raw %}
+```markdown
+---
+layout: page
+title: Parts list
+permalink: /parts/
 ---
 
-### Creating a New Post
+<ul>
+{% for part in site.data.parts %}
+  <li>{{ part.qty }} x {{ part.name }} ({{ part.used_in }})</li>
+{% endfor %}
+</ul>
 
-- Posts are typically blog entries.
-- To create a post, add a new file in the `_posts` directory.
-- Name the file in the format `YYYY-MM-DD-title.md`.
-- Start with front matter, for example:
-  
-  ```
-  ---
-  layout: post
-  title: "My First Post"
-  date: 2024-01-25
-  categories: tutorial
-  ---
-  ```
+There are {{ site.data.parts | size }} kinds of part on the page called "{{ page.title }}".
+```
+{% endraw %}
 
----
+Liquid has two kinds of marker. Double curly braces **output** a value, such as `{% raw %}{{ part.name }}{% endraw %}`. Curly-brace-percent tags such as `{% raw %}{% for %}{% endraw %}` run **logic**. The `| size` part is a **filter**, which changes a value on its way out. Building this gave exactly three list items, and the last line read "There are 3 kinds of part on the page called "Parts list"."
 
-### Creating a New Page
+I used a plain `<ul>` rather than Markdown bullets because blank lines left by the loop can turn Markdown bullets into spaced-out paragraphs.
 
-- Pages are more static and not date-based like posts.
-- To add a page, create a new markdown file in your root directory or in a subdirectory.
-- For example, `about.md` for an About page. Start with front matter too.
+> **Teachers**: this lesson is about file names and folders as much as code. Before each save, ask learners to say which folder the file belongs in (`_posts`, `_data` or the site root). Folders starting with an underscore are special to Jekyll, so a missing underscore or a mis-dated file name means the file is ignored. Also check that nobody puts personal details in a post that will later be published.
 
----
+## Try it Yourself
 
-## Part 2: Markdown Basics
+1. Add a fourth part to `_data/parts.yml` and refresh the Parts page. Did you need to touch `parts.md`?
+2. Write a second post about wiring a sensor. Give it a different `categories` value and find where the URL changed.
+3. In `parts.md`, show only the parts used in `Drive`. Hint: Liquid has an `if` tag, written as `{% raw %}{% if part.used_in == "Drive" %}{% endraw %}` and closed with `{% raw %}{% endif %}{% endraw %}`.
+4. Challenge: add a `{% raw %}{{ part.qty | times: 2 }}{% endraw %}` to show how many parts you need to build two robots.
 
-Markdown is a lightweight markup language that allows you to write using an easy-to-read, easy-to-write plain text format.
+## Common Issues
 
----
+- **Problem**: Jekyll reports `YAML Exception reading ... mapping values are not allowed in this context`.
+- **Solution**: Put quotes around any title containing a colon, such as `title: "Robots: a build log"`.
+- **Why**: A colon followed by a space means "key and value" in YAML, so a second one confuses the reader.
 
-### Basic Markdown Syntax
+- **Problem**: Your new post does not appear, and the build prints `Skipping: ... has a future date`.
+- **Solution**: Set the date to today or earlier, or build with `--future` while you test.
+- **Why**: Jekyll hides posts dated in the future so you can schedule them.
 
-- **Headings**: Use `#` for headings. More `#`s mean a lower level heading.
-- **Paragraphs**: Write plain text in paragraphs.
-- **Bold and Italic**: Use `**bold**` for bold text, `*italic*` for italic text.
-- **Links**: `[Link text](URL)` to create hyperlinks.
-- **Images**: `![Alt text](image URL)` to insert images.
+- **Problem**: A file in `_posts/` is ignored without any message.
+- **Solution**: Rename it to `YYYY-MM-DD-title.md`.
+- **Why**: Jekyll only recognises posts whose names start with a date.
 
----
+- **Problem**: Your page shows `{% raw %}{{ site.title }}{% endraw %}` as text instead of the title.
+- **Solution**: Add the two `---` front matter lines, even if they are empty, at the top of the file.
+- **Why**: Jekyll only processes files that start with front matter. Others are copied across untouched.
 
-## Part 3: Front Matter and Data Files
+## Check your understanding
 
-Front matter allows you to set variables for your page or post, which you can then access using Jekyll's templating system.
+{% quiz %}
+? What must a blog post file be named?
+- [ ] post.md
+- [x] YYYY-MM-DD-title.md, inside `_posts`
+- [ ] Anything, as long as it has `layout: post`
+> Jekyll recognises posts by the date at the start of the file name.
 
----
+? Where does Jekyll look for data files such as `parts.yml`?
+- [ ] In `_includes`
+- [x] In `_data`, and you read them through `site.data`
+- [ ] In `assets`
+> Files in `_data` become available as `site.data.<filename>`.
 
-### Using Front Matter
-
-- It's written in YAML and sits between two triple-dashed lines.
-- Example:
-
-  ```
-  ---
-  layout: page
-  title: "About"
-  ---
-  ```
-
----
-
-### Data Files
-
-- Jekyll supports data files in YAML, JSON, and CSV formats.
-- Store these files in the `_data` directory.
-- Access the data in these files using Liquid templating.
-
-> ## Liquid Templating
->
->Liquid is a templating language developed by Shopify. Jekyll uses it to process templates, allowing you to use variables, logic, and filters in your content.
-> for example:
->
->```markdown
->  {% raw %}{% for item in site.data.mydata %}
->    {{ item.name }}
->  {% endfor %}{% endraw %}
->```
->
-> Note how the logic is wrapped in `{% raw %}{% %}{% endraw %}` and the variables are wrapped in `{% raw %}{{ }}{% endraw %}`.
-
-In this example, `mydata` is the name of the data file, and `name` is a variable in the data file. The `for` loop iterates through the data file and prints the value of the `name` variable.
-
----
-
-## Part 4: Organizing Content
-
-Organizing your content helps visitors navigate your site easily.
-
----
-
-### Categories and Tags
-
-- Use categories and tags in your post's front matter for organization.
-- Example:
-
-  ```
-  categories: tutorial
-  tags: jekyll markdown
-  ```
-
----
-
-## Conclusion
-
-You now have the knowledge to manage content in Jekyll effectively. Experiment with writing posts, using Markdown, and organizing your site's content.
-
----
-
-## Additional Resources
-
-- [Markdown Guide](https://www.markdownguide.org/)
-- [Jekyll Docs on Posts](https://jekyllrb.com/docs/posts/)
-- [Jekyll Data Files](https://jekyllrb.com/docs/datafiles/)
-
----
-
-## Assignment
-
-Create a blog post about a topic of your choice using Markdown. Include front matter, and categorize and tag your post.
-
----
+? What is the difference between double curly braces and curly-brace-percent tags in Liquid?
+- [x] Double braces output a value, percent tags run logic such as loops
+- [ ] Double braces run loops, percent tags print values
+- [ ] There is no difference
+> Output markers print values, and tags control logic such as `for` and `if`.
+{% endquiz %}
