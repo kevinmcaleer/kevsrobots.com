@@ -10,8 +10,9 @@ next: 10_switches_and_pull_resistors.html
 description: 'Learn to find the numbers that matter in a datasheet: LED forward voltage
   and current, resistor colour codes and transistor ratings.'
 percent: 60
-duration: 5
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -66,9 +67,20 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to find the key numbers on a datasheet and read a four band resistor colour code.
+
 ## Overview
 
 Every component has a datasheet: a short document from the maker that says what the part can and cannot do. They look intimidating, but you only need a handful of numbers from each. In this lesson we learn where to find them for the parts in our night light, and how to read resistor colour bands, which are a tiny datasheet printed on the part.
+
+Using a datasheet number to choose a resistor looks like this:
+
+```mermaid
+flowchart LR
+    A["Find the LED's Vf<br>and wanted current"] --> B["Supply minus Vf<br>= voltage left for the resistor"]
+    B --> C["R = that voltage / current"]
+    C --> D["Round up to the<br>next E12 value"]
+```
 
 ## What to look for
 
@@ -177,7 +189,7 @@ For the night light's transistor, look for:
 
 - **Collector current (Ic) max**: a BC547 allows about 100 mA, a 2N2222 about 600 to 800 mA depending on the maker.
 - **Current gain (hFE)**: how many times the base current is multiplied. Often 100 or more, but it varies a lot, so design with the minimum.
-- **Pinout**: crucial. Many 2N2222 packages are E-B-C from the flat side, while the BC547 is C-B-E. Always check the datasheet for your exact part, because getting the legs swapped means it will not work.
+- **Pinout**: crucial, and it is not the same for every part. Different makers and packages of the same part number can order the legs differently, so always check the datasheet for the exact transistor you hold. Getting the legs swapped means it will not work.
 
 **Why this matters:** a datasheet lookup takes two minutes and avoids burnt parts and mystery faults. It is a great habit for every part in your robot.
 
@@ -189,10 +201,32 @@ For the night light's transistor, look for:
 
 ## Common Issues
 
-**Problem**: I cannot find a datasheet for my kit LEDs.
-**Solution**: Use the typical values by colour above, and start with a larger resistor, then reduce it until the brightness is right.
-**Why**: Starting high is the safe direction.
+- **Problem**: I cannot find a datasheet for my kit LEDs.
+- **Solution**: Use the typical values by colour above, and start with a larger resistor, then reduce it until the brightness is right.
+- **Why**: Starting high is the safe direction.
 
-**Problem**: The colour bands are hard to read.
-**Solution**: Measure the resistor with your multimeter instead.
-**Why**: Brown, red and orange look similar in poor light.
+- **Problem**: The colour bands are hard to read.
+- **Solution**: Measure the resistor with your multimeter instead.
+- **Why**: Brown, red and orange look similar in poor light.
+
+## Check your understanding
+
+{% quiz %}
+? Which resistor colour code reads 4.7k?
+- [ ] Brown, black, orange
+- [ ] Red, red, brown
+- [x] Yellow, violet, red
+> Yellow 4, violet 7, multiplier red x100, so 47 x 100 = 4700 ohm. Brown, black, orange is 10k, and red, red, brown is 220 ohm.
+
+? Why do blue and white LEDs struggle on a 3.3 V Pico pin?
+- [x] Their forward voltage is about 3.0 V or more, leaving almost nothing for the resistor
+- [ ] They need a 5 V logic signal
+- [ ] They draw too little current
+> With Vf near 3.1 V only about 0.2 V is left across the resistor, which is too tight.
+
+? How should you design with a datasheet's two tables?
+- [x] Around the typical values, well under the absolute maximums
+- [ ] Right up to the absolute maximums
+- [ ] Using only the maximums
+> Maximum ratings are limits not to be exceeded. Typical characteristics are what you can expect in normal use.
+{% endquiz %}

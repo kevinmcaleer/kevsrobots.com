@@ -10,8 +10,9 @@ next: 04_first_circuit_led_and_resistor.html
 description: Learn how a solderless breadboard is wired inside, and set up a clean
   power layout for the night light.
 percent: 24
-duration: 5
-date_updated: 2026-11-21
+duration: 7
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -66,6 +67,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to say which breadboard holes are connected, and set up a clean power layout for the night light.
+
 ## Overview
 
 A breadboard lets you build circuits without soldering. Push parts and jumper wires into the holes, and if you make a mistake, pull them out and try again. It is the best friend of every robot builder. In this lesson we learn what is hidden inside the board, so a circuit never fails because of a connection you thought existed but did not.
@@ -77,7 +80,18 @@ A breadboard is a plastic block with rows of little metal clips under the holes.
 - **Terminal strips** (the main area): each row of 5 holes, labelled a to e on one side and f to j on the other, is joined across. Holes a1, b1, c1, d1 and e1 are all connected to each other. The gap down the middle separates the two halves, so f1 is *not* connected to e1.
 - **Power rails** (the long strips along the edges, marked red and blue or + and -): each rail is joined along its whole length. Use the red one for positive and the blue one for negative (ground).
 
-Careful: on some full size boards the rails are split in the middle, so the top half and the bottom half are not connected. If your parts at the far end have no power, bridge the gap with a jumper wire. Check with your multimeter once we meet it in lesson 5.
+Careful: on some full size boards the rails are split in the middle, so the top half and the bottom half are not connected. If your parts at the far end have no power, bridge the gap with a jumper wire. Check with your multimeter, which we meet in lesson 5.
+
+Here is what is joined and what is not:
+
+| Holes | Connected? | Why |
+|---|---|---|
+| a10, b10, c10, d10, e10 | Yes | One row of five, joined by a clip underneath |
+| e10 and f10 | No | The central gap splits the board in two |
+| a10 and a11 | No | Different rows are separate |
+| Any hole in the red rail | Yes, along the rail | A rail is one long strip (check for a split in the middle) |
+| Red rail and blue rail | No | They are separate strips |
+{:class="table table-single"}
 
 ## Real example: a clean power layout
 
@@ -104,7 +118,7 @@ That is not a rule of nature, but if you stick to it, a quick glance tells you w
 
 ## A quick connectivity test in code
 
-Not sure which holes are joined? Here is a sneaky way to check once you have the Pico: connect a jumper from GP14 to a hole, another from GND to a different hole, then see whether the Pico sees a connection. Do not worry if this is a little early, we cover pins fully in the later lessons. For now, the multimeter in lesson 6 does the same job better.
+Not sure which holes are joined? Here is a sneaky way to check once you have the Pico: connect a jumper from GP14 to a hole, another from GND to a different hole, then see whether the Pico sees a connection. Do not worry if this is a little early, we cover pins fully in the later lessons. For now, the continuity beeper on the multimeter in lesson 6 does the same job better.
 
 ```python
 # MicroPython on the Pico
@@ -130,6 +144,8 @@ Touch a wire from GND to the probe wire's hole. If the holes are joined, you wil
 - Using the wrong side of the central gap.
 - Assuming the rails run all the way around.
 
+> **Teachers**: breadboards from class sets often have worn clips and bent jumper ends, which cause the most "it does not work" calls. Check kits before the lesson and keep a few spare boards. Remind learners to leave the battery pack disconnected while they build, and to use short wires so a short circuit across the rails is easy to spot.
+
 ## Try it Yourself
 
 1. Place an LED and a resistor so they share a row, then another pair on a different row. Sketch which holes are connected.
@@ -138,10 +154,32 @@ Touch a wire from GND to the probe wire's hole. If the holes are joined, you wil
 
 ## Common Issues
 
-**Problem**: A part does nothing even though everything looks plugged in.
-**Solution**: Wiggle each leg, and check it sits in the right row.
-**Why**: Clips can be worn out, and legs can sit between rows. Move the part to a fresh set of holes.
+- **Problem**: A part does nothing even though everything looks plugged in.
+- **Solution**: Wiggle each leg, and check it sits in the right row.
+- **Why**: Clips can be worn out, and legs can sit between rows. Move the part to a fresh set of holes.
 
-**Problem**: The circuit works on one side of the board but not the other.
-**Solution**: Check for a split power rail and bridge it with a jumper.
-**Why**: Many boards break the rail in the middle.
+- **Problem**: The circuit works on one side of the board but not the other.
+- **Solution**: Check for a split power rail and bridge it with a jumper.
+- **Why**: Many boards break the rail in the middle.
+
+## Check your understanding
+
+{% quiz %}
+? Which holes are joined together?
+- [ ] e5 and f5
+- [ ] a5 and a6
+- [x] a5, b5, c5, d5 and e5
+> A row of five holes is joined across, but the central gap separates e from f, and neighbouring rows are separate.
+
+? Half your breadboard has no power, but the other half is fine. What do you check first?
+- [ ] Whether the resistor is too big
+- [x] Whether the power rail is split in the middle
+- [ ] Whether the LED is the right colour
+> Some full size boards break the rails in the middle. Bridge the gap with a jumper.
+
+? Which LED leg is the anode (positive)?
+- [ ] The short leg
+- [x] The long leg
+- [ ] Either, it does not matter
+> The long leg is positive. The short leg and the flat edge on the rim mark the cathode (negative).
+{% endquiz %}

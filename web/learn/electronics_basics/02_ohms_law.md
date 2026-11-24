@@ -10,8 +10,9 @@ next: 03_the_breadboard.html
 description: Learn the one formula every electronics builder uses, with worked examples
   and short Python calculations.
 percent: 18
-duration: 4
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -66,6 +67,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to use Ohm's law to find the current, voltage or resistance in a simple circuit, and check the power a resistor must handle.
+
 ## Overview
 
 Ohm's law ties voltage, current and resistance together in one tidy relationship. If you know any two, you can work out the third. It is the formula you will use most in your whole electronics life, and it is the key to choosing the resistor for our night light's LED.
@@ -83,6 +86,18 @@ R = V / I      resistance = voltage divided by current
 The classic memory trick is a triangle with V on top and I and R along the bottom. Cover the thing you want, and the triangle shows you the formula.
 
 One thing to watch: the units must be **volts, amps and ohms**. If you have milliamps, divide by 1000 first. 10 mA is 0.010 A. Mixing mA into the formula is the number one source of wrong answers.
+
+Not sure which version of the formula to use? Start from what you know:
+
+```mermaid
+flowchart TD
+    S["What do you want to find?"] --> A["Current I"]
+    S --> B["Resistance R"]
+    S --> C["Voltage V"]
+    A --> A1["I = V / R"]
+    B --> B1["R = V / I"]
+    C --> C1["V = I x R"]
+```
 
 ## Worked examples
 
@@ -158,6 +173,8 @@ Power in the 270 ohm resistor: 75.0 mW
 
 Notice 75 mW is far below the 250 mW a quarter-watt resistor can handle. Plenty of margin.
 
+Now try a harsher case. A 100 ohm resistor on 4.5 V passes 4.5 / 100 = 0.045 A (45 mA), so the power is 4.5 x 0.045 = 0.2 W, or 203 mW. That is just under the quarter-watt rating, so the resistor would run hot. Smaller resistance on the same voltage means much more heat.
+
 **Why this matters:** every time you wire up a new part, Ohm's law answers "how much current will this draw?" and "what resistor protects it?" before you ever switch on.
 
 **Common mistakes:**
@@ -173,10 +190,32 @@ Notice 75 mW is far below the 250 mW a quarter-watt resistor can handle. Plenty 
 
 ## Common Issues
 
-**Problem**: My answer is 1000 times too big or too small.
-**Solution**: Check you converted mA to A and k to thousands.
-**Why**: The formula wants base units. 10 mA is 0.01, and 4.7k is 4700.
+- **Problem**: My answer is 1000 times too big or too small.
+- **Solution**: Check you converted mA to A and k to thousands.
+- **Why**: The formula wants base units. 10 mA is 0.01, and 4.7k is 4700.
 
-**Problem**: The calculator says 0 or crashes with ZeroDivisionError.
-**Solution**: You divided by a resistance of 0.
-**Why**: A resistance of zero is a short circuit, which in real life means huge current. Treat the error as a warning.
+- **Problem**: The calculator says 0 or crashes with ZeroDivisionError.
+- **Solution**: You divided by a resistance of 0.
+- **Why**: A resistance of zero is a short circuit, which in real life means huge current. Treat the error as a warning.
+
+## Check your understanding
+
+{% quiz %}
+? A 4.7k resistor has 3.3 V across it. What current flows?
+- [ ] About 7 mA
+- [ ] About 1.4 A
+- [x] About 0.7 mA
+> I = V / R = 3.3 / 4700 = 0.0007 A, which is 0.7 mA.
+
+? Before using a current of 10 mA in V = I x R, what must you do?
+- [ ] Multiply it by 1000
+- [x] Convert it to 0.010 A
+- [ ] Nothing, mA works as it is
+> The formula wants volts, amps and ohms, so 10 mA becomes 0.010 A.
+
+? Which formula gives the heat a resistor produces?
+- [x] P = V x I
+- [ ] R = V / I
+- [ ] V = I x R
+> Power in watts is voltage times current. Most kit resistors are rated at 1/4 watt (0.25 W).
+{% endquiz %}

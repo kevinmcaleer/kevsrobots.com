@@ -9,9 +9,10 @@ description: 'Learn the electronics every robot builder needs: voltage, current,
   build a light-sensing night light on a breadboard, then hand it over to a Raspberry
   Pi Pico running MicroPython.'
 level: beginner
-course_duration: 1h 12m
+course_duration: 1h 37m
 lesson_count: 16
 first_lesson: 00_intro.html
+quiz_total: 48
 outcomes:
 - Use Ohm's law to pick the right resistor for an LED
 - Build circuits on a breadboard without guessing
@@ -21,7 +22,8 @@ outcomes:
 - Power a project safely and understand why motors need their own supply
 prerequisites:
 - None. This is a good first course.
-- Robotics 101
+- Robotics 101 (optional, for the big picture)
+- Learn MicroPython - The basics (helpful for lessons 13 to 14)
 you_need:
 - A solderless breadboard (half size or full size)
 - Jumper wires (male to male)

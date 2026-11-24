@@ -10,8 +10,9 @@ next: 02_ohms_law.html
 description: The three ideas behind every circuit, explained with a water pipe and
   a tiny LED example.
 percent: 12
-duration: 4
-date_updated: 2026-11-21
+duration: 5
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -66,6 +67,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain voltage, current and resistance in your own words, and say which one a given measurement is.
+
 ## Overview
 
 Three words come up in every electronics conversation: voltage, current and resistance. They sound abstract, but each one answers a simple question about your robot. In this lesson we meet all three, and by the end you will know what each one feels like on a real circuit, starting with the first step of our night light: a battery lighting an LED.
@@ -79,6 +82,16 @@ Imagine a tank of water on a hill, connected to a pipe that runs downhill to a w
 - **Resistance** is how narrow the pipe is. A narrow pipe holds the flow back. Measured in **ohms**, written with the Greek letter omega, but we will just write "ohm", "k" for thousands and "M" for millions. So 4k7 or 4.7k means 4700 ohms.
 
 A bigger hill (more voltage) pushes more water. A narrower pipe (more resistance) lets less through. That single relationship is Ohm's law, and we meet it properly in the next lesson.
+
+The three ideas meet in one loop. Follow it from the battery round to the battery:
+
+```mermaid
+flowchart LR
+    B["Battery positive<br>voltage pushes"] --> R["Resistor<br>resistance holds back"]
+    R --> L["LED<br>lights up"]
+    L --> N["Battery negative<br>0 V, ground"]
+    N -.->|"current flows round the loop"| B
+```
 
 ## Voltage
 
@@ -136,10 +149,32 @@ Same voltage, but more resistance means less current. That is the pipe getting n
 
 ## Common Issues
 
-**Problem**: "Voltage flows through the wire"
-**Solution**: Say "current flows, voltage is across".
-**Why**: Voltage is the push between two points. Current is the thing that moves. Mixing them up makes later lessons confusing, especially when measuring with a multimeter.
+- **Problem**: "Voltage flows through the wire"
+- **Solution**: Say "current flows, voltage is across".
+- **Why**: Voltage is the push between two points. Current is the thing that moves. Mixing them up makes later lessons confusing, especially when measuring with a multimeter.
 
-**Problem**: "My circuit has no current, but the battery is fine"
-**Solution**: Look for a break in the loop: a loose wire, a part not pushed in, or a gap in the breadboard.
-**Why**: Current needs a complete loop from the positive side back to the negative side.
+- **Problem**: "My circuit has no current, but the battery is fine"
+- **Solution**: Look for a break in the loop: a loose wire, a part not pushed in, or a gap in the breadboard.
+- **Why**: Current needs a complete loop from the positive side back to the negative side.
+
+## Check your understanding
+
+{% quiz %}
+? Which statement is correct?
+- [x] Current flows through a wire, voltage is across two points
+- [ ] Voltage flows through a wire, current is across two points
+- [ ] Voltage and current mean the same thing
+> Voltage is the push between two points. Current is the flow that moves round the loop.
+
+? You raise the resistance in a circuit and keep the same battery. What happens to the current?
+- [ ] It goes up
+- [x] It goes down
+- [ ] It stays the same
+> More resistance is a narrower pipe, so less current flows. The script showed 45 mA at 100 ohm and 0.5 mA at 10k.
+
+? What does 4k7 mean?
+- [x] 4700 ohm
+- [ ] 47 ohm
+- [ ] 4.7 ohm
+> The k stands for thousands, so 4k7 and 4.7k both mean 4700 ohm.
+{% endquiz %}

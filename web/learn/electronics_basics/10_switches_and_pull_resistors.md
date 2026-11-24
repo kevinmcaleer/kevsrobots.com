@@ -10,8 +10,9 @@ next: 11_transistors_as_switches.html
 description: Learn how a push button works with a Pico input, why inputs need pull-up
   or pull-down resistors, and how to debounce.
 percent: 66
-duration: 4
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -65,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wire a button to a Pico pin with a pull-up so it reads reliably, and handle contact bounce in code.
 
 ## Overview
 
@@ -122,6 +125,16 @@ while True:
 
 Because it is a pull-up, the logic is inverted: **0 means pressed**. This catches everyone once.
 
+A debounced press passes through these states:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Released
+    Released --> Pressed: pin reads 0, more than 50 ms since last change
+    Pressed --> Released: pin reads 1
+    Pressed --> Pressed: bounces within 50 ms are ignored
+```
+
 ## Bounce
 
 When a metal contact closes, it does not close cleanly. It bounces for a few milliseconds, so a single press can look like five presses. The easy fix: after seeing a press, ignore the button for about 50 ms. Here is a toggle that handles that, which we will reuse in the project:
@@ -161,6 +174,8 @@ On a plain Pico or Pico 2 (not the W versions) use `Pin(25, Pin.OUT)` instead of
 - Forgetting the pull-up inverts the logic.
 - Using two legs that are already joined inside the button. On a 4-pin tactile switch, pick legs diagonal to each other.
 
+> **Teachers**: the 4-pin tactile switches in most kits are the usual problem, as two legs on the same side are always joined. Mark the correct diagonal pair with a pen on one example, and have learners test it with the continuity beeper before wiring it in. Logic inverted by a pull-up (0 means pressed) is a good moment for a quick class discussion.
+
 ## Try it Yourself
 
 1. Run the first program and watch the output while you press the button.
@@ -169,10 +184,32 @@ On a plain Pico or Pico 2 (not the W versions) use `Pin(25, Pin.OUT)` instead of
 
 ## Common Issues
 
-**Problem**: The program always says Pressed.
-**Solution**: Check the wire is on the right button leg, and that it is not stuck in the ground row.
-**Why**: Two legs on the same side of a 4-pin button are always connected.
+- **Problem**: The program always says Pressed.
+- **Solution**: Check the wire is on the right button leg, and that it is not stuck in the ground row.
+- **Why**: Two legs on the same side of a 4-pin button are always connected.
 
-**Problem**: One press toggles several times.
-**Solution**: Increase the debounce time to 80 ms or so.
-**Why**: Some cheap buttons bounce for longer.
+- **Problem**: One press toggles several times.
+- **Solution**: Increase the debounce time to 80 ms or so.
+- **Why**: Some cheap buttons bounce for longer.
+
+## Check your understanding
+
+{% quiz %}
+? With the internal pull-up on and the button wired to GND, what does `button.value()` read when it is pressed?
+- [ ] 1
+- [x] 0
+- [ ] It floats
+> The pull-up holds the pin at 1, and pressing connects it to GND, so pressed reads 0.
+
+? What is a floating input?
+- [ ] A pin connected to 3.3 V
+- [ ] A pin set as output
+- [x] A pin connected to nothing, which picks up noise and reads randomly
+> An unconnected pin has no default level, so it can flip between 0 and 1 without any button press.
+
+? Why does the toggle program ignore changes for about 50 ms?
+- [ ] The Pico is too slow to read faster
+- [x] Contacts bounce, so one press can look like many
+- [ ] The button needs time to charge
+> A closing contact bounces for a few milliseconds, which would otherwise count as several presses.
+{% endquiz %}
