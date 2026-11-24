@@ -1,6 +1,6 @@
 ---
 title: Python Basics for Robotics
-description: Learn the handful of Python ideas a robot arm needs: variables, functions, loops and dictionaries, with joint angles as the running example.
+description: "Learn the handful of Python ideas a robot arm needs: variables, functions, loops and dictionaries, with joint angles as the running example."
 layout: lesson
 type: page
 cover: assets/3.png
