@@ -6,18 +6,19 @@ type: page
 cover: /learn/k3s/assets/banners/18_summary.jpg
 date: 2025-06-01
 previous: 17_final_project.html
-description: "Review what you've learned, what you\u2019ve built, and where to go\
-  \ next in your Kubernetes journey after completing the K3s on Raspberry Pi course."
+description: Review what you have learned and built in the K3s on Raspberry Pi course,
+  and find out where to go next.
 percent: 100
-duration: 2
-date_updated: 2025-05-24
+duration: 4
+quiz_total: 54
+date_updated: 2026-11-24
 navigation:
 - name: Running K3s on Raspberry Pi
 - content:
   - section: Introduction
     content:
     - name: Introduction to K3s on Raspberry Pi
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Preparing Your Raspberry Pi Cluster
     content:
     - name: Hardware Requirements
@@ -54,13 +55,13 @@ navigation:
       link: 14_ci_cd_on_k3s.html
   - section: Advanced Topics
     content:
-    - name: Advanced Networking & Custom CNI
+    - name: Advanced Networking and Custom CNI
       link: 15_custom_cni.html
     - name: Securing Your Cluster
       link: 16_securing_your_cluster.html
   - section: Final Project
     content:
-    - name: "Final Project \u2013 Deploying a Multi-Service App"
+    - name: Final Project - A Visit Counter That Survives
       link: 17_final_project.html
   - section: Summary
     content:
@@ -73,88 +74,88 @@ navigation:
 
 ---
 
-Congratulations! You've completed the **Running K3s on Raspberry Pi** course.
-
-Over the past lessons, you’ve transformed a few Raspberry Pi boards into a full-featured **Kubernetes cluster** — one that’s capable of running real workloads, supporting modern deployment workflows, and mirroring production systems on a small scale.
+By the end of this lesson you will be able to describe the pieces of your K3s cluster and how they fit together, and choose what to learn next.
 
 ---
 
-## What You’ve Learned
+## What you built
 
-Here’s a quick recap of what you’ve accomplished:
+You started with a few bare Raspberry Pis and finished with a Kubernetes cluster running an app with a database that survives restarts.
 
-- **Kubernetes Concepts**: Pods, services, deployments, ingress, RBAC, and more
-- **Cluster Setup**: Installed and configured a multi-node K3s cluster
-- **Networking**: Configured static IPs, hostnames, and ingress routing
-- **Storage**: Used local-path storage and persistent volumes
-- **CI/CD**: Set up automated deployment with GitHub Actions or GitOps
-- **Security**: Applied RBAC, secrets, TLS, and best practices
-- **Advanced Topics**: Swapped CNIs and secured the control plane
+```mermaid
+flowchart TB
+    subgraph Setup["Preparing"]
+        A["Hardware and 64-bit OS"] --> B["Hostnames, fixed IPs, cgroups"]
+    end
+    subgraph Cluster["The cluster"]
+        C["K3s server"] --> D["Worker nodes"]
+    end
+    subgraph Using["Using it"]
+        E["kubectl, metrics, Headlamp"] --> F["Storage, Services, Ingress"]
+        F --> G["Deployments and Helm"]
+    end
+    subgraph Safe["Running it well"]
+        H["CI/CD and GitOps"] --> I["NetworkPolicy, RBAC, Secrets, TLS"]
+    end
+    Setup --> Cluster --> Using --> Safe
+```
 
----
-
-## What You’ve Built
-
-Your cluster can now:
-
-- Run scalable containerized apps
-- Support multi-service workloads with persistent data
-- Use Ingress for clean routing and domain-based access
-- Update and deploy applications automatically
-- Serve as a testbed for real-world Kubernetes learning
-
----
-
-## Where to Go Next
-
-Here are a few directions you can explore beyond this course:
-
-### Build Your Own Helm Charts
-
-Package your apps for reusability across environments.
-
-### Set Up Multi-Cluster Environments
-
-Use tools like K3s + K3s or connect to a public cloud via kubeconfig.
-
-### Explore Advanced GitOps
-
-Use ArgoCD or Flux with Helm and automated sync from Git.
-
-### Learn About Service Meshes
-
-Try Linkerd or Istio on ARM devices for microservice observability and traffic management.
-
-### Join the Kubernetes Community
-
-Contribute to open source, join meetups, or get certified (CKA, CKAD).
+| Lesson | The key idea you took away |
+|---|---|
+| Hardware and OS | An SSD, wired Ethernet and the memory cgroup matter on a Pi |
+| Networking | Fixed addresses and unique hostnames keep nodes in the cluster |
+| Installing K3s | One script gives a server, with Flannel, Traefik, ServiceLB and local-path built in |
+| Adding nodes | `K3S_URL` and the token turn a Pi into a worker |
+| kubectl | You describe what you want, and Kubernetes keeps it that way |
+| Storage | A PVC keeps data beyond one pod, but local-path is tied to one node |
+| Ingress | Traefik routes many apps through ports 80 and 443 |
+| Helm | A chart and a values file make deployments repeatable |
+| CI/CD | A runner inside your network, or GitOps, deploys from Git |
+| Security | Secrets, RBAC, NetworkPolicy and TLS, and never exposing port 6443 |
+{:class="table table-single"}
 
 ---
 
-## Suggested Projects
+## Where to go next
 
-- Self-hosted Git server or Gitea with CI/CD
-- Kubernetes-powered homelab dashboard
-- IoT fleet manager using MQTT + K3s
-- Personal blog or portfolio deployed via GitHub Actions
+- **Containers underneath.** Revisit [Docker](/learn/docker/) for images and containers, or see how [Podman](/learn/podman/) connects to Kubernetes.
+- **Another way to cluster.** Build a [Raspberry Pi 5 Cluster with Docker Swarm](/learn/docker_swarm/) and compare how the two approaches feel.
+- **Your Linux skills.** Brush up in [Introduction to the Linux Command Line on Raspberry Pi OS](/learn/linux_intro/), which makes a cluster much easier to run.
+- **Version control.** The [Git](/learn/git/) course makes the GitOps ideas in lesson 14 click.
+- **Apps to run.** Try [Redis](/learn/redis/) properly, or write an API with [FastAPI](/learn/fastapi/) and deploy it on your cluster.
 
----
+Ideas for your cluster: a self-hosted Git server, a dashboard for your robots, or an MQTT broker for a fleet of sensors. A cluster of Pis is a wonderful place to try things safely, because you can wipe and rebuild it in under an hour.
 
-## Thank You!
-
-Thank you for joining this course and building something awesome on Raspberry Pi.
-
-If you found this helpful:
-
-- Star the GitHub repo
-- Share your cluster setup online
-- Join the community and ask questions
-- Revisit lessons as needed — they’re all here for you
+> **Teachers**: A good wrap-up is a short demo from each group: show your app, kill a pod, kill a node (pull its power lead), and explain what Kubernetes did. Ask groups to write one thing that went wrong and how they fixed it. Do a final tidy: delete test namespaces and, if kit is shared, uninstall K3s with the uninstall scripts so the Pis are clean for the next class.
 
 ---
 
-You now have the skills to build, run, and maintain your own Kubernetes clusters — from home lab to edge computing!
+## Try it Yourself
 
-Stay curious, keep shipping, and happy hacking.
+1. Write a one-page README for your cluster: node names, addresses, K3s version and what is running on it.
+2. Pull the network cable from a worker and run `kubectl get nodes` and `kubectl get pods -o wide` a few times over a few minutes. What happens to the pods that were on that worker?
+3. Challenge: pick one idea from the list above and plan the manifests it would need.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Which two files do you need from the server to work from your laptop and to join workers?
+- [x] The kubeconfig and the node token
+- [ ] The Traefik config and the PVC
+- [ ] The cmdline.txt and the hosts file
+> The kubeconfig lets kubectl and Helm talk to the cluster, and the token lets workers join.
+
+? Which K3s feature stores volumes on a node's disk by default?
+- [x] local-path
+- [ ] ServiceLB
+- [ ] CoreDNS
+> The local-path provisioner creates folders on a node for each claim.
+
+? What is the safest way to deploy from Git to a home cluster without opening ports?
+- [ ] Expose port 6443 to GitHub
+- [x] A self-hosted runner inside the network, or a GitOps controller in the cluster
+- [ ] Copy files by hand
+> Both keep the cluster private and reach it from inside.
+{% endquiz %}

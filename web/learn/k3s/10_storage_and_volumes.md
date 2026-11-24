@@ -10,15 +10,16 @@ next: 11_ingress_and_services.html
 description: Learn how storage works in Kubernetes, how to use persistent volumes
   in K3s, and set up storage that survives pod restarts.
 percent: 50
-duration: 3
-date_updated: 2025-05-24
+duration: 5
+quiz_total: 54
+date_updated: 2026-11-24
 navigation:
 - name: Running K3s on Raspberry Pi
 - content:
   - section: Introduction
     content:
     - name: Introduction to K3s on Raspberry Pi
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Preparing Your Raspberry Pi Cluster
     content:
     - name: Hardware Requirements
@@ -55,13 +56,13 @@ navigation:
       link: 14_ci_cd_on_k3s.html
   - section: Advanced Topics
     content:
-    - name: Advanced Networking & Custom CNI
+    - name: Advanced Networking and Custom CNI
       link: 15_custom_cni.html
     - name: Securing Your Cluster
       link: 16_securing_your_cluster.html
   - section: Final Project
     content:
-    - name: "Final Project \u2013 Deploying a Multi-Service App"
+    - name: Final Project - A Visit Counter That Survives
       link: 17_final_project.html
   - section: Summary
     content:
@@ -74,27 +75,37 @@ navigation:
 
 ---
 
-In Kubernetes, storage isn’t tied to a container like in Docker — it’s managed independently as **persistent volumes (PVs)** and **persistent volume claims (PVCs)**.
-
-This lesson will show you how **storage works in K3s**, how to use the **built-in local-path provisioner**, and how to prepare for **external storage options** (like NFS or USB SSDs).
+By the end of this lesson you will be able to give a pod storage that survives restarts by using a PersistentVolumeClaim with K3s's built-in local-path storage, and explain its limits.
 
 ---
 
-## How Storage Works in K3s
+## Containers forget
 
-K3s includes a **default dynamic storage provisioner** called `local-path-provisioner`.
+Anything a container writes to its own filesystem disappears when the pod is replaced. That is fine for nginx, but not for a database or a counter you want to keep. Kubernetes separates the *request* for storage from the storage itself:
 
-- It uses local disk storage on the node running the pod
-- PVCs are automatically provisioned
-- Easy to use, but not shared across nodes
+- A **PersistentVolumeClaim (PVC)** is your request: "I need 1GB I can read and write."
+- A **PersistentVolume (PV)** is the actual storage.
+- A **StorageClass** says how to create storage on demand.
 
-> If a pod moves to a different node, its data may not follow.
+K3s ships a StorageClass called `local-path`, which is the default. When you create a PVC, it makes a folder on a node's disk and hands it over. Check it exists:
+
+```bash
+kubectl get storageclass
+```
+
+```mermaid
+flowchart LR
+    P["Pod"] -->|"mounts"| C["PVC demo-pvc<br/>your request"]
+    C -->|"bound to"| V["PV<br/>made automatically"]
+    V --> D["Folder under<br/>/var/lib/rancher/k3s/storage<br/>on one node"]
+    SC["StorageClass local-path"] -.->|"creates"| V
+```
 
 ---
 
-## Step 1: Test with a Simple PVC
+## Step 1: Ask for storage
 
-Create a file `pvc-demo.yaml`:
+Create `pvc-demo.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -104,22 +115,24 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: local-path
   resources:
     requests:
       storage: 1Gi
-````
-
-Apply it:
+```
 
 ```bash
 kubectl apply -f pvc-demo.yaml
+kubectl get pvc
 ```
+
+The PVC will probably show `Pending`. That is expected: local-path waits until a pod actually uses the claim, so that it can create the folder on the same node the pod runs on.
 
 ---
 
-## Step 2: Mount PVC in a Pod
+## Step 2: Use it in a pod
 
-Create a pod with a volume mount:
+Create `pvc-tester.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -130,9 +143,9 @@ spec:
   containers:
     - name: busybox
       image: busybox
-      command: [ "sleep", "3600" ]
+      command: ["sleep", "3600"]
       volumeMounts:
-        - mountPath: "/data"
+        - mountPath: /data
           name: myvolume
   volumes:
     - name: myvolume
@@ -140,53 +153,49 @@ spec:
         claimName: demo-pvc
 ```
 
-Apply it:
-
 ```bash
 kubectl apply -f pvc-tester.yaml
+kubectl get pvc
 ```
 
-Then exec into the pod and test:
+Once the pod is running, the PVC changes to `Bound`. Write a file, then delete and recreate the pod:
 
 ```bash
-kubectl exec -it pvc-tester -- sh
-# Inside pod:
-echo "Hello Pi Cluster" > /data/test.txt
-cat /data/test.txt
+kubectl exec pvc-tester -- sh -c 'echo "Hello Pi cluster" > /data/test.txt'
+kubectl delete pod pvc-tester
+kubectl apply -f pvc-tester.yaml
+kubectl exec pvc-tester -- cat /data/test.txt
 ```
+
+The file is still there, because it lives in the volume, not in the pod.
 
 ---
 
-## Where Is the Data Stored?
+## Where is the data?
 
-On the node hosting the pod, the data is typically under:
+By default local-path stores data on the node's disk under `/var/lib/rancher/k3s/storage`. Find which node your pod ran on with `kubectl get pod pvc-tester -o wide`, then on that Pi:
 
 ```bash
-/opt/local-path-provisioner
+sudo ls /var/lib/rancher/k3s/storage
 ```
 
-Each PVC is stored in its own directory.
+You will see a folder named after the volume. You can change this location with the `default-local-storage-path` setting in `/etc/rancher/k3s/config.yaml`.
 
 ---
 
-## External Storage Options (Optional)
+## The limits of local-path
 
-For more advanced setups:
+- The data lives on **one node**. A pod that uses it is tied to that node, so if the Pi dies, so does access to the data.
+- By default, deleting a PVC deletes its data. Do not delete a claim you care about.
+- It is a plain folder on the node's disk, so an SD card wears faster. Prefer an SSD.
 
-| Option     | Benefit                        | Tool                                  |
-| ---------- | ------------------------------ | ------------------------------------- |
-| USB SSD    | Fast, local storage            | Mount manually or with Longhorn       |
-| NFS Server | Shared across all nodes        | Use `nfs-subdir-external-provisioner` |
-| Ceph       | Highly available block storage | More complex to set up                |
-{:class="table table-striped"}
+For storage that follows pods around, look at **Longhorn**, which the K3s docs list as a distributed block storage option (it is not supported on 32-bit ARM, which is another reason to use 64-bit), or an NFS share on a NAS.
 
-> Consider using **Longhorn** if you want persistent block storage with replication and snapshots.
+> **Teachers**: Storage is where learners lose work. Make the point early that data in local-path is not backed up, and that deleting a PVC deletes the data. If many learners share a cluster, a small SSD can fill up, so agree a size (`1Gi` is plenty) and clean up claims at the end of a session.
 
 ---
 
 ## Cleanup
-
-To remove test volumes and pods:
 
 ```bash
 kubectl delete pod pvc-tester
@@ -195,17 +204,45 @@ kubectl delete pvc demo-pvc
 
 ---
 
-## Summary
+## Try it Yourself
 
-You now know how to:
-
-- Create persistent volume claims in K3s
-- Use local-path provisioner for basic storage needs
-- Mount volumes into pods
-- Plan for external and scalable storage options
+1. Run the demo and confirm the file survives deleting the pod.
+2. Check `kubectl get pv`. What is the name of the volume and its status?
+3. Change the claim to ask for `2Gi` in a new file, apply it, and see what you get.
+4. Challenge: after the pod is running, look on the node for the folder and read `test.txt` directly from the node's disk.
 
 ---
 
-Next up: [Ingress and Services](11_ingress_and_services)
+## Common Issues
+
+- **Problem**: The PVC stays `Pending`.
+- **Solution**: Create a pod that uses the claim. Then run `kubectl describe pvc demo-pvc` and read the Events.
+- **Why**: local-path waits for the first pod to use the claim before choosing a node.
+
+- **Problem**: A pod will not start after its node went down.
+- **Solution**: Bring that node back, or restore the data and recreate the claim elsewhere.
+- **Why**: The volume exists on that one node, so the pod can only run there.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? What is the name of the default StorageClass in K3s?
+- [ ] longhorn
+- [x] local-path
+- [ ] nfs-client
+> K3s bundles the local-path provisioner as its default.
+
+? Where does local-path store data by default?
+- [ ] /opt/data
+- [x] /var/lib/rancher/k3s/storage on the node
+- [ ] On all nodes at once
+> Data is a folder on one node's disk.
+
+? What is a PVC?
+- [x] A request for storage that a pod can mount
+- [ ] A type of container image
+- [ ] A network policy
+> A claim asks for storage, and a StorageClass provides it.
+{% endquiz %}

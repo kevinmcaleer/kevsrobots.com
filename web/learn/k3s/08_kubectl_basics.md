@@ -10,15 +10,16 @@ next: 09_dashboard_and_monitoring.html
 description: Learn the essential `kubectl` commands to interact with your K3s Kubernetes
   cluster from the command line.
 percent: 40
-duration: 2
-date_updated: 2025-05-24
+duration: 5
+quiz_total: 54
+date_updated: 2026-11-24
 navigation:
 - name: Running K3s on Raspberry Pi
 - content:
   - section: Introduction
     content:
     - name: Introduction to K3s on Raspberry Pi
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Preparing Your Raspberry Pi Cluster
     content:
     - name: Hardware Requirements
@@ -55,13 +56,13 @@ navigation:
       link: 14_ci_cd_on_k3s.html
   - section: Advanced Topics
     content:
-    - name: Advanced Networking & Custom CNI
+    - name: Advanced Networking and Custom CNI
       link: 15_custom_cni.html
     - name: Securing Your Cluster
       link: 16_securing_your_cluster.html
   - section: Final Project
     content:
-    - name: "Final Project \u2013 Deploying a Multi-Service App"
+    - name: Final Project - A Visit Counter That Survives
       link: 17_final_project.html
   - section: Summary
     content:
@@ -74,134 +75,169 @@ navigation:
 
 ---
 
-With your K3s cluster up and running, it’s time to **interact with it using `kubectl`** — the command-line tool for managing Kubernetes.
-
-This lesson will walk you through the basics of exploring and managing your cluster.
+By the end of this lesson you will be able to point `kubectl` on your own computer at your K3s cluster, and use it to deploy, inspect, expose and delete a simple app.
 
 ---
 
-## Setting Up `kubectl` Access
+## What kubectl does
 
-On the **master node**, or from your development machine:
+`kubectl` is the command-line tool that talks to the Kubernetes API on your server. You describe what you want ("three copies of nginx"), and Kubernetes makes it so and keeps it that way. If a pod dies, the Deployment creates another.
 
-```bash
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-````
-
-Or copy the config to your local system:
-
-```bash
-scp pi@pi-master:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+```mermaid
+flowchart LR
+    K["kubectl on your laptop"] -->|"HTTPS port 6443"| API["API server on pi-server"]
+    API --> D["Deployment<br/>hello-world"]
+    D --> RS["ReplicaSet"]
+    RS --> P1["Pod on pi-node1"]
+    RS --> P2["Pod on pi-node2"]
+    SVC["Service<br/>NodePort"] --> P1
+    SVC --> P2
 ```
 
-Replace `pi@pi-master` with your actual master node address.
+---
 
-Ensure correct file permissions:
+## Step 1: Install kubectl on your computer
+
+K3s already includes `kubectl` on the server, but it is nicer to work from your own computer. Install the standard `kubectl` by following the instructions at kubernetes.io/docs/tasks/tools/ for your operating system, then check it with:
 
 ```bash
+kubectl version --client
+```
+
+---
+
+## Step 2: Copy the kubeconfig
+
+The kubeconfig at `/etc/rancher/k3s/k3s.yaml` is root-only, so `scp` as a normal user is refused. Instead, read it with `sudo` over SSH:
+
+```bash
+mkdir -p ~/.kube
+ssh pi@pi-server.local "sudo cat /etc/rancher/k3s/k3s.yaml" > ~/.kube/config
 chmod 600 ~/.kube/config
 ```
 
----
+Inside the file, the `server:` line points to `https://127.0.0.1:6443`, which means "this computer". The K3s docs tell you to replace that with your server's address. Open the file in an editor and change it, or on Linux:
 
-## Inspecting the Cluster
+```bash
+sed -i 's/127.0.0.1/192.168.1.100/' ~/.kube/config
+```
 
-List all nodes:
+On macOS use `sed -i '' ...` instead. Now test:
 
 ```bash
 kubectl get nodes
 ```
 
-List all running pods (across namespaces):
+You should see the same nodes as before, with no `sudo` and no `k3s` in front. Keep this file private: it gives full administrator access to your cluster.
+
+---
+
+## Step 3: Explore
 
 ```bash
+kubectl get nodes -o wide
 kubectl get pods -A
-```
-
-Check system components (K3s uses `kube-system` namespace):
-
-```bash
 kubectl get pods -n kube-system
 ```
 
+`-A` means all namespaces and `-n` picks one. Namespaces are folders for resources. K3s puts its own components in `kube-system`, and yours go in `default` unless you say otherwise.
+
 ---
 
-## Deploying a Simple App
-
-Create a simple deployment:
+## Step 4: Deploy and expose an app
 
 ```bash
-kubectl create deployment hello-world --image=nginx
-```
-
-Expose it as a service:
-
-```bash
+kubectl create deployment hello-world --image=nginx --replicas=2
 kubectl expose deployment hello-world --port=80 --type=NodePort
-```
-
-Find the assigned NodePort:
-
-```bash
+kubectl get pods -o wide
 kubectl get svc hello-world
 ```
 
-Access it via any node's IP and the port listed.
+The Service line shows a port such as `80:3xxxx/TCP`. The number after the colon is the **NodePort**, between 30000 and 32767. Open `http://192.168.1.100:<nodeport>` in your browser, using any node's address, and you should see the nginx welcome page. NodePort opens that same port on every node.
 
 ---
 
-## Useful Commands
-
-| Command                          | Description                                |
-| -------------------------------- | ------------------------------------------ |
-| `kubectl get pods`               | List all pods in the current namespace     |
-| `kubectl describe pod <name>`    | Show detailed info about a pod             |
-| `kubectl logs <pod>`             | View logs from a pod                       |
-| `kubectl exec -it <pod> -- bash` | Open a shell inside a pod (if it has bash) |
-| `kubectl delete pod <name>`      | Delete a pod                               |
-| `kubectl apply -f <file.yaml>`   | Apply resources from a YAML file           |
-{:class="table table-striped"}
-
----
-
-## Pro Tips
-
-* Use `-A` to view resources across all namespaces
-* Add bash completion for `kubectl`:
-
-  ```bash
-  source <(kubectl completion bash)
-  ```
-  
-* Use `kubectl get all` to quickly see services, pods, deployments
-
----
-
-## Example: Get Details on Your Node
+## Step 5: Look inside and watch it heal
 
 ```bash
-kubectl describe node pi-master
+kubectl describe pod <pod-name>
+kubectl logs <pod-name>
+kubectl exec -it <pod-name> -- sh
 ```
 
-Look at:
+Replace `<pod-name>` with a name from `get pods`. Then delete a pod and watch the Deployment replace it:
 
-* Capacity
-* Allocated resources
-* Kubelet version
-* Taints and labels
+```bash
+kubectl delete pod <pod-name>
+kubectl get pods
+```
 
----
-
-## Summary
-
-You now know how to:
-
-* Access your K3s cluster with `kubectl`
-* Deploy, expose, and interact with workloads
-* Use key commands to inspect cluster health
+A new pod with a different name appears almost at once. This is Kubernetes keeping its promise of two replicas.
 
 ---
 
-Next up: [Dashboard and Monitoring](09_dashboard_and_monitoring)
+## Handy commands
+
+| Command | What it does |
+|---|---|
+| `kubectl get <thing>` | List pods, services, deployments, nodes |
+| `kubectl describe <thing> <name>` | Details and recent events, the first stop for problems |
+| `kubectl logs <pod>` | Output from a pod's container |
+| `kubectl apply -f file.yaml` | Create or update from a file |
+| `kubectl delete -f file.yaml` | Remove what a file created |
+| `kubectl scale deployment <name> --replicas=3` | Change the number of copies |
+{:class="table table-single"}
+
+Clean up when you are done:
+
+```bash
+kubectl delete service hello-world
+kubectl delete deployment hello-world
+```
+
+> **Teachers**: Learners sharing one cluster will all type `hello-world` and trip over each other. Give each learner a namespace (`kubectl create namespace alice`) and have them add `-n alice` to every command. Also stress that the kubeconfig is an administrator key, so it should not be emailed or committed to Git.
 
 ---
+
+## Try it Yourself
+
+1. Deploy `nginx` with three replicas and use `get pods -o wide` to see which nodes they run on.
+2. Delete one pod and time how long it takes the replacement to become `Running`.
+3. Scale the deployment up to five replicas and back down to one.
+4. Challenge: run `kubectl create deployment demo --image=nginx --dry-run=client -o yaml` and read the YAML it prints. Which fields could you change?
+
+---
+
+## Common Issues
+
+- **Problem**: `kubectl` says `connection refused` to `127.0.0.1:6443`, or `localhost:8080`.
+- **Solution**: Check `~/.kube/config` exists and its `server:` line holds the server's real IP address.
+- **Why**: The copied kubeconfig points at `127.0.0.1`, which on your laptop is not the Pi.
+
+- **Problem**: A pod is stuck in `ImagePullBackOff`.
+- **Solution**: Run `kubectl describe pod <name>`, read the Events, and check the image name and that it supports `arm64`.
+- **Why**: A typo or an image built only for another CPU type cannot be pulled and started on a Pi.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does `kubectl get pods -A` show?
+- [ ] Only pods on the current node
+- [x] Pods in all namespaces
+- [ ] Only failed pods
+> `-A` is short for all namespaces.
+
+? What happens if you delete one pod owned by a Deployment?
+- [ ] The Deployment is deleted
+- [x] The Deployment creates a replacement
+- [ ] Nothing, until you restart K3s
+> A Deployment keeps the requested number of replicas running.
+
+? Why do you edit the `server:` line in the copied kubeconfig?
+- [x] It points to 127.0.0.1, which is your laptop, not the Pi
+- [ ] It must be a hostname
+- [ ] It has expired
+> The server's own copy refers to itself, so you replace the address when copying it elsewhere.
+{% endquiz %}
