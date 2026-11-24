@@ -235,10 +235,11 @@
   date_published: 2023-01-29
   description: Design a 3D-printable robot eye mechanism in Fusion 360, with upper
     and lower eyelids that open and close around a central eyeball on a single servo.
-  duration: 0h 25m
+  duration: 0h 39m
   groups:
-  - robotics
-  - fusion 360
+  - 3ddesign
+  - robots
+  - 3dprinting
   lessons: 10
   level: intermediate
   link: /learn/eye_mechanism/00_intro.html

@@ -4,11 +4,14 @@ description: Let's create the lower eyelid, similar to the upper eyelid
 layout: lesson
 type: page
 cover: /learn/eye_mechanism/assets/banners/07_create_lower_sketch.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to repeat a sketch-and-revolve workflow to create the lower eyelid and its hinge profile.
 
 ## Picking up the pace
 
@@ -89,3 +92,37 @@ Let's create the hinges similar to in [lesson 4](04_create_hinges.html).
 * **Finish Sketch** - Click the `Finish Sketch` button
 
 ---
+
+## Try it Yourself
+
+1. Look at the upper and lower sketches side by side and list what is the same and what is different.
+2. Hide the Upper Eyelid (click the eye icon in the browser) and look at the lower eyelid on its own.
+3. Challenge: write down the steps for the lower eyelid from memory, then check them against this lesson.
+
+## Common Issues
+
+- **Problem**: The lower profile revolves into the upper eyelid.
+- **Solution**: Check you sketched on the XY plane and revolved by -180, not 180.
+- **Why**: The sign of the angle sets which way the shape sweeps around the axis.
+
+## Check your understanding
+
+{% quiz %}
+? Which plane is the lower eyelid sketch drawn on?
+- [x] XY
+- [ ] YZ
+- [ ] The offset plane
+> We start on the XY plane, then use an offset plane for the hinge.
+
+? How many circles does the lower hinge profile have?
+- [x] Four: 2mm, 6mm, 8mm and 10mm
+- [ ] Three
+- [ ] Two
+> The extra 10mm circle lets it fit over the upper hinge.
+
+? What do we revolve the lower profile by?
+- [x] -180 degrees
+- [ ] 90 degrees
+- [ ] 360 degrees
+> The lower eyelid sweeps the other way round.
+{% endquiz %}

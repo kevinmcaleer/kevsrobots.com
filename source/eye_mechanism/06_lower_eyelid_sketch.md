@@ -4,6 +4,7 @@ description: Let's create the Lower Eyelid
 layout: lesson
 type: page
 cover: /learn/eye_mechanism/assets/cover.jpg
+date_updated: 2026-11-24
 ---
 
 ![Eye mechanism]({{page.cover}}){:class="cover"}
@@ -60,3 +61,37 @@ The result should look like this:
 ![Create new Component](assets/eye47.jpg){:class="img-fluid w-50"}
 
 ---
+
+## Try it Yourself
+
+1. Rename the root component and check the browser to see the new name.
+2. Switch the active component between Upper Eyelid and Lower Eyelid and notice which one is highlighted.
+3. Challenge: create a third empty component called `Eyeball` for the exercise in the last lesson.
+
+## Common Issues
+
+- **Problem**: Your new component ends up inside the Upper Eyelid.
+- **Solution**: Make the root component active first, then create the new component.
+- **Why**: Components are nested inside whichever component is active, and we want the two eyelids side by side.
+
+## Check your understanding
+
+{% quiz %}
+? Why do we keep each part in its own component?
+- [x] So we can connect them with joints later
+- [ ] It makes the eyelid smaller
+- [ ] Fusion can only print components
+> Joints connect components, so each moving part needs its own.
+
+? Why do we save regularly?
+- [x] Fusion makes a new version each time we save
+- [ ] Saving rotates the model
+- [ ] Saving closes the sketch
+> Each save is a version you can return to.
+
+? Which component should be active before you create the Lower Eyelid component?
+- [x] The root component
+- [ ] The Upper Eyelid
+- [ ] None of them
+> We create it at the same level as the original component.
+{% endquiz %}
