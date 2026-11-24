@@ -1,19 +1,18 @@
 ---
-layout: ''
-title: 15_troubleshooting.md
+layout: lesson
+title: Troubleshooting
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_projects/assets/cover.jpg
+cover: /learn/micropython_projects/assets/banners/15_troubleshooting.jpg
 date: 2026-11-24
 previous: 14_the_full_gadget.html
 next: 16_summary.html
-description: Take your MicroPython beyond blinking LEDs. Build one desk gadget, a
-  status buddy, that senses a door with a reed switch, shows it on an OLED screen,
-  says it out loud with SAM speech, and reports to Arduino Cloud over Wi-Fi. Then
-  shrink it onto a tiny Seeed XIAO.
+description: 'A single place to look when the status buddy doesn''t behave, grouped
+  by stage: Sense, Show, Talk, Connect and porting'
 percent: 80
 duration: 6
 quiz_total: 19
+date_updated: 2026-11-24
 navigation:
 - name: MicroPython Projects - Make It Show, Talk and Connect
 - content:
@@ -61,7 +60,7 @@ navigation:
     content:
     - name: The full gadget
       link: 14_the_full_gadget.html
-    - name: 15_troubleshooting.md
+    - name: Troubleshooting
       link: 15_troubleshooting.html
     - name: Summary
       link: 16_summary.html

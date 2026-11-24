@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-description: A single place to look when the status buddy doesn't behave, grouped by stage: Sense, Show, Talk, Connect and porting
+description: "A single place to look when the status buddy doesn't behave, grouped by stage: Sense, Show, Talk, Connect and porting"
 layout: lesson
 type: page
 cover: /learn/micropython_projects/assets/banners/15_troubleshooting.jpg

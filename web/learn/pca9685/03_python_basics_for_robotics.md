@@ -1,19 +1,18 @@
 ---
-layout: ''
-title: 03_python_basics_for_robotics.md
+layout: lesson
+title: Python Basics for Robotics
 author: Kevin McAleer
 type: page
-cover: /learn/pca9685/assets/cover.png
+cover: assets/3.png
 date: 2024-04-06
 previous: 02_raspberry_pi_setup.html
 next: 04_introduction_to_pca9685.html
-description: Build Buddy Jr, a small 3D printed robot arm with four servos, and bring
-  it to life with a Raspberry Pi, Python and a PCA9685 servo driver. You'll set up
-  the Pi, wire the board safely with a separate servo supply, learn the maths from
-  angle to pulse, assemble the arm and program smooth, repeatable movements.
+description: 'Learn the handful of Python ideas a robot arm needs: variables, functions,
+  loops and dictionaries, with joint angles as the running example.'
 percent: 24
 duration: 5
 quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Building a Robot Arm with Raspberry Pi and PCA9685
 - content:
@@ -23,7 +22,7 @@ navigation:
       link: 00_intro.html
     - name: Setting Up Your Raspberry Pi
       link: 02_raspberry_pi_setup.html
-    - name: 03_python_basics_for_robotics.md
+    - name: Python Basics for Robotics
       link: 03_python_basics_for_robotics.html
   - section: Understanding the PCA9685 Servo Driver
     content:
