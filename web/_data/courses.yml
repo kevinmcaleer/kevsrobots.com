@@ -4,7 +4,7 @@
   description: Transition from Arduino C++ to MicroPython quickly and easily. Learn
     Python syntax with side-by-side comparisons, control hardware, and build IoT and
     robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.
-  duration: 1h 38m
+  duration: 1h 15m
   groups:
   - micropython
   - arduino

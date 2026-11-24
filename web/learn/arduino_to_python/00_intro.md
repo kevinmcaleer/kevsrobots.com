@@ -3,12 +3,15 @@ layout: lesson
 title: Introduction to Arduino to MicroPython
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/intro.jpg
+cover: /learn/arduino_to_python/assets/banner01.jpg
 date: 2025-11-20
 next: 01_why_micropython.html
-description: Quick start guide for Arduino developers learning MicroPython
+description: A quick start guide for Arduino C++ makers learning MicroPython, with
+  side-by-side code for every idea and two finished projects
 percent: 8
-duration: 3
+duration: 4
+quiz_total: 43
+date_updated: 2026-11-24
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:
@@ -51,90 +54,67 @@ navigation:
 
 {% include youtubeplayer.html id="A7ZJ5TC-zUk" %}
 
-## Welcome!
+By the end of this lesson you will be able to say what this course covers, what kit you need, and how the side-by-side lessons work.
 
-You already know how to make LEDs blink, read sensors, and control motors with Arduino C++. Now it's time to learn MicroPython - a powerful alternative that can make your projects faster to develop and easier to maintain.
+## Overview
 
-This course is designed specifically for Arduino developers like you. We'll use side-by-side code comparisons so you can see exactly how your Arduino knowledge translates to MicroPython.
+Ahoy there makers! You already know how to blink LEDs, read sensors and drive motors with Arduino C++. This course takes that knowledge and shows you how each piece looks in MicroPython, Python for microcontrollers. Every idea is shown twice, once as an Arduino sketch and once as MicroPython, so you are translating something you already understand rather than starting again.
 
-## What You'll Learn
+You will finish with two working projects: a WiFi temperature monitor that serves its own web page, and a small obstacle-avoiding robot.
 
-By the end of this course, you'll be able to:
+```mermaid
+flowchart LR
+    A["Arduino C++ sketch"] --> B["Translate the idea"]
+    B --> C["MicroPython program"]
+    C --> D["Run it on the board and use the REPL"]
+```
 
-- ✅ Write MicroPython code for microcontrollers
-- ✅ Control hardware (pins, ADC, PWM) with Python
-- ✅ Choose between C++ and Python for your projects
-- ✅ Build IoT projects with WiFi
-- ✅ Create robot control systems in Python
+## Course Content
 
-## Target Hardware
+- Why and when to choose MicroPython over C++
+- Python syntax for C++ programmers: no semicolons, indentation, dynamic types
+- Control flow, functions and the end of `setup()` and `loop()`
+- Digital pins, analogue input and PWM with `Pin`, `ADC` and `PWM`
+- Timing: seconds, milliseconds and the non-blocking `millis()` pattern
+- `print()`, the REPL and debugging
+- A WiFi temperature monitor and an obstacle-avoiding robot
+- A quick reference card to keep next to your keyboard
 
-This course works with any of these boards:
+## Key Results
 
-- **Arduino Nano ESP32** - Arduino with WiFi and MicroPython support
-- **Raspberry Pi Pico W** - Popular, affordable, WiFi-enabled
-- **Raspberry Pi Pico 2W** - Faster version with WiFi
+After completing this course, you will:
 
-All examples will work on these boards with minimal changes.
+- Translate common Arduino sketches into working MicroPython programs
+- Control pins, analogue inputs and PWM outputs with the `machine` module
+- Avoid the classic seconds versus milliseconds mistake
+- Use the REPL to test hardware without re-uploading code
+- Build an IoT web server and a simple robot in MicroPython
+- Decide when Arduino C++ is still the better tool
 
-## Prerequisites
+## What you'll need
 
-**You should already know:**
-- Arduino C++ programming
-- Basic electronics (LEDs, resistors, breadboards)
-- How to upload sketches to Arduino
+- A Raspberry Pi Pico W or Pico 2 W (the examples are written for these; a Pico or Pico 2 works for everything except the WiFi lesson)
+- A micro-USB or USB-C cable to suit the board
+- Breadboard, jumper wires, a few LEDs with resistors (around 330 ohm) and a push button
+- Thonny, a free editor, with MicroPython already on the board. If it is not, follow [How to install MicroPython](/learn/how_to_install_micropython/)
+- For the robot lesson: two DC motors, a motor driver board, an HC-SR04 ultrasonic sensor, a chassis and a battery pack
 
-**You do NOT need:**
-- Python experience (we'll teach you!)
-- Linux or command line knowledge
-- Advanced programming skills
+An Arduino Nano ESP32 can also run MicroPython, but its pin names differ from the Pico's. Check the pinout in Arduino's MicroPython documentation before reusing the pin numbers in this course.
 
-## What You'll Need
+## How the course works
 
-**Hardware:**
-- One of the boards listed above
-- USB cable
-- LEDs, resistors, breadboard
-- (Optional) Sensors and modules you already have
-
-**Software:**
-- **Thonny IDE** - Free, beginner-friendly editor
-- **MicroPython firmware** - Already installed if you followed our [MicroPython Installation Course](/learn/how_to_install_micropython/)
-
-**Not installed yet?** Check out our quick installation guide: [How to Install MicroPython](/learn/how_to_install_micropython/)
-
-## Course Structure
-
-**Section 1**: Getting Started (2 lessons)
-Quick introduction and why MicroPython matters
-
-**Section 2**: Language Fundamentals (4 lessons)
-Learn Python syntax with Arduino comparisons
-
-**Section 3**: Hardware Basics (3 lessons)
-Control pins, ADC, PWM, and timing
-
-**Section 4**: Practical Projects (3 lessons)
-Build real IoT and robotics projects
-
-**Total time:** 2-3 hours for complete course
-
-## How This Course Works
-
-### Side-by-Side Comparisons
-
-Every concept shows Arduino C++ and MicroPython side by side:
+Most lessons follow the same pattern: the Arduino version first, the MicroPython version second, then a short list of what changed. Here is the idea in miniature:
 
 **Arduino C++:**
 ```cpp
 void setup() {
-  pinMode(13, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
-  digitalWrite(13, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(1000);
-  digitalWrite(13, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
 }
 ```
@@ -144,7 +124,7 @@ void loop() {
 from machine import Pin
 import time
 
-led = Pin(25, Pin.OUT)
+led = Pin("LED", Pin.OUT)  # the on-board LED on a Pico W or Pico 2 W
 
 while True:
     led.on()
@@ -153,38 +133,20 @@ while True:
     time.sleep(1)
 ```
 
-### Try It Yourself
+Each lesson opens with one objective, then teaches one idea, and ends with three parts:
 
-Each lesson includes hands-on exercises you can do with your board.
+- **Try it Yourself**: exercises of rising difficulty
+- **Common Issues**: the mistakes people really make, with the fix
+- **Check your understanding**: a short quiz, scored in the lesson sidebar
 
-### Keep It Simple
+Code boxes with a Run button are small programs you can try in the browser. Longer programs are complete: save them to the board as `main.py` and they run on power-up.
 
-We focus on practical skills, not theory. You'll learn by doing.
+> **Teachers**: This course suits learners aged about 14 and up who have already written Arduino sketches, and it works for a club or a lesson series. Allow 30 to 45 minutes per lesson (the two project lessons need 60 to 90). Each learner or pair needs one Pico W, a breadboard and basic parts; the robot lesson works best with one kit per group of three or four. Lessons 1 to 4 need no hardware at all, because the Run boxes execute the code in the browser. The WiFi lesson needs a network that lets devices reach each other, which some school networks block, so test it first or use a teacher's phone hotspot.
 
-## Why Learn MicroPython?
+## Prerequisites
 
-**Faster development:**
-- No compile time - run code instantly
-- Interactive REPL for testing
-- Change code without re-uploading
+You should already be comfortable with Arduino sketches, basic electronics (LEDs, resistors, breadboards) and uploading code to a board. You do not need any Python experience. If you want a gentler Python start first, try [Learn MicroPython - The basics](/learn/micropython/), and for general Python see [Python](/learn/python/).
 
-**Easier to read:**
-- Less boilerplate
-- Clearer syntax
-- Better for beginners teaching others
+## Ready to start?
 
-**Powerful features:**
-- Built-in WiFi libraries (on ESP32/Pico W)
-- File system for data logging
-- Easy string manipulation
-
-**When to still use Arduino C++:**
-- Need microsecond timing
-- Very limited RAM
-- Existing Arduino libraries you need
-
-## Ready to Start?
-
-In the next lesson, we'll explore why MicroPython is worth learning and when to use it versus Arduino C++.
-
-Let's go!
+Next up is a straight answer to the question you are probably asking: why switch at all? Let's go!

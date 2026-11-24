@@ -8,10 +8,27 @@ description: Transition from Arduino C++ to MicroPython quickly and easily. Lear
   Python syntax with side-by-side comparisons, control hardware, and build IoT and
   robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.
 level: beginner
-course_duration: 1h 38m
+course_duration: 1h 15m
 lesson_count: 12
 first_lesson: 00_intro.html
+quiz_total: 43
 video: A7ZJ5TC-zUk
+outcomes:
+- Translate common Arduino C++ sketches into working MicroPython programs
+- Control digital pins, analogue inputs and PWM outputs with the machine module
+- Use seconds, milliseconds and ticks_diff correctly, and blink without delay
+- Test hardware live in the REPL and debug with print and f-strings
+- Build a WiFi temperature web server and an obstacle-avoiding robot
+- Decide when MicroPython or Arduino C++ is the better tool
+prerequisites:
+- Arduino C++ basics, such as writing and uploading a sketch
+- Basic electronics (LEDs, resistors, breadboards)
+you_need:
+- A Raspberry Pi Pico W or Pico 2 W with MicroPython installed
+- A USB cable, a breadboard, LEDs, resistors and a push button
+- Thonny on your computer
+- For the robot project, two DC motors, a motor driver, an HC-SR04 sensor and a battery
+  pack
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:
