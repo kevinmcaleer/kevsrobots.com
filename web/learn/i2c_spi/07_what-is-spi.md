@@ -108,6 +108,7 @@ spi.write(b'data')    # Send data
 response = spi.read() # Receive data
 cs.value(1)           # Deselect device
 ```
+{: .no-snakie }
 
 ## SPI on Raspberry Pi Pico
 
@@ -236,6 +237,7 @@ spi = SPI(0, baudrate=10000000, ...) # 10 MHz
 # Very fast - Pico can handle up to 62.5 MHz
 spi = SPI(0, baudrate=62500000, ...) # 62.5 MHz
 ```
+{: .no-snakie }
 
 > **Tip**: Start with 1 MHz and increase speed once everything works. Some sensors have maximum speed limits.
 
@@ -445,6 +447,7 @@ spi = SPI(0, baudrate=1000000, polarity=1, phase=1, ...)
 # Try slower speed
 spi = SPI(0, baudrate=100000, ...)
 ```
+{: .no-snakie }
 
 ### Reading Wrong Data
 

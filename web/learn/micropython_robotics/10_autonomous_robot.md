@@ -137,6 +137,7 @@ def explore():
 # Run the loop
 explore()
 ```
+{: .no-snakie }
 
 ---
 

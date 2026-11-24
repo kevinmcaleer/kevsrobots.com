@@ -265,6 +265,7 @@ spi = SPI(0, baudrate=100000, ...)  # 100 kHz
 # Once working, increase gradually
 spi = SPI(0, baudrate=1000000, ...)  # 1 MHz
 ```
+{: .no-snakie }
 
 ### Wrong SPI Mode
 
@@ -285,6 +286,7 @@ spi = SPI(0, baudrate=1000000, polarity=1, phase=0, ...)
 # Mode 3
 spi = SPI(0, baudrate=1000000, polarity=1, phase=1, ...)
 ```
+{: .no-snakie }
 
 ## Multiple SPI Devices
 
