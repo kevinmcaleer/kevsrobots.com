@@ -4,12 +4,14 @@ description: Lay out the schematic symbol for your Snakie part, record its I2C a
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/07_schematic_symbol_and_electrical_details.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to arrange a part's schematic symbol, record its I2C address, and set the supply limits that let Snakie catch wiring mistakes.
 
 So far you've described what the part looks like. Now you'll describe how it **behaves**: its circuit symbol, its I2C address and the voltage it's happy with. This is the information that lets Snakie catch mistakes before they cost you a sensor.
 

@@ -9,8 +9,8 @@ next: 01_lesson_01.html
 description: Learn to program your SMARS robot in Arduino C++, from first moves to
   line following
 percent: 12
-duration: 2
-quiz_total: 17
+duration: 3
+quiz_total: 21
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:
@@ -83,7 +83,11 @@ By the end of this course you will be able to:
 
 ## How the course works
 
-Each lesson has a livestream video, the complete code to type in, and an explanation of what each part does. Typing the code yourself (rather than copying it) is the best way to learn. There's a quick quiz at the end of each lesson.
+Each lesson has a livestream video, the complete code to type in, and an explanation of what each part does. Typing the code yourself (rather than copying it) is the best way to learn. Every lesson ends with a few things to try yourself, a list of common problems and fixes, and a quick quiz.
+
+Code is shown in grey boxes. Lines starting with `//` are comments for you, and the Arduino ignores them. Where a lesson shows only part of a sketch, it says which part of your sketch to change.
+
+> **Teachers**: This course suits ages 11 and up, working in pairs with one SMARS per pair. Allow 45 to 60 minutes per lesson. Each pair needs a built SMARS (see the [build course](/learn/smars/)), a USB cable and a computer with the Arduino IDE installed. Install the IDE and any libraries (Lessons 4 and 5) before the class, because school laptops often block installs and the USB driver may need an administrator. Without robots, learners can still write and verify (compile) every sketch, but they need a board to upload and test. Always test on the floor or in a tray with edges, because a SMARS will happily drive off a desk, and unplug the USB cable (or lift the robot on a block) when you only want to test the code.
 
 ## Prerequisites
 

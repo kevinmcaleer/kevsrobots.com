@@ -4,12 +4,14 @@ description: Fade an LED, play a tune on a buzzer and sweep a servo using Snakie
 layout: lesson
 type: page
 cover: /learn/snakie_blocks/assets/banners/06_pwm_servos_and_buzzers.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to fade an LED, play a tune and sweep a servo using PWM-based blocks.
 
 On and off is only the start. This lesson is about everything in between: brightness, pitch and position.
 
@@ -112,6 +114,8 @@ This program uses the other wait block, **wait 1 seconds**, which writes `time.s
 
 ---
 
+> **Teachers**: The simulator has no speaker, so learners watch GP16 in the board view and read the console instead of hearing the tune. A real piezo buzzer on a Pico is needed to hear it.
+
 ## Try it Yourself
 
 1. Make the LED fade down again after fading up. You'll need a second **for each** loop that counts backwards.
@@ -121,17 +125,17 @@ This program uses the other wait block, **wait 1 seconds**, which writes `time.s
 
 ## Common Issues
 
-**Problem**: The LED flickers instead of fading.
-**Solution**: Set the frequency to 1000 Hz before setting the power.
-**Why**: At a low frequency your eye can see each flash.
+- **Problem**: The LED flickers instead of fading.
+- **Solution**: Set the frequency to 1000 Hz before setting the power.
+- **Why**: At a low frequency your eye can see each flash.
 
-**Problem**: The servo twitches or the Pico resets.
-**Solution**: Power the servo from a separate supply, and join the grounds.
-**Why**: Servos draw more current than the Pico's 3.3V pin can give.
+- **Problem**: The servo twitches or the Pico resets.
+- **Solution**: Power the servo from a separate supply, and join the grounds.
+- **Why**: Servos draw more current than the Pico's 3.3V pin can give.
 
-**Problem**: A warning badge appears on my buzzer blocks.
-**Solution**: Nothing to fix if they are meant to share a pin.
-**Why**: Snakie flags any two blocks on one pin, in case it was a mistake.
+- **Problem**: A warning badge appears on my buzzer blocks.
+- **Solution**: Nothing to fix if they are meant to share a pin.
+- **Why**: Snakie flags any two blocks on one pin, in case it was a mistake.
 
 ## Check your understanding
 

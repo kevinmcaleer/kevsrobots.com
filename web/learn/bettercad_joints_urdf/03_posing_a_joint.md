@@ -11,8 +11,8 @@ description: Move a BetterCad joint with its slider, by typing an angle or by dr
   the part, and go back to the home pose
 percent: 28
 duration: 4
-quiz_total: 39
-date_updated: 2026-11-21
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to move a joint with its slider, by typing an angle or by dragging the part, and go back to the home pose.
 
 The shoulder is made. Now make it move. There are three ways, and you'll end up using all of them.
 

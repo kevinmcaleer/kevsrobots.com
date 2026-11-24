@@ -5,6 +5,7 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/00_intro.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -61,6 +62,10 @@ After completing this course, you will be able to:
 * A computer running Windows, macOS or Linux, or a Raspberry Pi
 * A text editor such as [VS Code](https://code.visualstudio.com) or [Thonny](https://thonny.org)
 * A free [GitHub](https://github.com) account (for modules 10 to 12)
+
+---
+
+> **Teachers**: this course suits learners from about 11 upwards, and fits a single club or classroom session per module (30 to 45 minutes each). Each learner needs a computer with Git installed and a text editor. Modules 1 to 9 need no internet account at all, so they work on a locked-down school network. Modules 10 to 12 need a GitHub account per learner, so check GitHub's minimum age rules and your school's policy first, or demonstrate those modules on one shared account.
 
 ---
 

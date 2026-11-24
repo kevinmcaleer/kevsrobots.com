@@ -7,12 +7,13 @@ cover: /learn/gymnasium/assets/banners/04_spaces.jpg
 date: 2026-06-14
 previous: 03_terminated_vs_truncated.html
 next: 05_qlearning_on_gymnasium.html
-description: "Learn how Gymnasium's Discrete, Box, and MultiDiscrete spaces describe\
-  \ what an agent can observe and do \u2014 and why spaces make generic algorithms\
-  \ possible."
+description: Learn how Gymnasium's Discrete, Box, and MultiDiscrete spaces describe
+  what an agent can observe and do, and why spaces make generic algorithms possible.
 percent: 30
-duration: 5
-date_updated: 2026-06-14
+duration: 6
+quiz_total: 56
+snakie: false
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning with Gymnasium
 - content:
@@ -54,7 +55,7 @@ navigation:
       link: 12_meet_stable_baselines3.html
     - name: Train, Evaluate, and Export
       link: 13_train_evaluate_export.html
-    - name: "What You Have Built \u2014 and Where to Go Next"
+    - name: What You Have Built, and Where to Go Next
       link: 14_summary.html
 ---
 
@@ -63,154 +64,169 @@ navigation:
 
 ---
 
-## Why Spaces Exist
+By the end of this lesson you will be able to read and create `Discrete`, `Box` and `MultiDiscrete` spaces, and explain why a generic agent needs them.
 
-When you wrote the BurgerBot Q-learning agent by hand, your `choose_action` function knew the exact structure of the state: a tuple of `(row, col, heading, sensor)`. It knew that `row` ranged from 0 to 6, that `heading` was one of four string values, and that `sensor` had three levels. You hard-coded that knowledge.
+---
 
-A generic algorithm — one that should work on CartPole, BurgerBot, and a simulated robot arm without modification — cannot have that knowledge baked in. It needs a way to ask: "What does the observation look like? What actions are available?"
+## Why spaces exist
 
-That is what `observation_space` and `action_space` are for. They are machine-readable descriptions of the shape and range of the data the environment produces and accepts.
+When you wrote the BurgerBot Q-learning agent by hand, your code knew the exact shape of the state: a tuple of `(row, col, heading, sensor)`, with `row` from 0 to 6 and so on. You hard-coded that knowledge.
 
-## The Three Spaces You Will Use
+A generic algorithm that should work on CartPole, BurgerBot and a simulated arm cannot hard-code anything. It needs to ask: "What does an observation look like? What can I do?" That is what `env.observation_space` and `env.action_space` are for: machine-readable descriptions of the shape and range of the data going in and out.
 
-Gymnasium defines many space types. Three cover the vast majority of environments you will encounter.
+```mermaid
+flowchart LR
+    ENV["Environment"] -- "observation_space" --> AG["Generic agent"]
+    ENV -- "action_space" --> AG
+    AG -- "builds input layer to match observation_space" --> NET["Network or table"]
+    AG -- "builds output layer to match action_space" --> NET
+```
+
+## The three spaces you will use most
 
 ### Discrete
 
-A single integer chosen from `{0, 1, 2, ..., n-1}`.
-
-```python
-from gymnasium import spaces
-
-# Four possible actions: 0, 1, 2, 3
-action_space = spaces.Discrete(4)
-
-print(action_space.n)           # 4
-print(action_space.sample())    # random integer in {0, 1, 2, 3}
-print(action_space.contains(2)) # True
-print(action_space.contains(4)) # False — 4 is out of range
-```
-
-BurgerBot uses `Discrete(4)` for actions: 0=forward, 1=turn_left, 2=turn_right, 3=stop.
+One integer from `0` to `n - 1`. BurgerBot's actions use `Discrete(4)`: 0 forward, 1 turn left, 2 turn right, 3 stop.
 
 ### Box
 
-A continuous n-dimensional array, where each dimension has its own lower and upper bound.
+A block of numbers, each with a lower and upper bound. It covers sensor readings, joint angles, velocities and even camera images, which are a `Box` of shape `(height, width, 3)`. CartPole's observation is a `Box` of four numbers: cart position, cart speed, pole angle, pole angular speed.
+
+### MultiDiscrete
+
+Several independent integers, each with its own range. BurgerBot's observation is `[row, col, heading, sensor]`, so it is `MultiDiscrete([7, 7, 4, 3])`.
+
+Here is all three in one runnable program:
 
 ```python
 import numpy as np
 from gymnasium import spaces
 
-# CartPole's observation: 4 continuous values
-# [cart_position, cart_velocity, pole_angle, pole_angular_velocity]
-obs_space = spaces.Box(
-    low=np.array([-4.8, -np.inf, -0.418, -np.inf]),
-    high=np.array([4.8, np.inf, 0.418, np.inf]),
-    dtype=np.float32
+# Discrete: one integer from 0 to n-1
+actions = spaces.Discrete(4)
+print("Discrete(4) n =", actions.n)
+print("contains 2:", actions.contains(2), " contains 4:", actions.contains(4))
+
+# Box: continuous numbers with bounds (here CartPole's observation)
+inf = np.float32(np.inf)
+cartpole_obs = spaces.Box(
+    low=np.array([-4.8, -inf, -0.418, -inf], dtype=np.float32),
+    high=np.array([4.8, inf, 0.418, inf], dtype=np.float32),
+    dtype=np.float32,
 )
+print("Box shape:", cartpole_obs.shape)
+print("zeros float32 inside:", cartpole_obs.contains(np.zeros(4, dtype=np.float32)))
+print("zeros float64 inside:", cartpole_obs.contains(np.zeros(4)))
+print("cart at 9.0 inside:", cartpole_obs.contains(np.array([9.0, 0, 0, 0], dtype=np.float32)))
 
-print(obs_space.shape)          # (4,)
-print(obs_space.sample())       # random float array — will be in range
-print(obs_space.contains(np.zeros(4, dtype=np.float32)))  # True
-```
-
-Box is what you get with continuous sensor data, camera images (a Box of shape `(H, W, 3)`), joint angles, velocities, and most real-world robotics observations.
-
-### MultiDiscrete
-
-An array of independent integers, each from its own range. This is what BurgerBot uses for observations.
-
-```python
-from gymnasium import spaces
-
-# BurgerBot observation: [row, col, heading_index, sensor_reading]
-# row: 0-6, col: 0-6, heading: 0-3, sensor: 0-2
-obs_space = spaces.MultiDiscrete([7, 7, 4, 3])
-
-print(obs_space.nvec)           # array([7, 7, 4, 3])
-print(obs_space.sample())       # e.g. array([3, 5, 1, 2])
-print(obs_space.contains(np.array([6, 6, 3, 2])))   # True
-print(obs_space.contains(np.array([7, 0, 0, 0])))   # False — row 7 out of range
-```
-
-The total number of possible observations is `7 * 7 * 4 * 3 = 588`. This matches exactly what the previous course calculated when discussing the state-space size.
-
-## How a Generic Algorithm Uses Spaces
-
-Here is a simplified version of what Stable-Baselines3 does internally when you call `model = DQN("MlpPolicy", env)`:
-
-```python
-# The algorithm inspects the spaces without knowing what the environment is.
-n_actions = env.action_space.n                  # 4 for BurgerBot
-obs_shape = env.observation_space.shape         # (4,) for CartPole
-
-# It builds a neural network whose input size matches the observation shape
-# and whose output size matches the number of actions.
-# It never reads the actual environment code.
-```
-
-This is the power of the contract. The algorithm does not know if it is training on CartPole or BurgerBot. It only knows the shape of the data coming in and the range of actions going out.
-
-## Checking What an Environment Has
-
-You can always inspect any Gymnasium environment's spaces:
-
-```python
-import gymnasium as gym
-
-env = gym.make("CartPole-v1")
-print("Observation space:", env.observation_space)
-print("Action space:     ", env.action_space)
-print("Obs shape:        ", env.observation_space.shape)
-print("Obs dtype:        ", env.observation_space.dtype)
-print("Num actions:      ", env.action_space.n)
-env.close()
+# MultiDiscrete: several integers, each with its own range (BurgerBot)
+burger_obs = spaces.MultiDiscrete([7, 7, 4, 3])
+print("nvec:", burger_obs.nvec)
+print("legal:", burger_obs.contains(np.array([6, 6, 3, 2])))
+print("row 7:", burger_obs.contains(np.array([7, 0, 0, 0])))
+print("number of states:", int(np.prod(burger_obs.nvec)))
+burger_obs.seed(1)
+print("sample:", burger_obs.sample())
 ```
 
 Output:
 
 ```
-Observation space: Box([-4.8       -inf -0.4188    -inf], [4.8        inf  0.4188     inf], (4,), float32)
-Action space:      Discrete(2)
-Obs shape:         (4,)
-Obs dtype:         float32
-Num actions:       2
+Discrete(4) n = 4
+contains 2: True  contains 4: False
+Box shape: (4,)
+zeros float32 inside: True
+zeros float64 inside: False
+cart at 9.0 inside: False
+nvec: [7 7 4 3]
+legal: True
+row 7: False
+number of states: 588
+sample: [3 6 0 2]
 ```
 
-## Using .sample() in Training Loops
+Look at the `zeros float64` line: a `float64` array of zeros is **not** inside a `float32` Box, even though the numbers are fine. Spaces check the data type as well as the range. That is the number-one cause of `check_env` errors when you write your own environment.
 
-`space.sample()` is used in two places in RL code:
+The 588 matches the state count from the previous course: 7 x 7 x 4 x 3.
 
-1. Random agents and baselines: `action = env.action_space.sample()` gives you a legal random action without knowing the environment's internals.
-2. Exploration during epsilon-greedy: when the random roll is below epsilon, you call `env.action_space.sample()` instead of querying the Q-table.
+## Looking at real environments
+
+Every environment tells you its spaces. This program prints five of them:
 
 ```python
-import random
+import gymnasium as gym
 
-epsilon = 0.3
-
-if random.random() < epsilon:
-    # Explore: pick a random legal action
-    action = env.action_space.sample()
-else:
-    # Exploit: pick the best known action
-    action = best_action_from_q_table(state)
+for env_id in ["CartPole-v1", "MountainCar-v0", "Acrobot-v1", "Pendulum-v1", "FrozenLake-v1"]:
+    env = gym.make(env_id)
+    print(env_id)
+    print("  observation:", env.observation_space)
+    print("  action:     ", env.action_space)
+    env.close()
 ```
 
-This replaces the `random.choice(ACTIONS)` call from the previous course with something that works on any environment, regardless of how many actions it has.
+On our run, MountainCar printed `Box([-1.2  -0.07], [0.6  0.07], (2,), float32)` for its observation and `Discrete(3)` for actions, FrozenLake printed `Discrete(16)` and `Discrete(4)`, and Pendulum printed a `Box` for its action: its action is a continuous torque, not a choice from a short list. Notice how different the problems are, yet your code can ask each of them the same questions.
 
-## Try It Yourself
+## How an agent uses spaces
 
-1. Create a `Box` space for a 64x64 greyscale image observation: values between 0 and 255, `dtype=np.uint8`. What is `space.shape`? How many possible observations exist? (You don't need to compute the exact number — just express it symbolically.)
-2. Create a `MultiDiscrete([3, 3])` space representing a 3x3 grid position. How many distinct positions can the agent be in?
-3. Inspect the `LunarLander-v3` environment's spaces (use `gym.make("LunarLander-v3")`). Is the action space discrete or continuous? How many observations does the agent get?
+A library like Stable-Baselines3 reads the spaces and builds its network to fit. For BurgerBot it one-hot encodes the four `MultiDiscrete` numbers, which gives `7 + 7 + 4 + 3 = 21` network inputs, and uses 4 outputs for the four actions (we confirmed this by printing the policy network in testing). The library never reads your environment's code; the spaces are enough.
+
+Spaces also give you a generic random action:
+
+```python
+if random.random() < epsilon:
+    action = env.action_space.sample()      # explore: any legal action
+else:
+    action = best_action_from_q_table(state)  # exploit
+```
+{: .no-snakie }
+
+This replaces `random.choice(ACTIONS)` from the previous course and works on any environment with any number of actions.
+
+## Try it Yourself
+
+1. Make a `Box` for a 64 by 64 greyscale image: values 0 to 255, `dtype=np.uint8`. What is its `shape`? Does `contains` accept an array of zeros of type `uint8`? What about `float32`?
+2. Make `MultiDiscrete([3, 3])` for a 3 by 3 tic-tac-toe cell choice. How many distinct values can it hold?
+3. Print the spaces for `Acrobot-v1`. How many numbers make up one observation? How many actions are there?
+4. Challenge: `Pendulum-v1` has a `Box` action space. What does `env.action_space.sample()` return? Why could a Q-table with one row per action not handle it?
 
 ## Common Issues
 
-**Problem:** `AssertionError: observation is not in observation_space` from `check_env`
-**Solution:** Your `reset()` or `step()` returned an observation with the wrong dtype or out-of-range values.
-**Why:** NumPy arrays have strict dtypes. `np.array([1, 2, 3])` defaults to `int64`, but `MultiDiscrete` expects `int64` too — usually fine. `Box` with `dtype=float32` rejects a `float64` array. Use `dtype=np.int64` or `dtype=np.float32` explicitly in your environment.
+- **Problem**: `AttributeError: 'Box' object has no attribute 'n'`
+- **Solution**: Use `.n` only on `Discrete`. For a Box, use `.shape`, `.low` and `.high`.
+- **Why**: Each space type has its own attributes. Check the type with `print(env.action_space)` first.
 
-**Problem:** `AttributeError: 'Box' object has no attribute 'n'`
-**Solution:** `.n` is a `Discrete` attribute. Use `env.action_space.shape` or `env.action_space.low` for Box spaces.
-**Why:** Different space types have different attributes. Always check the space type before accessing type-specific properties.
+- **Problem**: `check_env` complains that the observation is not in the observation space.
+- **Solution**: Return an array with the dtype the space declares: `np.float32` for a `float32` Box, `np.int64` for a `MultiDiscrete`.
+- **Why**: `contains` checks the dtype as well as the range, as the `float64` line above shows.
+
+- **Problem**: `gym.make("LunarLander-v3")` fails with `DependencyNotInstalled: Box2D`.
+- **Solution**: That environment needs an extra install (`pip install swig` then `pip install "gymnasium[box2d]"`, as the error message says). Use one of the five environments above instead.
+- **Why**: Some environments depend on physics libraries that are not part of the base install.
+
+## Check your understanding
+
+{% quiz %}
+? Which space describes BurgerBot's actions (forward, turn left, turn right, stop)?
+- [x] `Discrete(4)`
+- [ ] `Box(4)`
+- [ ] `MultiDiscrete([4])`
+> Four choices numbered 0 to 3 is a `Discrete(4)`.
+
+? Which space fits CartPole's four continuous sensor numbers?
+- [ ] `Discrete(4)`
+- [x] `Box` of shape `(4,)`
+- [ ] `MultiDiscrete([4, 4])`
+> Continuous values with bounds are a `Box`.
+
+? How many distinct observations are in `MultiDiscrete([7, 7, 4, 3])`?
+- [ ] 21
+- [x] 588
+- [ ] 84
+> Multiply the ranges: 7 x 7 x 4 x 3 = 588.
+
+? Why was a `float64` array of zeros not inside the `float32` Box?
+- [ ] Zero is out of range
+- [x] Spaces check the data type as well as the range
+- [ ] Boxes cannot hold zeros
+> The program printed `False` for float64 and `True` for float32.
+{% endquiz %}

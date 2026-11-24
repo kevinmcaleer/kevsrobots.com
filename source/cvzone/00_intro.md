@@ -5,7 +5,7 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/cvzone/assets/banners/00_intro.jpg
-date_updated: 2026-10-23
+date_updated: 2026-11-24
 duration: 62
 redirect_from:
   - /learn/cvzone/00_video.html
@@ -61,7 +61,9 @@ The Raspberry Pi 5 gives the smoothest frame rates, but a Pi 4 works well too.
 
 ## Prerequisites
 
-You should be comfortable writing and running simple Python programs. If you're new to Python, start with [Python for beginners](/learn/python/).
+You should be comfortable writing and running simple Python programs. If you're new to Python, start with [Python for beginners](/learn/python/). You'll also type a few commands in the terminal, so [Introduction to the Linux Command Line](/learn/linux_intro/) helps if that is new to you.
+
+> **Teachers**: This course suits secondary school and older learners, or a club, who can already write simple Python. Allow about an hour per lesson, so five sessions in all, with the install lesson taking longest. You need one Raspberry Pi 4 or 5, with a screen and camera, per learner or per pair. The installs and the one-off model downloads need a decent internet connection, and a school network that blocks Google's download servers will stop the detectors from starting, so test one Pi first. Point a camera at pupils only with the permission your school requires: these programs only find faces and bodies in a live picture and do not save or identify anyone, but agree where the camera points before you start. Without Pi hardware, the code reading, quizzes and exercises in each lesson can still be done on paper or on a laptop with a webcam.
 
 ---
 

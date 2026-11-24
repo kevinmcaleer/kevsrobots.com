@@ -4,12 +4,14 @@ description: Review what you learned about planning, wiring and checking circuit
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/11_summary.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recall the order of work for any circuit project and choose where to go next.
 
 You started with a single board on a blue canvas. You're finishing with a wired, checked, documented and programmed robot. Nice work.
 

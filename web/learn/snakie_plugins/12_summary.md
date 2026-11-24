@@ -11,7 +11,7 @@ description: A recap of the ClubKit Snakie plugin, the complete finished code to
 percent: 100
 duration: 6
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -55,6 +55,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recap the ClubKit plugin and choose plugins of your own to write.
 
 ## You've extended your editor
 

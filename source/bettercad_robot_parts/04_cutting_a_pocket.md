@@ -4,12 +4,14 @@ description: Cut a servo pocket and its screw holes in one click with BetterCad'
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/04_cutting_a_pocket.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to cut a servo's pocket and screw holes in one click with Cut pocket, and edit the steps it makes.
 
 The servo is sitting in the deck with nowhere to go. You could sketch a rectangle the right size, cut it, then add two screw holes in the right places. Or you could let BetterCad do all three.
 
@@ -81,17 +83,17 @@ To move both, delete the three steps, move the servo, and cut the pocket again. 
 
 ## Common Issues
 
-**Problem**: There's no Cut pocket in the menu.
-**Solution**: Right-click a part that came from the catalogue.
-**Why**: Only catalogue parts carry a pocket outline. An imported STL doesn't.
+- **Problem**: There's no Cut pocket in the menu.
+- **Solution**: Right-click a part that came from the catalogue.
+- **Why**: Only catalogue parts carry a pocket outline. An imported STL doesn't.
 
-**Problem**: The pocket was cut into the wrong body.
-**Solution**: Undo, move the part so the body you want is directly beneath it, and try again.
-**Why**: Cut pocket uses the body just under the part.
+- **Problem**: The pocket was cut into the wrong body.
+- **Solution**: Undo, move the part so the body you want is directly beneath it, and try again.
+- **Why**: Cut pocket uses the body just under the part.
 
-**Problem**: The real servo is tight in the printed pocket.
-**Solution**: Calibrate your fits with the fit coupon, or widen the pocket's sketch by a few tenths.
-**Why**: The sliding gap comes from your printer profile, and an uncalibrated one may be too small for your machine.
+- **Problem**: The real servo is tight in the printed pocket.
+- **Solution**: Calibrate your fits with the fit coupon, or widen the pocket's sketch by a few tenths.
+- **Why**: The sliding gap comes from your printer profile, and an uncalibrated one may be too small for your machine.
 
 ## Check your understanding
 

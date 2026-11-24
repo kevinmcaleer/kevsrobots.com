@@ -4,12 +4,14 @@ description: Move a BetterCad joint with its slider, by typing an angle or by dr
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/03_posing_a_joint.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to move a joint with its slider, by typing an angle or by dragging the part, and go back to the home pose.
 
 The shoulder is made. Now make it move. There are three ways, and you'll end up using all of them.
 

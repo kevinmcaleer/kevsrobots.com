@@ -10,6 +10,8 @@ cover: /learn/micropython_gpio/assets/banners/17_summary.jpg
 
 ---
 
+By the end of this lesson you will be able to recall what each kind of pin can do and choose the next course to take.
+
 ## Overview
 
 Congratulations on finishing `Raspberry Pi Pico with MicroPython - GPIO Mastery`! Here's a quick recap.
@@ -40,9 +42,17 @@ Congratulations on finishing `Raspberry Pi Pico with MicroPython - GPIO Mastery`
 | Analog input | `ADC(26).read_u16()` |
 | I2C scan | `I2C(0, sda=Pin(0), scl=Pin(1)).scan()` |
 | UART | `UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1))` |
-{:class="table table-striped"}
+{:class="table table-single"}
 
 ---
+
+## Try it Yourself
+
+1. Pick one project from this course and write its wiring as a table.
+2. Build it with your own parts, using the quick reference above.
+3. Challenge: combine two lessons, for example a potentiometer setting a servo angle.
+
+## Check your understanding
 
 {% quiz %}
 ? Which method sets the PWM duty cycle on the Pico?
@@ -56,6 +66,12 @@ Congratulations on finishing `Raspberry Pi Pico with MicroPython - GPIO Mastery`
 - [x] GP27
 - [ ] VBUS
 > GP27 is ADC1, one of the three analog-capable pins.
+
+? Which module do you import to set up pins?
+- [ ] `time`
+- [x] `machine`
+- [ ] `dht`
+> `machine` holds `Pin`, `PWM`, `ADC`, `UART`, `I2C` and `SPI`.
 {% endquiz %}
 
 ---

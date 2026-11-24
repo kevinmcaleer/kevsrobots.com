@@ -12,7 +12,7 @@ description: Attach a one-click quick fix to a Snakie linter warning so the ligh
 percent: 63
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to attach a one-click quick fix to a linter warning so the lightbulb can repair the code for you.
 
 ## Don't just complain
 

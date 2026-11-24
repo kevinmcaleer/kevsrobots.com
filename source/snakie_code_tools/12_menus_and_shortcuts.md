@@ -4,7 +4,7 @@ description: Learn Snakie's menus and the keyboard shortcuts worth memorising, a
 layout: lesson
 type: page
 cover: /learn/snakie_code_tools/assets/banners/12_menus_and_shortcuts.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -131,17 +131,17 @@ If you only memorise five:
 
 ## Common Issues
 
-**Problem**: A shortcut does nothing.
-**Solution**: Click in the Snakie window first. In the browser, some shortcuts such as <kbd>Ctrl</kbd>+<kbd>N</kbd> and <kbd>Ctrl</kbd>+<kbd>W</kbd> belong to the browser itself, so use the buttons.
-**Why**: A browser keeps certain keys for its own tabs and windows.
+- **Problem**: A shortcut does nothing.
+- **Solution**: Click in the Snakie window first. In the browser, some shortcuts such as <kbd>Ctrl</kbd>+<kbd>N</kbd> and <kbd>Ctrl</kbd>+<kbd>W</kbd> belong to the browser itself, so use the buttons.
+- **Why**: A browser keeps certain keys for its own tabs and windows.
 
-**Problem**: <kbd>Ctrl</kbd>+<kbd>.</kbd> opened a menu instead of stopping my program.
-**Solution**: Click the **Stop** button, or click outside the editor first.
-**Why**: With the cursor in the editor, that key belongs to the quick-fix lightbulb.
+- **Problem**: <kbd>Ctrl</kbd>+<kbd>.</kbd> opened a menu instead of stopping my program.
+- **Solution**: Click the **Stop** button, or click outside the editor first.
+- **Why**: With the cursor in the editor, that key belongs to the quick-fix lightbulb.
 
-**Problem**: I can't find the menus.
-**Solution**: In the desktop app they're at the top of the window, or the top of the screen on a Mac. In the browser, use the toolbar and the activity bar.
-**Why**: The full menu bar is part of the desktop app.
+- **Problem**: I can't find the menus.
+- **Solution**: In the desktop app they're at the top of the window, or the top of the screen on a Mac. In the browser, use the toolbar and the activity bar.
+- **Why**: The full menu bar is part of the desktop app.
 
 ## Check your understanding
 

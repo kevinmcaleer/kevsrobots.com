@@ -4,12 +4,14 @@ description: See every module available to your MicroPython program, on your com
 layout: lesson
 type: page
 cover: /learn/snakie_code_tools/assets/banners/08_the_modules_shelf.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use the Modules shelf to tell whether a module is already in your board's firmware or on the device before you install anything.
 
 Before installing a library, it's worth asking a simpler question: *is it already there?* MicroPython boards ship with dozens of modules built in, and it's easy to install a copy of something you already have.
 
@@ -90,17 +92,17 @@ Before you install anything:
 
 ## Common Issues
 
-**Problem**: **MODULES ON COMPUTER** says to open a folder.
-**Solution**: Open your project folder from the Files panel.
-**Why**: Snakie can only list the modules beside your program when it knows which folder that is.
+- **Problem**: **MODULES ON COMPUTER** says to open a folder.
+- **Solution**: Open your project folder from the Files panel.
+- **Why**: Snakie can only list the modules beside your program when it knows which folder that is.
 
-**Problem**: A module I just installed isn't listed.
-**Solution**: Press **RESCAN**.
-**Why**: The list is a snapshot, not a live view.
+- **Problem**: A module I just installed isn't listed.
+- **Solution**: Press **RESCAN**.
+- **Why**: The list is a snapshot, not a live view.
 
-**Problem**: A module is built in on one board but missing on another.
-**Solution**: Check the firmware list for the board you're using, and install a package if needed.
-**Why**: Each board's firmware is built with a different set of modules.
+- **Problem**: A module is built in on one board but missing on another.
+- **Solution**: Check the firmware list for the board you're using, and install a package if needed.
+- **Why**: Each board's firmware is built with a different set of modules.
 
 ## Check your understanding
 

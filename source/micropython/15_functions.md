@@ -2,26 +2,24 @@
 title: Functions
 description: Learn how to make reusable blocks of code
 layout: lesson
+type: page
 cover: /learn/micropython/assets/banners/15_functions.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-![Photo of a laptop and notepad on a desk](assets//functions.jpg){:.cover}
+![Photo of a laptop and notepad on a desk](assets/functions.jpg){:.cover}
 
-At some point you will want to make a block of code that you will use many times, perhaps with different values. This is not only essential to save repeating the same block of code over and over again, its a better technique to improve reliability and readability.
+By the end of this lesson you will be able to write your own functions with parameters and return values, and call them as many times as you like.
+
+At some point you will want a block of code that you use many times, perhaps with different values. A robot might need to drive forward, turn left and turn right many times in one program. Putting that code in a **function** saves repeating it, and makes programs easier to read and to fix.
 
 ## Defining a function
 
-In MicroPython we use the `def` keyword to define the code that follows as a function. 
-
-Functions can also have parameters of there own.
-
-Lets create a simple function that will print a message when its called:
-
-##### Example
+We use the `def` keyword to define a function. Here is a simple one that prints a message:
 
 {% capture snakie_code %}
 def say_hello():
@@ -33,79 +31,118 @@ say_hello()
 {% endcapture %}
 {% include snakie.html code=snakie_code name="functions_1.py" %}
 
-The example above defines (thats why its the `def` keyword) the function called `say_hello`, notice that we also need to provide the `()` brackets as functions need this, we also need to use the `:` colon symbol to tell MicroPython that the following block of code relates to this function.
+`def` is short for `define`. After the name we need the `()` brackets, and a `:` colon to tell MicroPython that the indented code that follows is the function. Defining the function doesn't run it. The last line, `say_hello()`, **calls** it.
 
-The function code is also indented.
+```mermaid
+flowchart LR
+    A["def say_hello()"] -->|"stored, not run"| B["Later: say_hello()"]
+    B --> C["Code in the function runs"]
+    C --> D["Back to the next line"]
+```
 
----
+## Parameters
 
-## Defining a function with Parameters
-
-We often want our function to take in an input variable so that we can use it in the function code. Lets extend our `say_hello` example so that it can include a name and age.
-
-##### Example
+We often want to give a function an input. These are called `parameters`. Let's greet a robot by name:
 
 {% capture snakie_code %}
-def say_hello(name, age):
-    # This function prints the message hello
-    print('hello', name, 'how does',age,'feel?')
+def greet(name, battery):
+    print('Hello', name, '- battery is', battery, 'percent')
 
 
-say_hello('Kev', 47)
+greet('Bolt', 87)
+greet('Sparky', 42)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="functions_2.py" %}
 
-In the example above we've added two parameters `name` and `age`. Our functions can use these parameters within its block of code, in this case we use it to print out the message `hello Kev how does 47 feel?`.
-Notice how Python accepts the two different types of variables - the `name` is a string (`Str`) of text, and `age` is an integer (a whole number with no decimal points).
+The function runs twice, with different values each time. The values you pass in are called `arguments`. They are matched to the parameters in order, so `'Bolt'` goes into `name`.
 
----
-
-We can take this a step further and pass variables to the function and it will work just the same:
-
-##### Example
+We can also give a parameter a **default value**, which is used if you leave the argument out:
 
 {% capture snakie_code %}
-def say_hello(name, age):
-    # This function prints the message hello
-    print('hello', name, 'how does',age,'feel?')
+def drive(left, right, seconds=1):
+    print('left', left, 'right', right, 'for', seconds, 'seconds')
 
-my_name = 'Kev'
-my_age = 47
 
-say_hello(my_name, my_age)
+drive(60, 60)
+drive(60, -60, seconds=2)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="functions_3.py" %}
 
-Functions can also call other functions, though on a MicroController you may find that the device crashes if it runs out of memory, if you nest too many functions, but that will take quite a few levels.
-
----
-
 ## Returning values
 
-Functions can do more than just run blocks of code, they can return values too. Lets make a new function that takes a value and adds `1` to it.
-
-##### Example
+Functions can also give an answer back, using `return`. Let's make a function that adds `1` to a number:
 
 {% capture snakie_code %}
 def add_one(number):
     number += 1
     return number
 
+
 a = add_one(1)
 print(a)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="functions_4.py" %}
 
-In the example above we define the function `add_one` which has one parameter `number`. It then adds `1` to the number and `return`s the number to the caller.
+The function takes `number`, adds `1`, and `return`s it to the caller. So `a` holds `2`. A function that doesn't `return` anything gives back `None`.
 
-We assign `a` to the result of running `add_one(1)`, which should return the value `2`. Therefore the variable `a` should contain the value `2`. Run the code and try passing different values and changing the `number += 1` to different values.
+Here is a more useful one, which turns a distance sensor's reading into a decision:
 
----
+{% capture snakie_code %}
+def too_close(distance_cm, limit=10):
+    return distance_cm < limit
+
+
+print(too_close(5))
+print(too_close(50))
+print(too_close(15, limit=20))
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_5.py" %}
+
+Functions can call other functions too. Just don't nest too deeply: a microcontroller has limited memory, and will give a `RuntimeError` (maximum recursion depth exceeded) if a function keeps calling itself.
 
 > ## Challenge
 >
-> Write your own function that takes a value, multiplies it by `10`, and then returns that value.
->
+> Write your own function that takes a value, multiplies it by `10`, and returns it.
 {:.bg-blue}
 
----
+## Try it Yourself
+
+1. Write a function `say_goodbye()` that prints a message, and call it three times.
+2. Write a function `double(number)` that returns the number times 2. Print `double(21)`.
+3. Write `drive(left, right)` with a default `seconds=1`, and print what the robot would do.
+4. Challenge: write `celsius_to_fahrenheit(c)` that returns `c * 9 / 5 + 32`, and check that `100` gives `212.0`.
+
+## Common Issues
+
+- **Problem**: Nothing happens when I run my program.
+- **Solution**: Add a line that calls the function, such as `say_hello()`.
+- **Why**: `def` only defines the function, it doesn't run it.
+
+- **Problem**: `TypeError: function takes 2 positional arguments but 1 were given`.
+- **Solution**: Pass the same number of arguments as the function has parameters, or give the extra ones a default.
+- **Why**: MicroPython can't guess a missing value.
+
+- **Problem**: My function prints the answer but `print(result)` shows `None`.
+- **Solution**: Use `return` instead of `print` inside the function.
+- **Why**: `print` shows a value but doesn't hand it back to the caller.
+
+## Check your understanding
+
+{% quiz %}
+? What does the `def` keyword do?
+- [ ] Deletes a function
+- [x] Defines a function without running it
+- [ ] Runs a function
+> `def` stores the code, and a later call runs it.
+
+? What does `return` do?
+- [ ] Prints a value
+- [x] Sends a value back to the code that called the function
+- [ ] Ends the program
+> `return` gives the answer back to the caller.
+
+? What does `def drive(left, right, seconds=1)` mean for `seconds`?
+- [ ] It must always be given
+- [x] It defaults to 1 if you leave it out
+> A parameter with `=` has a default value.
+{% endquiz %}

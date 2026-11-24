@@ -11,6 +11,7 @@ description: Watch the full video walkthrough covering I2C communication on the 
   Pi Pico - part of the From Code to Creation series.
 percent: 14
 duration: 1
+quiz_total: 36
 video_id: lthSloWM3Fk
 navigation:
 - name: Talking to the World - Working with I2C and SPI

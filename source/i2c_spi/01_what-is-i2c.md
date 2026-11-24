@@ -4,11 +4,14 @@ description: Understand the I2C protocol, how it works, and why it's one of the 
 layout: lesson
 type: page
 cover: /learn/i2c_spi/assets/banners/01_what-is-i2c.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how I2C uses two wires and an address to talk to many devices, and create an I2C bus on the Pico in MicroPython.
 
 ## Understanding I2C
 
@@ -30,7 +33,20 @@ This is much simpler than other protocols that might need 4, 6, or even more wir
 - **GPIO 8** for SDA
 - **GPIO 9** for SCL
 
-> **Note**: The Pico has two I2C buses (I2C0 and I2C1), giving you flexibility in pin selection. We'll use I2C0 in this course.
+> **Note**: The Pico has two hardware I2C buses (I2C0 and I2C1). Each can be routed to several pairs of pins, but only certain pins work: for I2C0, SDA can be GP0, GP4, GP8, GP12, GP16 or GP20 and SCL is the matching pin one higher (GP1, GP5, GP9 and so on). For I2C1, SDA can be GP2, GP6, GP10, GP14, GP18 or GP26, with SCL on GP3, GP7, GP11, GP15, GP19 or GP27. We'll use I2C0 on GP8 and GP9 in this course.
+
+Here is the whole bus at a glance. Every device hangs off the same two wires, and each has its own address:
+
+```mermaid
+flowchart LR
+    Pico["Pico (controller)"]
+    Pico ---|"SDA (GP8)"| Bus[(I2C bus)]
+    Pico ---|"SCL (GP9)"| Bus
+    Bus --- BME["BME280<br/>address 0x76"]
+    Bus --- OLED["OLED display<br/>address 0x3C"]
+    Bus --- IMU["MPU6050<br/>address 0x68"]
+    R["Pull-up resistors<br/>from SDA and SCL to 3.3 V"] -.- Bus
+```
 
 ### Controller and Peripherals
 
@@ -45,7 +61,7 @@ The controller is always in charge. It decides when to communicate and with whic
 
 Each I2C device on the bus has a unique 7-bit address (like a house number on a street). Common addresses look like:
 
-- `0x77` - BME280 sensor (hexadecimal notation)
+- `0x76` or `0x77` - BME280 sensor (hexadecimal notation)
 - `0x3C` - OLED display
 - `0x68` - MPU6050 motion sensor
 
@@ -71,7 +87,7 @@ print(f"I2C configuration: {i2c}")
 - Imports the necessary classes from the `machine` module
 - Creates an I2C object on bus 0 (I2C0)
 - Configures SDA and SCL pins
-- Sets communication speed to 400kHz (standard fast mode)
+- Sets communication speed to 400kHz (I2C "fast mode")
 
 **Why this matters:**
 
@@ -85,8 +101,8 @@ I2C supports different communication speeds:
 |------|-------|----------|
 | Standard | 100 kHz | Basic sensors, simple devices |
 | Fast | 400 kHz | Most common - good balance of speed and reliability |
-| Fast Plus | 1 MHz | High-speed applications |
-| High Speed | 3.4 MHz | Rare, specialized use |
+| Fast Plus | 1 MHz | High-speed applications (the Pico accepts `freq=1000000`, but the device must support it too) |
+| High Speed | 3.4 MHz | Rare, specialized use (not available on the Pico) |
 {:class="table table-single table-narrow"}
 
 For most projects with sensors like the BME280, use **Fast mode (400 kHz)**. It's reliable and supported by virtually all I2C devices.
@@ -109,7 +125,7 @@ i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 - Neat and organized projects
 
 **Multiple Devices**
-- Connect up to 127 devices on the same bus (theoretical limit)
+- Connect up to 112 devices on the same bus (addresses 0x08 to 0x77 are usable; the rest are reserved)
 - Each device has a unique address
 - Controller can talk to any device at will
 
@@ -139,6 +155,21 @@ i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 - Needs external resistors (we'll cover this in the next lesson)
 - Can't work without them
 - Sometimes causes confusion for beginners
+
+### Any pins you like: SoftI2C
+
+If your wiring needs pins that the hardware buses cannot reach, MicroPython can bit-bang I2C in software on any two GPIO pins:
+
+```python
+from machine import Pin, SoftI2C
+
+# Software I2C on GP4 (SDA) and GP7 (SCL): no hardware bus uses that pair,
+# but SoftI2C will happily use any two pins
+i2c = SoftI2C(scl=Pin(7), sda=Pin(4), freq=100000)
+print(i2c.scan())
+```
+
+`SoftI2C` is slower and uses more processor time than the hardware `I2C`, so keep it for when you need it.
 
 ## Real-World Applications
 
@@ -205,19 +236,45 @@ i2c1 = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 print("Using second I2C bus")
 ```
 
-## Common Mistakes
+## Common Issues
 
-**Problem**: Code runs but no devices respond
-**Solution**: Check that you've connected SDA and SCL to the correct pins
-**Why**: I2C won't work if the pins don't match your code
+- **Problem**: `ValueError: bad SCL pin` or `bad SDA pin` when creating the bus
+- **Solution**: Pick a pair from the list above, with SDA and SCL on the same bus (GP8 and GP9 are both I2C0), or use `SoftI2C` for any other pair
+- **Why**: Hardware I2C is built into the chip and can only reach certain pins
 
-**Problem**: "I2C bus error" message
-**Solution**: Make sure you have pull-up resistors on SDA and SCL (covered in next lesson)
-**Why**: I2C requires these resistors to function properly
+- **Problem**: Code runs but no devices respond
+- **Solution**: Check that you've connected SDA and SCL to the correct pins
+- **Why**: I2C won't work if the pins don't match your code
 
-**Problem**: Devices work individually but not together
-**Solution**: Check that no two devices share the same address
-**Why**: Address conflicts prevent proper communication
+- **Problem**: `OSError: [Errno 5] EIO` or an empty scan
+- **Solution**: Make sure the board has pull-up resistors on SDA and SCL (covered in the next lesson)
+- **Why**: I2C requires these resistors to function properly
+
+- **Problem**: Devices work individually but not together
+- **Solution**: Check that no two devices share the same address
+- **Why**: Address conflicts prevent proper communication
+
+## Check your understanding
+
+{% quiz %}
+? How many wires does I2C need to talk to several devices?
+- [ ] One wire per device
+- [x] Two: SDA for data and SCL for the clock
+- [ ] Four: SCLK, MOSI, MISO and CS
+> Every device shares the same SDA and SCL lines and is picked out by its address.
+
+? How does the controller choose which device it is talking to?
+- [ ] A chip select wire for each device
+- [ ] The order the devices are wired in
+- [x] Each device has a unique 7-bit address
+> That is why two devices with the same address cannot share one bus.
+
+? Which pins can you use for I2C0 on the Pico's hardware bus?
+- [ ] Any GPIO pins
+- [x] Only certain pairs such as GP8 (SDA) and GP9 (SCL)
+- [ ] Only GP0 and GP1
+> For any other pair of pins, use `SoftI2C` instead.
+{% endquiz %}
 
 ## What You've Learned
 

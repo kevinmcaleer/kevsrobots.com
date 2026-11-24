@@ -11,7 +11,8 @@ description: Create a Git repository with git init, look inside the .git folder,
   learn to read git status
 percent: 28
 duration: 5
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create a repository with `git init`, find the hidden `.git` folder, and read the output of `git status`.
 
 ## Make a project folder
 
@@ -223,6 +226,12 @@ There's a second way to get a repository: copy someone else's with `git clone`. 
 - [ ] The file has been deleted
 - [ ] The file has been committed
 > Git never tracks a new file until you tell it to with `git add`.
+
+? Which command shows you the hidden `.git` folder?
+- [ ] `ls`
+- [x] `ls -a`
+- [ ] `git hidden`
+> Names that start with a dot are hidden, so you need `ls -a` (or a file manager setting) to see them.
 {% endquiz %}
 
 ---

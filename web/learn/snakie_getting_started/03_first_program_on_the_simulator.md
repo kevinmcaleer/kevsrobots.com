@@ -10,9 +10,9 @@ next: 04_the_repl_and_console.html
 description: Write and run your first MicroPython program in Snakie using the built-in
   simulator, with no hardware
 percent: 32
-duration: 3
-quiz_total: 20
-date_updated: 2026-11-20
+duration: 4
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -54,6 +54,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write, run and stop a MicroPython program on the simulated device.
 
 Time to write some code. You don't need a board for this lesson, because Snakie has one built in.
 
@@ -121,6 +123,8 @@ In the desktop app you can press <kbd>Ctrl</kbd>+<kbd>R</kbd> to run (<kbd>⌘</
 
 ---
 
+> **Teachers**: This lesson needs no hardware at all, so a whole class can start at once. The simulated board forgets everything when you disconnect, so on shared machines ask learners to save their file with the **Save** button before they finish.
+
 ## Try it Yourself
 
 1. Change the countdown to start from 10.
@@ -129,13 +133,13 @@ In the desktop app you can press <kbd>Ctrl</kbd>+<kbd>R</kbd> to run (<kbd>⌘</
 
 ## Common Issues
 
-**Problem**: `SyntaxError: invalid syntax`
-**Solution**: Check that every `(` has a `)`, every `"` has a partner, and the `for` line ends with a colon.
-**Why**: Python needs these to know where things start and end.
+- **Problem**: `SyntaxError: invalid syntax`
+- **Solution**: Check that every `(` has a `)`, every `"` has a partner, and the `for` line ends with a colon.
+- **Why**: Python needs these to know where things start and end.
 
-**Problem**: `IndentationError`
-**Solution**: The lines inside the loop must all start with the same four spaces.
-**Why**: Indentation is how Python knows which lines belong to the loop.
+- **Problem**: `IndentationError`
+- **Solution**: The lines inside the loop must all start with the same four spaces.
+- **Why**: Indentation is how Python knows which lines belong to the loop.
 
 ## Check your understanding
 

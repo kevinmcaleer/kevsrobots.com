@@ -4,12 +4,14 @@ description: Use MicroPython framebuf to draw shapes and text, and show them on 
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/07_a_screen_in_the_simulator.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use framebuf to draw shapes and text and show them on the simulated Display.
 
 ## Meet framebuf
 

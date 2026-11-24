@@ -4,12 +4,14 @@ description: Export a part from BetterCad as STL, 3MF or STEP, and learn which f
 layout: lesson
 type: page
 cover: /learn/bettercad/assets/banners/03_export_your_first_print.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to export a part as STL, 3MF or STEP, choose a resolution, and explain why exporting is not the same as saving.
 
 A model in BetterCad isn't a print yet. Your slicer, the program that prepares files for your printer, needs it as a file it understands.
 
@@ -74,6 +76,8 @@ Exporting makes a file for *printing*. It doesn't keep your sketches, steps or p
 
 ---
 
+> **Teachers**: exporting is where shared computers cause trouble. Chrome and Edge let the learner choose where the file goes, while Safari and Firefox download it straight to the Downloads folder. On shared machines, ask learners to put their name or class in the file name and to collect or move the file before the end of the session. Check which file formats your own slicer opens: the lesson recommends 3MF for modern slicers and STL for anything that will not open 3MF.
+
 ## Try it Yourself
 
 1. Export your block as **3MF** and open it in your slicer.
@@ -82,17 +86,17 @@ Exporting makes a file for *printing*. It doesn't keep your sketches, steps or p
 
 ## Common Issues
 
-**Problem**: Ctrl+E opens something in my browser instead.
-**Solution**: Click the 3D view first, or use **Export** in the menu beside Save.
-**Why**: Some browsers keep Ctrl+E for the address bar when the page isn't focused.
+- **Problem**: Ctrl+E opens something in my browser instead.
+- **Solution**: Click the 3D view first, or use **Export** in the menu beside Save.
+- **Why**: Some browsers keep Ctrl+E for the address bar when the page isn't focused.
 
-**Problem**: The file downloads without asking where to put it.
-**Solution**: Look in your Downloads folder.
-**Why**: Chrome and Edge let you pick a place. Safari and Firefox download it.
+- **Problem**: The file downloads without asking where to put it.
+- **Solution**: Look in your Downloads folder.
+- **Why**: Chrome and Edge let you pick a place. Safari and Firefox download it.
 
-**Problem**: My slicer shows the part tiny or enormous.
-**Solution**: Use 3MF, or set your slicer's STL units to millimetres.
-**Why**: An STL has no units in it. BetterCad always writes millimetres.
+- **Problem**: My slicer shows the part tiny or enormous.
+- **Solution**: Use 3MF, or set your slicer's STL units to millimetres.
+- **Why**: An STL has no units in it. BetterCad always writes millimetres.
 
 ## Check your understanding
 

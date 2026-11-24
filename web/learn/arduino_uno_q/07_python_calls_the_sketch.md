@@ -12,7 +12,7 @@ description: Build Q Board stage 4, where Python reads the real clock and tells 
 percent: 40
 duration: 11
 quiz_total: 50
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
 - content:
@@ -66,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to call a sketch function from Python over the Bridge and tell a call from a notify.
 
 This is where the two brains finally work as a team. Python decides what to show, and the sketch shows it.
 
@@ -296,6 +298,8 @@ The choice comes up in every project. Here is how to decide.
 In our clock, `draw` is a `call` because we like to know the picture arrived. `set_status` is a `notify` because the LED is refreshed every 0.2 seconds anyway.
 
 ---
+
+> **Teachers**: Allow about 45 minutes (our estimate). The in-page simulator lets the whole class see Python drive the sketch with no board. The real-board step needs one Uno Q per learner or pair running App Lab.
 
 ## Try it Yourself
 

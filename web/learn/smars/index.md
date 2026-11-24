@@ -7,11 +7,26 @@ date: 2023-02-19
 description: Learn how to 3D print, assemble, wire up and program the original SMARS
   robot, a small tracked robot powered by an Arduino Uno and a motor shield.
 level: beginner
-course_duration: 0h 22m
+course_duration: 0h 57m
 lesson_count: 15
 first_lesson: 00_intro.html
-quiz_total: 8
+quiz_total: 42
 video: XhArIe9UDoc
+outcomes:
+- Print the SMARS parts and gather the electronics you need
+- Solder wires to two N20 motors and test them on a battery
+- Assemble the chassis, wheels, battery, Arduino Uno and Fundumoto motor shield
+- Wire the battery and both motors to the shield, and fit the tracks
+- Upload an Arduino sketch and drive your robot from a phone over Bluetooth
+prerequisites:
+- None. This is a great first robot, and Robotics 101 is a helpful warm-up
+you_need:
+- Access to a 3D printer, PLA filament and the SMARS files from Thingiverse
+- An Arduino Uno (or clone) and a Fundumoto motor shield
+- Two 6v N20 150RPM geared motors and a 9V battery with a clip
+- A soldering iron, solder, flux and red and black wire
+- A computer with the Arduino IDE and a USB cable
+- A Bluetooth serial module such as an HC-05 (for the final lesson)
 navigation:
 - name: Build a SMARS Robot
 - content:

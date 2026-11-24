@@ -9,9 +9,9 @@ previous: 12_exporting_urdf.html
 description: Review what you learned about joints, poses, clash checks, drive links
   and URDF in BetterCad and find out where to go next
 percent: 100
-duration: 4
-quiz_total: 39
-date_updated: 2026-11-21
+duration: 5
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to recall the joint, pose, clash check, drive link and export workflow, and choose where to go next.
+
 You started with three flat bars on a print bed. You finish with an arm that bends at two joints, knows its own weight and limits, can't be driven into itself, and can be handed to a simulator in one file.
 
 ![The finished desk arm with its joints and poses](/learn/bettercad_joints_urdf/assets/poses.jpg){:class="img-fluid w-100"}
@@ -102,6 +104,16 @@ If you'd like to compare, here is my finished arm: [desk-arm.bcad](/learn/better
 7. Print.
 
 Steps 5 and 6 are the ones that save filament.
+
+```mermaid
+flowchart TD
+    A["Design parts with a hole for each joint"] --> B["Make and name each joint at home"]
+    B --> C["Set limits from your hardware"]
+    C --> D["Save the poses you care about"]
+    D --> E["Sweep and fix what hits"]
+    E --> F["Check the heaviest pose against servo torque"]
+    F --> G["Print"]
+```
 
 ---
 

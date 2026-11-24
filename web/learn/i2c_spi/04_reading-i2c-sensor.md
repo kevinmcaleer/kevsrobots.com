@@ -10,7 +10,9 @@ next: 05_demystifying-datasheets.html
 description: Learn how to read temperature, humidity, and pressure data from the BME280
   sensor using I2C
 percent: 42
-duration: 10
+duration: 14
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -59,6 +61,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to save a BME280 driver on your Pico and read temperature, pressure and humidity from it over I2C.
+
 ## Reading Real Sensor Data
 
 Now comes the exciting part - reading actual environmental data from your BME280 sensor! This lesson teaches you how to communicate with I2C sensors, use existing libraries, and understand what's happening behind the scenes.
@@ -67,9 +71,9 @@ Now comes the exciting part - reading actual environmental data from your BME280
 
 You have two options when working with I2C sensors:
 
-### 1. Using Libraries (Recommended for Projects)
+### 1. Using a Driver (Recommended for Projects)
 
-Pre-written libraries handle the complex communication details:
+A driver file handles the complex communication details:
 
 ```python
 from machine import I2C, Pin
@@ -78,8 +82,8 @@ import bme280
 # Initialize I2C
 i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 
-# Create BME280 object
-bme = bme280.BME280(i2c=i2c)
+# Create BME280 object (use addr=0x77 if your scan showed 0x77)
+bme = bme280.BME280(i2c)
 
 # Read sensor - it's this easy!
 temperature, pressure, humidity = bme.read_compensated_data()
@@ -103,99 +107,130 @@ chip_id = i2c.readfrom_mem(0x76, 0xD0, 1)
 print(f"Chip ID: 0x{chip_id[0]:02X}")  # Should be 0x60 for BME280
 ```
 
-> **Recommendation**: Use libraries for real projects, but understanding manual communication helps you debug and work with any sensor.
+> **Recommendation**: Use a driver for real projects, but understanding manual communication helps you debug and work with any sensor. (The first block above only works once `bme280.py` is saved on the Pico, which we do next.)
 
-## Installing the BME280 Library
+## Getting the BME280 Driver onto the Pico
 
-MicroPython doesn't include the BME280 library by default. Let's install it:
-
-### Method 1: Using Thonny (Easiest)
-
-1. Open Thonny IDE
-2. Go to **Tools → Manage packages**
-3. Search for "micropython-bme280"
-4. Click **Install**
-
-### Method 2: Manual Installation
-
-Download the library and upload to your Pico:
-
-1. Download `bme280.py` from [GitHub](https://github.com/robert-hh/BME280)
-2. In Thonny, go to **File → Save As**
-3. Choose **Raspberry Pi Pico**
-4. Save as `bme280.py` in the root directory
-
-### Method 3: Direct File Copy
-
-Create `bme280.py` on your Pico with the library code. For this lesson, I'll provide a simplified version that works perfectly:
+MicroPython does not include a BME280 driver in its firmware, so `import bme280` fails with `ImportError: no module named 'bme280'` until you save a file called `bme280.py` on the Pico. Here is a complete driver you can use. It checks the chip ID, reads the factory calibration numbers stored inside the chip, and applies the integer formulas from the Bosch datasheet, so the values it gives you are real temperatures, pressures and humidities.
 
 ```python
-# Save this as bme280.py on your Pico
-
-from micropython import const
+# bme280.py - a small, complete BME280 driver for MicroPython (I2C)
+import struct
 import time
 
-# BME280 default address
-BME280_I2C_ADDR = const(0x76)
+BME280_ADDR = 0x76          # 0x77 if the SDO pin is tied to 3.3V
 
-# Register addresses
-REG_CHIP_ID = const(0xD0)
-REG_RESET = const(0xE0)
-REG_CTRL_HUM = const(0xF2)
-REG_CTRL_MEAS = const(0xF4)
-REG_CONFIG = const(0xF5)
-REG_DATA = const(0xF7)
+REG_ID = 0xD0
+REG_RESET = 0xE0
+REG_CTRL_HUM = 0xF2
+REG_STATUS = 0xF3
+REG_CTRL_MEAS = 0xF4
+REG_CONFIG = 0xF5
+REG_DATA = 0xF7
+
 
 class BME280:
-    def __init__(self, i2c, addr=BME280_I2C_ADDR):
+    def __init__(self, i2c, addr=BME280_ADDR):
         self.i2c = i2c
         self.addr = addr
 
-        # Verify chip ID
-        chip_id = self.i2c.readfrom_mem(self.addr, REG_CHIP_ID, 1)[0]
+        chip_id = self.i2c.readfrom_mem(addr, REG_ID, 1)[0]
         if chip_id != 0x60:
-            raise RuntimeError(f"BME280 not found. Chip ID: 0x{chip_id:02X}")
+            raise RuntimeError("Not a BME280, chip ID is 0x%02X" % chip_id)
 
-        # Load calibration data
         self._load_calibration()
-
-        # Configure sensor
-        self.i2c.writeto_mem(self.addr, REG_CTRL_HUM, b'\x03')   # Humidity oversampling x4
-        self.i2c.writeto_mem(self.addr, REG_CTRL_MEAS, b'\x6F')  # Temp/pressure oversampling, normal mode
-        self.i2c.writeto_mem(self.addr, REG_CONFIG, b'\xA0')     # Standby 1000ms, filter off
+        self.t_fine = 0
 
     def _load_calibration(self):
-        """Load calibration coefficients from sensor"""
-        # This is simplified - real library has full calibration
-        cal = self.i2c.readfrom_mem(self.addr, 0x88, 24)
-        self.dig_T1 = cal[0] | (cal[1] << 8)
-        self.dig_T2 = cal[2] | (cal[3] << 8)
-        self.dig_T3 = cal[4] | (cal[5] << 8)
-        # ... (more calibration values)
+        """Read the factory calibration numbers stored inside the chip."""
+        # 0x88..0x9F: temperature and pressure coefficients (24 bytes)
+        (self.T1, self.T2, self.T3,
+         self.P1, self.P2, self.P3, self.P4, self.P5,
+         self.P6, self.P7, self.P8, self.P9) = struct.unpack(
+            "<HhhHhhhhhhhh", self.i2c.readfrom_mem(self.addr, 0x88, 24))
+        # 0xA1: humidity coefficient H1
+        self.H1 = self.i2c.readfrom_mem(self.addr, 0xA1, 1)[0]
+        # 0xE1..0xE7: the other humidity coefficients (7 bytes)
+        e = self.i2c.readfrom_mem(self.addr, 0xE1, 7)
+        self.H2 = struct.unpack("<h", e[0:2])[0]
+        self.H3 = e[2]
+        h4 = (e[3] << 4) | (e[4] & 0x0F)
+        h5 = (e[5] << 4) | (e[4] >> 4)
+        self.H4 = h4 - 4096 if h4 > 2047 else h4
+        self.H5 = h5 - 4096 if h5 > 2047 else h5
+        self.H6 = e[6] - 256 if e[6] > 127 else e[6]
 
     def read_raw_data(self):
-        """Read raw sensor data"""
-        data = self.i2c.readfrom_mem(self.addr, REG_DATA, 8)
-
-        pressure_raw = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4)
-        temperature_raw = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
-        humidity_raw = (data[6] << 8) | data[7]
-
-        return temperature_raw, pressure_raw, humidity_raw
+        """Take one reading and return the raw (temp, pressure, humidity)."""
+        # Forced mode: measure once, then go back to sleep.
+        self.i2c.writeto_mem(self.addr, REG_CTRL_HUM, b"\x01")   # humidity x1
+        self.i2c.writeto_mem(self.addr, REG_CTRL_MEAS, b"\x25")  # T x1, P x1, forced
+        time.sleep_ms(12)                                        # conversion takes under 10 ms
+        d = self.i2c.readfrom_mem(self.addr, REG_DATA, 8)
+        press_raw = (d[0] << 12) | (d[1] << 4) | (d[2] >> 4)
+        temp_raw = (d[3] << 12) | (d[4] << 4) | (d[5] >> 4)
+        hum_raw = (d[6] << 8) | d[7]
+        return temp_raw, press_raw, hum_raw
 
     def read_compensated_data(self):
-        """Read and compensate sensor data"""
-        temp_raw, press_raw, hum_raw = self.read_raw_data()
+        """Return (temperature, pressure, humidity) in fixed-point units.
 
-        # Apply calibration (simplified)
-        temperature = temp_raw  # In real library, this uses calibration
-        pressure = press_raw
-        humidity = hum_raw
+        temperature: hundredths of a degree C   (2245 means 22.45 C)
+        pressure:    Pa x 256                   (divide by 256 for Pa)
+        humidity:    %RH x 1024                 (divide by 1024 for %RH)
+        These are the integer formulas from the Bosch datasheet.
+        """
+        adc_t, adc_p, adc_h = self.read_raw_data()
 
-        return temperature, pressure, humidity
+        # Temperature
+        var1 = (((adc_t >> 3) - (self.T1 << 1)) * self.T2) >> 11
+        var2 = (((((adc_t >> 4) - self.T1) * ((adc_t >> 4) - self.T1)) >> 12) * self.T3) >> 14
+        self.t_fine = var1 + var2
+        temp = (self.t_fine * 5 + 128) >> 8
+
+        # Pressure
+        var1 = self.t_fine - 128000
+        var2 = var1 * var1 * self.P6
+        var2 = var2 + ((var1 * self.P5) << 17)
+        var2 = var2 + (self.P4 << 35)
+        var1 = ((var1 * var1 * self.P3) >> 8) + ((var1 * self.P2) << 12)
+        var1 = (((1 << 47) + var1) * self.P1) >> 33
+        if var1 == 0:
+            press = 0
+        else:
+            p = 1048576 - adc_p
+            p = (((p << 31) - var2) * 3125) // var1
+            var1 = (self.P9 * (p >> 13) * (p >> 13)) >> 25
+            var2 = (self.P8 * p) >> 19
+            press = ((p + var1 + var2) >> 8) + (self.P7 << 4)
+
+        # Humidity
+        h = self.t_fine - 76800
+        h = (((((adc_h << 14) - (self.H4 << 20) - (self.H5 * h)) + 16384) >> 15) *
+             (((((((h * self.H6) >> 10) * (((h * self.H3) >> 11) + 32768)) >> 10)
+                + 2097152) * self.H2 + 8192) >> 14))
+        h = h - (((((h >> 15) * (h >> 15)) >> 7) * self.H1) >> 4)
+        h = max(0, min(h, 419430400))
+        hum = h >> 12
+
+        return temp, press, hum
+
+    def read(self):
+        """Return (temperature in C, pressure in hPa, humidity in %RH)."""
+        t, p, h = self.read_compensated_data()
+        return t / 100, p / 256 / 100, h / 1024
 ```
+{: .no-snakie }
 
-> **Note**: This is a simplified version for learning. For production projects, use the full library from GitHub.
+**How to copy it to the Pico:**
+
+1. Open a new file in Thonny and paste in the code above
+2. Choose **File, Save as**, and pick **Raspberry Pi Pico** when asked where to save
+3. Name the file `bme280.py` and save it in the top folder (the root) of the Pico
+
+The raw numbers need calibration because every BME280 is slightly different from the factory: the chip stores about 30 correction values, and the datasheet formulas combine them with the raw readings. That is the part earlier "simplified" examples skip, and it is why raw values on their own are meaningless.
+
+> **Note**: The driver uses forced mode, which tells the sensor to take one reading and go back to sleep. Lesson 6 explains the modes. If you would rather use a community driver, Robert Hammelrath's `robert-hh/BME280` on GitHub returns values in the same units, but check its README for the constructor arguments, because they differ slightly from the class above.
 
 ## Your First Sensor Reading
 
@@ -236,9 +271,9 @@ else:
     pressure_hpa = press / 256 / 100
     humidity_pct = hum / 1024
 
-    print(f"🌡️  Temperature: {temperature_c:.2f} °C")
-    print(f"📊 Pressure: {pressure_hpa:.2f} hPa")
-    print(f"💧 Humidity: {humidity_pct:.2f} %")
+    print(f"Temperature: {temperature_c:.2f} °C")
+    print(f"Pressure: {pressure_hpa:.2f} hPa")
+    print(f"Humidity: {humidity_pct:.2f} %")
 ```
 
 **Example output:**
@@ -250,9 +285,9 @@ Using address 0x76
 
 Reading sensor data...
 
-🌡️  Temperature: 22.45 °C
-📊 Pressure: 1013.25 hPa
-💧 Humidity: 45.67 %
+Temperature: 22.45 °C
+Pressure: 1013.25 hPa
+Humidity: 45.67 %
 ```
 
 ## Understanding the Data
@@ -434,11 +469,13 @@ while True:
 Compute additional useful metrics:
 
 ```python
+import math
+
 def calculate_dew_point(temperature, humidity):
-    """Calculate dew point from temperature and humidity"""
+    """Calculate dew point from temperature (C) and relative humidity (%)"""
     a = 17.27
     b = 237.7
-    alpha = ((a * temperature) / (b + temperature)) + (humidity / 100.0)
+    alpha = ((a * temperature) / (b + temperature)) + math.log(humidity / 100.0)
     dew_point = (b * alpha) / (a - alpha)
     return dew_point
 
@@ -455,7 +492,7 @@ def calculate_heat_index(temperature, humidity):
 
     return hi
 
-# Use them
+# Use them (this snippet carries on from the earlier code, where bme was created)
 temp, press, hum = bme.read_compensated_data()
 temperature = temp / 100
 humidity = hum / 1024
@@ -519,46 +556,25 @@ while True:
     temperature = temp / 100
 
     if temperature > TEMP_ALERT:
-        print(f"⚠️  ALERT: Temperature is {temperature:.1f}°C!")
+        print(f"[WARNING] ALERT: Temperature is {temperature:.1f}°C!")
     else:
-        print(f"✓ Temperature OK: {temperature:.1f}°C")
+        print(f"[OK] Temperature: {temperature:.1f}°C")
 
     time.sleep(5)
 ```
 
 ## Common Issues
 
-### Getting Zero or Strange Values
+- **Problem**: `ImportError: no module named 'bme280'`
+- **Solution**: Save the driver on the Pico as `bme280.py` (File, Save as, Raspberry Pi Pico), in the top folder
+- **Why**: The BME280 driver is not part of the MicroPython firmware, so the Pico only finds it if the file is on its own storage
 
-**Problem**: All readings are 0 or nonsensical
+- **Problem**: `RuntimeError: Not a BME280, chip ID is 0x58` (or 0x00)
+- **Solution**: 0x58 means you have a BMP280, which has no humidity sensor, so use a BMP280 driver. 0x00 means nothing answered, so check the wiring and the address (0x76 or 0x77)
+- **Why**: The driver reads the chip ID register (0xD0) first, and the BME280 always answers 0x60
 
-**Causes**:
-- Sensor not initialized properly
-- Wrong I2C address
-- Calibration data not loaded
-
-**Solution**:
-
-```python
-# Verify chip ID first
-chip_id = i2c.readfrom_mem(0x76, 0xD0, 1)[0]
-print(f"Chip ID: 0x{chip_id:02X}")  # Should be 0x60
-
-# If wrong, try other address
-chip_id = i2c.readfrom_mem(0x77, 0xD0, 1)[0]
-print(f"Chip ID: 0x{chip_id:02X}")
-```
-
-### OSError When Reading
-
-**Problem**: `OSError: [Errno 5] EIO` or `OSError: [Errno 19] ENODEV`
-
-**Causes**:
-- Sensor disconnected mid-read
-- Loose connection
-- Power issue
-
-**Solution**: Add error handling:
+- **Problem**: `OSError: [Errno 5] EIO` while reading
+- **Solution**: Check for a loose wire, then add `try/except OSError` around the read and retry:
 
 ```python
 try:
@@ -568,29 +584,41 @@ except OSError as e:
     print(f"Sensor read error: {e}")
     print("Check connections!")
 ```
+{: .no-snakie }
 
-### Readings Don't Change
+- **Why**: The sensor stopped acknowledging, which is almost always a wiring or power problem
 
-**Problem**: Values are constant regardless of environment
+- **Problem**: The temperature reads a degree or two high
+- **Solution**: Keep the sensor away from the Pico, regulators and your hand, and let it settle for a minute
+- **Why**: The BME280 measures the air next to it, and nearby electronics warm that air
 
-**Causes**:
-- Sensor in wrong mode (sleep mode)
-- Reading old data from buffer
-- Faulty sensor
+## Check your understanding
 
-**Solution**: Ensure sensor is in normal mode and add delays:
+{% quiz %}
+? What does the BME280 chip ID register (0xD0) return?
+- [ ] 0x76
+- [x] 0x60
+- [ ] 0x58
+> 0x76 is a common I2C address, and 0x58 is the BMP280's ID. The BME280 always reports 0x60.
 
-```python
-# Wait for sensor to complete measurement
-time.sleep(0.1)
-temp, press, hum = bme.read_compensated_data()
-```
+? Why does the driver read calibration data from the chip?
+- [ ] To set the I2C address
+- [x] Because the raw readings only become real units after the factory correction values are applied
+- [ ] To speed up the bus
+> Each chip is calibrated at the factory and stores its own correction numbers.
+
+? The driver returns pressure as `press`. How do you turn it into hectopascals?
+- [ ] `press / 100`
+- [x] `press / 256 / 100`
+- [ ] `press * 256`
+> Pressure comes back in Pa multiplied by 256, so divide by 256 for pascals and by 100 for hPa.
+{% endquiz %}
 
 ## What You've Learned
 
 In this lesson, you mastered:
 
-- Installing and using the BME280 MicroPython library
+- Saving a complete BME280 driver on the Pico and using it
 - Reading temperature, humidity, and pressure data
 - Converting raw sensor values to meaningful units
 - Continuous monitoring and data logging

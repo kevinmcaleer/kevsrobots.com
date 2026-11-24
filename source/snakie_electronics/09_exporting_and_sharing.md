@@ -4,12 +4,14 @@ description: Export a Snakie wiring project as a picture, a bill of materials, a
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/09_exporting_and_sharing.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to export your wiring as a picture, a bill of materials and a printable PDF build guide.
 
 A circuit that only lives on your screen isn't much use at the workbench, or to anyone else. Snakie can turn it into pictures, parts lists and a build guide you can print.
 
@@ -85,6 +87,8 @@ If you have a kevsrobots.com account, **Send to kevsrobots…** puts the wiring 
 ![The Send to kevsrobots dialog](/learn/snakie_electronics/assets/send_dialog.jpg){:class="img-fluid w-100"}
 
 You sign in once, pick the project, and it's there for others to build from. As the dialog says, signing in is only for sending, and Snakie never sends your code. Your project links to that on GitHub.
+
+> **Teachers**: The PDF build guide, with a tick-box for every wire, is ideal when many robots are being wired at once. Sending to kevsrobots needs a kevsrobots.com account and puts the diagram and parts list into a project on the site, so use the PNG, BOM and PDF exports instead where learners do not have accounts or work should stay inside the class.
 
 ---
 

@@ -12,7 +12,7 @@ description: Write a Snakie linter plugin that underlines a classic MicroPython 
 percent: 56
 duration: 6
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write a linter that underlines a classic MicroPython mistake as you type and lists it in the Problems panel.
 
 ## A helper that never needs asking
 

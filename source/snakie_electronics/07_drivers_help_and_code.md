@@ -4,12 +4,14 @@ description: Install a part's MicroPython driver from Snakie's Electronics works
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/07_drivers_help_and_code.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to install a part's driver, use a part's help page, and write MicroPython whose pin numbers come from your wiring diagram.
 
 A wired circuit does nothing until code runs on it. This lesson is about the bridge between the two: drivers, the help that ships with each part, and code that uses the pins you actually wired.
 

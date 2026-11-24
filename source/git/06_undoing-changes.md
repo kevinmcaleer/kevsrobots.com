@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/06_undoing-changes.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose the right command to throw away an edit, unstage a file, fix the last commit or safely undo an older one.
 
 ## Mistakes are fine
 

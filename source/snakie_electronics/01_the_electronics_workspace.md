@@ -4,12 +4,14 @@ description: Take a tour of Snakie's Electronics workspace, from the breadboard 
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/01_the_electronics_workspace.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find your way around the Electronics workspace, move parts and the view, and name the panels and toolbar buttons you will use for the rest of the course.
 
 Before we place a single part, let's find out where everything is.
 
@@ -77,6 +79,8 @@ The pin icon at the top of each panel keeps it open. Unpin it and the panel tuck
 ## Your work is kept
 
 A wiring project is saved as you go. Once you've named it, the Browser shows a small **Saved to robot.yml** note under the description. And every change can be undone with <kbd>Ctrl</kbd>+<kbd>Z</kbd>, so nothing you try in this course can break anything.
+
+> **Teachers**: Snakie runs in a browser with no install, so a whole class can start from the same link. On shared machines, ask learners to give each project their own name (initials plus the project name works well) so that one pupil's work is not mistaken for another's, and check where each machine keeps saved work before the lesson ends.
 
 ---
 

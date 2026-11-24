@@ -4,12 +4,14 @@ description: Set up Snakie's AI chat pane and optional ghost-text suggestions wi
 layout: lesson
 type: page
 cover: /learn/snakie_code_tools/assets/banners/11_ai_chat_and_suggestions.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to set up the AI chat pane and ask it good questions, and to check any code it gives you.
 
 > **Desktop app**: the chat pane is in the Snakie desktop app. It's optional, and it needs your own API key from an AI provider, which is usually a paid service.
 
@@ -99,17 +101,17 @@ And the oldest rule: don't run code you can't explain. Ask the chat to explain i
 
 ## Common Issues
 
-**Problem**: There's no Chat button.
-**Solution**: Use the Snakie desktop app.
-**Why**: The chat pane isn't part of the browser version.
+- **Problem**: There's no Chat button.
+- **Solution**: Use the Snakie desktop app.
+- **Why**: The chat pane isn't part of the browser version.
 
-**Problem**: The pane says *No API key*.
-**Solution**: Add a key in **Settings**, **Chat**, for the provider selected at the bottom of the pane.
-**Why**: Each provider needs its own key, and the pane uses whichever provider is selected.
+- **Problem**: The pane says *No API key*.
+- **Solution**: Add a key in **Settings**, **Chat**, for the provider selected at the bottom of the pane.
+- **Why**: Each provider needs its own key, and the pane uses whichever provider is selected.
 
-**Problem**: The code it wrote uses a module my board doesn't have.
-**Solution**: Tell it your board and that you're using MicroPython, and check the Modules tab.
-**Why**: Without that, an AI assumes desktop Python.
+- **Problem**: The code it wrote uses a module my board doesn't have.
+- **Solution**: Tell it your board and that you're using MicroPython, and check the Modules tab.
+- **Why**: Without that, an AI assumes desktop Python.
 
 ## Check your understanding
 

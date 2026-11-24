@@ -11,8 +11,8 @@ description: Choose between Snakie in the browser and the installed desktop app,
   install it on Windows, macOS, Linux or Raspberry Pi
 percent: 16
 duration: 4
-quiz_total: 20
-date_updated: 2026-11-20
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -54,6 +54,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose between the Snakie web app and the desktop app, and open or install the one that suits you.
 
 Snakie comes in two forms that look and work the same: a web app that runs in your browser, and a desktop app you install. Let's pick the right one for you.
 
@@ -120,6 +122,8 @@ The version number sits at the bottom right of the window, in the status bar. In
 
 ---
 
+> **Teachers**: The web app needs no install, so it suits locked-down school machines and Chromebooks, and the simulator works in any browser. Real boards need Chrome or Edge. The desktop installer for Windows and Linux is not signed yet, so Windows may ask for confirmation, and a school may need its IT team to approve the install.
+
 ## Try it Yourself
 
 1. Open [app.snakie.org](https://app.snakie.org/) in your browser.
@@ -128,13 +132,13 @@ The version number sits at the bottom right of the window, in the status bar. In
 
 ## Common Issues
 
-**Problem**: The web app can't see my board.
-**Solution**: Use Chrome or Edge, and check your USB cable carries data.
-**Why**: Only those browsers support Web Serial, and many cheap cables only carry power.
+- **Problem**: The web app can't see my board.
+- **Solution**: Use Chrome or Edge, and check your USB cable carries data.
+- **Why**: Only those browsers support Web Serial, and many cheap cables only carry power.
 
-**Problem**: On Linux, double-clicking the AppImage does nothing.
-**Solution**: Make it executable with `chmod +x`, as shown above.
-**Why**: Downloaded files are not allowed to run until you say so.
+- **Problem**: On Linux, double-clicking the AppImage does nothing.
+- **Solution**: Make it executable with `chmod +x`, as shown above.
+- **Why**: Downloaded files are not allowed to run until you say so.
 
 ## Check your understanding
 

@@ -4,7 +4,7 @@ description: Learn to plan, wire and check a circuit on screen in Snakie's Elect
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/00_intro.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}

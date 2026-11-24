@@ -3,12 +3,16 @@ title: Securing and Backing Up SQLite Databases
 description: >-
     Module 10 focuses on securing SQLite databases and implementing backup strategies to protect data integrity and ensure business continuity
 layout: lesson
+type: page
 cover: /learn/sqlite3/assets/banners/10_securing_and_backing_up.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to protect a SQLite file sensibly, and back it up with the `backup()` method and an SQL dump.
 
 Module 10 focuses on securing SQLite databases and implementing backup strategies to protect data integrity and ensure business continuity.
 
@@ -31,6 +35,15 @@ Ensure appropriate file system access controls are in place to restrict unauthor
 Implement access control mechanisms within your application or system to control user access to the SQLite database. Use authentication and authorization techniques to restrict database access to authorized users only.
 
 ### Backing Up SQLite Databases
+
+```mermaid
+flowchart TD
+    A["Need a backup"] --> B{"Is a program using the database?"}
+    B -->|no| C["Copy the .db file"]
+    B -->|yes| D["Use connection.backup()"]
+    A --> E{"Want readable text, or to move to another database?"}
+    E -->|yes| F["iterdump() to an .sql file"]
+```
 
 Regularly backing up SQLite databases is crucial to protect against data loss and ensure business continuity.
 
@@ -90,7 +103,39 @@ Develop a comprehensive disaster recovery plan that outlines the steps to recove
 
 By implementing security measures and implementing backup strategies, you can protect the confidentiality, integrity, and availability of your SQLite databases and ensure business continuity.
 
+## Try it Yourself
+
+1. Run the backup example on your `mydatabase.db`. Open `mydatabase_backup.db` and count the rows in `books` to prove the copy works.
+2. Write the SQL dump to `backup.sql` and open it in a text editor. Can you spot the `CREATE TABLE` and `INSERT` statements?
+3. Restore the dump into a brand new database:
+
+```python
+import sqlite3
+
+restored = sqlite3.connect("restored.db")
+with open("backup.sql") as dump_file:
+    restored.executescript(dump_file.read())
+print(restored.execute("SELECT COUNT(*) FROM books").fetchone())
+restored.close()
+```
+
+4. Challenge: write a function `backup_with_date(path)` that names the copy with today's date, using `datetime.date.today()`.
+
+## Common Issues
+
+- **Problem**: A copied `.db` file is corrupt or missing recent changes.
+- **Solution**: Use `connection.backup()` instead of copying the file while a program has it open.
+- **Why**: A file copy can catch the database halfway through a write. `backup()` takes a consistent copy.
+
+- **Problem**: Restoring a dump into a database that already has the tables gives `table books already exists`.
+- **Solution**: Restore into a new, empty database file.
+- **Why**: The dump contains plain `CREATE TABLE` statements.
+
+> **Teachers**: An unencrypted SQLite file is readable by anyone who can open it, so don't have learners store real personal details (names with addresses, photos of people) in their practice databases. Use made-up data and keep backups on school-approved storage.
+
 ---
+
+## Check your understanding
 
 {% quiz %}
 ? Does the standard SQLite in Python encrypt your database with `PRAGMA key`?
@@ -103,6 +148,18 @@ By implementing security measures and implementing backup strategies, you can pr
 - [x] Use the `backup()` method from Python's sqlite3 module
 - [ ] Email the file to yourself
 > `backup()` makes a consistent copy even while the database is in use.
+
+? Which format is plain text, easy to read and good for version control?
+- [ ] A copy of the `.db` file
+- [x] An SQL dump from `iterdump()`
+- [ ] The `backup()` copy
+> A dump is just the SQL statements needed to rebuild the database.
+
+? Why test a backup by restoring it?
+- [x] A backup you have never restored might not work when you need it
+- [ ] Restoring makes the backup smaller
+- [ ] It's required by SQLite
+> The lesson recommends regularly restoring backups to check they are valid.
 {% endquiz %}
 
 ---

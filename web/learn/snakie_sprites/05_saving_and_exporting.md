@@ -12,7 +12,7 @@ description: Save a sprite as a .spr file and export it as a MicroPython module,
 percent: 42
 duration: 5
 quiz_total: 39
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to save a sprite as a .spr file and export it as a MicroPython module, a GIF, a PNG or a PBM.
 
 ## Open a project folder first
 
@@ -143,6 +145,8 @@ A 16×16 sprite at 1× is a speck. At 8× it becomes 128×128, with each pixel a
 **Import** also opens PNG, JPEG, GIF and PBM files, and turns them into 1-bit frames. An animated GIF becomes several frames.
 
 Start with small, simple, high-contrast pictures. A photo squeezed down to 1-bit rarely looks like anything, but a logo or an icon often comes out well and gives you something to tidy up by hand.
+
+> **Teachers**: Learners open a project folder and, in the browser, Snakie asks permission to read and write there. On shared computers give each learner or pair their own folder (such as `robot-face`) and have them copy their `.spr` and `eye.py` files somewhere safe before logging out.
 
 ---
 

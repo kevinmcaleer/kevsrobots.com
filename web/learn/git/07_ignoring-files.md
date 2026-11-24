@@ -11,7 +11,8 @@ description: Keep junk files, build output and secrets out of your repository wi
   .gitignore
 percent: 56
 duration: 5
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to keep junk files and secrets out of your repository with a `.gitignore` file, and stop tracking a file you committed by mistake.
 
 ## Not everything belongs in Git
 
@@ -184,6 +187,8 @@ git check-ignore -v secrets.py
 ```
 
 That means line 2 of `.gitignore` matched it.
+
+> **Teachers**: use this lesson to set the rule early: no passwords, Wi-Fi details or tokens go into a repository, especially one that will be pushed to a public site. Pupils should use made-up values in the exercises.
 
 ---
 

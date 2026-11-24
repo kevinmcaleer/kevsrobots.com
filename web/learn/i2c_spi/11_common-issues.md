@@ -9,7 +9,9 @@ previous: 10_i2c-vs-spi.html
 next: 12_final-project.html
 description: Learn how to diagnose and fix common I2C and SPI problems
 percent: 91
-duration: 11
+duration: 13
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -58,6 +60,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to work through a checklist to find the cause of a failing I2C or SPI device, and use MicroPython code to narrow it down.
+
 ## Systematic Troubleshooting
 
 Hardware communication problems are frustrating but solvable. This lesson teaches you a systematic approach to diagnosing and fixing common I2C and SPI issues. With these techniques, you'll spend less time stuck and more time building.
@@ -91,7 +95,7 @@ print(devices)  # Prints: []
 
 ```python
 # Check if your module has pull-up resistors
-# Look for small resistors marked "103" (10kΩ) or "473" (47kΩ)
+# Look for small resistors marked "103" (10kΩ), "472" (4.7kΩ) or "473" (47kΩ)
 # If missing, add 4.7kΩ resistors:
 # - SDA to 3.3V
 # - SCL to 3.3V
@@ -118,8 +122,8 @@ i2c = I2C(0, scl=Pin(9), sda=Pin(8))  # Check physical connections!
 4. **Device in wrong mode**
 
 ```python
-# Some devices need initialization before appearing on bus
-# Try power cycling:
+# Some devices need a moment after power-up, or a reset pin pulled high,
+# before they appear on the bus. Try power cycling:
 # 1. Disconnect VCC for 5 seconds
 # 2. Reconnect
 # 3. Scan again
@@ -139,9 +143,9 @@ def diagnose_i2c():
     print("Test 1: Initializing I2C...")
     try:
         i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=100000)  # Start slow
-        print("✓ I2C initialized at 100 kHz")
+        print("[OK] I2C initialized at 100 kHz")
     except Exception as e:
-        print(f"✗ Failed to initialize I2C: {e}")
+        print(f"[FAIL] Failed to initialize I2C: {e}")
         return
 
     # Test 2: Scan for devices
@@ -149,11 +153,11 @@ def diagnose_i2c():
     devices = i2c.scan()
 
     if devices:
-        print(f"✓ Found {len(devices)} device(s):")
+        print(f"[OK] Found {len(devices)} device(s):")
         for addr in devices:
             print(f"  - 0x{addr:02X} (decimal {addr})")
     else:
-        print("✗ No devices found")
+        print("[FAIL] No devices found")
         print("\nTroubleshooting steps:")
         print("1. Check SDA and SCL connections")
         print("2. Verify VCC and GND connected")
@@ -165,7 +169,7 @@ def diagnose_i2c():
     for speed in [100000, 400000]:
         i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=speed)
         devices = i2c.scan()
-        status = "✓" if devices else "✗"
+        status = "[OK]" if devices else "[FAIL]"
         print(f"{status} {speed/1000:.0f} kHz: {len(devices)} device(s)")
 
 diagnose_i2c()
@@ -262,9 +266,12 @@ value = (data[1] << 8) | data[0]
 # Check for duplicate addresses
 devices = i2c.scan()
 if len(devices) != len(set(devices)):
-    print("⚠️  Duplicate addresses detected!")
+    print("WARNING: Duplicate addresses detected!")
 
-# Solution: Change device address if possible
+# Note: scan() lists an address once even if two chips answer it, so a
+# duplicate usually shows up as a device that behaves oddly or a scan
+# that is missing a device you expected.
+# Solution: change a device address if possible
 # (e.g., BME280 SDO pin, OLED solder jumper)
 ```
 
@@ -280,9 +287,11 @@ i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=100000)
 3. **Insufficient pull-up resistors**
 
 ```python
-# More devices = more load on bus
-# May need stronger pull-ups (2.2kΩ instead of 10kΩ)
-# Or: Ensure only one set of pull-ups total
+# Every breakout board's pull-ups are in parallel with the others, so
+# three boards with 10kΩ each give about 3.3kΩ. That is usually fine.
+# Problems come when the total drops below about 1kΩ (too many boards),
+# or when a bare bus has none at all. Check the resistance with a meter
+# (power off) between SDA and 3.3V.
 ```
 
 ## SPI Common Issues
@@ -296,7 +305,7 @@ i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=100000)
 1. **Wrong SPI mode (polarity/phase)**
 
 ```python
-# Try all 4 modes systematically
+# Try all 4 modes systematically (cs is the Pin you created for chip select)
 for mode in range(4):
     polarity = mode >> 1
     phase = mode & 1
@@ -327,12 +336,12 @@ cs.value(1)  # Start HIGH (deselected)
 
 ```python
 # Common mistake!
-# MOSI (Master Out) → Device SDI/MOSI/DIN
-# MISO (Master In) ← Device SDO/MISO/DOUT
+# MOSI (Controller Out) → Device SDI/MOSI/DIN
+# MISO (Controller In) ← Device SDO/MISO/DOUT
 
 # If swapped, reading returns zeros or 0xFF
-# Solution: Swap in code or physically
-spi = SPI(0, sck=Pin(2), mosi=Pin(4), miso=Pin(3))  # Swapped
+# Solution: swap the jumper wires. (Hardware SPI0 only accepts GP3 as MOSI
+# and GP4 as MISO in this wiring, so swapping them in code raises ValueError.)
 ```
 {: .no-snakie }
 
@@ -344,6 +353,7 @@ spi = SPI(0, sck=Pin(2), mosi=Pin(4), miso=Pin(3))  # Swapped
 
 1. **Clock speed too fast**
 
+<!-- code-check: skip -->
 ```python
 # Start slow and increase gradually
 spi = SPI(0, baudrate=100000, ...)   # 100 kHz
@@ -377,11 +387,12 @@ spi = SPI(0, baudrate=10000000, ...) # 10 MHz
 **Cause**: Not sending dummy bytes for reading
 
 ```python
-# WRONG: Only send read command
+# WRONG: Only send the read command
 tx_data = bytearray([0x80])  # Read register 0x00
 rx_data = bytearray(1)
 spi.write_readinto(tx_data, rx_data)
-# Result: rx_data contains command echo, not data!
+# Result: rx_data holds only what the device sent while it was still
+# receiving the command (junk), not the register value!
 
 # CORRECT: Send dummy bytes
 tx_data = bytearray([0x80, 0x00])  # Command + dummy byte
@@ -471,19 +482,19 @@ def debug_i2c_read(i2c, addr, reg, num_bytes):
         # Check device present
         devices = i2c.scan()
         if addr not in devices:
-            print(f"✗ Device 0x{addr:02X} not found on bus")
+            print(f"[FAIL] Device 0x{addr:02X} not found on bus")
             print(f"  Available: {[hex(d) for d in devices]}")
             return None
 
-        print(f"✓ Device 0x{addr:02X} present")
+        print(f"[OK] Device 0x{addr:02X} present")
 
         # Attempt read
         data = i2c.readfrom_mem(addr, reg, num_bytes)
-        print(f"✓ Read successful: {[hex(b) for b in data]}")
+        print(f"[OK] Read successful: {[hex(b) for b in data]}")
         return data
 
     except OSError as e:
-        print(f"✗ OSError: {e}")
+        print(f"[FAIL] OSError: {e}")
         print("  Check: wiring, pull-ups, speed")
         return None
 
@@ -536,7 +547,7 @@ class SafeSensor:
         """Verify sensor is connected"""
         if self.addr not in self.i2c.scan():
             raise RuntimeError(f"Sensor at 0x{self.addr:02X} not found")
-        print(f"✓ Sensor at 0x{self.addr:02X} verified")
+        print(f"[OK] Sensor at 0x{self.addr:02X} verified")
 ```
 
 **4. Add decoupling capacitors**
@@ -600,6 +611,7 @@ Practice troubleshooting:
 
 1. **Intentionally create problems**:
 
+<!-- code-check: skip -->
 ```python
 # Wrong address
 data = i2c.readfrom(0x99, 1)  # Doesn't exist
@@ -639,6 +651,44 @@ def full_diagnostics():
 
 full_diagnostics()
 ```
+
+## Common Issues at a Glance
+
+- **Problem**: The I2C scan is empty
+- **Solution**: Check power, SDA and SCL wiring, pull-up resistors and the pin numbers in code, in that order, then retry at 100 kHz
+- **Why**: Nine times in ten a missing or loose wire looks identical to a dead device
+
+- **Problem**: An SPI device returns all 0x00 or all 0xFF
+- **Solution**: Check MISO and chip select wiring, then try the other SPI mode and a lower speed
+- **Why**: A floating or mis-clocked MISO line reads as constant values
+
+- **Problem**: It worked yesterday and fails today
+- **Solution**: Unplug everything, rebuild the simplest circuit (one device, short wires) and add things back one at a time
+- **Why**: Breadboard contacts loosen, and one change at a time shows which part broke
+
+## Check your understanding
+
+{% quiz %}
+? What is the first thing to check when an I2C scan returns nothing?
+- [ ] The Python version
+- [x] Power, ground and the SDA and SCL wiring
+- [ ] The chip ID
+> Start with the simple, physical causes before debugging code.
+
+? An SPI sensor returns 0xFF for every byte. Which is a likely cause?
+- [ ] The scan is empty
+- [x] MISO is unplugged, or the chip select is not being pulled low
+- [ ] The pull-up resistors are missing
+> SPI has no pull-ups or addresses, so check MISO, CS and the mode.
+
+? Why does a long run of breadboard wires cause trouble at high speed?
+- [ ] They use more power
+- [x] They pick up noise and blur the fast clock edges
+- [ ] The Pico cannot see them
+> Signal quality falls as wires get longer, so shorten them or slow the clock.
+{% endquiz %}
+
+> **Teachers**: Troubleshooting is easiest to teach when the faults are on purpose. Have one learner secretly swap or unplug a wire on a working circuit, then let a partner find it with the checklist. A pair of spare, known-good sensors makes it quick to tell a faulty part from a faulty wire. A multimeter and a bag of jumper wires per bench is plenty; a logic analyser is nice to demonstrate but not needed.
 
 ## What You've Learned
 

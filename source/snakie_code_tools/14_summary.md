@@ -4,12 +4,14 @@ description: Review the Snakie code tools you have learned, a workflow that uses
 layout: lesson
 type: page
 cover: /learn/snakie_code_tools/assets/banners/14_summary.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose the right Snakie editor tool for a job and decide where to go next.
 
 You started this course with an editor. You're finishing it with a workshop.
 

@@ -1,168 +1,184 @@
 ---
 title: Meet Stable-Baselines3
-description: Train DQN on CartPole in ten lines using Stable-Baselines3 — your first neural-network RL agent — and understand how MlpPolicy replaces the Q-table.
+description: Train DQN on CartPole in a few lines using Stable-Baselines3, your first neural-network RL agent, and understand how MlpPolicy replaces the Q-table.
 layout: lesson
+snakie: false
 type: page
 cover: /learn/gymnasium/assets/banners/12_meet_stable_baselines3.jpg
-date_updated: 2026-06-14
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## From Table to Network
+By the end of this lesson you will be able to train a DQN agent with Stable-Baselines3, measure it with `evaluate_policy`, and explain how a Q-network stands in for a Q-table.
 
-In the previous course, lesson 14 ended with this question: "What happens when the state space is too large for a lookup table?"
+---
 
-The BurgerBot grid-world has 588 states. A lookup table with 588 entries is tiny. But even a low-resolution camera (say, 64x64 pixels in greyscale) has `256^4096` possible images — a number that dwarfs the number of atoms in the observable universe. No table can hold that.
+## From table to network
 
-The answer is to replace the table with a neural network. Instead of looking up `Q[state][action]`, you compute `network.forward(state)` and get Q-values for all actions in one pass. The network generalises — if it has seen similar states during training, it can make a reasonable prediction on a new one.
+The previous course ended with a question: what if the state space is too big for a lookup table? Your BurgerBot has 588 states, which is tiny. A 64 by 64 greyscale camera image has more possible pictures than there are atoms in the universe, so no table could hold them.
 
-Stable-Baselines3 (SB3) provides battle-tested implementations of the most widely-used deep RL algorithms. You do not need to write the network, the replay buffer, the loss function, or the optimizer. You hand SB3 an environment; SB3 trains an agent on it.
+The answer is to replace the table with a neural network. Instead of looking up `Q[state]`, you feed the observation through a function and get a Q-value for every action. Because the network is smooth, it **generalises**: states it has never seen get sensible answers if they resemble ones it has.
 
-## Installing Stable-Baselines3
+**Stable-Baselines3** (SB3) gives you tested versions of the common deep RL algorithms, so you do not have to write the network, the replay buffer, the loss or the optimiser. You hand it an environment and a policy type, and call `learn()`.
 
-If you installed it at the start of the course, it is already ready:
+```mermaid
+flowchart LR
+    subgraph Table["Q-table (tabular)"]
+        S1["state key"] --> L1["dictionary lookup"] --> Q1["Q-values per action"]
+    end
+    subgraph Net["Q-network (DQN)"]
+        S2["observation"] --> L2["64 units, ReLU"] --> L3["64 units, ReLU"] --> Q2["Q-values per action"]
+    end
+```
+
+## Install and check
 
 ```bash
 pip install stable-baselines3
 ```
 
-Verify:
+This brings PyTorch with it, and it is a big download, so it may take a while.
 
-```python
-import stable_baselines3
-print(stable_baselines3.__version__)   # 2.x.x
-```
+> **Teachers**: Plan for the install to take several minutes and a few gigabytes on Linux, because the default PyTorch download includes GPU libraries. On a locked-down or slow network, install in advance and have learners reuse the same environment. Training in this lesson takes under a minute on a laptop CPU.
 
-## DQN on CartPole in Ten Lines
+## DQN on CartPole
+
+DQN (Deep Q-Network) is Q-learning with a neural network for the Q-function, a replay buffer of past experience, and a slowly updated "target" copy of the network for stability. You keep the Q-learning idea from the previous course and swap the table for the network.
+
+Save this as `dqn_cartpole.py`:
 
 ```python
 import gymnasium as gym
+import stable_baselines3
 from stable_baselines3 import DQN
+from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.monitor import Monitor
 
-# Create the environment
-env = gym.make("CartPole-v1")
+print("gymnasium", gym.__version__, "| stable-baselines3", stable_baselines3.__version__)
 
-# Create a DQN agent with a small multi-layer perceptron (MlpPolicy).
-# SB3 inspects env.observation_space and env.action_space automatically.
+env = Monitor(gym.make("CartPole-v1"))
+
 model = DQN(
     "MlpPolicy",
     env,
-    verbose=1,          # print training progress
     learning_rate=1e-3,
-    buffer_size=10000,
+    buffer_size=50_000,
+    learning_starts=1_000,
+    exploration_fraction=0.3,
+    target_update_interval=250,
+    verbose=0,
+    seed=0,
 )
 
-# Train for 20,000 steps (takes about 20 seconds on CPU)
-model.learn(total_timesteps=20000)
+before, before_std = evaluate_policy(model, env, n_eval_episodes=10, deterministic=True)
+print(f"Before training: {before:.1f} +/- {before_std:.1f}")
 
-# Evaluate: run 5 episodes with the greedy policy
-for episode in range(5):
-    obs, info = env.reset()
-    episode_reward = 0
-    done = False
-    while not done:
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, terminated, truncated, info = env.step(action)
-        episode_reward += reward
-        done = terminated or truncated
-    print(f"Episode {episode + 1}: reward = {episode_reward:.0f}")
+model.learn(total_timesteps=30_000)
 
+after, after_std = evaluate_policy(model, env, n_eval_episodes=10, deterministic=True)
+print(f"After training:  {after:.1f} +/- {after_std:.1f}")
+
+obs, info = env.reset(seed=123)
+action, _state = model.predict(obs, deterministic=True)
+print("predicted action for one observation:", int(action))
+print(model.policy.q_net.q_net)
 env.close()
 ```
 
-With 20,000 timesteps you should see episode rewards climbing from around 20 early in training to somewhere between 150 and 500 by the end. The network is learning.
+Output from our test run (it took about 25 seconds on a CPU):
 
-## What MlpPolicy Means
-
-`"MlpPolicy"` tells SB3 to use a Multi-Layer Perceptron (MLP) — a standard fully-connected neural network — as the function approximator.
-
-For DQN, the network takes the current observation as input and outputs one Q-value per possible action. The network learns to predict how much total future reward the agent will earn if it takes each action from the current state.
-
-Compare this to the Q-table from the previous course:
-
-```python
-# Tabular Q-learning (RL course, lesson 8):
-# Look up the state in the table, get stored Q-values.
-q_values = q_table[(row, col, heading, sensor)]   # exact lookup
-action = argmax(q_values)
-
-# DQN (what SB3 is doing internally):
-# Feed the state to the network, get predicted Q-values.
-q_values = network.forward(obs)   # neural network forward pass
-action = argmax(q_values)
 ```
-
-The interface is the same. The mechanism is different. And the scaling is dramatically better.
-
-## model.predict vs env.step
-
-```python
-action, _states = model.predict(obs, deterministic=True)
-```
-
-`model.predict` takes a single observation (or a batch) and returns the best action according to the current policy. The second return value (`_states`) is only used for recurrent policies — you can ignore it for MLP policies.
-
-`deterministic=True` means "use the greedy policy: always pick the highest Q-value action". During training, SB3 handles exploration internally. During evaluation, you want the deterministic policy.
-
-## Key Hyperparameters
-
-You do not need to tune these to get started, but it is good to know what they control:
-
-```python
-model = DQN(
-    "MlpPolicy",
-    env,
-    learning_rate=1e-3,      # how fast the network weights update
-    buffer_size=50000,        # how many past transitions to store
-    learning_starts=1000,     # how many random steps before training begins
-    batch_size=32,            # transitions per gradient update
-    gamma=0.99,               # discount factor — same gamma as the RL course
-    exploration_fraction=0.1, # fraction of training spent reducing epsilon
-    exploration_final_eps=0.05, # final epsilon (minimum exploration)
-    target_update_interval=1000, # how often to sync the target network
-    verbose=1,
+gymnasium 1.4.0 | stable-baselines3 2.9.2
+Before training: 9.3 +/- 0.8
+After training:  129.7 +/- 7.6
+predicted action for one observation: 0
+Sequential(
+  (0): Linear(in_features=4, out_features=64, bias=True)
+  (1): ReLU()
+  (2): Linear(in_features=64, out_features=64, bias=True)
+  (3): ReLU()
+  (4): Linear(in_features=64, out_features=2, bias=True)
 )
 ```
 
-The `gamma` and `exploration_final_eps` parameters are familiar from the previous course. SB3 handles all the mechanics around them.
+The untrained network balances the pole for about 9 steps. After 30,000 steps of experience it reaches about 130: a clear win, though short of CartPole's 500 maximum. Your numbers will differ slightly, and DQN results on CartPole are known to wobble: in our testing a 100,000-step run scored about 113, no better than the 30,000-step one, and a 5,000-step run scored about 46. More training does not always mean a better policy with DQN, so treat any single result with care. In exercise 2 you will try PPO on the same problem, which in our test scored the full 500 in 30,000 steps.
 
-## Evaluating Cleanly with evaluate_policy
+The last lines show what "MlpPolicy" gave us: a network with 4 inputs (the four CartPole numbers), two hidden layers of 64 units, and 2 outputs, one Q-value per action. SB3 read the sizes from the spaces, as lesson 4 described.
 
-SB3 provides a utility function for rigorous evaluation:
+## What the pieces mean
 
-```python
-from stable_baselines3.common.evaluation import evaluate_policy
+**`"MlpPolicy"`** means a Multi-Layer Perceptron: plain fully connected layers. It takes flat number arrays, including `Box`, `Discrete` and `MultiDiscrete` observations.
 
-mean_reward, std_reward = evaluate_policy(
-    model,
-    env,
-    n_eval_episodes=10,
-    deterministic=True,
-)
-print(f"Mean reward over 10 episodes: {mean_reward:.1f} +/- {std_reward:.1f}")
-```
+**`Monitor`** wraps the environment so SB3 records true episode scores. It silences a warning from `evaluate_policy`, and it is the SB3 cousin of `RecordEpisodeStatistics`.
 
-This runs exactly `n_eval_episodes` episodes and returns the mean and standard deviation of the episode rewards. Use this instead of a manual evaluation loop when you want a clean, comparable number.
+**`model.predict(obs, deterministic=True)`** returns `(action, state)`. The second value is only used by recurrent policies, so we ignore it. `deterministic=True` means "always take the highest-valued action", which is what you want when *using* the agent. During training SB3 handles exploration itself.
 
-## Try It Yourself
+**`evaluate_policy`** runs full episodes and returns the mean and standard deviation of the return. Use it, not a hand-rolled loop, when you want numbers you can compare.
 
-1. Change `total_timesteps=20000` to `5000` and retrain. How much does the final performance drop? This gives you a feel for how much training the agent needs.
-2. Try `from stable_baselines3 import PPO` and replace `DQN` with `PPO`. Use `n_steps=64` and `n_envs=1`. Does PPO reach the same performance? (PPO is an on-policy algorithm — it needs different hyperparameters.)
-3. After training DQN, print `model.policy`. This shows the neural network architecture. How many layers does the default MLP have?
+## The knobs that matter
+
+| Parameter | What it controls |
+| --- | --- |
+| `learning_rate` | How big each weight update is |
+| `buffer_size` | How many past transitions the replay buffer remembers |
+| `learning_starts` | Random steps collected before any learning begins |
+| `batch_size` | Transitions used for each weight update |
+| `gamma` | The discount factor, the same gamma as in the previous course |
+| `exploration_fraction` | The share of training spent lowering epsilon |
+| `exploration_final_eps` | The smallest epsilon, the "never stop exploring" floor |
+| `target_update_interval` | How often the target network copies the main one |
+{:class="table table-single"}
+
+You will recognise `gamma` and epsilon from the previous course. SB3 anneals epsilon for you: it starts at 1.0 and falls linearly over `exploration_fraction` of the run.
+
+## Try it Yourself
+
+1. Change `total_timesteps` to 5,000. How far does the score drop? What does that tell you about how much experience DQN needs?
+2. Swap `DQN` for `PPO` (`from stable_baselines3 import PPO`) with `PPO("MlpPolicy", env, seed=0)`. Remove the DQN-only keyword arguments. How does PPO do after 30,000 steps?
+3. Print `model.policy` for the full architecture. Can you find the main network and the target network?
+4. Challenge: run the same script with `gym.make("Acrobot-v1")`. Does DQN learn it? What score counts as good, given that every step costs -1?
 
 ## Common Issues
 
-**Problem:** `ValueError: You must use `MultiInputPolicy` when dealing with dictionary observation spaces`
-**Solution:** Your environment uses a Dict observation space. Use `"MultiInputPolicy"` instead of `"MlpPolicy"`.
-**Why:** SB3 has different policy classes for different observation types. `MlpPolicy` handles flat arrays (Box, Discrete, MultiDiscrete). `MultiInputPolicy` handles Dict spaces.
+- **Problem**: `UserWarning: Evaluation environment is not wrapped with a Monitor wrapper`
+- **Solution**: Wrap the environment with `Monitor(...)` as in the program.
+- **Why**: Other wrappers can change the rewards or lengths SB3 sees, and `Monitor` records the true episode numbers.
 
-**Problem:** Training prints nothing even with `verbose=1`
-**Solution:** SB3 only prints progress every `log_interval` timesteps. With very few timesteps (under 1000) you may not see output. Try `verbose=2` for more frequent logging.
-**Why:** SB3's progress reporting is tied to episode completions and log intervals, not raw step count.
+- **Problem**: Training seems to print nothing.
+- **Solution**: Set `verbose=1` on the model to see progress tables.
+- **Why**: We set `verbose=0` to keep the output short. SB3 prints its logs only when verbose is on.
 
-**Problem:** `UserWarning: Stable Baselines3 currently does not support Discrete observation spaces`
-**Solution:** Wrap your Discrete observation in a Box: `from gymnasium.wrappers import FlattenObservation`. Or use `MultiDiscrete` (which SB3 does support).
-**Why:** DQN's neural network expects a numeric array, not a single integer. SB3 handles MultiDiscrete by treating each component as a separate input feature.
+- **Problem**: `ValueError` about the policy or observation space when your observations are dictionaries or images.
+- **Solution**: Use `"MultiInputPolicy"` for `Dict` spaces and `"CnnPolicy"` for images.
+- **Why**: `MlpPolicy` expects flat numbers. Other observation types need other network designs.
+
+## Check your understanding
+
+{% quiz %}
+? What does `"MlpPolicy"` mean in `DQN("MlpPolicy", env)`?
+- [ ] A camera-based policy
+- [x] A fully connected neural network
+- [ ] A lookup table
+> MLP stands for Multi-Layer Perceptron. SB3 sizes its input and output from the spaces.
+
+? What does `deterministic=True` do in `model.predict`?
+- [ ] Adds exploration noise
+- [x] Always picks the action with the highest value
+- [ ] Reseeds the environment
+> Use it when you want the trained agent's best behaviour, not exploration.
+
+? Why can a network handle states that a Q-table has never seen?
+- [ ] It memorises more states
+- [x] It generalises between similar inputs
+- [ ] It ignores the observation
+> A table has one cell per state, with nothing for an unseen one. A network gives an answer for any input.
+
+? Which function gives you a clean mean and standard deviation of episode returns?
+- [ ] `model.predict`
+- [x] `evaluate_policy`
+- [ ] `env.render`
+> It runs full episodes and averages the results.
+{% endquiz %}

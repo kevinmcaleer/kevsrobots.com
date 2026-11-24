@@ -9,10 +9,28 @@ description: Design printed parts around the servos, boards and gears a robot re
   add standoffs and horn mounts, generate gears that mesh, and finish with a geared
   servo deck for a Raspberry Pi Pico.
 level: intermediate
-course_duration: 1h 16m
+course_duration: 1h 17m
 lesson_count: 14
 first_lesson: 00_intro.html
 quiz_total: 42
+outcomes:
+- Drop a servo, motor, board, sensor or bearing into a model and design round it
+- Cut a pocket that the real part slides into
+- Add standoffs for a Pico or a Pi without looking up a dimension
+- Generate a pair of gears with the ratio you want, at the right distance apart
+- Choose a gear bore for a motor shaft or a servo horn
+- Make the holes in a downloaded STL editable
+prerequisites:
+- Learn BetterCad, for adding shapes, Properties, the Browser and the timeline
+- Print It Right with BetterCad is recommended, so your fits are calibrated if you
+  plan to print
+you_need:
+- A computer with a recent browser and a mouse. BetterCad needs no install and no
+  account
+- '{''To build the project for real'': ''an SG90 micro servo with its horns and screws,
+  a Raspberry Pi Pico, a few M2 screws and one M3 screw about 20 mm long''}'
+- Callipers, and a 3D printer if you want to print the deck
+- None of the hardware is needed to follow along on screen
 navigation:
 - name: Design Robot Parts with BetterCad
 - content:

@@ -4,12 +4,14 @@ description: A recap of Print It Right with BetterCad, a pre-flight checklist to
 layout: lesson
 type: page
 cover: /learn/bettercad_printing/assets/banners/11_summary.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recall the checks and calibrated numbers from the course, and run the pre-flight checklist before a print.
 
 You've been through the Print panel from top to bottom, calibrated your printer twice and finished with a box whose lid fits because you decided it would. Most of what separates a frustrating print from a good one happened before the slicer opened.
 
@@ -73,7 +75,8 @@ Before every export:
 ## What's next
 
 - New to the app, or want to revise? **[Learn BetterCad](/learn/bettercad/)** covers sketching, shapes, the timeline and parameters
-- The **[Start with BetterCad](/learn/learning_pathways/bettercad.html)** pathway keeps the BetterCad courses in order as more are added. Courses on robot parts, joints and exporting a robot for simulation are on the way
+- The **[Start with BetterCad](/learn/learning_pathways/bettercad.html)** pathway keeps the BetterCad courses in order
+- Designing for robots? **[Design Robot Parts with BetterCad](/learn/bettercad_robot_parts/)** is next, and it relies on the hole and fit calibration you have just done. After it, **[Make It Move with BetterCad](/learn/bettercad_joints_urdf/)** adds joints and a URDF export. Both are in the **[BetterCad for Robot Builders](/learn/learning_pathways/bettercad-robot-builders.html)** pathway
 - Ready to put electronics in your box? **[Getting Started with Snakie](/learn/snakie_getting_started/)** gets a Raspberry Pi Pico running MicroPython, and **[Snakie Blocks](/learn/snakie_blocks/)** has you programming it by snapping blocks together
 - Want to compare with a traditional CAD program? Try **[Introduction to FreeCAD for Beginners](/learn/freecad/)**
 

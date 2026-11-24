@@ -4,7 +4,7 @@ description: Meet Snakie, the robotics-first MicroPython editor, and see what yo
 layout: lesson
 type: page
 cover: /learn/snakie_getting_started/assets/banners/00_intro.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -71,6 +71,8 @@ print("Hello from Snakie!")
 {% include snakie.html code=snakie_code name="hello.py" %}
 
 Each lesson ends with a **Try it Yourself** challenge and a quick quiz. Your quiz score and progress are kept in the lesson sidebar.
+
+> **Teachers**: This course needs no coding experience. Each lesson is short and has one job, and the traffic light project needs a longer session. Everything up to lesson 5 runs on the simulator in a browser with nothing to install, so a class can start with no hardware at all. Lessons 6 to 10 need one Pico and USB data cable per learner or group, plus the project parts listed above. The web app needs Chrome or Edge to talk to a real board. Simulator work is lost when you disconnect, so ask learners to save files to their computer.
 
 ## Prerequisites
 

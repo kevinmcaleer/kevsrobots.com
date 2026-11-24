@@ -4,12 +4,14 @@ description: See how a row of pixels is packed into bytes and decode a sprite fr
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/06_pixels_into_bytes.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how a row of pixels is packed into bytes and decode a sprite frame by hand in MicroPython.
 
 ## What's in those strange lines?
 

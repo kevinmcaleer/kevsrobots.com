@@ -4,12 +4,14 @@ description: Use hover highlighting, click a line and Show me the Python in Snak
 layout: lesson
 type: page
 cover: /learn/snakie_blocks/assets/banners/09_reading_the_python.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use hover, click-a-line and Show me the Python to match each block to the Python it writes, and edit in either pane.
 
 You've been glancing at the Python all along. This lesson is about reading it on purpose, using three tools Snakie gives you.
 
@@ -104,17 +106,17 @@ That's why this course writes a pressed button as `pin_14.value() == 0`: it matc
 
 ## Common Issues
 
-**Problem**: I typed some Python and the blocks went grey.
-**Solution**: Check the Problems tab for a syntax error, and fix the line.
-**Why**: Half-typed Python can't be turned into blocks until it makes sense again.
+- **Problem**: I typed some Python and the blocks went grey.
+- **Solution**: Check the Problems tab for a syntax error, and fix the line.
+- **Why**: Half-typed Python can't be turned into blocks until it makes sense again.
 
-**Problem**: My typed line became a grey Python block.
-**Solution**: That's fine. It still runs.
-**Why**: There isn't a matching coloured block for every line of Python, so Snakie keeps it exactly as you wrote it.
+- **Problem**: My typed line became a grey Python block.
+- **Solution**: That's fine. It still runs.
+- **Why**: There isn't a matching coloured block for every line of Python, so Snakie keeps it exactly as you wrote it.
 
-**Problem**: A banner says the file uses advanced blocks.
-**Solution**: Click to show them in the toolbox.
-**Why**: Your code used something from the advanced set. The next lesson covers those.
+- **Problem**: A banner says the file uses advanced blocks.
+- **Solution**: Click to show them in the toolbox.
+- **Why**: Your code used something from the advanced set. The next lesson covers those.
 
 ## Check your understanding
 

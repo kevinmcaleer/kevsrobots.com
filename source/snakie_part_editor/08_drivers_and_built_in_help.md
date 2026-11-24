@@ -4,12 +4,14 @@ description: Attach a MicroPython driver and bundled help to your Snakie part so
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/08_drivers_and_built_in_help.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to attach a MicroPython driver to a part, write its bundled help, and explain when Snakie copies a driver to the board.
 
 A sensor is no use without its **driver**, the MicroPython library that talks to it. Normally you'd hunt for the right file and copy it to your board. A good part does that for you.
 
@@ -132,6 +134,8 @@ for reading in range(6):
 {% include snakie.html code=snakie_code name="distance.py" view="code" %}
 
 The `try` and `except ImportError` pattern is worth remembering. Your program runs with the real driver when it's installed and falls back to pretend readings when it isn't.
+
+> **Teachers**: Snakie only copies a driver to a board after the learner agrees, so on shared boards agree in advance who may install files. A driver from a GitHub address or a web address is downloaded from the internet, so check that your school network allows it, or put the driver file in the part folder instead. The stand-in sensor in this lesson runs with no hardware.
 
 ---
 

@@ -12,7 +12,7 @@ description: Let BetterCad find every place two printed parts meet, report the f
 percent: 64
 duration: 6
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Print It Right with BetterCad
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to switch on the check that finds where parts meet, and repair joints that are too tight to print.
 
 In a model with several parts, it's easy to lose track of which faces touch. A peg modelled at exactly the size of its hole looks perfect on screen and seizes solid on the printer. BetterCad can go looking for those places for you.
 
@@ -144,17 +146,17 @@ For any design with more than one part, before you export:
 
 ## Common Issues
 
-**Problem**: The check lists nothing, but my parts are meant to fit together.
-**Solution**: Move them into their assembled positions.
-**Why**: Only faces within 1 mm of each other, or a pin inside a hole, count as meeting.
+- **Problem**: The check lists nothing, but my parts are meant to fit together.
+- **Solution**: Move them into their assembled positions.
+- **Why**: Only faces within 1 mm of each other, or a pin inside a hole, count as meeting.
 
-**Problem**: A joint I care about isn't listed.
-**Solution**: Measure it by hand with **Measure** (<kbd>I</kbd>).
-**Why**: The check finds round pins in round holes and facing flat faces. Odd shapes, like a hexagon in a hexagonal pocket, show up face by face or not at all.
+- **Problem**: A joint I care about isn't listed.
+- **Solution**: Measure it by hand with **Measure** (<kbd>I</kbd>).
+- **Why**: The check finds round pins in round holes and facing flat faces. Odd shapes, like a hexagon in a hexagonal pocket, show up face by face or not at all.
 
-**Problem**: There's no Fix button on a tight joint.
-**Solution**: Read the note it gives and widen the hole yourself.
-**Why**: When the hole wasn't made by cutting with that pin, BetterCad can't tell which step to change.
+- **Problem**: There's no Fix button on a tight joint.
+- **Solution**: Read the note it gives and widen the hole yourself.
+- **Why**: When the hole wasn't made by cutting with that pin, BetterCad can't tell which step to change.
 
 ## Check your understanding
 

@@ -4,12 +4,14 @@ description: Build a 3D printable deck in BetterCad that holds an SG90 servo and
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/12_project_geared_servo_deck.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to design a deck that holds an SG90 servo and a Raspberry Pi Pico and drives a 2 to 1 gear pair.
 
 Time to put the whole course on one plate. You'll build a deck that could be the top of a small robot: a micro servo dropped into a pocket, a Pico on standoffs, and a pair of gears that halve the servo's speed and double its strength. Put a sensor or a head on the big gear and you have a pan mount with finer, stronger movement than the bare servo gives.
 
@@ -167,6 +169,8 @@ Compare yours with the finished file: [servo-deck.bcad](/learn/bettercad_robot_p
 
 ---
 
+> **Teachers**: the three printed parts weigh about 73 g of PLA at 15% infill according to the lesson, so budget filament and printer time per group, and print the deck and gears across a later session. Building the deck needs a servo, a Pico and M2 and M3 screws for every group. Learners without kit can finish the design, checks and export on screen, and compare with the downloadable servo-deck.bcad.
+
 ## Try it Yourself
 
 1. Edit **Gear 24T** and change it to 16 teeth. Does the 48-tooth gear follow? What's the new ratio, and is the post still in the right place?
@@ -176,21 +180,21 @@ Compare yours with the finished file: [servo-deck.bcad](/learn/bettercad_robot_p
 
 ## Common Issues
 
-**Problem**: The gear landed on the servo's body, not its shaft.
-**Solution**: Undo, zoom in on the shaft and click its round end face.
-**Why**: The gear stands on whichever flat face you click. The shaft's end is a small target.
+- **Problem**: The gear landed on the servo's body, not its shaft.
+- **Solution**: Undo, zoom in on the shaft and click its round end face.
+- **Why**: The gear stands on whichever flat face you click. The shaft's end is a small target.
 
-**Problem**: The post isn't under the big gear.
-**Solution**: Check the servo's X is -35.2 and the mating gear's **Angle** is 0. Then the post belongs at X = 6.
-**Why**: The post's place is the shaft's X plus the 36 mm centre distance.
+- **Problem**: The post isn't under the big gear.
+- **Solution**: Check the servo's X is -35.2 and the mating gear's **Angle** is 0. Then the post belongs at X = 6.
+- **Why**: The post's place is the shaft's X plus the 36 mm centre distance.
 
-**Problem**: The gears mesh on screen but bind when printed.
-**Solution**: Edit both gears and raise **Backlash** under More settings by 0.05 mm, and check the big gear's nut isn't done up tight.
-**Why**: Printed teeth come out slightly fat, and a clamped gear can't turn.
+- **Problem**: The gears mesh on screen but bind when printed.
+- **Solution**: Edit both gears and raise **Backlash** under More settings by 0.05 mm, and check the big gear's nut isn't done up tight.
+- **Why**: Printed teeth come out slightly fat, and a clamped gear can't turn.
 
-**Problem**: Ctrl+G grouped the wrong things.
-**Solution**: Undo. Select only **Deck** and **Gear post** before grouping.
-**Why**: Group joins every selected solid into one body.
+- **Problem**: Ctrl+G grouped the wrong things.
+- **Solution**: Undo. Select only **Deck** and **Gear post** before grouping.
+- **Why**: Group joins every selected solid into one body.
 
 ## Check your understanding
 

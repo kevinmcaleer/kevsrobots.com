@@ -12,7 +12,7 @@ description: Add screw holes that fit on a real printer with the BetterCad Hole 
 percent: 56
 duration: 6
 quiz_total: 39
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Learn BetterCad
 - content:
@@ -60,6 +60,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add screw holes that fit with the Hole tool, and cut one shape out of another with a hole shape and the Combine tool.
 
 A box becomes a useful part when things can be screwed to it and cables can get into it. This lesson covers the two ways BetterCad makes holes: the **Hole** tool for screws, and **hole shapes** for everything else.
 
@@ -163,17 +165,17 @@ Keep the model open. Next you'll round it off and hollow it out.
 
 ## Common Issues
 
-**Problem**: I grouped the parts and nothing was cut.
-**Solution**: Ungroup with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>, select the cutting shape and switch it from Solid to Hole, then group again.
-**Why**: Grouping solids joins them. Only a shape marked Hole cuts.
+- **Problem**: I grouped the parts and nothing was cut.
+- **Solution**: Ungroup with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>, select the cutting shape and switch it from Solid to Hole, then group again.
+- **Why**: Grouping solids joins them. Only a shape marked Hole cuts.
 
-**Problem**: The cable hole only goes part of the way through the wall.
-**Solution**: Ungroup, make the hole shape longer or move it so it sticks out on both sides of the wall, then group again.
-**Why**: A hole shape only removes material where it overlaps the solid.
+- **Problem**: The cable hole only goes part of the way through the wall.
+- **Solution**: Ungroup, make the hole shape longer or move it so it sticks out on both sides of the wall, then group again.
+- **Why**: A hole shape only removes material where it overlaps the solid.
 
-**Problem**: My printed holes are still too tight.
-**Solution**: Print the Hole calibration sample and set your printer's hole offset.
-**Why**: The 0.4 mm allowance is a good average, but nozzles, materials and slicers all differ.
+- **Problem**: My printed holes are still too tight.
+- **Solution**: Print the Hole calibration sample and set your printer's hole offset.
+- **Why**: The 0.4 mm allowance is a good average, but nozzles, materials and slicers all differ.
 
 ## Check your understanding
 

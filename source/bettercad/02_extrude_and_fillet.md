@@ -4,12 +4,14 @@ description: Turn a sketch into a solid block with Extrude, then round its top e
 layout: lesson
 type: page
 cover: /learn/bettercad/assets/banners/02_extrude_and_fillet.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to turn a sketch into a solid with Extrude, round its top edges with Fillet, and explain why bottom edges are better left sharp.
 
 You have a flat rectangle. Two tools turn it into something you'd want to hold: **Extrude** gives it height, and **Fillet** rounds its edges.
 
@@ -85,17 +87,17 @@ You can, but think about printing first. A rounded bottom edge curves away from 
 
 ## Common Issues
 
-**Problem**: Extrude says to click inside a closed sketch shape, but nothing happens when I click.
-**Solution**: Click *inside* the shape, not on its line.
-**Why**: Extrude works on the area a shape encloses.
+- **Problem**: Extrude says to click inside a closed sketch shape, but nothing happens when I click.
+- **Solution**: Click *inside* the shape, not on its line.
+- **Why**: Extrude works on the area a shape encloses.
 
-**Problem**: "A 20 mm fillet does not fit here."
-**Solution**: Use a smaller radius. BetterCad suggests the largest that will fit.
-**Why**: A fillet can't be bigger than the faces on each side of the edge.
+- **Problem**: "A 20 mm fillet does not fit here."
+- **Solution**: Use a smaller radius. BetterCad suggests the largest that will fit.
+- **Why**: A fillet can't be bigger than the faces on each side of the edge.
 
-**Problem**: I can't click an edge at the back.
-**Solution**: Drag to turn the view while the Fillet tool is still on, then click it.
-**Why**: You can only pick what you can see. Turning the view doesn't cancel the tool.
+- **Problem**: I can't click an edge at the back.
+- **Solution**: Drag to turn the view while the Fillet tool is still on, then click it.
+- **Why**: You can only pick what you can see. Turning the view doesn't cancel the tool.
 
 ## Check your understanding
 

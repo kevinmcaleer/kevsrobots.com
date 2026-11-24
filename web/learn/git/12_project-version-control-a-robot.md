@@ -12,7 +12,8 @@ description: 'Put everything together: start a brand new MicroPython robot proje
   GitHub'
 percent: 91
 duration: 8
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -62,6 +63,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to take a project from an empty folder to a tagged release on GitHub, using branches, a pull request and `.gitignore`.
 
 ## The project
 
@@ -315,6 +318,8 @@ git log --oneline --graph --all
 
 ## Step 5: Open a pull request and merge
 
+GitHub's buttons and menus change from time to time, so the labels below may look slightly different. The idea stays the same.
+
 Push the branch to GitHub:
 
 ```bash
@@ -370,6 +375,8 @@ Now you've got a proper workflow. For every new feature:
 3. Edit, `git add`, `git commit`, repeat
 4. `git push -u origin my-new-feature` and open a pull request
 5. Merge, then `git switch main`, `git pull`, and delete the branch
+
+> **Teachers**: this project needs the GitHub account and network access from module 10, so allow a full session (60 to 90 minutes). The code only runs with a Pico, two motors on a driver and an HC-SR04 sensor, but learners can complete every Git step with no hardware at all. If the motors are shared kit, make sure the wheels are off the ground before powering up.
 
 ---
 

@@ -9,8 +9,9 @@ previous: 04_posture.html
 description: Overlay live text and feedback on your video with CVZone's putTextRect,
   and build a curl counter
 percent: 100
-duration: 4
-quiz_total: 10
+duration: 6
+quiz_total: 16
+date_updated: 2026-11-24
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
@@ -38,6 +39,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to draw live text on your video, and build a bicep curl counter that uses a joint angle and two thresholds.
 
 ## Annotating your video
 
@@ -96,6 +99,7 @@ while True:
 
     if lmList:
         angle, img = detector.findAngle(lmList[11][0:2], lmList[13][0:2], lmList[15][0:2], img=img)
+        angle = min(angle, 360 - angle)   # 0 to 180, whichever way the arm swings
 
         if angle < 50 and not arm_bent:
             arm_bent = True
@@ -122,6 +126,7 @@ cv2.destroyAllWindows()
 
 ## How it works
 
+- `findAngle()` can return 20 or 340 for the same bend, so `min(angle, 360 - angle)` folds the answer into 0 to 180. A straight arm is still about 180
 - `arm_bent` remembers whether the arm was last seen bent or straight
 - A curl only counts when the arm goes from bent (below 50 degrees) back to straight (above 150 degrees). The gap between the two numbers stops one wobbly movement being counted several times
 - The status label changes colour so you can see the state at a glance
@@ -130,6 +135,33 @@ cv2.destroyAllWindows()
 > ## No degree symbol
 >
 > OpenCV's built-in fonts can't draw `°`, so it would show up as `??`. Stick to plain text in your labels.
+
+---
+
+## Try it Yourself
+
+1. Change the text of the status label, and its colours, to something you like.
+2. Change the 50 and 150 thresholds. Does a looser curl still count? Does a wobbly one get counted twice?
+3. Add a second counter for your right arm, using landmarks 12, 14 and 16.
+4. Challenge: count squats with the hip, knee and ankle (23, 25, 27), standing side-on to the camera.
+
+---
+
+## Common Issues
+
+- **Problem**: The count goes up when you hardly move, or never goes up.
+- **Solution**: Print the angle and watch its range as you curl, then set the two thresholds a little inside that range.
+- **Why**: Every camera position and body gives different angles, and a curl is only counted when the angle crosses both thresholds.
+
+- **Problem**: The text shows `??` where a degree sign should be.
+- **Solution**: Leave the symbol out and write `Angle: 45`.
+- **Why**: OpenCV's built-in fonts can't draw that character.
+
+- **Problem**: The text is hard to read, or runs off the edge of the picture.
+- **Solution**: Use a smaller `scale`, or move the position.
+- **Why**: `putTextRect()` draws from the position you give, and doesn't check it fits.
+
+> **Teachers**: This is the course's project lesson, so give it a full session. Keep the exercise gentle and optional, as curls and squats in front of a class camera can embarrass some pupils. Pairs can take turns, with one doing the exercise and one holding the keyboard, and learners can test the counter by moving an arm slowly without any weights.
 
 ---
 
@@ -153,6 +185,12 @@ cv2.destroyAllWindows()
 - [x] So small wobbles around one angle don't count as several curls
 - [ ] Because `findAngle()` returns two values
 > The gap means the arm has to fully bend and fully straighten before a curl is counted.
+
+? Why is the count drawn outside the `if lmList:` block?
+- [x] So it stays on screen even when you step out of view
+- [ ] Because it can't be drawn inside an `if`
+- [ ] To make the detector faster
+> The lesson draws it outside so the total remains visible even when nobody is detected.
 {% endquiz %}
 
 ---

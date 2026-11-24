@@ -12,6 +12,7 @@ description: Draw the states a robot can be in, and what makes it change between
 percent: 42
 duration: 5
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a state diagram of a robot's states and the events that move it between them.
 
 ---
 

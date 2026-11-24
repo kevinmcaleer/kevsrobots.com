@@ -4,10 +4,15 @@ description: >-
     Draw flowcharts with Mermaid - set the direction, choose node shapes, and connect them with different arrows and labels
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/03_flowcharts.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a flowchart with the direction, node shapes, arrows and labels you choose.
 
 ---
 

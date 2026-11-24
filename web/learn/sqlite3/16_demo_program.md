@@ -10,8 +10,9 @@ next: 17_tools.html
 description: This is an example program highlighting some of the simple concepts covered
   in this course
 percent: 85
-duration: 2
-quiz_total: 24
+duration: 4
+quiz_total: 60
+date_updated: 2026-11-24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -68,6 +69,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to read a complete SQLite program from start to finish and explain what each part does.
+
 {% capture snakie_code %}
 import sqlite3
 
@@ -118,6 +121,47 @@ Finally, we close the database connection to ensure proper cleanup.
 
 You can run this program to see the database creation, data insertion, and retrieval in action. The `sqlite3` module comes with Python, so there's nothing to install.
 
-Each time you run it, the three books are added again. To stop duplicates, try adding `UNIQUE` to the `title` column and using `INSERT OR IGNORE INTO books ...` instead.
+Each time you run it, the three books are added again. To stop duplicates, try adding `UNIQUE` to the `title` column and using `INSERT OR IGNORE INTO books ...` instead. Because `CREATE TABLE IF NOT EXISTS` leaves an existing table alone, delete the old `mydatabase.db` file first so the new `UNIQUE` table is created.
+
+---
+
+## Try it Yourself
+
+1. Run the program twice and count the books. Why are there six?
+2. Make it safe to run many times with a `UNIQUE` title and `INSERT OR IGNORE`.
+3. Add a fourth book, then print the books newest first.
+4. Challenge: ask the user for a book with `input()`, and add it using `?` placeholders.
+
+## Common Issues
+
+- **Problem**: The books appear again every time you run the program.
+- **Solution**: Delete `mydatabase.db`, or make `title` `UNIQUE` and use `INSERT OR IGNORE`.
+- **Why**: The `.db` file keeps its rows between runs, so each run adds the three books again.
+
+> **Teachers**: The run box on this page uses the `pyodide` engine, so learners can try the program in the browser with nothing installed. For a real `.db` file they can open in a tool, they need to run it on their own machine as in lesson 2.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why does the demo use `executemany()` inside `with connection:`?
+- [x] To insert all three rows in one call and commit them to the file
+- [ ] To close the connection
+- [ ] To create the table
+> The `with` block commits when it finishes.
+
+? What does the demo print for each book?
+- [ ] The id, title and author
+- [x] The title, author and year (`row[1]`, `row[2]`, `row[3]`)
+- [ ] Only the title
+> `row[0]` is the id, which the demo skips.
+
+? Why do the books double up on a second run?
+- [x] The database file already holds them, and the program inserts them again
+- [ ] The commit fails
+- [ ] `fetchall()` repeats rows
+> Data persists in the `.db` file between runs.
+{% endquiz %}
 
 ---

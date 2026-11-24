@@ -3,12 +3,16 @@ title: Querying and Joining Tables
 description: >-
     Module 6 focuses on more advanced querying techniques in SQLite, including working with multiple tables and performing joins
 layout: lesson
+type: page
 cover: /learn/sqlite3/assets/banners/06_querying_and_joining_tables.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to combine rows from several tables with inner and left joins, and use aliases to keep queries readable.
 
 Module 6 focuses on more advanced querying techniques in SQLite, including working with multiple tables and performing joins. You will learn how to retrieve data from multiple tables, establish relationships, and use join operations to combine data.
 
@@ -137,9 +141,32 @@ By understanding how to work with multiple tables and perform joins, you will be
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
-Write a query that lists every author and how many books they have, including Ada Lovelace with 0. Hint: start `FROM authors` and use a `LEFT JOIN` to books, then look ahead to `GROUP BY` in the next module.
+1. Run the setup script, then run the inner join and the left join. Which book is missing from the first, and why?
+2. List every book with its author name and genre name. Use aliases (`b`, `a`, `g`) to keep the query short.
+3. Write a query that lists every author and how many books they have, including Ada Lovelace with 0. Hint: start `FROM authors` and use a `LEFT JOIN` to books, then look ahead to `GROUP BY` in the next module. (When we ran it, Andy Weir had 2, Frank Herbert 1 and Ada Lovelace 0.)
+4. Challenge: find the books that have no author at all, using a left join and `WHERE authors.id IS NULL`.
+
+## Common Issues
+
+- **Problem**: `sqlite3.OperationalError: ambiguous column name: id`.
+- **Solution**: Put the table name or alias in front: `books.id` or `b.id`.
+- **Why**: Both tables have an `id` column, so SQLite can't guess which you mean.
+
+- **Problem**: A book or an author you expect is missing from the results.
+- **Solution**: Swap the `INNER JOIN` for a `LEFT JOIN`.
+- **Why**: An inner join drops rows with no match in the other table.
+
+- **Problem**: `RIGHT JOIN` or `FULL OUTER JOIN` raises an `OperationalError`.
+- **Solution**: Print `sqlite3.sqlite_version`. If it's older than 3.39, swap the table order and use a `LEFT JOIN` instead.
+- **Why**: Right and full outer joins were only added in SQLite 3.39.
+
+> **Teachers**: The `RIGHT` and `FULL` joins need SQLite 3.39 or newer. Older school machines may ship an older Python and SQLite, so have learners print `sqlite3.sqlite_version` first. The `LEFT JOIN` examples work on every version.
+
+---
+
+## Check your understanding
 
 {% quiz %}
 ? A book has no matching author. Which join still includes it?
@@ -152,6 +179,18 @@ Write a query that lists every author and how many books they have, including Ad
 - [x] Gives the table a short alias to use in the rest of the query
 - [ ] Renames the table permanently
 > Aliases only last for that query.
+
+? Why does the join of three tables leave out *Mystery Book*?
+- [ ] It has no title
+- [x] It has no author, and `INNER JOIN authors` drops books with no matching author
+- [ ] Genres can't be joined
+> Use `LEFT JOIN` to keep rows that have no match.
+
+? What does a one-to-many relationship look like in tables?
+- [x] A foreign key column in the "many" table that points at the "one" table, like `books.author_id`
+- [ ] Two tables with identical columns
+- [ ] A single table with repeated rows
+> Many books can share one `author_id`.
 {% endquiz %}
 
 ---

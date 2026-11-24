@@ -10,9 +10,9 @@ next: 03_posing_a_joint.html
 description: Make a hinge joint in BetterCad by picking a snap on the part that moves
   and a snap on the part it hangs from
 percent: 21
-duration: 5
-quiz_total: 39
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to make a hinge joint by picking a snap on the part that moves and a snap on the part it hangs from.
 
 A joint in BetterCad takes two clicks. The first says *this point, on the part that moves*. The second says *goes here, on the part it hangs from*. BetterCad moves the part into place and works out the axle.
 

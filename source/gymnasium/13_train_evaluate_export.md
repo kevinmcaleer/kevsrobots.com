@@ -1,279 +1,234 @@
 ---
 title: Train, Evaluate, and Export
-description: The capstone lesson — train PPO on BurgerBotEnv, evaluate the policy, save and load the model, and export a lookup table that runs on a Pico.
+description: The capstone lesson. Train PPO on BurgerBotEnv, evaluate the policy, save and load the model, and export a lookup table you can run without a neural network.
 layout: lesson
+snakie: false
 type: page
 cover: /learn/gymnasium/assets/banners/13_train_evaluate_export.jpg
-date_updated: 2026-06-14
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Bringing It All Together
+By the end of this lesson you will be able to train a PPO agent on BurgerBotEnv, save, load and evaluate it, and export its policy as a JSON lookup table that runs with no neural network.
 
-This is the capstone. In the previous course you trained a Q-table on the BurgerBot grid-world and saved it as `q_table.json` so a Pico could load and execute the policy. In this lesson you will do the same thing — but the policy comes from a neural network trained with Stable-Baselines3, not a hand-written Q-learning loop.
+---
 
-The closing loop is this: neural networks cannot run on a Pico, but BurgerBot's observation space is small enough that we can extract a lookup table from the trained network by querying it over every possible state. The result is a JSON file in the same format as the previous course's `q_table.json` — and the same Pico loader from lesson 13 of that course can read it directly.
+## Bringing it all together
 
-## The Complete Training Script
+This is the capstone. In the previous course you trained a Q-table on the BurgerBot grid-world and saved it as JSON. Here the policy comes from a neural network trained by Stable-Baselines3 on your own `BurgerBotEnv`.
 
-Save this as `train_burgerbot.py`. It covers environment setup, training, saving, and loading.
+A neural network cannot run on a Raspberry Pi Pico, but BurgerBot's observation space is tiny: 588 possible observations. So we can ask the trained network "what would you do?" in every one of them and write the answers down. The result is a plain lookup table, in the same spirit as the Q-table you started with.
+
+```mermaid
+flowchart LR
+    E["BurgerBotEnv x 4<br/>make_vec_env"] --> T["PPO.learn<br/>50,000 steps"]
+    T --> S["model.save<br/>burgerbot_ppo.zip"]
+    S --> L["PPO.load"]
+    L --> V["evaluate_policy"]
+    L --> X["query all 588 states"]
+    X --> J["nn_policy.json"]
+    J --> R["rollout using only<br/>the JSON table"]
+```
+
+## The training and export program
+
+Save this as `train_burgerbot.py` beside `burgerbot_env.py`. We trained with four copies of the environment (lesson 11), PPO with its default network, and a fixed seed.
 
 ```python
+import json
+
 import numpy as np
-import gymnasium as gym
-from gymnasium import spaces
 from stable_baselines3 import PPO
-from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.monitor import Monitor
 
-# ── BurgerBotEnv definition ────────────────────────────────────────────────
-# (Paste the full BurgerBotEnv class here — identical to lesson 08)
+from burgerbot_env import ACTIONS, GOAL, GRID_COLS, GRID_ROWS, BurgerBotEnv
 
-GRID_ROWS, GRID_COLS = 7, 7
-OBSTACLES = {(0,3),(1,1),(1,5),(3,0),(3,3),(4,5),(5,1)}
-START, GOAL = (0,0), (6,6)
-ACTIONS   = ["forward","turn_left","turn_right","stop"]
-HEADINGS  = ["north","east","south","west"]
-HEADING_DELTA = {"north":(-1,0),"east":(0,1),"south":(1,0),"west":(0,-1)}
-NEAR, MEDIUM = 1, 3
+TIMESTEPS = 50_000
 
-class BurgerBotEnv(gym.Env):
-    metadata = {"render_modes": ["ansi"]}
-    def __init__(self, max_steps=150, render_mode=None):
-        super().__init__()
-        self.max_steps = max_steps
-        self.render_mode = render_mode
-        self.observation_space = spaces.MultiDiscrete([GRID_ROWS, GRID_COLS, 4, 3])
-        self.action_space = spaces.Discrete(4)
-    def _sensor(self):
-        dr,dc = HEADING_DELTA[self.heading]
-        r,c = self.row+dr, self.col+dc
-        n=0
-        while 0<=r<GRID_ROWS and 0<=c<GRID_COLS:
-            if (r,c) in OBSTACLES: break
-            n+=1
-            if n>=5: break
-            r+=dr; c+=dc
-        if n<=NEAR: return 0
-        if n<=MEDIUM: return 1
-        return 2
-    def _obs(self):
-        return np.array([self.row,self.col,HEADINGS.index(self.heading),self._sensor()],dtype=np.int64)
-    def reset(self,*,seed=None,options=None):
-        super().reset(seed=seed)
-        self.row,self.col=START; self.heading="east"; self.steps=0
-        return self._obs(),{}
-    def step(self,action):
-        self.steps+=1
-        a=ACTIONS[action]; hit=False; moved=False
-        if a=="forward":
-            dr,dc=HEADING_DELTA[self.heading]; nr,nc=self.row+dr,self.col+dc
-            if 0<=nr<GRID_ROWS and 0<=nc<GRID_COLS and (nr,nc) not in OBSTACLES:
-                self.row,self.col=nr,nc; moved=True
-            else: hit=True
-        elif a=="turn_left":
-            self.heading=HEADINGS[(HEADINGS.index(self.heading)-1)%4]
-        elif a=="turn_right":
-            self.heading=HEADINGS[(HEADINGS.index(self.heading)+1)%4]
-        reached=(self.row,self.col)==GOAL
-        if hit: reward=-10.0
-        elif reached: reward=50.0
-        elif moved: reward=1.0
-        else: reward=-0.1
-        terminated=reached or hit; truncated=self.steps>=self.max_steps
-        return self._obs(),reward,terminated,truncated,{}
-    def render(self):
-        if self.render_mode!="ansi": return
-        h={"north":"^","east":">","south":"v","west":"<"}
-        out=""
-        for r in range(GRID_ROWS):
-            for c in range(GRID_COLS):
-                if (r,c)==(self.row,self.col): out+=h[self.heading]+" "
-                elif (r,c) in OBSTACLES: out+="O "
-                elif (r,c)==GOAL: out+="G "
-                else: out+=". "
-            out+="\n"
-        return out
 
-# ── Training ──────────────────────────────────────────────────────────────────
-print("Creating environment...")
-env = BurgerBotEnv()
+def reached_goal_rate(model, episodes=50):
+    """Run greedy episodes and count how many finish on the goal cell."""
+    env = BurgerBotEnv()
+    successes = 0
+    for ep in range(episodes):
+        obs, info = env.reset(seed=1000 + ep)
+        done = False
+        while not done:
+            action, _ = model.predict(obs, deterministic=True)
+            obs, reward, terminated, truncated, info = env.step(action)
+            done = terminated or truncated
+        if (env.row, env.col) == GOAL:
+            successes += 1
+    env.close()
+    return successes / episodes
 
-print("Creating PPO model...")
-model = PPO(
-    "MlpPolicy",
-    env,
-    verbose=0,
-    learning_rate=3e-4,
-    n_steps=512,
-    batch_size=64,
-    gamma=0.99,
-    seed=42,
-)
 
-print("Training... (this takes about 1-2 minutes on CPU)")
-model.learn(total_timesteps=50000)
+# Training: four copies of the environment, collecting experience together.
+train_env = make_vec_env(BurgerBotEnv, n_envs=4, seed=42)
+model = PPO("MlpPolicy", train_env, verbose=0, seed=42, n_steps=256, batch_size=64)
+model.learn(total_timesteps=TIMESTEPS)
 print("Training complete.")
 
-# ── Save ─────────────────────────────────────────────────────────────────────
 model.save("burgerbot_ppo")
-print("Model saved to burgerbot_ppo.zip")
+loaded = PPO.load("burgerbot_ppo")
 
-# ── Load ─────────────────────────────────────────────────────────────────────
-loaded_model = PPO.load("burgerbot_ppo", env=env)
-print("Model loaded from burgerbot_ppo.zip")
+eval_env = Monitor(BurgerBotEnv())
+mean_reward, std_reward = evaluate_policy(loaded, eval_env, n_eval_episodes=20, deterministic=True)
+print(f"Mean reward over 20 episodes: {mean_reward:.1f} +/- {std_reward:.1f}")
+print(f"Goal reach rate: {100 * reached_goal_rate(loaded):.0f}%")
 
-# ── Evaluate ──────────────────────────────────────────────────────────────────
-mean_reward, std_reward = evaluate_policy(
-    loaded_model,
-    env,
-    n_eval_episodes=20,
-    deterministic=True,
-)
-print(f"\nEvaluation over 20 episodes:")
-print(f"  Mean reward: {mean_reward:.1f} +/- {std_reward:.1f}")
+# Export: ask the network for its choice in every one of the 588 states.
+policy_table = {}
+for row in range(GRID_ROWS):
+    for col in range(GRID_COLS):
+        for heading in range(4):
+            for sensor in range(3):
+                obs = np.array([row, col, heading, sensor], dtype=np.int64)
+                action, _ = loaded.predict(obs, deterministic=True)
+                policy_table[f"{row},{col},{heading},{sensor}"] = ACTIONS[int(action)]
 
-# Also count goal reach rate manually
-successes = 0
-for ep in range(20):
-    obs, info = env.reset(seed=1000 + ep)
-    done = False
-    while not done:
-        action, _ = loaded_model.predict(obs, deterministic=True)
-        obs, reward, terminated, truncated, info = env.step(action)
-        done = terminated or truncated
-        if reward == 50.0:
-            successes += 1
+with open("nn_policy.json", "w") as f:
+    json.dump(policy_table, f, indent=1)
+print(f"Exported {len(policy_table)} states to nn_policy.json")
+print("Start state 0,0,1,1 ->", policy_table["0,0,1,1"])
+```
 
-print(f"  Goal reach rate: {successes}/20 ({100*successes//20}%)")
+It took about 40 seconds on a CPU. Our output, identical on a second run with the same seeds:
 
+```
+Training complete.
+Mean reward over 20 episodes: 60.8 +/- 0.0
+Goal reach rate: 100%
+Exported 588 states to nn_policy.json
+Start state 0,0,1,1 -> forward
+```
+
+### Reading the result
+
+- A reward of **60.8** is what the route earns: 14 steps in total, made of 12 forward moves (11 at +1, then the final one onto the goal for +50) and 2 turns at -0.1 each, so `11 + 50 - 0.2 = 60.8`. Twelve moves is the shortest possible trip across the grid.
+- The standard deviation is **0.0** and the goal rate is **100%**, and that is not a lucky streak. BurgerBot has a fixed start, no random obstacles and no noise, and `deterministic=True` always picks the same action, so every evaluation episode is the *same* episode. Do not read "100% over 20 episodes" as "robust". It means "this one route works". In the previous course you added sensor noise to test that kind of thing.
+- **PPO** (Proximal Policy Optimisation) is a policy-gradient algorithm: it learns the policy directly rather than learning Q-values. It is a good default, and SB3 handles the `terminated`/`truncated` distinction for you.
+- SB3 one-hot encodes each `MultiDiscrete` entry, so the network sees 21 numbers (lesson 4).
+
+If you cut training to `TIMESTEPS = 5_000`, our test scored a mean reward of -8.4 and a 0% goal rate: the robot crashed. Training time matters, and a number like 50,000 is not magic: it is just enough here.
+
+## Using only the exported table
+
+The test that matters is whether the table behaves like the network. Save this as `run_table.py`. It loads `nn_policy.json`, never touches PyTorch or SB3, and drives a fresh environment:
+
+```python
+import json
+
+from burgerbot_env import ACTIONS, BurgerBotEnv
+
+with open("nn_policy.json") as f:
+    table = json.load(f)
+
+env = BurgerBotEnv(render_mode="ansi")
+obs, info = env.reset(seed=0)
+total = 0.0
+for step in range(1, 151):
+    key = ",".join(str(int(v)) for v in obs)
+    action = ACTIONS.index(table[key])
+    obs, reward, terminated, truncated, info = env.step(action)
+    total += reward
+    if terminated or truncated:
+        break
+
+print(env.render())
+print(f"Finished after {step} steps, total reward {total:.1f}, terminated={terminated}")
 env.close()
 ```
 
-## Expected Training Results
+Our output:
 
-With 50,000 timesteps, PPO on BurgerBot typically reaches:
+```
+. . . O . . .
+. O . . . O .
+. . . . . . .
+O . . O . . .
+. . . . . O .
+. O . . . . .
+. . . . . . >
+Finished after 14 steps, total reward 60.8, terminated=True
+```
 
-- Mean reward: 35 to 50 per episode
-- Goal reach rate: 60 to 90 % (the variance is higher with a random seed)
+The arrow sits on the goal cell: the robot arrived. The same route, 14 steps and 60.8 reward, came out of the table alone. The policy now lives in a 14 KB text file.
 
-Increase `total_timesteps` to 200,000 for a more reliably trained policy. The training takes about 5-10 minutes on CPU.
+## What this can and cannot do on a Pico
 
-## Exporting the Policy as a Lookup Table
+This is the honest part. The Reinforcement Learning course's Pico program uses a Q-table whose keys are only the sensor reading, `near`, `medium` or `far`, because a real robot knows what its ultrasonic sensor sees but not "I am in row 4, column 2". **`nn_policy.json` is a different table**: its keys are `"row,col,heading,sensor"`, and so it cannot replace that `q_table.json`, and the old loader will not find its keys.
 
-Here is where this course closes the loop with the previous one. BurgerBot's observation space has 588 possible states. We can query the trained neural network on all 588 and record the best action — producing a lookup table identical in format to the Q-table from the previous course.
+You can load the new file on a Pico with the `json` module, and a lookup is a dictionary access:
 
 ```python
 import json
 
-def export_policy_to_json(model, filename="nn_policy.json"):
-    """
-    Query the trained neural network for every possible BurgerBot state
-    and save the best action as a JSON lookup table.
+with open("nn_policy.json") as f:
+    table = json.load(f)
 
-    The format matches q_table.json from the RL course so the Pico
-    loader from lesson 13 of that course can read this file directly.
-    """
-    policy_table = {}
 
-    for row in range(GRID_ROWS):
-        for col in range(GRID_COLS):
-            for heading_idx in range(4):
-                for sensor in range(3):
-                    # Build the observation numpy array
-                    obs = np.array([row, col, heading_idx, sensor], dtype=np.int64)
-
-                    # Query the neural network
-                    action, _ = model.predict(obs, deterministic=True)
-                    action = int(action)
-
-                    # Key format: "row,col,heading,sensor" — matches RL course
-                    key = f"{row},{col},{heading_idx},{sensor}"
-
-                    # Store both the best action and dummy Q-values
-                    # so the Pico loader (which expects a dict of action->value)
-                    # can read the file unchanged.
-                    policy_table[key] = {
-                        a: (1.0 if i == action else 0.0)
-                        for i, a in enumerate(ACTIONS)
-                    }
-
-    with open(filename, "w") as f:
-        json.dump(policy_table, f, indent=2)
-
-    print(f"Exported policy for {len(policy_table)} states to {filename}")
-    return policy_table
-
-# Export the loaded model's policy
-policy = export_policy_to_json(loaded_model)
-
-# Spot-check: what does the agent do at the starting position?
-start_key = "0,0,1,2"   # row=0, col=0, heading=east(1), sensor=far(2)
-print(f"\nAt start state {start_key}:")
-print(f"  Action values: {policy[start_key]}")
-best = max(policy[start_key], key=policy[start_key].get)
-print(f"  Best action:   {best} (index {ACTIONS.index(best)})")
+def choose_action(row, col, heading, sensor):
+    return table[f"{row},{col},{heading},{sensor}"]
 ```
+{: .no-snakie }
 
-## How the Pico Reads This File
+But the robot must *know* its row, column and heading. That needs a way to track position, such as counting wheel turns or using a camera or a floor grid, and that is a robotics project in itself. We did not run this on a board, so treat the file size (about 14 KB, which should fit in a Pico's memory) as an estimate to check, not a promise.
 
-The Pico loader from the previous course (lesson 13) reads `q_table.json` and picks the action with the highest value for the current state:
+The deeper lesson is the pattern: a trained network can be distilled into a table when the observation space is small and discrete. For bigger spaces, such as camera images, the realistic route is to run the network on a Raspberry Pi and send commands to a Pico for the motors.
 
-```python
-# Pico loader (from RL course lesson 13) — unchanged:
-import json
+## Try it Yourself
 
-with open("q_table.json") as f:
-    q_table = json.load(f)
-
-def choose_action(state):
-    key = f"{state[0]},{state[1]},{state[2]},{state[3]}"
-    if key in q_table:
-        return max(q_table[key], key=q_table[key].get)
-    return "forward"   # fallback if state not seen
-```
-
-Our exported `nn_policy.json` has the same structure. The best action has value `1.0` and all others have `0.0`, so `max(...)` correctly returns the best action. You can drop `nn_policy.json` in place of `q_table.json` on the Pico and the loader needs no changes.
-
-## Getting Neural Networks onto Hardware
-
-Two realistic deployment paths:
-
-**Path A: Policy table (works for BurgerBot)**
-
-This is what we just did. It works because BurgerBot's observation space is small and fully discrete — we can enumerate all 588 states. The Pico runs no neural network; it just does a dictionary lookup.
-
-This approach works any time your observation space is small and discrete. For a real robot with a camera or continuous sensors, it does not scale.
-
-**Path B: Inference on a Raspberry Pi**
-
-For bigger observation spaces (camera images, multiple sensors), the deployment path is to run inference on a Raspberry Pi rather than a Pico. A Pi 4 or Pi 5 can run PyTorch in CPU mode. You would:
-
-1. Save the SB3 model with `model.save("policy")`
-2. Load it on the Pi: `model = PPO.load("policy")`
-3. Read sensor data on the Pi, call `model.predict(obs)`, and send the action to the robot (over serial, I2C, or GPIO)
-
-The Pico handles hardware I/O at the bottom; the Pi handles neural network inference in the middle.
-
-## Try It Yourself
-
-1. Re-run the training with `total_timesteps=5000` (very short). Export the policy. Does the exported table still beat a random agent? Use the manual evaluation loop to measure the success rate.
-2. Open `nn_policy.json` in a text editor and find the entry for the goal state `"6,6,..."`. What action does the network choose when the robot is already at the goal? Does this make sense?
-3. Compare the exported `nn_policy.json` to the `q_table.json` from your previous course. Are the chosen actions the same for the starting state? If they differ, which policy reaches the goal in fewer steps?
+1. Run with `TIMESTEPS = 5_000` and look at the result. Then try 20,000. At what point does the robot first reach the goal?
+2. Open `nn_policy.json` and find an entry for a cell the robot can never reach, such as `"0,3,1,2"` (an obstacle cell). What does the network say, and does it matter?
+3. Add one random action 10% of the time inside `run_table.py` (use `random.random() < 0.1`) and run it 20 times. How often does the robot still reach the goal? Now you are testing robustness.
+4. Challenge: use the shaping wrapper from lesson 10 during training. Does PPO reach the goal with fewer timesteps?
 
 ## Common Issues
 
-**Problem:** `ValueError: observation is not in observation space` during `model.predict`
-**Solution:** Make sure `obs` has `dtype=np.int64`. `model.predict` checks the dtype against the declared observation space.
-**Why:** SB3 respects Gymnasium's space declarations and validates observations before the forward pass.
+- **Problem**: `ModuleNotFoundError: No module named 'burgerbot_env'`
+- **Solution**: Run the script from the folder that has `burgerbot_env.py` in it.
+- **Why**: Python only finds the module if it is in the script's folder or on the path.
 
-**Problem:** The policy reaches the goal 0% of the time after 50,000 timesteps.
-**Solution:** Check that the reward function is correct. A `reward=-10` on every step suggests the environment is hitting the obstacle logic on all forward moves. Print `env.unwrapped.row, env.unwrapped.col` during a rollout to debug position.
-**Why:** PPO converges reliably on BurgerBot with 50k steps. If it does not, there is almost certainly a bug in the environment or reward function.
+- **Problem**: The robot reaches the goal 0% of the time.
+- **Solution**: Train for more timesteps (50,000 worked in our test, 5,000 did not), and check that you did not change the reward function.
+- **Why**: The goal reward of +50 is only found by luck early on. The network needs enough experience to learn the route to it.
 
-**Problem:** `json.JSONDecodeError` when the Pico loads the exported file.
-**Solution:** NumPy integers are not JSON-serialisable by default. Make sure you convert with `int(action)` before storing in the dict. The code above does this, but if you modify it, watch out for NumPy types slipping in.
-**Why:** Python's `json.dump` cannot serialise `numpy.int64`. Use `int()` to cast before storing.
+- **Problem**: `TypeError: Object of type int64 is not JSON serializable` when saving.
+- **Solution**: Convert NumPy values with `int(...)` before they go into the dictionary, as the program does with `ACTIONS[int(action)]`.
+- **Why**: The `json` module does not know NumPy integer types.
+
+> **Teachers**: Training takes under a minute on a laptop, so it fits easily in a lesson, and `burgerbot_ppo.zip` and `nn_policy.json` are small files that learners can swap and compare. A good discussion: two learners with different seeds may get different routes, both correct. Stress that "100% on one fixed start" is not proof of a robust robot.
+
+## Check your understanding
+
+{% quiz %}
+? Why does the evaluation show a standard deviation of 0.0?
+- [ ] PPO always scores zero
+- [x] The environment has a fixed start and no noise, and the policy is deterministic, so every episode is identical
+- [ ] The evaluation function is broken
+> Same start, same actions, same result every time.
+
+? How is the exported `nn_policy.json` used?
+- [ ] It contains the neural network weights
+- [x] It maps each of the 588 observations to the action the network chose
+- [ ] It is a PyTorch checkpoint
+> It is a plain lookup table that needs no PyTorch.
+
+? Why can't `nn_policy.json` simply replace the previous course's `q_table.json` on a Pico?
+- [ ] It is too large
+- [x] Its keys include row, column and heading, which that robot does not sense
+- [ ] JSON is not supported
+> The old table is keyed by sensor reading alone. This one needs the robot's position.
+
+? Which two calls save and reload a Stable-Baselines3 model?
+- [x] `model.save("name")` and `PPO.load("name")`
+- [ ] `model.export()` and `PPO.import()`
+- [ ] `json.dump(model)` and `json.load()`
+> SB3 saves to a zip file and loads it with the algorithm's class.
+{% endquiz %}

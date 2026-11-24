@@ -4,12 +4,14 @@ description: Review what you have learned about sprites, framebuf and animation 
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/13_summary.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recap sprites, framebuf and animation, and choose your next project.
 
 ## What you built
 

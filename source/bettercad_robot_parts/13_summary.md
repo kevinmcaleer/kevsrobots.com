@@ -4,12 +4,14 @@ description: A recap of designing robot parts in BetterCad with the catalogue, p
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/13_summary.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recall the tools from the course, and use the checklist to plan your next robot part.
 
 You started with a bare plate and a bag of bought parts. You finish with a printed deck that holds a servo and a microcontroller and drives a gear train, and you looked up almost no dimensions to get there.
 

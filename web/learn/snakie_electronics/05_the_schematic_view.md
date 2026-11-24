@@ -12,7 +12,7 @@ description: Switch a Snakie wiring project to the Schematic view, learn to read
 percent: 48
 duration: 5
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to switch to the Schematic view, read the robot's circuit from it, and tidy a diagram so that it is easy to follow.
 
 The Breadboard view shows what your circuit *looks* like. The Schematic view shows what it *does*. Same circuit, same wires, drawn a different way.
 

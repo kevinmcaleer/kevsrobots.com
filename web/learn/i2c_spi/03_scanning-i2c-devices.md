@@ -10,7 +10,9 @@ next: 04_reading-i2c-sensor.html
 description: Learn how to scan for I2C devices, understand hexadecimal addresses,
   and identify what's connected to your bus
 percent: 35
-duration: 9
+duration: 10
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -59,6 +61,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to scan the I2C bus, read the hexadecimal addresses it returns, and use a scan to check that your project's devices are present.
+
 ## Finding Devices on the I2C Bus
 
 One of the most useful tools in your I2C toolkit is the ability to scan the bus and discover what devices are connected. This lesson teaches you how scanning works, what those hexadecimal addresses mean, and how to use scanning to troubleshoot projects.
@@ -79,10 +83,22 @@ Scanning the I2C bus helps you:
 
 The scanning process is simple:
 
-1. Controller (your Pico) tries to communicate with every possible address (0x00 to 0x7F)
+1. Controller (your Pico) tries to communicate with every usable address (0x08 to 0x77)
 2. If a device responds at that address, it's detected
 3. If no response, that address is empty
 4. Results show which addresses have active devices
+
+```mermaid
+sequenceDiagram
+    participant P as Pico (controller)
+    participant B as BME280 at 0x76
+    P->>B: START, address 0x08 + write
+    Note over B: Not my address: no reply
+    P->>B: START, address 0x76 + write
+    B-->>P: ACK (I am here)
+    P->>P: Add 0x76 to the list
+    Note over P: Carries on to 0x77
+```
 
 MicroPython makes this incredibly easy with the `scan()` method:
 
@@ -141,7 +157,7 @@ The "0x" prefix means "this number is in hexadecimal":
 | 127 | 0x7F | 0111 1111 |
 {:class="table table-single table-narrow"}
 
-> **Note**: I2C uses 7-bit addresses, so the maximum is 0x7F (127 in decimal). There are technically 128 possible addresses, but some are reserved.
+> **Note**: I2C uses 7-bit addresses, so the maximum is 0x7F (127 in decimal). There are technically 128 possible addresses, but some are reserved, and `scan()` on the Pico only checks 0x08 to 0x77.
 
 ### Common Device Addresses
 
@@ -241,12 +257,12 @@ from machine import I2C, Pin
 
 # Database of common I2C devices
 KNOWN_DEVICES = {
-    0x3C: "SSD1306 OLED Display (128x64)",
-    0x3D: "SSD1306 OLED Display (128x32)",
+    0x3C: "SSD1306 OLED Display",
+    0x3D: "SSD1306 OLED Display (alternate address)",
     0x68: "MPU6050 IMU / DS3231 RTC",
     0x69: "MPU6050 IMU (ALT address)",
-    0x76: "BME280 / BMP280 Sensor",
-    0x77: "BME280 / BMP280 Sensor (ALT)",
+    0x76: "BME280 / BMP280 Sensor (check the chip ID)",
+    0x77: "BME280 / BMP280 Sensor (alternate address)",
     0x48: "ADS1115 ADC",
     0x20: "PCF8574 Port Expander",
 }
@@ -255,26 +271,26 @@ def smart_scan():
     """Scan and identify devices"""
     i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 
-    print("\n🔍 Smart I2C Scanner")
+    print("\nSmart I2C Scanner")
     print("=" * 50)
 
     devices = i2c.scan()
 
     if not devices:
-        print("❌ No devices found")
+        print("[FAIL] No devices found")
         print("\nTroubleshooting tips:")
         print("  - Check SDA and SCL connections")
         print("  - Verify power (VCC and GND)")
         print("  - Ensure pull-up resistors present")
         return
 
-    print(f"✅ Found {len(devices)} device(s):\n")
+    print(f"[OK] Found {len(devices)} device(s):\n")
 
     for device in devices:
         hex_addr = f"0x{device:02X}"
         device_name = KNOWN_DEVICES.get(device, "Unknown device")
 
-        print(f"📍 Address: {hex_addr} ({device})")
+        print(f"Address: {hex_addr} ({device})")
         print(f"   Likely: {device_name}")
         print()
 
@@ -287,11 +303,11 @@ smart_scan()
 **Example output:**
 
 ```
-🔍 Smart I2C Scanner
+Smart I2C Scanner
 ==================================================
-✅ Found 1 device(s):
+[OK] Found 1 device(s):
 
-📍 Address: 0x76 (118)
+Address: 0x76 (118)
    Likely: BME280 / BMP280 Sensor
 
 ==================================================
@@ -308,7 +324,10 @@ from machine import I2C, Pin
 
 i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 devices = i2c.scan()
-print(f"BME280 address: 0x{devices[0]:02X}")
+if devices:
+    print(f"BME280 address: 0x{devices[0]:02X}")
+else:
+    print("No device found - check the wiring")
 ```
 
 2. **Temporarily disconnect SDA** - Run the scan. You should see no devices
@@ -327,16 +346,17 @@ i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 print(f"400kHz scan: {i2c.scan()}")
 ```
 
-5. **Challenge**: Modify the smart scanner to check EVERY address (0x00 to 0x7F) and show which are empty vs occupied:
+5. **Challenge**: Modify the smart scanner to show every usable address (0x08 to 0x77) as empty or occupied. Scan once, then test each address against the list:
 
 ```python
 from machine import I2C, Pin
 
 i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
+found = i2c.scan()
 
-print("Full address scan (0x00 to 0x7F):")
-for addr in range(0x00, 0x80):
-    if addr in i2c.scan():
+print("Full address scan (0x08 to 0x77):")
+for addr in range(0x08, 0x78):
+    if addr in found:
         print(f"0x{addr:02X}: DEVICE FOUND")
     else:
         print(f"0x{addr:02X}: empty")
@@ -351,11 +371,11 @@ What happens if two devices have the same address? **They conflict and communica
 Many devices let you change their address:
 
 **Hardware jumpers** - Solder pads or physical jumpers
-- BME280: SDO pin changes 0x76 ↔ 0x77
-- SSD1306: Resistor changes 0x3C ↔ 0x3D
+- BME280: SDO pin changes 0x76 <-> 0x77
+- SSD1306: Resistor changes 0x3C <-> 0x3D
 
-**Software configuration** - Some devices allow address changes via commands
-- PCF8574: Has 8 different possible addresses via A0, A1, A2 pins
+**Software configuration** - A few devices (such as some distance sensors) let you change their address with a command after power-up
+- PCF8574: Has 8 different possible addresses, chosen by wiring its A0, A1 and A2 pins high or low
 
 ### Detecting Conflicts
 
@@ -392,9 +412,9 @@ def check_devices(expected_addresses):
 
     for addr in expected_addresses:
         if addr in found:
-            print(f"✓ Found device at 0x{addr:02X}")
+            print(f"[OK] Found device at 0x{addr:02X}")
         else:
-            print(f"✗ Missing device at 0x{addr:02X}")
+            print(f"[FAIL] Missing device at 0x{addr:02X}")
             return False
 
     return True
@@ -430,38 +450,38 @@ else:
 
 ## Common Issues
 
-### Scanner Shows No Devices
+- **Problem**: `i2c.scan()` returns an empty list `[]`
+- **Solution**: Check SDA, SCL, VCC and GND, confirm the pull-up resistors are present, try `freq=100000`, and test with a known-good sensor
+- **Why**: A scan only reports devices that acknowledge their address, so any break in power or wiring looks like an empty bus
 
-**Problem**: `i2c.scan()` returns empty list `[]`
+- **Problem**: The device appears at a different address than the lesson shows
+- **Solution**: Note the address the scan reports and use that in your code
+- **Why**: Manufacturers set different defaults, and many boards have an address jumper or solder pad
 
-**Solutions**:
-- Verify SDA and SCL are connected
-- Check power connections (VCC and GND)
-- Ensure pull-up resistors are present
-- Try lower speed (100kHz instead of 400kHz)
-- Test with known-good sensor
+- **Problem**: Unexpected extra addresses appear
+- **Solution**: Unplug devices one at a time and rescan to see which address disappears
+- **Why**: Some breakout boards carry extra chips on the same bus, such as an EEPROM or a clock
 
-### Scanner Shows Unexpected Address
+## Check your understanding
 
-**Problem**: Device appears at wrong address
+{% quiz %}
+? What does `i2c.scan()` return?
+- [ ] A dictionary of device names
+- [x] A list of the addresses that acknowledged
+- [ ] The temperature from each sensor
+> It returns a list of integers; print them with `0x{addr:02X}` to see the hex form.
 
-**This is normal if**:
-- Different manufacturer uses alternate address
-- Hardware jumper is in different position
-- Device has configurable address
+? What is 0x76 in decimal?
+- [ ] 76
+- [x] 118
+- [ ] 127
+> The table in this lesson shows 0x76 as 118, binary 0111 0110.
 
-**Solution**: Note the actual address and use it in your code
-
-### Scanner Shows Multiple Unknown Addresses
-
-**Problem**: Unexpected devices appear
-
-**Possible causes**:
-- Breadboard has other devices connected
-- I2C bus extender or multiplexer present
-- Hidden I2C components on breakout board
-
-**Solution**: Disconnect devices one at a time to identify each address
+? Your BME280 shows up at 0x77 instead of 0x76. What should you do?
+- [ ] Rewire it, because it is faulty
+- [x] Use 0x77 in your code
+> Both are valid BME280 addresses, chosen by the SDO pin.
+{% endquiz %}
 
 ## What You've Learned
 

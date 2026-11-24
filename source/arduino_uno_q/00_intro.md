@@ -4,7 +4,7 @@ description: Meet the Arduino Uno Q, a board with a Linux computer and a microco
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/00_intro.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -79,5 +79,7 @@ You don't need to know both Python and Arduino C++. A little of either is enough
 **Videos.** Where a lesson has a video, watch it first. It makes the written steps easier to follow.
 
 **Mistakes are normal.** Every lesson has a Common Issues list for the things that trip people up. Check it before you assume something is broken.
+
+> **Teachers**: This course suits ages 12 and up with a little Python or Arduino C++, in a club or a class. Allow roughly 45 to 60 minutes per lesson (our estimate). One Uno Q with a USB-C data cable per learner or pair is ideal; lessons 5 and 8 add a potentiometer and jumper wires. Several lessons (the matrix painter in lesson 4, and the simulators in lessons 7, 8 and 11) work in the browser with no board, so a class can start without any kit. Lesson 2 needs a normal Wi-Fi network, and the computer and board must be on the same network.
 
 Ready? Let's meet the two brains.

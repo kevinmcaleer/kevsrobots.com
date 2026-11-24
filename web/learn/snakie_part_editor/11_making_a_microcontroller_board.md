@@ -10,9 +10,9 @@ next: 12_sharing_your_parts.html
 description: Turn a Snakie part into a microcontroller board with GPIO numbers so
   it appears in the board selector for your projects
 percent: 84
-duration: 5
+duration: 6
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to turn a part into a microcontroller board with GPIO numbers and see it in the board selector.
 
 Sensors plug into a board. But what if the *board* is the thing that's missing? Maybe you've designed your own robot controller, or bought a new microcontroller that Snakie doesn't list yet.
 

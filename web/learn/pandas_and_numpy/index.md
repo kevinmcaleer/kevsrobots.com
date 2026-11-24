@@ -6,18 +6,33 @@ cover: /learn/pandas_and_numpy/assets/pandas.png
 date: 2023-11-14
 description: Learn how to manipulate data using Pandas and Numpy
 level: beginner
-course_duration: 0h 37m
+course_duration: 0h 59m
 lesson_count: 12
-first_lesson: 01_overview.html
-quiz_total: 17
+first_lesson: 00_intro.html
+quiz_total: 33
 video: kD5r-dph7Lg
+outcomes:
+- Create Pandas Series and DataFrames and select, filter and sort the rows and columns
+  you need
+- Read and write CSV, Excel and YAML files from Python
+- Clean messy sensor data by finding gaps, filling or dropping them, and fixing types
+- Summarise readings with describe, groupby, pivot tables and resampling
+- Combine tables with concat, merge and join
+- Chart your data with Pandas and Matplotlib
+prerequisites:
+- Python for beginners, or comfort with variables, lists, dictionaries and functions
+you_need:
+- A computer that can run Python 3.10 or later, or just a web browser to use the built-in
+  code boxes
+- Pandas, NumPy and Matplotlib (installed in lesson 2), or a free Google Colab account
+- A text editor or an IDE such as Thonny or VS Code
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
   - section: Overview
     content:
     - name: About this course
-      link: 01_overview.html
+      link: 00_intro.html
   - section: Introduction to Pandas
     content:
     - name: Pandas and NumPy

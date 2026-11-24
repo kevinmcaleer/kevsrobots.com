@@ -9,9 +9,9 @@ next: 01_how_plugins_work.html
 description: Learn to write Snakie plugins in Python, with commands, a linter with
   quick fixes and custom blocks for a robot club
 percent: 7
-duration: 3
+duration: 4
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -117,3 +117,5 @@ Each lesson adds one feature to the same plugin, so do them in order. The plugin
 Plugin code is ordinary Python that runs on your computer, not MicroPython on a board. Every lesson has a **Try it Yourself** task and a short quiz.
 
 > **A note on trust.** A plugin can do anything a Python program on your computer can do. That's what makes plugins powerful, and it's why you should only install ones you trust. We'll come back to this in the last lessons.
+
+> **Teachers**: This course suits learners who already write some Python and have used Snakie, such as an older class or a coding club. Each lesson is roughly 30 to 45 minutes. Unlike most Snakie courses it does not run in the browser: plugins need the Snakie desktop app and Python 3 on the computer, and they load from a `.snakie/plugins` folder in each user's home folder, so check that school computers allow both before the first lesson. No robot or microcontroller is needed. Because a plugin can do anything a Python program can do, make sure learners only install plugins that they or their teacher wrote, or that someone they trust has read.

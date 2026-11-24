@@ -4,12 +4,14 @@ description: Draw wires between pins in Snakie, understand power, ground and sig
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/04_wiring_with_noodles.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to draw, reshape, recolour and undo wires, and tell power, ground and signal connections apart.
 
 Snakie's wires are soft, curved and colourful, a bit like noodles. Drawing one takes a single drag.
 

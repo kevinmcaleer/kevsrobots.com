@@ -12,7 +12,7 @@ description: Build a part from ready-made BetterCad shapes, size it by typing, a
 percent: 49
 duration: 5
 quiz_total: 39
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Learn BetterCad
 - content:
@@ -60,6 +60,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add a ready-made shape from the Library, size it by typing, reshape it by pulling a face, and move and turn it.
 
 Sketching is precise, but it isn't the only way to start. BetterCad also has a **Library** of ready-made shapes you can drop in and resize, Tinkercad style. Over the next three lessons you'll use them to build a small enclosure for an electronics project, with screw posts and a cable hole.
 
@@ -145,17 +147,17 @@ Keep this model open. In the next lesson you'll put holes in it.
 
 ## Common Issues
 
-**Problem**: A new shape landed beside the one I already had, not where I wanted it.
-**Solution**: Use Move (<kbd>M</kbd>) to drag it into place, or type a Position.
-**Why**: The first Library shape arrives at the centre. Later ones are put down next to what's already there so they don't overlap.
+- **Problem**: A new shape landed beside the one I already had, not where I wanted it.
+- **Solution**: Use Move (<kbd>M</kbd>) to drag it into place, or type a Position.
+- **Why**: The first Library shape arrives at the centre. Later ones are put down next to what's already there so they don't overlap.
 
-**Problem**: Push/pull moved the wrong face.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, turn the view so the face you want is clearly visible, and press on the middle of it.
-**Why**: You pull whichever face is under the pointer when you press.
+- **Problem**: Push/pull moved the wrong face.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, turn the view so the face you want is clearly visible, and press on the middle of it.
+- **Why**: You pull whichever face is under the pointer when you press.
 
-**Problem**: I pressed R to draw a rectangle and got the Turn tool.
-**Solution**: Start a sketch first with <kbd>K</kbd>.
-**Why**: Some keys do one job in a sketch and another outside it. R is Rectangle in a sketch and Turn in the model.
+- **Problem**: I pressed R to draw a rectangle and got the Turn tool.
+- **Solution**: Start a sketch first with <kbd>K</kbd>.
+- **Why**: Some keys do one job in a sketch and another outside it. R is Rectangle in a sketch and Turn in the model.
 
 ## Check your understanding
 

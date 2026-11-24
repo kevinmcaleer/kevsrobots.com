@@ -346,7 +346,7 @@ def slugs_from(paths):
 
 # Courses with hard failures that predate the strict check. Each is tracked by
 # the issue listed, and its entry is removed when that course is reworked.
-KNOWN_DEBT = {"scrawly_wally": 690}
+KNOWN_DEBT = {}
 
 
 def main():

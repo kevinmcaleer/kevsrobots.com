@@ -12,6 +12,7 @@ description: Draw flowcharts with Mermaid - set the direction, choose node shape
 percent: 24
 duration: 5
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a flowchart with the direction, node shapes, arrows and labels you choose.
 
 ---
 

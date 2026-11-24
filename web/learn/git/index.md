@@ -7,10 +7,27 @@ date: 2026-11-04
 description: 'Learn to track your code and projects with Git: commits, history, undoing
   mistakes, branches, merging, and sharing your work on GitHub.'
 level: beginner
-course_duration: 1h 15m
+course_duration: 1h 18m
 lesson_count: 14
 first_lesson: 00_intro.html
-quiz_total: 35
+quiz_total: 39
+outcomes:
+- Install Git and set it up with your name, email and default branch
+- Save snapshots of a project with git add and git commit, and read its history
+- Undo mistakes safely with git restore, git commit --amend and git revert
+- Keep secrets and junk out of a repository with .gitignore
+- Use branches, merge them, and resolve a merge conflict
+- Publish a project on GitHub, sign in safely, and keep copies in sync with push,
+  pull and pull requests
+prerequisites:
+- No Git or GitHub experience needed
+- Comfortable typing a command into a terminal and pressing Enter
+you_need:
+- A computer running Windows, macOS or Linux, or a Raspberry Pi
+- A text editor such as VS Code or Thonny
+- A free GitHub account (for modules 10 to 12)
+- Optional for the final project, a Raspberry Pi Pico robot with two motors and an
+  HC-SR04 sensor
 navigation:
 - name: Git for Beginners
 - content:

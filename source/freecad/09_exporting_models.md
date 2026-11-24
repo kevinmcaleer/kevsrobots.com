@@ -4,26 +4,40 @@ description: Learn how to validate and refine your FreeCAD models through local 
 layout: lesson
 type: page
 cover: assets/8.png
+date_updated: 2026-11-24
 ---
 
 ![Building and Testing Models in FreeCAD]({{ page.cover }}){:class="cover"}
 
+By the end of this lesson you will be able to check a model for geometry problems and describe how you would test a part before printing it.
+
 ## Introduction to Local Testing
 
-Building and testing locally are crucial steps in the CAD design process, allowing you to identify and address issues before moving to production or sharing your models. This lesson covers the tools and techniques in FreeCAD for effective local testing and iteration.
+Testing a model on screen is much cheaper than printing it and finding out it does not fit. This lesson covers the kinds of checks FreeCAD offers. Workbench and tool names vary by version, and some tools (such as rendering) may need an add-on.
+
+```mermaid
+flowchart LR
+    A[Finished model] --> B[Geometry check]
+    B --> C[Test fit or movement]
+    C --> D[Stress analysis if needed]
+    D --> E{Happy?}
+    E -->|No| F[Adjust the design]
+    F --> B
+    E -->|Yes| G[Export]
+```
 
 ---
 
 ## Key Testing Tools in FreeCAD
 
 1. **Simulation Tools:**
-   - FreeCAD includes tools for simulating mechanical movements and interactions, such as the FEM (Finite Element Method) workbench for stress analysis.
+   - FreeCAD includes the FEM (Finite Element Method) workbench for stress analysis.
 
 2. **Rendering and Visualization:**
-   - Use FreeCAD's rendering tools to visualize your models under realistic lighting and materials. This can help identify visual aspects that need adjustment.
+   - Rendering shows your model with realistic lighting and materials. In some versions this is an add-on you install separately.
 
 3. **Model Checking and Validation:**
-   - Use FreeCAD’s built-in checking tools to validate the geometry and ensure there are no errors such as non-manifold edges or intersecting faces.
+   - Use the built-in geometry checking tool to find errors such as invalid shapes or self-intersecting faces.
 
 ---
 
@@ -38,38 +52,74 @@ Building and testing locally are crucial steps in the CAD design process, allowi
 ### Testing Process
 
 1. **Geometry Check:**
-   - Run a geometry check to ensure all parts fit together without overlaps or gaps that aren't part of the design.
+   - Run a geometry check to ensure all parts are valid and fit together without overlaps or gaps that are not part of the design.
 
-2. **Simulation:**
-   - Set up a simulation to see how the hinge moves. Ensure that the movement is smooth and the range of motion is correct.
+2. **Movement Test:**
+   - Move the hinge through its range to check the motion is smooth and clear of collisions.
 
 3. **Stress Analysis:**
-   - Use the FEM workbench to perform a stress analysis on the hinge under expected loads to ensure it will hold up under use.
+   - Use the FEM workbench to look at how the hinge copes under expected loads. This takes more setup than the other checks, so treat it as an advanced step.
 
 4. **Adjustments:**
-   - Based on the simulation results, make necessary adjustments to the hinge design to improve performance or correct issues.
+   - Based on the results, adjust the design and run the checks again.
 
 ---
 
 ## Practical Exercise: Building and Testing a Gearbox
 
-- **Objective:** Construct a gearbox assembly and run a series of tests to verify its operation.
+- **Objective:** Construct a gearbox assembly and run a series of checks.
 - **Steps:**
   - Assemble the gearbox using the skills learned in previous lessons.
   - Check for geometric accuracy.
-  - Simulate the gearbox operation to ensure all gears mesh correctly without undue stress or misalignment.
+  - Test that the gears mesh correctly without misalignment.
 
 ---
 
-## Lesson Assignment
+## Try it Yourself
 
-Design a simple mechanical device (such as a clamp or vise) and perform a series of tests to ensure it functions as intended. Document the testing process and any modifications made to the design based on the tests.
+1. Run the geometry check on a model you built earlier and read the result.
+2. Move one part of a hinge to see where it collides, then fix it by adding a gap of 0.5 mm.
+3. Challenge: write a short checklist of your own tests to run before every print.
+
+---
+
+## Common Issues
+
+- **Problem**: The geometry check reports errors on a Boolean result.
+- **Solution**: Undo the last operation and make the shapes overlap clearly rather than just touching.
+- **Why**: Shapes that only share an edge or face can produce invalid geometry.
+
+- **Problem**: Parts fit on screen but not after printing.
+- **Solution**: Add a small clearance between moving parts.
+- **Why**: A 3D printer is never perfectly exact, so parts need a little room.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which workbench is used for stress analysis?
+- [ ] TechDraw
+- [x] FEM
+- [ ] Draft
+> The lesson names the FEM workbench for stress analysis.
+
+? Why add clearance between moving parts?
+- [x] Printers are not perfectly exact
+- [ ] It saves filament
+- [ ] It changes the file format
+> A little room stops parts jamming after printing.
+
+? What does a geometry check look for?
+- [ ] Spelling mistakes
+- [x] Errors such as invalid shapes or self-intersecting faces
+- [ ] Missing colours
+> It validates the geometry.
+{% endquiz %}
 
 ---
 
 ## Additional Resources
 
-- [FreeCAD FEM Workbench Guide](https://wiki.freecadweb.org/FEM_Workbench)
-- [Troubleshooting Tips for FreeCAD Models](https://forum.freecadweb.org/viewtopic.php?f=3&t=12345)
-
----
+- [FreeCAD FEM Workbench Guide](https://wiki.freecad.org/FEM_Workbench)
+- [FreeCAD community forums](https://forum.freecad.org/)

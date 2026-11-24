@@ -10,15 +10,16 @@ next: 09_advanced.html
 description: Explore the powerful data analysis and aggregation capabilities of Pandas,
   including summarizing data, grouping, and performing aggregate computations.
 percent: 64
-duration: 3
-quiz_total: 17
+duration: 5
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
   - section: Overview
     content:
     - name: About this course
-      link: 01_overview.html
+      link: 00_intro.html
   - section: Introduction to Pandas
     content:
     - name: Pandas and NumPy
@@ -54,6 +55,10 @@ navigation:
 
 ![Cover photo]({{page.cover}}){:class="cover"}
 
+---
+
+By the end of this lesson you will be able to summarise a Data Frame with `describe()`, and use `groupby()` and pivot tables to answer questions about each robot or sensor.
+
 ## Overview
 
 Effective data analysis often involves summarising data, grouping it, and performing calculations on each group. We'll keep using the robot sensor data.
@@ -69,7 +74,7 @@ df = pd.DataFrame({
 })
 print(df)
 {% endcapture %}
-{% include snakie.html code=snakie_code name="analysis.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="analysis.py" engine="pyodide" packages="numpy,pandas" %}
 
 ---
 
@@ -114,7 +119,21 @@ print(df['robot'].value_counts())   # how many rows each robot has
 
 ### Group By
 
-`groupby()` splits the data into groups that share a value:
+`groupby()` splits the data into groups that share a value, runs a calculation on each group, then puts the answers back together:
+
+```mermaid
+flowchart LR
+    A["All 6 rows"] --> B["Split by robot"]
+    B --> C["BurgerBot rows"]
+    B --> D["SMARS rows"]
+    B --> E["Quad rows"]
+    C --> F["Mean of each group"]
+    D --> F
+    E --> F
+    F --> G["One row per robot"]
+```
+
+In code:
 
 ```python
 grouped = df.groupby('robot')
@@ -161,6 +180,33 @@ Each robot becomes a row, each sensor becomes a column, and each cell holds the 
 
 ---
 
+## Try it Yourself
+
+1. Use `value_counts()` on the `sensor` column. Which sensor is used most?
+2. Find the lowest battery for each robot with `groupby('robot')['battery'].min()`.
+3. Build a pivot table of the average `battery` for each robot (rows) and sensor (columns). Which cells are `NaN`, and why?
+4. Challenge: use named aggregation to get the average battery and the number of readings for each robot in one table: `df.groupby('robot').agg(avg_battery=('battery', 'mean'), readings=('reading', 'count'))`.
+
+---
+
+## Common Issues
+
+- **Problem**: The `groupby` answer has `robot` as the row labels, and you wanted it as a normal column.
+- **Solution**: Add `.reset_index()` to the end, such as `df.groupby('robot')['battery'].mean().reset_index()`.
+- **Why**: `groupby()` makes the group names the index of the result.
+
+- **Problem**: `describe()` shows `count` lower than the number of rows.
+- **Solution**: Check for missing values with `df.isna().sum()`, then fill or drop them as you did in the cleaning lesson.
+- **Why**: `describe()` and `mean()` skip missing values, so the `count` only includes readings that exist.
+
+- **Problem**: `KeyError` when you group by a column name.
+- **Solution**: Check the spelling and case with `print(df.columns)`.
+- **Why**: Column names must match exactly, so `'Robot'` and `'robot'` are different columns.
+
+---
+
+## Check your understanding
+
 {% quiz %}
 ? In the output of `describe()`, what does the `50%` row show?
 - [ ] The average
@@ -173,6 +219,12 @@ Each robot becomes a row, each sensor becomes a column, and each cell holds the 
 - [x] The average battery for each robot separately
 - [ ] The number of robots
 > `groupby()` splits the rows by robot, then `mean()` runs on each group.
+
+? In a pivot table made with `index='robot'` and `columns='sensor'`, what does an empty (`NaN`) cell mean?
+- [ ] The reading was zero
+- [x] That robot has no data for that sensor
+- [ ] The table is broken
+> Each cell summarises the rows for one robot and sensor, so no matching rows means `NaN`.
 {% endquiz %}
 
 ---

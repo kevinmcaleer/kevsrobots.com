@@ -4,12 +4,14 @@ description: Load .spr sprite files straight from the board, and use Snakie desk
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/11_sprite_files_on_the_board.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to load .spr sprite files straight from the board and use the desktop features that link sprites and code.
 
 ## Two ways to ship a sprite
 
@@ -149,6 +151,8 @@ If it says nothing references the sprite, it's safe to delete.
 In the browser version these two don't apply. A sprite saved from the browser isn't tied to your project folder, so the editor reports that nothing references it even when your code does.
 
 Both of these look for names written out in full, such as `"eye.spr"`. A name built while the program runs, such as `name + ".spr"`, can't be found this way.
+
+> **Teachers**: The tools that link sprites to code are desktop-app features. In the browser version the editor reports that nothing references a saved sprite even when the code does, so tell learners not to delete a sprite on that report alone.
 
 ---
 

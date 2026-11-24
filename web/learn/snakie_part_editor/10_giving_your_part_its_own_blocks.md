@@ -12,7 +12,7 @@ description: Write a blocks.yml file for your Snakie part so it adds friendly cu
 percent: 77
 duration: 6
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write a blocks.yml file that gives your part blocks which read like plain English.
 
 Snakie's derived blocks get you started. A part that's really finished has blocks that read like a sentence: **distance in mm from** the sensor. You make those with one small text file.
 

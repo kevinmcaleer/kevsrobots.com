@@ -12,7 +12,7 @@ description: Add standoffs for a Raspberry Pi Pico or Pi with the BetterCad Moun
 percent: 42
 duration: 6
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Design Robot Parts with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add standoffs for a board with the Mount tool, choosing a built-in hole pattern and either Through or Insert holes.
 
 A circuit board shouldn't sit flat on a printed plate. Its solder joints need air under them, and it needs something to screw into. The answer is a **standoff**: a short post with a hole down the middle.
 
@@ -147,6 +149,8 @@ The Pico's four corner holes line up with the four posts. It's a reference body,
 
 ---
 
+> **Teachers**: the Insert option makes holes for heat-set inserts, which are pressed in with a soldering iron. That is a hot tool, so supervise it under your usual workshop rules. The lesson says Through holes need no extra parts, so choose Through if you have no inserts or no soldering irons in the room.
+
 ## Try it Yourself
 
 1. On a new 100 × 70 × 3 mm box, add standoffs with the **Raspberry Pi Zero 2 W** pattern. Which screw does it choose?
@@ -155,17 +159,17 @@ The Pico's four corner holes line up with the four posts. It's a reference body,
 
 ## Common Issues
 
-**Problem**: I clicked and nothing happened.
-**Solution**: Click a flat face of a printed body. The tool doesn't place mounts on the ground.
-**Why**: A standoff has to be joined to something.
+- **Problem**: I clicked and nothing happened.
+- **Solution**: Click a flat face of a printed body. The tool doesn't place mounts on the ground.
+- **Why**: A standoff has to be joined to something.
 
-**Problem**: The pattern landed half off the plate.
-**Solution**: Click nearer the middle of the space you have, or retype the X and Y.
-**Why**: A pattern is centred on the point you clicked.
+- **Problem**: The pattern landed half off the plate.
+- **Solution**: Click nearer the middle of the space you have, or retype the X and Y.
+- **Why**: A pattern is centred on the point you clicked.
 
-**Problem**: My heat-set inserts are loose in the printed holes.
-**Solution**: Measure your inserts and print a single test post before the whole plate. Sizes vary between makers.
-**Why**: The Insert hole is sized for a typical insert of that thread.
+- **Problem**: My heat-set inserts are loose in the printed holes.
+- **Solution**: Measure your inserts and print a single test post before the whole plate. Sizes vary between makers.
+- **Why**: The Insert hole is sized for a typical insert of that thread.
 
 ## Check your understanding
 

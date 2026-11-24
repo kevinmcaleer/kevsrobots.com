@@ -4,12 +4,14 @@ description: Place your own Snakie part on the breadboard, wire it to a Pico, in
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/09_using_your_part_in_a_project.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to place and wire your own part in a project, install its driver, and find the blocks Snakie derives for it.
 
 This is the payoff. Your part leaves the editor and goes to work in a project, exactly like one of the standard parts.
 

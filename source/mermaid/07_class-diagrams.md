@@ -4,10 +4,15 @@ description: >-
     Picture your Python classes - their attributes, methods and how they relate - with Mermaid class diagrams
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/07_class-diagrams.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a class diagram that shows your Python classes, their attributes and methods, and how they relate.
 
 ---
 

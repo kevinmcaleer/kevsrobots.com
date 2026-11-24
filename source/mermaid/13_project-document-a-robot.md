@@ -4,10 +4,15 @@ description: >-
     Put everything together and write a README for a Pico W robot, with a block diagram, a flowchart, a state diagram, a sequence diagram and a class diagram
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/13_project-document-a-robot.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to write a complete README for a robot that uses five different Mermaid diagrams to explain how it is wired, how it thinks and how its code is organised.
 
 ---
 
@@ -357,6 +362,10 @@ The prices are just examples, so swap in what you actually paid.
 4. Open the repository on GitHub and check every diagram is drawn.
 
 From now on, whenever you change the robot, update the diagram in the same commit as the code. Your README will never go out of date again.
+
+---
+
+> **Teachers**: This is the longest lesson, so plan for two sessions of about 45 minutes, or set the later steps as homework. It works well in pairs, one learner typing and one checking against the wiring of a real or imagined robot. No hardware is needed, since PicoBot is a design on paper. Learners who finish early can add a diagram for a robot they have actually built.
 
 ---
 

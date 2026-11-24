@@ -12,7 +12,7 @@ description: Make your own blocks in Snakie with functions and inputs, and see h
 percent: 56
 duration: 4
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to make your own function block with inputs and use it to draw different shapes.
 
 You've drawn a square, a triangle and a hexagon. Each time you rebuilt nearly the same blocks. A **function** lets you build something once, give it a name, and use it as often as you like.
 
@@ -143,17 +145,17 @@ You met that sum in the last lesson. Wrapped in a function, it has a name that s
 
 ## Common Issues
 
-**Problem**: Nothing happens when I run it.
-**Solution**: Add a call block. A definition on its own does nothing.
-**Why**: `def` only teaches Python the recipe. Calling it is what cooks the meal.
+- **Problem**: Nothing happens when I run it.
+- **Solution**: Add a call block. A definition on its own does nothing.
+- **Why**: `def` only teaches Python the recipe. Calling it is what cooks the meal.
 
-**Problem**: `TypeError: function takes 2 positional arguments but 1 were given`
-**Solution**: Fill in every socket on the call block.
-**Why**: The function needs a value for each of its inputs.
+- **Problem**: `TypeError: function takes 2 positional arguments but 1 were given`
+- **Solution**: Fill in every socket on the call block.
+- **Why**: The function needs a value for each of its inputs.
 
-**Problem**: I renamed the function and the calls broke.
-**Solution**: Rename it on the definition block. The call blocks follow.
-**Why**: The calls are tied to the definition, so one rename updates them all.
+- **Problem**: I renamed the function and the calls broke.
+- **Solution**: Rename it on the definition block. The call blocks follow.
+- **Why**: The calls are tied to the definition, so one rename updates them all.
 
 ## Check your understanding
 

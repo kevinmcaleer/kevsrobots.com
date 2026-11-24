@@ -4,12 +4,14 @@ description: Use if and else blocks with comparisons in Snakie to make a dice ga
 layout: lesson
 type: page
 cover: /learn/snakie_blocks/assets/banners/04_making_decisions.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use if and else blocks with a comparison to make a dice game, and tell = from == in Python.
 
 Robots have to decide things. Is the wall too close? Is the button pressed? In blocks and in Python, decisions are made with **if**.
 
@@ -92,17 +94,17 @@ You can join questions with the **and** / **or** block, and flip one with **not*
 
 ## Common Issues
 
-**Problem**: The comparison block won't fit in the print block.
-**Solution**: Put it in the **if** block's pointed socket.
-**Why**: Pointed blocks are true-or-false answers, and they belong in question-shaped sockets.
+- **Problem**: The comparison block won't fit in the print block.
+- **Solution**: Put it in the **if** block's pointed socket.
+- **Why**: Pointed blocks are true-or-false answers, and they belong in question-shaped sockets.
 
-**Problem**: I typed `if roll = 6:` in the code pane and got a `SyntaxError`.
-**Solution**: Use `==` to compare.
-**Why**: A single `=` stores a value. Python won't let you do that inside a question.
+- **Problem**: I typed `if roll = 6:` in the code pane and got a `SyntaxError`.
+- **Solution**: Use `==` to compare.
+- **Why**: A single `=` stores a value. Python won't let you do that inside a question.
 
-**Problem**: It prints both messages.
-**Solution**: Make sure the second print is inside the **else** mouth, not underneath the if block.
-**Why**: Blocks under the if block run every time, whatever the answer was.
+- **Problem**: It prints both messages.
+- **Solution**: Make sure the second print is inside the **else** mouth, not underneath the if block.
+- **Why**: Blocks under the if block run every time, whatever the answer was.
 
 ## Check your understanding
 

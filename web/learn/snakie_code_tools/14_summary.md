@@ -9,9 +9,9 @@ previous: 13_project_sensor_driver.html
 description: Review the Snakie code tools you have learned, a workflow that uses them
   together, and where to go next
 percent: 100
-duration: 3
+duration: 4
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -63,6 +63,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose the right Snakie editor tool for a job and decide where to go next.
 
 You started this course with an editor. You're finishing it with a workshop.
 

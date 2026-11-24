@@ -9,8 +9,9 @@ previous: 02_create_sketch.html
 next: 04_create_hinges.html
 description: Revolve to create the eyelid
 percent: 40
-duration: 2
-quiz_total: 9
+duration: 3
+quiz_total: 27
+date_updated: 2026-11-24
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -51,6 +52,10 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to turn a flat sketch profile into a curved 3D eyelid with the Revolve tool.
+
+Revolve is the heart of this design. Instead of modelling a dome by pushing and pulling blocks, we draw its cross-section once and let Fusion 360 spin it around an axis, like a potter's wheel. The two circles from lesson 2 become the inside and outside of a hollow shell, which is exactly what an eyelid is.
+
 * **Select the profile** - Click within the newly created profile to select it
 
 ![Profile](assets/eye18.jpg){:class="img-fluid w-50"}
@@ -70,6 +75,22 @@ navigation:
 ![Profile](assets/eye21.jpg){:class="img-fluid w-50"}
 
 ---
+
+## Try it Yourself
+
+1. Revolve the profile by 90 degrees instead of 180, then undo (`Ctrl+Z`) and go back to 180.
+2. Edit the Revolve feature in the timeline and change the angle to watch the eyelid update.
+3. Challenge: revolve a full 360 degrees and describe the shape you get.
+
+## Common Issues
+
+- **Problem**: The Revolve tool will not let you pick a profile.
+- **Solution**: Click inside the closed shape, not on its edge, so the profile highlights.
+- **Why**: Revolve works on closed profiles, so Fusion needs to know which area to spin.
+
+- **Problem**: The shape sweeps the wrong way.
+- **Solution**: Check you picked the blue Z axis, then try the opposite angle.
+- **Why**: The direction depends on the axis and the sign of the angle.
 
 ## Check your understanding
 

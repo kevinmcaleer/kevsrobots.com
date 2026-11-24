@@ -3,10 +3,15 @@ layout: lesson
 title: Skills and Knowledge
 description: What you’ll need to know to build robots and bring them to life
 type: page
+date_updated: 2026-11-24
 cover: /learn/robotics_101/assets/banners/lesson_03.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to name the three skill areas behind every robot - design, programming and electronics - and give an example of each.
 
 ---
 
@@ -32,7 +37,7 @@ Building a robot requires:
 - Tools & Machinery, a 3d printer
 - Time, Patience and practice
 
-SMARS is a 3d Printed Robot, the designs can be found at:
+SMARS is a 3D-printed robot, the designs can be found at:
 <https://www.smarsfan.com>
 
 ![SMARS robot](assets/smars.jpg){:class="img-fluid w-25"}
@@ -71,6 +76,26 @@ SMARS uses off-the-shelf components, so is easy to wire up
 
 ---
 
+## Putting it together
+
+Take a robot that stops before it bumps into a wall. **Design** gives it a body, a place to mount the distance sensor and wheels that grip. **Electronics** wires the sensor and motors to the brain and supplies power. **Programming** reads the sensor, decides "too close" and tells the motors to stop. If the robot crashes, you need all three skills to find out why: is the sensor loose (design), a wire off (electronics), or is the "too close" distance wrong (programming)?
+
+You do not need to be good at all three before you start. Most makers begin with one and pick up the others as they build.
+
+## Try it Yourself
+
+1. Draw your own version of the Venn diagram. Put three robots you know (a robot vacuum, a toy, a robot from a film) in the area where you think their main skills overlap.
+2. Write down a skill you already have (drawing, coding in Scratch, fixing bikes). Which of the three areas does it belong to?
+3. Challenge: choose one skill area and list five things you would like to learn in it.
+
+## Common Issues
+
+- **Problem**: I feel I need to learn everything before I can build a robot.
+- **Solution**: Start with a kit such as SMARS, where the design and the wiring are already worked out, and learn the rest a step at a time.
+- **Why**: Robots are built from small, separate skills. A kit lets you practise one while the others are done for you.
+
+> **Teachers**: Building robots brings in real hazards, covered properly in the follow-on courses: 3D printers have hot parts and moving parts, soldering irons are hot enough to burn, and craft knives and drills cut. This lesson only talks about them. If you go on to build, plan adult supervision, eye protection and a tidy bench, and check your school's rules for 3D printers and soldering.
+
 ## Check your understanding
 
 {% quiz %}
@@ -85,4 +110,10 @@ SMARS uses off-the-shelf components, so is easy to wire up
 - [x] I2C
 - [ ] PLA
 > I2C (along with SPI and UART) is a common way for a microcontroller to talk to sensors and other chips. PLA is a 3D printing filament!
+
+? A robot keeps bumping into walls even though its sensor works. Which skill area do you check first for the "too close" decision?
+- [ ] Design, because of the shape of the body
+- [x] Programming, because the code decides what to do with the sensor reading
+- [ ] Electronics, because of the battery
+> Programming is the area that writes the instructions, including what to do when the sensor reading says something is close.
 {% endquiz %}

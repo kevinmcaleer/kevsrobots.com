@@ -10,6 +10,8 @@ cover: /learn/micropython_gpio/assets/banners/11_uart.jpg
 
 ---
 
+By the end of this lesson you will be able to set up a UART on the Pico, send bytes and read replies.
+
 ## Overview
 
 In this lesson, you'll learn how to use UART (Universal Asynchronous Receiver/Transmitter) to send data between your Pico and other devices. UART is used by GPS modules, Bluetooth modules like the HC-05, and to link two microcontrollers together.
@@ -56,9 +58,53 @@ if uart.any():               # is there anything waiting?
 
 ---
 
-## Try it yourself
+---
 
-Connect `GP0` to `GP1` with a single jumper wire (a "loopback"). Write a message and read it straight back.
+## A complete loopback program
+
+Join `GP0` to `GP1` with a single jumper wire, so what the Pico sends on TX arrives on RX:
+
+```python
+from machine import UART, Pin
+from time import sleep
+
+uart = UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1))
+
+uart.write("Hello, world!\n")
+sleep(0.1)
+
+if uart.any():
+    data = uart.read()
+    print(data)
+```
+
+```mermaid
+flowchart LR
+    A["Pico TX (GP0)"] --> B["Device RX"]
+    C["Device TX"] --> D["Pico RX (GP1)"]
+    E["Pico GND"] --- F["Device GND"]
+```
+
+---
+
+## Try it Yourself
+
+1. Run the loopback program. You should see `b'Hello, world!\n'`.
+2. Change the message and run it again.
+3. Pull the jumper out and run it again. What do you see, and why?
+4. Challenge: send three messages in a loop and print each one as it arrives.
+
+## Common Issues
+
+- **Problem**: `uart.read()` returns `None`.
+- **Solution**: Check TX goes to RX and RX to TX, and add a short `sleep()` after writing.
+- **Why**: If nothing arrived there are no bytes to read.
+
+- **Problem**: The text arrives as garbage characters.
+- **Solution**: Set the same baud rate on both devices.
+- **Why**: UART has no clock, so each side times the bits from the agreed speed.
+
+## Check your understanding
 
 {% quiz %}
 ? How should TX and RX be wired between two UART devices?
@@ -72,6 +118,12 @@ Connect `GP0` to `GP1` with a single jumper wire (a "loopback"). Write a message
 - [ ] The I2C address
 - [ ] The clock pin
 > UART has no clock wire, so both sides must use the same baud rate.
+
+? What does `uart.any()` return?
+- [ ] The baud rate
+- [x] The number of bytes waiting to be read
+- [ ] The last byte received
+> Checking `any()` first means you only read when there is data.
 {% endquiz %}
 
 ---

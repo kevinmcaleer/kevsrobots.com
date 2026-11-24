@@ -4,12 +4,14 @@ description: Take a guided tour of Kev's chess camera App and learn how it reads
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/15_the_chess_camera.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how the chess camera App splits its work between the two brains, and reuse its key idea in your own project.
 
 Kev wanted to play chess against a computer without staring at a screen. So he pointed a webcam at a real board, plugged it into an Uno Q, and built an App that watches the game, works out each move you make, and plays back.
 

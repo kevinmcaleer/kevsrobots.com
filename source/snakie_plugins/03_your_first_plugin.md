@@ -4,12 +4,14 @@ description: Create the ClubKit plugin folder, write a one-command Snakie plugin
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/03_your_first_plugin.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create the ClubKit plugin folder, write a one-command plugin and load it into the Plugin Rack.
 
 ## Meet ClubKit
 

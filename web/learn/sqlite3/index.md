@@ -6,11 +6,23 @@ cover: /learn/sqlite3/assets/database.png
 date: 2023-07-15
 description: Learn how to create databases in Python with sqlite3
 level: beginner
-course_duration: 1h 8m
+course_duration: 1h 43m
 lesson_count: 18
 first_lesson: 00_intro.html
-quiz_total: 24
+quiz_total: 60
 video: 8BCsBgt-5zY
+outcomes:
+- Create a SQLite database and tables from Python
+- Insert, query, update and delete data safely using ? placeholders
+- Join related tables and summarise data with GROUP BY
+- Use transactions so your data is never left half-saved
+- Speed up queries with an index and back up a database properly
+- Design tidy tables using the first three normal forms
+prerequisites:
+- Comfortable writing simple Python programs (variables, loops and functions)
+you_need:
+- A computer with Python 3 (Windows, macOS, Linux or a Raspberry Pi)
+- A code editor such as Thonny or VS Code
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:

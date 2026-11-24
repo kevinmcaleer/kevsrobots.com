@@ -4,12 +4,14 @@ description: Find Snakie's instrument dock, open and close instruments, read the
 layout: lesson
 type: page
 cover: /learn/snakie_instruments/assets/banners/01_the_instrument_dock.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find the Instrument Dock, open and close instruments, read their help pages and float one in its own window.
 
 Every instrument in Snakie lives in one place. Let's find it and learn the controls they all share.
 

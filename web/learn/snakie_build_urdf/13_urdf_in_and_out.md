@@ -12,7 +12,7 @@ description: Export your Snakie robot as a URDF file, read what is inside it, an
 percent: 84
 duration: 6
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to export your robot as a URDF file, read what is inside it and open a robot designed in BetterCad.
 
 ## What a URDF is
 

@@ -4,12 +4,14 @@ description: Use the BetterCad clash check to find parts that overlap or touch i
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/09_checking_for_clashes.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to run the clash check on a pose and read its results.
 
 On screen, two parts can pass straight through each other and nothing complains. On the bench, something cracks. The **clash check** finds every place where two parts are trying to be in the same space.
 

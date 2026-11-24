@@ -12,7 +12,7 @@ description: Write a Snakie plugin command that searches a MicroPython program f
 percent: 42
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write a plugin command that searches a program for the pins it uses and reports them in a message and the status bar.
 
 ## A useful question
 

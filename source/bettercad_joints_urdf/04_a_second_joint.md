@@ -4,12 +4,14 @@ description: Chain a second hinge onto the first in BetterCad to build a two-joi
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/04_a_second_joint.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to chain a second hinge onto the first to build a two-joint arm, then rename, edit and reorder joints.
 
 One joint is a lever. Two joints is an arm. The second joint works exactly like the first, with one difference: the forearm hangs from the upper arm, not from the base. When the shoulder turns, the elbow and everything past it goes along for the ride.
 
@@ -61,6 +63,12 @@ Only the forearm moves.
 
 This is a **chain**: Base, then Upper arm, then Forearm. Each part's position depends on every joint between it and the base. Robot people call the parts **links**, and you'll meet that word again in the URDF file.
 
+```mermaid
+flowchart LR
+    B["Base"] -->|"Shoulder joint"| U["Upper arm"]
+    U -->|"Elbow joint"| F["Forearm"]
+```
+
 A chain can branch. A robot with two arms has two chains hanging from one body. What it can't do is loop back on itself: each component hangs from exactly one joint. If you try to give a part a second one, BetterCad says "Forearm already hangs from a joint".
 
 ---
@@ -91,6 +99,8 @@ Each component has its own row, with its own Bodies folder inside. Click the eye
 Right-click a body and you'll find **Move into** for each component. That's how a second body joins a moving part: model the sensor bracket, then move it into Forearm, and it swings with the forearm from then on.
 
 ---
+
+> **Teachers**: this is the lesson where a lost file hurts most, because every later lesson builds on the two-joint arm. Have learners save a `.bcad` file now, with their name in it, and keep it somewhere that survives a shared computer being wiped. Anyone who falls behind can open the downloadable stage files instead of rebuilding.
 
 ## Try it Yourself
 

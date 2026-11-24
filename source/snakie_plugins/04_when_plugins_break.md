@@ -4,12 +4,14 @@ description: Learn what Snakie shows when a plugin has a syntax error or crashes
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/04_when_plugins_break.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recognise what Snakie shows when a plugin has a syntax error or crashes, and find and fix the bug.
 
 ## Break it on purpose
 

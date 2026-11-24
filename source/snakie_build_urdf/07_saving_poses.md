@@ -4,12 +4,14 @@ description: Save named poses for your robot in Snakie, then rename, update and 
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/07_saving_poses.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to save named poses, then rename, update and reuse them.
 
 ## A pose is a snapshot
 
@@ -87,6 +89,8 @@ Open `robot.yml` in the Code workspace and you'll find them, in plain text:
 ```
 
 The values are joint angles in degrees. Because it's a text file, poses travel with your project and work nicely with Git.
+
+> **Teachers**: Poses and motions are saved as plain text in `robot.yml` inside the project folder, so copying or collecting the folder collects the learner's work. Make sure learners save into a folder they can get back to on a shared computer.
 
 ---
 

@@ -9,7 +9,7 @@ description: Learn the Arduino Uno Q from first boot to a project that runs by i
   an Arduino sketch talk over the Bridge, and build the Q Board, a number display
   you drive from Python, a web page and a camera.
 level: beginner
-course_duration: 2h 16m
+course_duration: 2h 21m
 lesson_count: 17
 first_lesson: 00_intro.html
 quiz_total: 50

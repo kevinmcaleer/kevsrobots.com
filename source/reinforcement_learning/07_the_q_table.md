@@ -1,4 +1,5 @@
 ---
+code_target: cpython
 title: The Q-Table
 description: Build the robot's cheat sheet — a Python dictionary that stores the estimated value of every action in every state.
 layout: lesson

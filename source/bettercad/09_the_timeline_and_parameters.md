@@ -4,12 +4,14 @@ description: Go back and change any step of a BetterCad model, and drive its siz
 layout: lesson
 type: page
 cover: /learn/bettercad/assets/banners/09_the_timeline_and_parameters.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the timeline, change an earlier step, and drive sizes from named parameters so one number resizes the whole part.
 
 The strip along the bottom of the screen has been quietly filling up with icons. That's the **timeline**: the recipe for your model. BetterCad doesn't store the finished shape. It stores the steps and rebuilds the shape from them. So you can go back and change step 2 of 10, and steps 3 to 10 simply run again.
 
@@ -121,17 +123,17 @@ Good parameters to make first are the ones you'd change for a different job: the
 
 ## Common Issues
 
-**Problem**: I changed an early step and a later one now shows a warning.
-**Solution**: Double-click the marked step and pick its edges or faces again.
-**Why**: The step referred to something that no longer exists in the same form.
+- **Problem**: I changed an early step and a later one now shows a warning.
+- **Solution**: Double-click the marked step and pick its edges or faces again.
+- **Why**: The step referred to something that no longer exists in the same form.
 
-**Problem**: "No value called width" when I type a parameter name.
-**Solution**: Check the spelling in the Parameters panel, and that you're in a box that takes names: sizes and positions in Properties, sketch dimensions and extrude distances.
-**Why**: The name must match a parameter exactly, and some tool panels only take numbers.
+- **Problem**: "No value called width" when I type a parameter name.
+- **Solution**: Check the spelling in the Parameters panel, and that you're in a box that takes names: sizes and positions in Properties, sketch dimensions and extrude distances.
+- **Why**: The name must match a parameter exactly, and some tool panels only take numbers.
 
-**Problem**: I added a step and it ended up in the middle of the timeline.
-**Solution**: Click **Go to the end** before you carry on working.
-**Why**: New steps go wherever the marker is. After a roll back, that's not the end.
+- **Problem**: I added a step and it ended up in the middle of the timeline.
+- **Solution**: Click **Go to the end** before you carry on working.
+- **Why**: New steps go wherever the marker is. After a roll back, that's not the end.
 
 ## Check your understanding
 

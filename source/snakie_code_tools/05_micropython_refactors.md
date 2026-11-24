@@ -4,12 +4,14 @@ description: Use Snakie's MicroPython refactoring hints, quick fixes with a prev
 layout: lesson
 type: page
 cover: /learn/snakie_code_tools/assets/banners/05_micropython_refactors.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to apply a MicroPython refactoring hint with a preview of every change, and use Tidy this file.
 
 **Refactoring** means changing how code is written without changing what it does. Snakie has a set of refactorings written specifically for microcontrollers. They know things a general Python tool has no reason to care about, like how much memory a float costs on a Pico.
 
@@ -121,17 +123,17 @@ Two settings control how much you see. Open **Settings**, then **Editor**, and f
 
 ## Common Issues
 
-**Problem**: There's no lightbulb on a hinted line.
-**Solution**: Read the hint and its **Why?** article, and make the change by hand.
-**Why**: Some hints need a decision only you can make, so Snakie explains instead of rewriting.
+- **Problem**: There's no lightbulb on a hinted line.
+- **Solution**: Read the hint and its **Why?** article, and make the change by hand.
+- **Why**: Some hints need a decision only you can make, so Snakie explains instead of rewriting.
 
-**Problem**: My program broke after `const()`.
-**Solution**: Undo it, and check whether the name is changed anywhere else, including from another file.
-**Why**: A `const` is fixed at compile time. Snakie only offers it when the file never reassigns the name, but it can't see other files that might.
+- **Problem**: My program broke after `const()`.
+- **Solution**: Undo it, and check whether the name is changed anywhere else, including from another file.
+- **Why**: A `const` is fixed at compile time. Snakie only offers it when the file never reassigns the name, but it can't see other files that might.
 
-**Problem**: Tidy changed more than I expected.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, then apply the fixes one at a time from the lightbulb.
-**Why**: Tidy applies every safe refactoring at once. The preview lists them all, so read it before pressing Apply.
+- **Problem**: Tidy changed more than I expected.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, then apply the fixes one at a time from the lightbulb.
+- **Why**: Tidy applies every safe refactoring at once. The preview lists them all, so read it before pressing Apply.
 
 ## Check your understanding
 

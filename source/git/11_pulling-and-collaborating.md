@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/11_pulling-and-collaborating.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to keep copies of a project in sync with `git fetch` and `git pull`, and explain how a pull request works.
 
 ## Keeping copies in sync
 

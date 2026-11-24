@@ -12,7 +12,7 @@ description: Turn the motion you animated in Snakie into a ready-to-run MicroPyt
 percent: 78
 duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -65,6 +65,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to turn an animated motion into a ready-to-run MicroPython program and explain the code it writes.
+
 ## Let Snakie write the loop
 
 You've animated a motion and bound the servos. Snakie now has everything it needs to write the program for you.
@@ -87,6 +89,7 @@ It has four parts. Here they are, shortened.
 
 **1. Your project data.** Three blocks marked "managed by Snakie" hold your poses, your Timeline sequence and your servo bindings.
 
+<!-- code-check: skip -->
 ```python
 # --- snakie:poses v1 --- managed by Snakie Motion Studio
 SNAKIE_POSES = { "rest": { "waist": 0, "shoulder": 0, "elbow": 0 }, ... }

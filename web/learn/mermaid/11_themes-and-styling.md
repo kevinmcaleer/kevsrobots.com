@@ -10,8 +10,9 @@ next: 12_exporting-and-sharing.html
 description: Change the look of a whole Mermaid diagram with built-in themes, config
   settings and your own theme colours
 percent: 72
-duration: 5
+duration: 6
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to change the look of a whole diagram using built-in themes, config settings and your own theme colours.
 
 ---
 

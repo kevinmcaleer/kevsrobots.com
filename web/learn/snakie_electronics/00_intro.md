@@ -11,7 +11,7 @@ description: Learn to plan, wire and check a circuit on screen in Snakie's Elect
 percent: 8
 duration: 4
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:

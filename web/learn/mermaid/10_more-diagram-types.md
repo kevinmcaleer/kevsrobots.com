@@ -10,8 +10,9 @@ next: 11_themes-and-styling.html
 description: Pie charts, mind maps, Git graphs and quadrant charts - four more handy
   Mermaid diagrams for makers
 percent: 66
-duration: 5
+duration: 6
 quiz_total: 41
+date_updated: 2026-11-24
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
@@ -63,6 +64,10 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a pie chart, a mind map, a Git graph and a quadrant chart, and pick the right one for the job.
 
 ---
 

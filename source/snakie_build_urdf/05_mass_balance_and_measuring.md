@@ -4,12 +4,14 @@ description: Give each part a mass in Snakie, find the robot's centre of mass an
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/05_mass_balance_and_measuring.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to give each part a mass, find the robot's centre of mass and check sizes with the measure, skeleton and exploded views.
 
 ## Will it fall over?
 

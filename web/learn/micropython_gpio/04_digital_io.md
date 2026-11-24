@@ -9,8 +9,8 @@ previous: 03_voltage_levels.html
 next: 05_pwm.html
 description: Learn about digital input and output with Raspberry Pi Pico using MicroPython.
 percent: 25
-duration: 3
-quiz_total: 33
+duration: 4
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -72,6 +72,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to switch an output pin on and off and read a button using the Pico's built-in pull-up resistor.
 
 ## Overview
 
@@ -141,9 +143,37 @@ while True:
 
 ---
 
-## Try it yourself
+---
 
-Change the program so each press *toggles* the LED instead of only lighting it while you hold the button. Hint: remember the last button value and only act when it changes from `1` to `0`.
+## Wiring table
+
+| Part | Connects to |
+| --- | --- |
+| LED long leg (anode), via a 220Ω resistor | GP15 (physical pin 20) |
+| LED short leg (cathode) | GND |
+| Button, one leg | GP14 (physical pin 19) |
+| Button, other leg | GND |
+{:class="table table-single"}
+
+---
+
+## Try it Yourself
+
+1. Run the button program and watch the LED follow the button.
+2. Swap `Pin.PULL_UP` for `Pin.PULL_DOWN` and move the button's second leg to `3V3`. What does `value()` read when pressed now?
+3. Challenge: make each press toggle the LED instead of lighting it only while held. Hint: remember the last button value and only act when it changes from `1` to `0`.
+
+## Common Issues
+
+- **Problem**: The LED stays on or flickers when the button is not pressed.
+- **Solution**: Check the button goes between GP14 and GND, and that you used `Pin.PULL_UP`.
+- **Why**: Without a pull resistor the pin floats and picks up noise, so it reads random values.
+
+- **Problem**: One press toggles the LED several times.
+- **Solution**: Add `sleep(0.2)` after a press is detected.
+- **Why**: Mechanical buttons bounce: the contact makes and breaks many times in a few milliseconds.
+
+## Check your understanding
 
 {% quiz %}
 ? A button is wired between GP14 and GND, with `Pin.PULL_UP`. What does `button.value()` return while it's pressed?
@@ -157,6 +187,12 @@ Change the program so each press *toggles* the LED instead of only lighting it w
 - [x] It floats and can read random values
 - [ ] It reads 3.3V as an analog value
 > A floating input picks up electrical noise. Pull resistors give it a known default.
+
+? Which constant turns on the Pico's internal pull-up resistor?
+- [ ] `Pin.OUT`
+- [x] `Pin.PULL_UP`
+- [ ] `Pin.IN` on its own
+> `Pin(14, Pin.IN, Pin.PULL_UP)` enables the resistor, so no external one is needed.
 {% endquiz %}
 
 ---
