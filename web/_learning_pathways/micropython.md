@@ -17,6 +17,7 @@ stages:
   build:
   - Raspberry Pi Pico with MicroPython - GPIO Mastery
   - Using the Raspberry Pi Pico's Built-in Temperature Sensor
+  - MicroPython Projects - Make It Show, Talk and Connect
   - Intermediate level MicroPython
   further:
   - Talking to the World - Working with I2C and SPI

@@ -546,6 +546,23 @@
   name: Raspberry Pi Pico with MicroPython - GPIO Mastery
   video: M-0P6ipVwNU
 - author: Kevin McAleer
+  cover: /learn/micropython_projects/assets/cover.jpg
+  date_published: 2026-11-24
+  description: Take your MicroPython beyond blinking LEDs. Build one desk gadget,
+    a status buddy, that senses a door with a reed switch, shows it on an OLED screen,
+    says it out loud with SAM speech, and reports to Arduino Cloud over Wi-Fi. Then
+    shrink it onto a tiny Seeed XIAO.
+  duration: 1h 18m
+  groups:
+  - micropython
+  - pico
+  - electronics
+  lessons: 17
+  level: beginner
+  link: /learn/micropython_projects/00_intro.html
+  name: MicroPython Projects - Make It Show, Talk and Connect
+  video: K0X4W09tiEA
+- author: Kevin McAleer
   cover: /learn/micropython_robotics/assets/cover.jpg
   date_published: 2025-05-20
   description: Learn how to build simple yet powerful robots using the Raspberry Pi
