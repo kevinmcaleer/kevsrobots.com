@@ -7,17 +7,19 @@ cover: /learn/intermediate_micropython/assets/banners/06_polymorphism.jpg
 date: 2024-07-07
 previous: 05_encapsulation.html
 next: 06a_decorators.html
-description: Learn about polymorphism in MicroPython and how it allows objects to
-  take on many forms.
+description: Treat different robot parts the same way with duck typing and method
+  overriding, and write a base class without the abc module
 percent: 42
-duration: 3
+duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Intermediate level MicroPython
 - content:
   - section: Introduction
     content:
     - name: Introduction to Intermediate MicroPython
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Object Oriented Programming
     content:
     - name: Object-Oriented Programming in MicroPython
@@ -38,15 +40,15 @@ navigation:
       link: 06a_decorators.html
   - section: Modules and Packages
     content:
-    - name: Modules & Libraries
+    - name: Modules
       link: 07_modules.html
     - name: Packages
       link: 08_packages.html
-    - name: PyPi & MIP
+    - name: PyPi and MIP
       link: 09_pypi.html
   - section: DocStrings
     content:
-    - name: DocStrings
+    - name: Docstrings
       link: 10_docstrings.html
   - section: Interrupts and Timers
     content:
@@ -56,11 +58,11 @@ navigation:
       link: 12_timers.html
   - section: MP Remote
     content:
-    - name: MP Remote
+    - name: mpremote
       link: 13_mp_remote.html
   - section: Conclusion
     content:
-    - name: MP Remote
+    - name: Summary
       link: 14_summary.html
 ---
 
@@ -69,131 +71,164 @@ navigation:
 
 ---
 
-## Polymorphism
+By the end of this lesson you will be able to write code that works with any object offering the right method, and write a base class that insists subclasses fill in a method.
 
-In MicroPython, `Polymorphism` means the ability of an object to take on many forms. This allows us to use a single interface to represent different types of objects. Polymorphism, meaning "occurring in many forms," is a key concept in object-oriented programming (OOP).
+## One name, many behaviours
+
+**Polymorphism** means "many forms". In practice: different objects respond to the same method name in their own way, so the code calling the method does not need to know which kind of object it has.
 
 ![Polymorphism](assets/polymorphism.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
----
-
-## What is Polymorphism?
-
-Polymorphism is the ability of different objects to respond, each in its own way, to identical messages (methods). In simpler terms, polymorphism allows the same method to be used on different objects, each having its own implementation of the method.
-
-### Example of Polymorphism
-
-Consider a scenario where we have different classes for different types of animals. Each animal can make a sound, but the sound is different for each animal.
+Your robot has an LED, a buzzer and a servo that can all "signal" that something happened. Each does it differently, but the main program just says `signal()`.
 
 {% capture snakie_code %}
-class Dog:
-    def make_sound(self):
-        return "Bark"
+class Led:
+    def signal(self):
+        print("LED flashes")
 
-class Cat:
-    def make_sound(self):
-        return "Meow"
+class Buzzer:
+    def signal(self):
+        print("Buzzer beeps")
 
-class Cow:
-    def make_sound(self):
-        return "Moo"
+class Servo:
+    def signal(self):
+        print("Servo waves")
 
-# Using polymorphism
-def animal_sound(animal):
-    print(animal.make_sound())
+def alert(outputs):
+    for item in outputs:
+        item.signal()
 
-dog = Dog()
-cat = Cat()
-cow = Cow()
-
-animal_sound(dog)  # Outputs: Bark
-animal_sound(cat)  # Outputs: Meow
-animal_sound(cow)  # Outputs: Moo
+alert([Led(), Buzzer(), Servo()])
 {% endcapture %}
 {% include snakie.html code=snakie_code name="polymorphism_1.py" %}
 
-In the example above, the `animal_sound` function uses polymorphism to call the `make_sound` method on different animal objects. Each object responds to the `make_sound` method in its own way.
+`alert()` has no `if isinstance(...)` checks. Add a `Display` class with a `signal()` method tomorrow and `alert()` works with it unchanged. That is the payoff: new behaviour, no edits to existing code.
+
+```mermaid
+flowchart TD
+    A["alert(outputs)"] --> B["Led.signal()"]
+    A --> C["Buzzer.signal()"]
+    A --> D["Servo.signal()"]
+    A --> E["Display.signal() - added later"]
+```
 
 ---
 
-## Benefits of Polymorphism
+## Duck typing
 
-- **Flexibility**: Polymorphism allows for writing more flexible and reusable code.
-- **Maintainability**: It helps in maintaining the code by allowing changes to be made to the method implementations without affecting the overall system.
-- **Extensibility**: New classes and methods can be added with minimal changes to the existing code.
+Notice that `Led`, `Buzzer` and `Servo` share no parent class at all. Python does not ask what an object *is*, only whether it has the method you call. This is called **duck typing**: "if it walks like a duck and quacks like a duck, treat it as a duck." It is one of Python's most useful habits, and it needs no extra memory.
 
 ---
 
-## Real-World Example
+## Polymorphism with inheritance
 
-Imagine a media player application that can play different types of media files (audio, video, etc.). Each media type has its own way of being played, but the media player can use a single interface to play any type of media file.
+You can also share a parent class. This documents the interface and lets you share common code:
 
 {% capture snakie_code %}
-class Audio:
-    def play(self):
-        return "Playing audio"
+class Output:
+    def __init__(self, name):
+        self.name = name
 
-class Video:
-    def play(self):
-        return "Playing video"
+    def signal(self):
+        raise NotImplementedError("subclasses must define signal()")
 
-class Image:
-    def play(self):
-        return "Displaying image"
+    def describe(self):
+        print(self.name, "->", end=" ")
+        self.signal()
 
-# Using polymorphism
-def play_media(media):
-    print(media.play())
+class Led(Output):
+    def signal(self):
+        print("flash")
 
-audio = Audio()
-video = Video()
-image = Image()
+class Buzzer(Output):
+    def signal(self):
+        print("beep")
 
-play_media(audio)  # Outputs: Playing audio
-play_media(video)  # Outputs: Playing video
-play_media(image)  # Outputs: Displaying image
+class Broken(Output):
+    pass
+
+Led("status").describe()
+Buzzer("alarm").describe()
+
+try:
+    Broken("oops").describe()
+except NotImplementedError as e:
+    print("caught:", e)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="polymorphism_2.py" %}
 
-In this example, the `play_media` function uses polymorphism to play different types of media files. Each media type responds to the `play` method in its own way.
+The base class `Output` is a contract. Its `signal()` raises `NotImplementedError`, so a subclass that forgets to write its own gets a clear message instead of silently doing nothing.
+
+### No `abc` module on a Pico
+
+On desktop Python you may see `from abc import ABC, abstractmethod` used for this job. **That module is not available in MicroPython** (`import abc` raises `ImportError`). The `raise NotImplementedError` pattern above is the standard replacement, with one difference: it complains when the method is *called*, not when the object is created.
 
 ---
 
-## Polymorphism vs. Inheritance
+## Built-in polymorphism: special methods
 
-Polymorphism and inheritance are closely related concepts in OOP. While inheritance allows classes to inherit properties and methods from a parent class, polymorphism allows different classes to be treated as instances of the same class through a common interface.
-
-For example, we can have a base class `Animal` with a method `make_sound`, and different animal classes (e.g., `Dog`, `Cat`) inherit from the base class and implement their own version of `make_sound`.
+Python's own operators are polymorphic too. `+` adds numbers, joins strings and merges lists. You can make `+` work for your own classes with special ("dunder") methods:
 
 {% capture snakie_code %}
-class Animal:
-    def make_sound(self):
-        raise NotImplementedError("Subclasses must implement this method")
+class Vec:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-class Dog(Animal):
-    def make_sound(self):
-        return "Bark"
+    def __add__(self, other):
+        return Vec(self.x + other.x, self.y + other.y)
 
-class Cat(Animal):
-    def make_sound(self):
-        return "Meow"
+    def __repr__(self):
+        return f"Vec({self.x}, {self.y})"
 
-# Using polymorphism with inheritance
-def animal_sound(animal):
-    print(animal.make_sound())
-
-dog = Dog()
-cat = Cat()
-
-animal_sound(dog)  # Outputs: Bark
-animal_sound(cat)  # Outputs: Meow
+step = Vec(1, 0) + Vec(0, 2)
+print(step)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="polymorphism_3.py" %}
 
----
-
-### Summary
-
-Polymorphism in MicroPython allows objects to take on many forms and enables a single interface to represent different types of objects. It enhances flexibility, maintainability, and extensibility in code. Understanding and using polymorphism is crucial for effective object-oriented programming.
+`__repr__` controls how `print()` shows the object, and `__add__` makes `+` work. Both work on MicroPython.
 
 ---
+
+## Try it Yourself
+
+1. Add a `Display` class with a `signal()` method and pass it to `alert()` too.
+2. Give `Output` a `volume` argument and make `Buzzer.signal()` print it.
+3. Write a `Shape` base class with `area()` that raises `NotImplementedError`, then `Square` and `Circle` subclasses. Loop over a list and print every area.
+4. Challenge: add `__eq__` to `Vec` so `Vec(1, 2) == Vec(1, 2)` is `True`.
+
+---
+
+## Common Issues
+
+- **Problem**: `AttributeError: 'Led' object has no attribute 'signal'`.
+- **Solution**: Make sure every class in the list defines a method with exactly that name.
+- **Why**: Duck typing only works if every object really has the method you call.
+
+- **Problem**: A tutorial uses `from abc import ABC, abstractmethod` and you get `ImportError`.
+- **Solution**: Use a base class whose method raises `NotImplementedError`.
+- **Why**: MicroPython does not include the `abc` module.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does polymorphism let you do?
+- [x] Call the same method name on different objects and get behaviour suited to each
+- [ ] Give every object the same data
+- [ ] Hide attributes from outside code
+> Each object responds to `signal()` in its own way, so the caller does not care which it is.
+
+? In the lesson, how do `Led`, `Buzzer` and `Servo` work together in `alert()`?
+- [ ] They all inherit from one base class
+- [x] They each have a `signal()` method (duck typing)
+- [ ] `alert()` checks each type with `isinstance`
+> They share no parent class. Python only needs the method to exist.
+
+? What replaces `abc.abstractmethod` on a Pico?
+- [ ] The `abstract` keyword
+- [x] A method that raises `NotImplementedError`
+- [ ] The `@property` decorator
+> `abc` is not available in MicroPython, so the base method raises an error if it is called unchanged.
+{% endquiz %}

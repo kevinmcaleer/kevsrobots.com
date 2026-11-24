@@ -1725,7 +1725,7 @@
   {
     "slug": "intermediate_micropython",
     "name": "Intermediate level MicroPython",
-    "description": "This course is designed to take you from a beginner to an intermediate level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules and Packages, DocStrings, Interrupts and Timers, and MP Remote.",
+    "description": "Take your MicroPython further. Build robot code with classes, inheritance and decorators, organise it into modules and packages, respond to the world with interrupts and timers, and manage your Pico from the command line with mpremote. Every example is checked on MicroPython, not just standard Python.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-07-07",
@@ -1736,9 +1736,9 @@
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/intermediate_micropython/01_intro.html"
+        "url": "/learn/intermediate_micropython/00_intro.html"
       },
       {
         "file": "02_oop.md",
