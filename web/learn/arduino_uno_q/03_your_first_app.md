@@ -10,9 +10,9 @@ next: 04_drawing_on_the_led_matrix.html
 description: Create the Q Board App, learn what is inside an App folder, and make
   both brains blink at their own speeds
 percent: 20
-duration: 6
+duration: 7
 quiz_total: 50
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
 - content:
@@ -66,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create an App, say what each file in its folder does, and blink one LED from each brain.
 
 Now let's build something of our own. We'll create an App called **Q Board** and make two LEDs blink, one from each brain. This is **Q Board stage 1**, and everything else in the course builds on it.
 

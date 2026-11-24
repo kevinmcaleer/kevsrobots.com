@@ -22,7 +22,7 @@
     Split a job between its Linux computer and its microcontroller, make Python and
     an Arduino sketch talk over the Bridge, and build the Q Board, a number display
     you drive from Python, a web page and a camera.
-  duration: 2h 16m
+  duration: 2h 21m
   groups:
   - arduino
   - electronics

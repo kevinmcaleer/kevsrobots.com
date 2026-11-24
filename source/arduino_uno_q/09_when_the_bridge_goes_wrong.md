@@ -4,12 +4,14 @@ description: Learn the handful of Bridge mistakes everyone makes, how to spot ea
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/09_when_the_bridge_goes_wrong.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recognise a Bridge deadlock, fix it, and use the error messages and a checklist to find the common Bridge bugs.
 
 Good news: Bridge problems are not a mystery. There are only a handful of mistakes, nearly everyone makes them, and each one has a clear sign. Once you know the signs, you can fix most problems in a minute.
 

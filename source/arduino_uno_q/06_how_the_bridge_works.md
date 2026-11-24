@@ -4,12 +4,14 @@ description: Meet the Bridge, the Arduino Router and the four calls that let Pyt
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/06_how_the_bridge_works.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to describe how a call travels across the Bridge, name the four verbs, and say which types can cross it.
 
 So far the two brains have lived side by side without a word between them. This lesson gives them a way to talk. It is the most valuable idea in the whole course, so let's take it slowly.
 

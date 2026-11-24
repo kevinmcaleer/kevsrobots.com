@@ -4,12 +4,14 @@ description: Learn what a Linux processor and a microcontroller are each good at
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/01_two_brains_one_board.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain what the Linux side and the microcontroller side of the Uno Q are each good at, and choose which one should do a given job.
 
 The Uno Q is shaped like an Arduino Uno, but inside it is two computers. Before we write any code, let's understand why, because every choice you make in this course comes back to it.
 

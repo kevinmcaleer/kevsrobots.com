@@ -4,7 +4,7 @@ description: See what the Linux brain can do on its own by running the Hermes AI
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/14_an_always_on_ai_agent.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -154,6 +154,8 @@ Kev has one more point about safety. Hermes builds its skills from your own sess
 This lesson used only the Linux brain. The natural next step is to give the agent hands. Imagine a sketch that provides a few small, safe functions over the Bridge, such as `set_status` from the Q Board. A Python program, or the agent, calls them by name. The agent can ask for a status change, and the sketch still owns the pins and decides what is safe. That is an idea to explore, not a recipe, but it is the same split you have used all course.
 
 ---
+
+> **Teachers**: Allow about 45 minutes (our estimate). This lesson installs a third-party open-source agent by piping a script from the internet into a shell, and it works with AI providers you may need an account or subscription for, so treat it as a teacher demonstration or a take-home extension. Check the install command in the Hermes README first, as it can change.
 
 ## Try it Yourself
 
