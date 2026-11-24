@@ -313,11 +313,11 @@
     and Stable-Baselines3. You will wrap the BurgerBot grid-world as a proper Gymnasium
     environment, discretize CartPole with your own binning code, and train neural-network
     agents that export a policy table you can drop straight onto a Pico.
-  duration: 1h 23m
+  duration: 1h 44m
   groups:
   - ai
   - python
-  - robotics
+  - robots
   lessons: 15
   level: intermediate
   link: /learn/gymnasium/00_intro.html

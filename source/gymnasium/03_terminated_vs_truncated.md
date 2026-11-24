@@ -2,62 +2,110 @@
 title: Terminated vs Truncated
 description: Learn why Gymnasium separates the done flag into terminated and truncated, and why this distinction matters for correct RL training.
 layout: lesson
+snakie: false
 type: page
 cover: /learn/gymnasium/assets/banners/03_terminated_vs_truncated.jpg
-date_updated: 2026-06-14
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## The Old Way: One Flag
+By the end of this lesson you will be able to explain the difference between `terminated` and `truncated`, and use each one correctly in a Q-learning update.
 
-In the previous course, the BurgerBot simulator returned a single `done` flag:
+---
 
-```python
-# The hand-built step() from the RL course
-state, reward, done = world.step(action)
-```
+## The old way: one flag
 
-`done` was `True` in two situations:
-- The robot hit an obstacle (bad ending — episode is truly over)
-- The episode hit `MAX_STEPS = 150` (time limit — we just stopped the episode)
+In the previous course the BurgerBot simulator returned a single `done` flag, which was `True` in two quite different situations:
 
-Those two situations are logically different, and collapsing them into one flag causes a subtle but real training problem. Let's look at why.
+- The robot hit an obstacle or reached the goal. The episode is truly over.
+- The episode reached `MAX_STEPS = 150`. We simply stopped it, and the robot was in a perfectly good state.
 
-## The Bootstrap Problem
+Mixing those two up causes a subtle training problem. Let's see why.
 
-Q-learning updates a value estimate based on what the agent expects to earn from the next state onward:
+## The bootstrap problem
+
+Q-learning updates a value using what the agent expects to earn from the next state onwards:
 
 ```python
-# The update from the RL course
-# td_target = reward + gamma * max(q_table[next_state])
-# q_table[state][action] += alpha * (td_target - q_table[state][action])
+td_target = reward + gamma * max(q_table[next_state])
 ```
+{: .no-snakie }
 
-The term `gamma * max(q_table[next_state])` is called the bootstrap: we are using our current estimate of the next state's value to update our estimate of the current state's value.
+The `gamma * max(...)` part is called the **bootstrap**: we use our estimate of the next state's value to improve our estimate of this one.
 
-When the episode genuinely ends — the pole falls, the robot crashes, the goal is reached — there is no next state. The bootstrap term should be zero. That is correct.
+- When an episode truly ends (the pole falls, the robot crashes, the goal is reached) there is no next state, so there is no future reward. The bootstrap should be **zero**.
+- When an episode is only cut off by a time limit, the robot is still in a valid state with plenty of future reward available. The bootstrap should **continue**.
 
-When the episode ends only because of a time limit, the agent is actually in a perfectly valid state. The environment could continue from there. The bootstrap term should NOT be zero — it should reflect how much future reward the agent could still earn.
-
-If you treat a time-limit ending the same as a genuine terminal state, you are incorrectly telling the agent "there is no future value from this state" when there actually is. For small, fast-converging problems this error is often small enough to not matter. For harder problems — or when you are using the time limit to learn about regions of the state space the agent hasn't reached yet — it introduces a real bias.
-
-## The New Way: Two Flags
-
-Gymnasium 1.x separates the concept into two flags:
+If you treat a time-out as a real ending you tell the agent "nothing is worth anything from here", which is false. A robot that is doing well when the clock runs out gets punished for its good position. Run the numbers:
 
 ```python
-obs, reward, terminated, truncated, info = env.step(action)
+GAMMA = 0.99
+reward = 1.0
+best_next_q = 95.0      # the agent believes this next state is worth 95
+
+if_terminated = reward
+if_truncated = reward + GAMMA * best_next_q
+
+print(f"Genuine ending, target = {if_terminated:.2f}")
+print(f"Time-limit ending, target = {if_truncated:.2f}")
 ```
 
-- `terminated` is `True` when the episode ends for a reason defined by the environment: the goal was reached, the agent died, the pole fell past the threshold, the robot hit a wall. This is a genuine terminal state. Bootstrap should be zero.
-- `truncated` is `True` when the episode ends because of an external limit: a time limit, a step budget, or any stopping condition imposed from outside the environment's own rules. This is NOT a terminal state. Bootstrap should continue.
+```
+Genuine ending, target = 1.00
+Time-limit ending, target = 95.05
+```
 
-The episode is over (from the training loop's perspective) if either is `True`. But a well-written RL algorithm can handle them differently.
+Same step, same state, but a target 95 times larger. That is the difference a correct flag makes.
 
-Here is what the distinction looks like in practice:
+## The new way: two flags
+
+```mermaid
+flowchart TD
+    S["env.step(action)"] --> T{"terminated?"}
+    T -- "yes" --> TT["Real ending:<br/>goal reached, crash,<br/>pole fell. Bootstrap = 0"]
+    T -- "no" --> U{"truncated?"}
+    U -- "yes" --> UU["Cut off from outside:<br/>time limit. State is still valid.<br/>Keep bootstrapping"]
+    U -- "no" --> V["Episode continues"]
+```
+
+Gymnasium splits the old flag:
+
+- **`terminated`** is `True` when the environment's own rules end the episode: goal reached, robot crashed, pole fell past its limit. Bootstrap from zero.
+- **`truncated`** is `True` when something outside the task's rules stops it: a step limit, a time budget. The state is still valid, so keep bootstrapping.
+
+For *stopping the loop* you still use `terminated or truncated`. For *learning* you use them separately: only `terminated` should switch the bootstrap off, which is exactly what the tabular Q-learning code in lesson 5 does.
+
+## Seeing both in CartPole
+
+A random agent never survives long enough to hit CartPole's time limit, so it only ever sees `terminated`:
+
+```python
+import gymnasium as gym
+
+env = gym.make("CartPole-v1")
+obs, info = env.reset(seed=0)
+env.action_space.seed(0)
+
+episodes_ended = 0
+for step in range(1000):
+    action = env.action_space.sample()
+    obs, reward, terminated, truncated, info = env.step(action)
+    if terminated or truncated:
+        episodes_ended += 1
+        kind = "TERMINATED (pole fell)" if terminated else "TRUNCATED (time limit)"
+        print(f"Step {step}: {kind}")
+        obs, info = env.reset()
+
+env.close()
+print("episodes ended:", episodes_ended)
+```
+
+The last lines of our output were `Step 975: TERMINATED (pole fell)` and `episodes ended: 45`. Not one `TRUNCATED` appeared, because CartPole's limit is 500 steps and a random agent lasts about twenty.
+
+To see a time-out you need an agent that balances. Here is a hand-written rule: push towards the side the pole is leaning, with a little help from its angular speed.
 
 ```python
 import gymnasium as gym
@@ -65,80 +113,79 @@ import gymnasium as gym
 env = gym.make("CartPole-v1")
 obs, info = env.reset(seed=0)
 
-for step in range(1000):
-    action = env.action_space.sample()
+for step in range(1200):
+    action = 1 if obs[2] + 0.5 * obs[3] > 0 else 0
     obs, reward, terminated, truncated, info = env.step(action)
-
-    if terminated:
-        # Pole fell — genuine terminal state.
-        # Bootstrap = 0. No future reward possible.
-        print(f"Step {step}: TERMINATED (pole fell). Resetting.")
-        obs, info = env.reset()
-
-    elif truncated:
-        # Time limit hit — agent is still in a valid state.
-        # Bootstrap could continue. Policy was cut short, not beaten.
-        print(f"Step {step}: TRUNCATED (time limit). Resetting.")
+    if terminated or truncated:
+        kind = "TERMINATED (pole fell)" if terminated else "TRUNCATED (time limit)"
+        print(f"Step {step}: {kind}")
         obs, info = env.reset()
 
 env.close()
 ```
 
-## What This Means for BurgerBot
+Output:
 
-Look back at the BurgerBot simulator from the previous course. Its `done` flag was set `True` in three cases:
-
-1. The robot hit an obstacle (hit = True) — **this is `terminated`**
-2. The robot reached the goal — **this is also `terminated`**
-3. `steps >= MAX_STEPS` — **this is `truncated`**
-
-The validated BurgerBotEnv you will build in lesson 8 handles all three correctly:
-
-```python
-# From BurgerBotEnv.step()
-reached = (self.row, self.col) == GOAL
-
-if hit:
-    reward = -10.0
-elif reached:
-    reward = 50.0
-elif moved:
-    reward = 1.0
-else:
-    reward = -0.1
-
-terminated = reached or hit          # genuine endings
-truncated = self.steps >= self.max_steps   # time limit only
-
-return self._obs(), reward, terminated, truncated, {}
+```
+Step 499: TRUNCATED (time limit)
+Step 999: TRUNCATED (time limit)
 ```
 
-A hit gives `terminated=True, truncated=False`. A time limit gives `terminated=False, truncated=True`. Both end the episode from the training loop's point of view, but Stable-Baselines3 (and any correct RL implementation) handles them differently.
+The pole never fell. The environment simply stopped the episode after 500 steps. Treating *that* as a failure would be wrong, and now you can tell the two apart.
 
-## The Simple Training Loop Pattern
+## What this means for BurgerBot
 
-For most hand-written training loops, you handle both flags the same way at the episode level:
+The hand-built simulator set `done` in three cases. In Gymnasium terms:
 
-```python
-done = terminated or truncated
-if done:
-    obs, info = env.reset()
-```
+| Event | terminated | truncated |
+| --- | --- | --- |
+| Robot crashes into an obstacle or wall | True | False |
+| Robot reaches the goal | True | False |
+| 150 steps pass | False | True |
+{:class="table table-single"}
 
-This is fine for tabular Q-learning where the distinction has little practical effect. When you move to SB3 in lessons 12 and 13, the library handles the distinction for you internally — which is one more reason to use a standard API.
+You will build exactly this logic into `BurgerBotEnv` in lesson 8. Libraries such as Stable-Baselines3 read the two flags and handle them properly for you, which is one more reason to use a standard API.
 
-## Try It Yourself
+> **Teachers**: This is the idea learners most often get wrong. A quick unplugged check: ask them to say which flag a robot vacuum sets when its battery dies (truncated, the task was not over) and when it falls down the stairs (terminated, the episode really ended).
 
-1. Run the code snippet above with `render_mode` omitted. After 200 steps, count how many `TERMINATED` events and how many `TRUNCATED` events you saw. CartPole's default time limit is 500 steps per episode — does this match your truncation count?
-2. Change the random policy to `action = 0` (always push left). Does the pole fall faster, making `TERMINATED` more common?
-3. Read the CartPole source code to find where `terminated` and `truncated` are set. You can find it by running `print(env.spec.entry_point)` — it will tell you the module path.
+## Try it Yourself
+
+1. Run the random CartPole loop and count the `TERMINATED` events. Then run the hand-written rule and count the `TRUNCATED` ones. Why is one of those counts always zero for the random agent?
+2. Change the hand-written rule to always push left (`action = 0`). Which flag fires, and after how many steps?
+3. In the lesson 5 code, change `update_q(..., terminated)` to pass `terminated or truncated`. Predict whether the agent will do better or worse, then test it.
 
 ## Common Issues
 
-**Problem:** Code written for old OpenAI Gym gives `ValueError: too many values to unpack`
-**Solution:** Change `obs, reward, done, info = env.step(action)` to `obs, reward, terminated, truncated, info = env.step(action)`.
-**Why:** Gymnasium 1.x returns five values from `step()`. The old Gym returned four.
+- **Problem**: `ValueError: too many values to unpack (expected 4)` or `not enough values to unpack`.
+- **Solution**: Use `obs, reward, terminated, truncated, info = env.step(action)` with five names.
+- **Why**: Gymnasium's `step()` returns five values. The old Gym returned four.
 
-**Problem:** `AttributeError: 'tuple' object has no attribute 'dtype'`
-**Solution:** You are probably unpacking `reset()` as `obs = env.reset()` instead of `obs, info = env.reset()`.
-**Why:** Gymnasium 1.x `reset()` returns a two-tuple. Assigning it to a single variable gives you the tuple, not the observation.
+- **Problem**: `reset()` gives you a tuple where you expected an array, such as `'tuple' object has no attribute 'shape'`.
+- **Solution**: Write `obs, info = env.reset()`.
+- **Why**: `reset()` returns two values, so `obs = env.reset()` stores the whole tuple.
+
+## Check your understanding
+
+{% quiz %}
+? A BurgerBot crashes into an obstacle. Which flag should be True?
+- [x] `terminated`
+- [ ] `truncated`
+- [ ] Neither
+> A crash is a real ending defined by the task's rules, so it is `terminated`.
+
+? An episode ends because it reached 150 steps. Which flag should be True?
+- [ ] `terminated`
+- [x] `truncated`
+> A step limit is imposed from outside the task. The robot's state is still valid.
+
+? In Q-learning, when should the bootstrap term `gamma * max(q_next)` be dropped?
+- [x] Only when the episode terminated
+- [ ] Whenever the episode ends for any reason
+- [ ] Never
+> A time-out leaves the agent in a valid state with future reward, so the bootstrap should stay.
+
+? How do you decide when to stop the episode loop?
+- [ ] When `terminated` is True
+- [x] When `terminated or truncated` is True
+> Either flag means the environment needs a reset.
+{% endquiz %}

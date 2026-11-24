@@ -5,10 +5,24 @@
   level: intermediate
   layout: course
   cover: assets/cover.jpg
+  outcomes:
+    - Use the current Gymnasium API (reset, step with terminated and truncated, spaces, seeding) with standard environments
+    - Explain why terminated and truncated are separate and use each correctly in a Q-learning update
+    - Write a custom gym.Env for the BurgerBot grid-world, check it with check_env and register it with gym.make
+    - Add behaviour with wrappers and run several environment copies with vector environments
+    - Train, evaluate, save and load a Stable-Baselines3 PPO or DQN agent on your own environment
+    - Export a trained policy as a JSON lookup table and say honestly what it can and cannot do on a Pico
+  prerequisites:
+    - The Reinforcement Learning for Beginners course (Q-tables, epsilon-greedy, the BurgerBot grid-world)
+    - Python basics such as functions, dictionaries and classes, for example the Introduction to Python course
+  you_need:
+    - A computer running macOS, Linux or Windows with Python 3.10 or newer and a virtual environment
+    - pip install "gymnasium[classic-control]" stable-baselines3 (PyTorch comes with Stable-Baselines3 and is a large download)
+    - No robot or other hardware, and no GPU. Tested with Gymnasium 1.4.0 and Stable-Baselines3 2.9.2
   groups:
       - ai
       - python
-      - robotics
+      - robots
   description: >-
     Take your Q-learning skills to the industry-standard Gymnasium API and
     Stable-Baselines3. You will wrap the BurgerBot grid-world as a proper

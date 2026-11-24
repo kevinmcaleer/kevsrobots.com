@@ -1,16 +1,18 @@
 ---
 layout: lesson
-title: "What You Have Built \u2014 and Where to Go Next"
+title: What You Have Built, and Where to Go Next
 author: Kevin McAleer
 type: page
 cover: /learn/gymnasium/assets/banners/14_summary.jpg
 date: 2026-06-14
 previous: 13_train_evaluate_export.html
 description: Recap the journey from hand-built loop to Gymnasium environment to neural-network
-  policy, check your understanding, and explore the Farama ecosystem.
+  policy, check your understanding, and explore what to learn next.
 percent: 100
 duration: 6
-date_updated: 2026-06-14
+quiz_total: 56
+snakie: false
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning with Gymnasium
 - content:
@@ -52,7 +54,7 @@ navigation:
       link: 12_meet_stable_baselines3.html
     - name: Train, Evaluate, and Export
       link: 13_train_evaluate_export.html
-    - name: "What You Have Built \u2014 and Where to Go Next"
+    - name: What You Have Built, and Where to Go Next
       link: 14_summary.html
 ---
 
@@ -61,100 +63,130 @@ navigation:
 
 ---
 
-## The Journey So Far
+By the end of this lesson you will be able to summarise what changed between a hand-built RL loop and the Gymnasium and Stable-Baselines3 workflow, and choose what to learn next.
 
-Let's trace the full arc across both courses.
+---
 
-In the Reinforcement Learning for Beginners course, you started with a blank Python file and wrote everything yourself: the grid, the sensor, the reward function, the Q-table as a plain dictionary, the epsilon-greedy loop, and the Pico deployment code. That was deliberate — understanding every line is how the concepts stick.
+## The journey so far
 
-In this course, you took those same ideas and moved them onto the tools the broader community uses. Here is what changed:
+In [Reinforcement Learning for Beginners](/learn/reinforcement_learning/) you wrote everything yourself: grid, sensor, reward, Q-table and epsilon-greedy loop. In this course you moved those same ideas onto the tools the wider community uses.
 
-**The environment interface:**
-- Before: `state, reward, done = world.step(action)` — a custom three-tuple, specific to your code
-- After: `obs, reward, terminated, truncated, info = env.step(action)` — the Gymnasium standard, compatible with any Gymnasium-aware library
+```mermaid
+flowchart TD
+    A["Hand-built GridWorld<br/>state, reward, done"] --> B["Gymnasium API<br/>obs, reward, terminated, truncated, info"]
+    B --> C["Spaces and seeding<br/>Discrete, Box, MultiDiscrete"]
+    C --> D["Custom BurgerBotEnv<br/>check_env, gym.register"]
+    D --> E["Wrappers and vector envs"]
+    E --> F["Stable-Baselines3<br/>DQN and PPO"]
+    F --> G["nn_policy.json<br/>a table distilled from a network"]
+```
 
-**The agent:**
-- Before: a Python dictionary with 588 entries, updated by a hand-written Q-learning rule
-- After: a neural network with thousands of parameters, trained by Stable-Baselines3's PPO implementation
+What changed, and what did not:
 
-**The deployment:**
-- Before: `q_table.json` loaded directly on the Pico
-- After: `nn_policy.json` in the same format, produced by querying the neural network over all 588 states — so the same Pico loader still works
+| Piece | Before | After |
+| --- | --- | --- |
+| Environment call | `state, reward, done = world.step(a)` | `obs, reward, terminated, truncated, info = env.step(a)` |
+| Describing the problem | Hard-coded in your agent | `observation_space` and `action_space` |
+| Agent | A dictionary of 588 entries | A neural network trained by PPO |
+| Ending an episode | One `done` flag | `terminated` and `truncated` |
+| Deployment | `q_table.json`, keyed by sensor reading | `nn_policy.json`, keyed by full state |
+{:class="table table-single"}
 
-The physics did not change. The obstacles, the sensor, the rewards — all identical. What changed was the interface around them and the algorithm on top of them.
+The physics did not change: same grid, obstacles, sensor and rewards. What changed was the interface around them and the algorithm on top.
 
-## Concept Checklist
+## Old Gym code cheat sheet
 
-Work through this list. If anything feels uncertain, go back to the relevant lesson.
+You will meet old tutorials for years. Here is how to bring them up to date:
 
-**The Gymnasium API:**
-- [ ] I know that `env.reset()` returns `(observation, info)` and `env.step(action)` returns five values
-- [ ] I can explain what `terminated` means and how it differs from `truncated`
-- [ ] I know what `observation_space` and `action_space` are and how to inspect them
-- [ ] I can use `env.action_space.sample()` to generate a random legal action
+| Old Gym code | Gymnasium 1.x |
+| --- | --- |
+| `import gym` | `import gymnasium as gym` |
+| `obs = env.reset()` | `obs, info = env.reset(seed=...)` |
+| `obs, r, done, info = env.step(a)` | `obs, r, terminated, truncated, info = env.step(a)` |
+| `env.seed(42)` | `env.reset(seed=42)` |
+| `env.render(mode="human")` | `gym.make(..., render_mode="human")` |
+| `info["TimeLimit.truncated"]` | the `truncated` return value |
+{:class="table table-single"}
 
-**Custom environments:**
-- [ ] I can subclass `gym.Env` and implement `reset()` and `step()` correctly
-- [ ] I know how to declare `observation_space` and `action_space` in `__init__`
-- [ ] I can run `check_env` and interpret its output
-- [ ] I know how to register an environment with `gym.register` and create it with `gym.make`
+## Concept checklist
 
-**Wrappers and vectorisation:**
-- [ ] I know what `RecordEpisodeStatistics` adds to the `info` dict
-- [ ] I can write a `RewardWrapper` that modifies rewards without editing the environment
-- [ ] I understand that `SyncVectorEnv` batches observations and rewards across N environments
+Work through these. If one feels shaky, go back to the lesson in brackets.
 
-**Stable-Baselines3:**
-- [ ] I can train a DQN or PPO agent with `model.learn(total_timesteps=...)`
-- [ ] I understand that `"MlpPolicy"` means a fully-connected neural network
-- [ ] I know how to save a model with `model.save()` and load it with `Algorithm.load()`
-- [ ] I can evaluate a trained policy with `evaluate_policy`
+- [ ] `reset()` returns two values and `step()` returns five (lessons 2 and 3)
+- [ ] I can explain `terminated` and `truncated`, and which one stops the bootstrap (3)
+- [ ] I can read and create `Discrete`, `Box` and `MultiDiscrete` spaces (4)
+- [ ] I can seed an environment, its action space and Python's `random` (6)
+- [ ] I can write a `gym.Env` subclass that passes `check_env` (7 and 8)
+- [ ] I can register an environment and create it with `gym.make` (9)
+- [ ] I can stack wrappers and write a reward-shaping wrapper (10)
+- [ ] I know how vector environments auto-reset, and that SB3 uses its own (11)
+- [ ] I can train, save, load and evaluate a DQN or PPO agent (12 and 13)
+- [ ] I can export a policy table, and say what it can and cannot do on a robot (13)
 
-**Deployment:**
-- [ ] I understand why neural networks cannot run directly on a Pico
-- [ ] I know the policy-table export trick: query the network over all states, save a JSON lookup table
-- [ ] I understand the alternative for larger problems: run inference on a Raspberry Pi
+## What's next
 
-## What Happened to the Q-Table
+**Other courses on this site**
 
-The Q-table from the previous course was a dictionary with 588 keys and four float values per key. The neural network trained in this course is a function that takes a 4-dimensional input and produces four output values. Both are estimating the same thing: "how much future reward should I expect if I take action A from state S?"
+- [Reinforcement Learning for Beginners](/learn/reinforcement_learning/): the foundation for this course. Re-read the tabular Q-learning lessons if the bootstrap idea still feels fuzzy.
+- [Learn ROS](/learn/learn_ros/): the professional robotics stack, where simulated robots can be controlled by the kind of policy you built here.
+- [MicroPython Robotics Projects](/learn/micropython_robotics/): build the hardware a policy table could eventually drive.
 
-The difference is that the neural network can generalise across similar states, and it can handle observations — camera images, raw sensor arrays, joint angles — that no table could hold. For the 588-state BurgerBot world, both approaches work. For a real robot navigating a building, only the neural network approach scales.
+**Going deeper on RL**
 
-## What's Next
+- **Other algorithms in SB3**: `A2C`, `SAC` and `TD3` use the same `model.learn()` call. SAC and TD3 are for continuous actions, such as motor speeds, where DQN cannot be used.
+- **Reading the code**: SB3's DQN is plain DQN with a replay buffer and a target network. Variants such as Double DQN and Dueling DQN are not switched on by default.
+- **Farama's other libraries**: PettingZoo for multi-agent problems, Minari for recorded datasets, and Gymnasium's own environment pages at [gymnasium.farama.org](https://gymnasium.farama.org/) for more environments to try.
+- **Reward design**: the biggest practical lever you have. Revisit the shaping wrapper from lesson 10 and break it on purpose.
 
-### The Farama Ecosystem
+## One last thing
 
-You have learned Gymnasium, but Farama maintains a whole family of tools that extend it:
+The move from a hand-written environment to a Gymnasium class is mostly renaming and restructuring. The concepts (states, actions, rewards, episodes, exploration, exploitation) do not change. The standard API just makes them portable.
 
-- [PettingZoo](https://pettingzoo.farama.org) — multi-agent environments with the same API style. If you want two BurgerBots navigating the same grid, PettingZoo is where to look.
-- [MuJoCo environments](https://gymnasium.farama.org/environments/mujoco/) — physics-simulated robot control. HalfCheetah, Ant, and Humanoid are standard benchmarks for continuous-action RL.
-- [Minari](https://minari.farama.org) — a dataset library for offline RL. Pre-recorded trajectories from expert policies, so you can train without interacting with the environment.
-- [Shimmy](https://shimmy.farama.org) — compatibility wrappers for third-party environments like DeepMind Control Suite and ALE (Atari).
-
-### Robotics-Specific Next Steps
-
-- [ROS 2 and Gazebo](/learn/learn_ros/) — the professional robotics simulation stack. Your agent can control a simulated robot in a physics engine, then deploy to a real robot with the same code.
-- [MicroPython Robotics Projects](/learn/micropython_robotics/) — if you want to build more hardware to run policies on, this course covers motors, sensors, and chassis assembly.
-
-### Going Deeper on RL
-
-- **Proximal Policy Optimisation (PPO)** — the algorithm you used in this course. The original paper is readable: "Proximal Policy Optimization Algorithms" by Schulman et al. (2017).
-- **Double DQN, Dueling DQN** — the improvements on plain DQN mentioned in lesson 14 of the previous course. SB3's `DQN` implements both by default.
-- **Soft Actor-Critic (SAC)** — the algorithm of choice for continuous-action robotics. If your robot needs to control motor speed (a continuous value, not a discrete choice), SAC is where to look.
-- **CleanRL** — single-file implementations of RL algorithms, excellent for reading and learning from. [cleanrl.dev](https://cleanrl.dev)
-
-### Back to the Beginning
-
-If you want to revisit where you started:
-- [Reinforcement Learning for Beginners](/learn/reinforcement_learning/) — the foundation this course builds on. If anything in this course felt unclear, re-reading the tabular Q-learning implementation often helps.
-
-## One Last Thing
-
-The move from a 100-line hand-written environment to a Gymnasium class is mostly renaming and restructuring. The concepts — states, actions, rewards, episodes, exploration, exploitation — do not change. The standard API just makes them portable.
-
-The move from a Q-table to a neural network is more significant. The network is harder to inspect, harder to debug, and harder to guarantee correct behaviour from. But it scales to problems the table never could.
-
-Knowing both is a genuine superpower. You can reach for a Q-table when the state space is small and interpretability matters. You can reach for SB3 and PPO when the problem is too large for a table. And you now know how to wrap any environment — grid-world, physical robot, simulated arm — in a standard interface that either approach can use.
+The move from a Q-table to a network is the bigger step. The network is harder to inspect and harder to trust. But it scales to problems a table never could, and the table you exported from it is a nice reminder that sometimes the old tool is still the right one.
 
 Good luck building.
+
+## Try it Yourself
+
+1. Pick a different environment from Gymnasium (such as `Acrobot-v1` or `MountainCar-v0`), and train PPO on it with the same few lines you used for CartPole.
+2. Change one thing about `BurgerBotEnv`: add a new obstacle, or move the goal. Re-run `check_env`, retrain, and export a new table. How many steps does it need now?
+3. Make BurgerBot harder: with a 10% chance, a `forward` action does nothing. Does a PPO agent trained on the old version cope? What does your exported table do?
+4. Challenge: write a short README for your environment explaining its spaces, rewards and endings, as if you were publishing it for others.
+
+## Common Issues
+
+- **Problem**: An old tutorial's code fails with `ValueError: too many values to unpack` or `AttributeError` about `reset()`.
+- **Solution**: Use the cheat sheet above. The error almost always comes from four versus five return values, or one versus two from `reset()`.
+- **Why**: The API changed in the move from Gym to Gymnasium.
+
+- **Problem**: A trained agent works in training but behaves strangely when you test it.
+- **Solution**: Evaluate with `deterministic=True`, the same environment settings and a fresh environment, and check that you did not leave a reward-shaping wrapper on.
+- **Why**: Exploration noise and wrappers that change rewards or observations both change what the agent experiences.
+
+## Check your understanding
+
+{% quiz %}
+? What replaces `env.seed(42)` in Gymnasium 1.x?
+- [ ] `env.set_seed(42)`
+- [x] `env.reset(seed=42)`
+- [ ] `gym.seed(42)`
+> Seeding moved into `reset()`.
+
+? Which pair of values does `reset()` return?
+- [ ] `obs, reward`
+- [x] `obs, info`
+- [ ] `obs, done`
+> The cheat sheet shows `obs, info = env.reset(seed=...)`.
+
+? When is it sensible to turn a trained network into a lookup table?
+- [ ] Whenever the observation is a camera image
+- [x] When the observation space is small and discrete, so every state can be enumerated
+- [ ] Never
+> We could ask the network about all 588 states, and a camera image has far too many.
+
+? Which Stable-Baselines3 algorithms suit continuous actions such as motor speeds?
+- [ ] DQN
+- [x] SAC and TD3
+- [ ] None of them
+> DQN picks from a short list of discrete actions.
+{% endquiz %}
