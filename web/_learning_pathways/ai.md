@@ -11,6 +11,7 @@ stages:
   - Computer Vision on Raspberry Pi with CVZone
   build:
   - Building Object Detection Models with Raspberry Pi AI Camera
+  - Raspberry Pi AI HAT+ 2 - Vision and Generative AI
   - Reinforcement Learning for Beginners
   - Arduino Uno Q - Two Brains, One Board
   further:
