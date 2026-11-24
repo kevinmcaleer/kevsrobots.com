@@ -180,6 +180,7 @@ The motor mounting works as a system:
 | Wheel stubs | Connect to wheels on outside |
 | Floor pads | Elevate and position motor |
 | Retention cutouts | Lock motor tabs in place |
+{:class="table table-single"}
 
 When assembled:
 1. Motor slides into position on floor pads

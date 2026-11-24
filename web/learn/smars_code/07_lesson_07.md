@@ -3,7 +3,7 @@ layout: lesson
 title: Lesson 07 - Line Following
 author: Kevin McAleer
 type: page
-cover: /learn/smars_code/assets/program_smars.png
+cover: /learn/smars_code/assets/banners/07_lesson_07.jpg
 date: 2023-09-10
 previous: 06_lesson_06.html
 description: Learn how to use the line follow module
@@ -40,7 +40,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
+---
 
 ## Watch the livestream
 

@@ -2,6 +2,11 @@
 title: Fillet the Shell
 description: Give the Chassis some roundness
 layout: lesson
+cover: /learn/smars_fusion360/assets/banners/04_fillet.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The Chassis is now given a fillet around the bottom edges and each of the corners, to make it pleasing to the eye.

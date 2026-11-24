@@ -2,6 +2,11 @@
 title: Print Feet
 description: Print the feet x4
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_09.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 9 Print the feet x4

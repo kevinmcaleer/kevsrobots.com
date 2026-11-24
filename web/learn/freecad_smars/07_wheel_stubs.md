@@ -351,6 +351,7 @@ Click `OK`.
 | Key slot | Prevents wheel from spinning |
 | Tangent constraints | Key extends to exact edge |
 | Polar Pattern | Ensures both stubs are identical |
+{:class="table table-single"}
 
 ---
 

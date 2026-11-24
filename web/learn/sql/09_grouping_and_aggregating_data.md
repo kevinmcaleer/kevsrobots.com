@@ -3,7 +3,7 @@ layout: lesson
 title: Grouping and Aggregating Data
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/09_grouping_and_aggregating_data.jpg
 date: 2024-11-01
 previous: 08_working_with_joins.html
 next: 10_introduction_to_normalization.html
@@ -55,6 +55,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll dive into grouping and aggregating data in SQL. These techniques allow us to summarize and analyze data across multiple rows, making it easier to extract valuable insights.
 

@@ -3,6 +3,11 @@ title: Setting Up Your SQL Environment
 description: >-
     How to install and set up SQL tools, and create your first database
 layout: lesson
+cover: /learn/sql/assets/banners/02_setting_up_environment.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll guide you through setting up a SQL environment on your computer, so you’re ready to start creating and managing databases.

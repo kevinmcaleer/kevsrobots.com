@@ -3,7 +3,7 @@ layout: lesson
 title: Fit the Motors
 author: Kevin McAleer
 type: page
-cover: /learn/smars/assets/how_to_build_a_smars.jpg
+cover: /learn/smars/assets/banners/smars03.jpg
 date: 2023-02-19
 previous: smars02.html
 next: smars04.html
@@ -58,6 +58,10 @@ navigation:
       link: summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Fit Motors
 

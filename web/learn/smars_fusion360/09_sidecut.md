@@ -3,7 +3,7 @@ layout: lesson
 title: Side Cutout
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/09_sidecut.jpg
 date: 2023-07-20
 previous: 08_side.html
 next: 10_fillet.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The [side profile](08_side.html) is now extruded to cut all the way through the main body.
 

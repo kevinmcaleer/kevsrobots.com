@@ -3,7 +3,7 @@ layout: lesson
 title: The Chassis Base
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/01_base.jpg
 date: 2023-07-20
 previous: 00_intro.html
 next: 02_extrude_base.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The Chassis Base is a rectangle with 2 dimensions:
 

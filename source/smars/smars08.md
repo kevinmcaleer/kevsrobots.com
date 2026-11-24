@@ -2,6 +2,11 @@
 title: Add the Arduino
 description: Slide the Arduino into place
 layout: lesson
+cover: /learn/smars/assets/banners/smars08.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the video

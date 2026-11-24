@@ -3,7 +3,7 @@ layout: lesson
 title: Docker vs Podman Architecture
 author: Kevin McAleer
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/02_docker_vs_podman_architecture.jpg
 date: 2025-05-24
 previous: 01_video.html
 next: 03_installing_podman.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

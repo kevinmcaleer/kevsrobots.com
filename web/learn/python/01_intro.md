@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Python Programming
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/1.png
+cover: /learn/python/assets/banners/01_intro.jpg
 date: 2023-07-20
 next: 02_basics.html
 description: Understand the fundamentals of Python, install it, and write your first
@@ -57,7 +57,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

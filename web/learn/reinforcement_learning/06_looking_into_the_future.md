@@ -3,7 +3,7 @@ layout: lesson
 title: Looking Into the Future
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/06_looking_into_the_future.jpg
 date: 2026-06-13
 previous: 05_markov_decision_processes.html
 next: 07_the_q_table.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

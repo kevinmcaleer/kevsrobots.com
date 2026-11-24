@@ -3,11 +3,11 @@ title: Podman Features Docker Doesn’t Have
 description: Discover the powerful features that set Podman apart from Docker — including rootless containers, systemd integration, and pods.
 layout: lesson
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/05_podman_unique_features.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

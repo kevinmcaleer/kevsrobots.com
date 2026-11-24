@@ -249,6 +249,7 @@ Click `OK`. You now have a cable routing slot at the top of the rear (and front)
 |------------|--------------|-------------|
 | **Coincident** | Two points must be at same location | Centering on a single reference point |
 | **Symmetric** | A point is exactly between two others | Centering between two edges/corners |
+{:class="table table-single"}
 
 Both achieve centering, but Symmetric is powerful when you have two reference points you want to center between.
 

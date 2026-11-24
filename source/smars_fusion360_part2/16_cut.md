@@ -3,6 +3,11 @@ title: Motor holder slot extrude-cut
 description: Cut out the slot
 layout: lesson
 redirect_from: /learn/smars_fusion360/32_cut.html
+cover: /learn/smars_fusion360_part2/assets/banners/16_cut.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The [Motor holder slots profile](15_slots.html) is used to extrude-cut the slots into the chassis.

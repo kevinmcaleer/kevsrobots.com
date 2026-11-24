@@ -3,6 +3,11 @@ title: Creating a Temperature Alert System
 description: Build a simple temperature alert system that notifies you when the temperature exceeds or falls below a set threshold.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/10_creating_a_temperature_alert_system.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Reinforcement Learning for Beginners
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/00_intro.jpg
 date: 2026-06-13
 next: 01_beyond_predefined_steps.html
 description: "Discover how to teach a Pico-powered robot to learn obstacle avoidance\
@@ -59,7 +59,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

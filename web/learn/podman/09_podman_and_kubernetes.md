@@ -3,7 +3,7 @@ layout: lesson
 title: Podman and Kubernetes
 author: Kevin McAleer
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/09_podman_and_kubernetes.jpg
 date: 2025-05-24
 previous: 08_docker_compose_vs_podman_compose.html
 next: 10_podman_in_production.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

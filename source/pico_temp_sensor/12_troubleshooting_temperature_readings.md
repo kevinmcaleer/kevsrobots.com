@@ -3,6 +3,11 @@ title: Troubleshooting Temperature Readings
 description: Learn how to diagnose and fix common issues with your Raspberry Pi Pico temperature monitoring system.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/12_troubleshooting_temperature_readings.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

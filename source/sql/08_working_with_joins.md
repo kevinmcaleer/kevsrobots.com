@@ -3,6 +3,11 @@ title: Working with Joins
 description: >-
     Learn how to combine data from multiple tables using SQL joins
 layout: lesson
+cover: /learn/sql/assets/banners/08_working_with_joins.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll explore how to work with multiple tables in a relational database using **joins**. Joins are essential for combining data across tables, helping you retrieve meaningful insights by connecting related data.

@@ -3,7 +3,7 @@ layout: lesson
 title: Boyce-Codd Normal Form (BCNF)
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: /learn/sqlite3/assets/banners/12_boyce_codd_normal_form.jpg
 date: 2023-07-15
 previous: 15_3nf.html
 next: 16_demo_program.html
@@ -63,6 +63,10 @@ navigation:
       link: 17_tools.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 > **Aside: "The key, the whole key, and nothing but the key, so help me Codd"**
 >

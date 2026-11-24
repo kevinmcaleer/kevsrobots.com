@@ -3,6 +3,11 @@ layout: lesson
 title: What is a Robot - a Definition
 type: page
 description: Learn about the different parts of a robot
+cover: /learn/robotics_101/assets/banners/lesson_01.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 > *"A Robot is a machine, especially one programmable by a computer, capable of carrying out a complex series of actions automatically.*

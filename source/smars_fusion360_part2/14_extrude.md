@@ -3,6 +3,11 @@ title: Stub wheel cutout
 description: Cut away the center section
 layout: lesson
 redirect_from: /learn/smars_fusion360/30_extrude.html
+cover: /learn/smars_fusion360_part2/assets/banners/14_extrude.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The [Stub wheel cutout profile](13_cut.html) is used to extrude-cut the section into the stub wheel to create two halves.

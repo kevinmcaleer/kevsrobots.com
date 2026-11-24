@@ -3,6 +3,11 @@ title: Motor nub profile
 description: Keep the motors in place
 layout: lesson
 redirect_from: /learn/smars_fusion360/19_nub.html
+cover: /learn/smars_fusion360_part2/assets/banners/03_nub.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 A small nub needs to be sketched - this is to prevent the motor from sliding backwards into the chassis body.

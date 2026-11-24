@@ -3,7 +3,7 @@ layout: lesson
 title: Control Flow in Python
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/4.png
+cover: /learn/python/assets/banners/04_flow.jpg
 date: 2023-07-20
 previous: 03_data_structures.html
 next: 05_files.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

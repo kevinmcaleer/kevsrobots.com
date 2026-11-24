@@ -3,7 +3,7 @@ layout: lesson
 title: "Podman Features Docker Doesn\u2019t Have"
 author: Kevin McAleer
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/05_podman_unique_features.jpg
 date: 2025-05-24
 previous: 04_cli_compatibility_and_commands.html
 next: 06_managing_containers_and_images.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

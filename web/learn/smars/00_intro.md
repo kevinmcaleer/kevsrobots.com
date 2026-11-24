@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: /learn/smars/assets/how_to_build_a_smars.jpg
+cover: /learn/smars/assets/banners/00_intro.jpg
 date: 2023-02-19
 next: smars01.html
 description: Learn how to download, print, assemble, and program the original SMARS
@@ -59,7 +59,9 @@ navigation:
 ---
 
 
-![SMARS Course image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

@@ -3,7 +3,7 @@ layout: lesson
 title: "Understanding the Pico\u2019s Temperature Sensor"
 author: Kevin McAleer
 type: page
-cover: assets/temperature_sensor_intro.png
+cover: /learn/pico_temp_sensor/assets/banners/04_overview_of_pico_temperature_sensor.jpg
 date: 2024-11-22
 previous: 03_installing_micropython_on_pico.html
 next: 05_how_the_temperature_sensor_works.html
@@ -50,6 +50,10 @@ navigation:
       link: 12_troubleshooting_temperature_readings.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

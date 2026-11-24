@@ -3,11 +3,11 @@ title: Scaling Up to Deep RL
 description: Discover where lookup tables run out of road, how neural networks take over as Q-function approximators, and where to go next.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/14_scaling_up_to_deep_rl.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

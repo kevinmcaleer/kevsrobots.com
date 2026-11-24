@@ -3,7 +3,7 @@ layout: lesson
 title: Beyond Predefined Steps
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/01_beyond_predefined_steps.jpg
 date: 2026-06-13
 previous: 00_intro.html
 next: 02_anatomy_of_robotic_rl.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -2,6 +2,11 @@
 title: Back profile cut
 description: Cut out the back
 layout: lesson
+cover: /learn/smars_fusion360/assets/banners/12_back.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The [profile created above](11_back.html) is used to extrude a cut through the back side of the body. This is where the Arduino will slide in. The slots will come shortly.

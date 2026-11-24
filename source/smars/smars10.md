@@ -2,6 +2,11 @@
 title: Insert Wires
 description: Add the power wires to the robot
 layout: lesson
+cover: /learn/smars/assets/banners/smars10.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Insert Wires

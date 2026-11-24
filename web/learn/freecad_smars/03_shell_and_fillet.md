@@ -173,6 +173,7 @@ Press `0` on your keyboard to return to the isometric view.
 | 2mm front/back walls | Will have large cutouts - don't need extra material |
 | 4mm fillet radius | Visible rounding, better print quality |
 | Shell before fillet | Easier to select edges after hollowing |
+{:class="table table-single"}
 
 ---
 

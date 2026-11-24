@@ -3,7 +3,7 @@ layout: lesson
 title: Working with Files in Python
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/5.png
+cover: /learn/python/assets/banners/05_files.jpg
 date: 2023-07-20
 previous: 04_flow.html
 next: 06_errors.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

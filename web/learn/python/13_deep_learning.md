@@ -3,7 +3,7 @@ layout: lesson
 title: Deep Learning with Python
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/6.png
+cover: /learn/python/assets/banners/13_deep_learning.jpg
 date: 2023-07-20
 previous: 12_ml.html
 next: 14_automation.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

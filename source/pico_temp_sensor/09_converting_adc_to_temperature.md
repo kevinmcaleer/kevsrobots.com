@@ -3,6 +3,11 @@ title: Getting More Accurate Temperature Readings
 description: Understand what each number in the temperature formula means, then smooth out noisy readings and calibrate the Pico's sensor against a thermometer.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/09_converting_adc_to_temperature.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

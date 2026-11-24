@@ -3,11 +3,11 @@ title: Wrap-up and Future Outlook
 description: Review what you’ve learned, explore how Podman fits into the future of containers, and discover next steps for deepening your knowledge.
 layout: lesson
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/13_wrap_up_and_future.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

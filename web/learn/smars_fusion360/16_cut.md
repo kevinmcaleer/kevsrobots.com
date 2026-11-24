@@ -3,7 +3,7 @@ layout: lesson
 title: Arduino slot cut
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/16_cut.jpg
 date: 2023-07-20
 previous: 15_slots.html
 description: Cut the slots out
@@ -57,6 +57,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The [Arduino slot profile](15_slots.html) created previously is used to extrude a cut into the body, to a depth of 0.5mm.
 

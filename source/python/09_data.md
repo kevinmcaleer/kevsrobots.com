@@ -2,10 +2,12 @@
 title: Working with Data in Python
 description: Learn about Python's capabilities for data manipulation and analysis, focusing on using lists, dictionaries, and introducing Pandas.
 layout: lesson
-cover: /learn/python/assets/2.png
+cover: /learn/python/assets/banners/09_data.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

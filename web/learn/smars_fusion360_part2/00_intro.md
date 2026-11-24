@@ -3,7 +3,7 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/00_intro.jpg
 date: 2023-07-20
 next: 01_motor.html
 description: Finish the SMARS robot chassis in Fusion 360 with motor holders and stub
@@ -65,7 +65,9 @@ navigation:
 ---
 
 
-![SMARS chassis in Fusion 360](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video first
 

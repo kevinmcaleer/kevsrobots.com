@@ -3,11 +3,11 @@ title: Assembling the Robot
 description: Step-by-step guide to assembling the wall drawing robot.
 layout: lesson
 type: page
-cover: assets/assembly.png
+cover: /learn/scrawly_wally/assets/banners/03_assembly.jpg
 date_updated: 2024-08-02
 ---
 
-![Assembly](assets/wiring01.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -2,10 +2,12 @@
 title: Python Object-Oriented Programming (OOP)
 description: Introduction to object-oriented programming in Python, including classes, objects, methods, and inheritance.
 layout: lesson
-cover: /learn/python/assets/1.png
+cover: /learn/python/assets/banners/08_oop.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

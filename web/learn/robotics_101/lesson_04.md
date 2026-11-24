@@ -3,7 +3,7 @@ layout: lesson
 title: What are the different parts of a Robot?
 author: Kevin McAleer
 type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
+cover: /learn/robotics_101/assets/banners/lesson_04.jpg
 date: 2023-01-17
 previous: lesson_03.html
 next: lesson_05.html
@@ -32,6 +32,10 @@ navigation:
       link: lesson_05.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Robots are made up of lots of different parts, for example:
 

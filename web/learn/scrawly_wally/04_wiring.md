@@ -3,7 +3,7 @@ layout: lesson
 title: Wiring the Components
 author: Kevin McAleer
 type: page
-cover: assets/wiring.png
+cover: /learn/scrawly_wally/assets/banners/04_wiring.jpg
 date: 2024-08-02
 previous: 03_assembly.html
 next: 05_setup_pi.html
@@ -47,7 +47,7 @@ navigation:
 ---
 
 
-![Wiring](assets/wiring01.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

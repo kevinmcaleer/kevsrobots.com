@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Python Topics
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/2.png
+cover: /learn/python/assets/banners/16_advanced.jpg
 date: 2023-07-20
 previous: 15_databases.html
 next: 17_apps.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

@@ -3,7 +3,7 @@ layout: lesson
 title: The Q-Table
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/07_the_q_table.jpg
 date: 2026-06-13
 previous: 06_looking_into_the_future.html
 next: 08_exploration_vs_exploitation.html
@@ -61,7 +61,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

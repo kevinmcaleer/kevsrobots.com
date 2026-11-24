@@ -43,6 +43,7 @@ Make sure to check your specific servo's color code.
 | GND        | GND         |
 | VCC        | 5V          |
 | Signal     | D3, D5, D6  |
+{:class="table table-single"}
 
 Use one digital pin per servo for signal. For example:
 

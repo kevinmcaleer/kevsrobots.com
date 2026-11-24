@@ -3,7 +3,7 @@ layout: lesson
 title: Deploying the Brain
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/13_deploying_the_brain.jpg
 date: 2026-06-13
 previous: 12_discretizing_real_sensors.html
 next: 14_scaling_up_to_deep_rl.html
@@ -61,7 +61,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

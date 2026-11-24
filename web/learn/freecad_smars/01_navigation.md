@@ -109,6 +109,7 @@ Memorize these - they'll save you hundreds of mouse movements:
 | `4` | Bottom | Rarely used, but helpful for base features |
 | `5` | Left | Sketching side holes and wheel stubs |
 | `6` | Right | Checking symmetric features |
+{:class="table table-single"}
 
 ### Other Essential Shortcuts
 
@@ -119,6 +120,7 @@ Memorize these - they'll save you hundreds of mouse movements:
 | `Shift + F` | Focus all | Show entire scene |
 | `+` / `-` | Zoom in/out | Fine zoom control |
 | `Arrow keys` | Pan | Precise panning in small steps |
+{:class="table table-single"}
 
 ---
 

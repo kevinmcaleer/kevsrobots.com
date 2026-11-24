@@ -3,6 +3,11 @@ title: Updating and Deleting Data
 description: >-
     Module 5 focuses on modifying data in SQLite tables. 
 layout: lesson
+cover: /learn/sqlite3/assets/banners/05_updating_and_deleting_data.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Module 5 focuses on modifying data in SQLite tables. You will learn how to update existing records and delete data from tables using SQL statements.

@@ -2,10 +2,12 @@
 title: Advanced Python Topics
 description: Dive into some advanced topics in Python, including decorators, generators, and context managers.
 layout: lesson
-cover: /learn/python/assets/2.png
+cover: /learn/python/assets/banners/16_advanced.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

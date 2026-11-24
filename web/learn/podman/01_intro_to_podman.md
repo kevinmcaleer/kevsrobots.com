@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Podman
 author: Kevin McAleer
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/01_intro_to_podman.jpg
 date: 2025-05-24
 next: 01_video.html
 description: Learn what Podman is, why it's a powerful alternative to Docker, and
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

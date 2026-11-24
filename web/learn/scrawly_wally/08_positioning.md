@@ -3,7 +3,7 @@ layout: lesson
 title: Understanding Positioning with Trigonometry
 author: Kevin McAleer
 type: page
-cover: assets/positioning.png
+cover: /learn/scrawly_wally/assets/banners/08_positioning.jpg
 date: 2024-08-02
 previous: 07_control.html
 next: 09_draw.html
@@ -47,6 +47,10 @@ navigation:
       link: 11_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding Positioning with Trigonometry
 

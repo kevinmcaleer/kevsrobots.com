@@ -3,11 +3,11 @@ title: Managing Containers and Images
 description: Learn how to manage containers, images, volumes, and logs using Podman’s CLI — including useful commands for day-to-day development and operations.
 layout: lesson
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/06_managing_containers_and_images.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Databases
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/overview01.jpg
+cover: /learn/sqlite3/assets/banners/01_introduction_to_databases.jpg
 date: 2023-07-15
 previous: 00_intro.html
 next: 02_getting_started_with_sqlite3.html
@@ -63,7 +63,9 @@ navigation:
 ---
 
 
-![banner]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview of Databases
 

@@ -3,11 +3,11 @@ title: Docker vs Podman Architecture
 description: Understand the key architectural differences between Docker and Podman, and why Podman's design offers improved security and flexibility.
 layout: lesson
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/02_docker_vs_podman_architecture.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

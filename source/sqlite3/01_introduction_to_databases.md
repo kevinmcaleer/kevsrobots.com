@@ -3,10 +3,12 @@ title: Introduction to Databases
 description: >-
     What are databases and why do we need them?
 layout: lesson
-cover: /learn/sqlite3/assets/overview01.jpg
+cover: /learn/sqlite3/assets/banners/01_introduction_to_databases.jpg
 ---
 
-![banner]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview of Databases
 
