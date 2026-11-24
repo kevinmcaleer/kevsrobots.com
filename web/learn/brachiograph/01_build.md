@@ -7,11 +7,12 @@ cover: /learn/brachiograph/assets/banners/01_build.jpg
 date: 2024-07-26
 previous: 00_intro.html
 next: 02_wire.html
-description: Learn how to build the BrachioGraph plotter from scratch using simple
-  components and tools.
+description: Build the BrachioGraph base, inner arm, outer arm and pen lift from card,
+  lolly sticks, servos and hot glue.
 percent: 24
-duration: 4
-date_updated: 2024-07-30
+duration: 6
+quiz_total: 21
+date_updated: 2026-11-24
 navigation:
 - name: BrachioGraph Tutorial
 - content:
@@ -46,86 +47,114 @@ navigation:
 
 ---
 
-## Assembling the BrachioGraph
+By the end of this lesson you will be able to build the base, inner arm, outer arm and pen lift, with the two arm lengths set correctly at 8cm between centres.
 
-> **Note:** Make sure you have all the materials from the introduction before starting. You'll need servos, popsicle sticks, hot glue, foam board, and the other items listed in the "What you'll need" section.
+## Why the measurements matter
 
----
+The BrachioGraph library does geometry. Given an x, y position on the paper it works out the two servo angles that put the pen there, and to do that it has to know how long the arms are. The default is 8cm for each arm, measured between rotation centres (the middle of one servo spindle to the middle of the next joint, and from the elbow to the pen). If your arms are not 8cm, every line you draw will be slightly out. The official build guide says the same: both distances should be exactly 8cm.
+
+```mermaid
+flowchart LR
+    A["Shoulder spindle at 0,0"] -->|"inner arm, 8cm between centres"| B["Elbow spindle"]
+    B -->|"outer arm, 8cm between centres"| C["Pen tip"]
+    D["Pen servo"] -.->|"lifts and lowers"| C
+```
 
 ![Base](assets/base.jpg){:class="w-100 card-hover card-shadow rounded-3"}
 
----
-
-## Step 1: Building the Base
-
-1. Take the foam core board and cut it to the desired size for the base, I chose A4 size as the paper I will be using is A5 (A4 cut in half).
-
-1. Print out the [base template](assets/template-grid.pdf) [^1] and stick it to the foam core board using a glue stick.
-
-1. The shoulder servo needs to be lifted slightly (between 4-6mm) above the base to allow the arm to move freely. To do this, cut out a small piece of foam core board and glue it to the base where the shoulder servo will be placed.
-  
-    You can 3D printed a [small spacer](assets/base.stl) to lift the servo, but you can also use anything you have to hand.
-
-1. Glue the shouler servo to the base using hot glue; the center of the servo should be aligned to the 0,0 point on the grid.
-
-    ![Shoulder](assets/shoulder.jpg){:class="w-100 card-hover card-shadow rounded-3"}
-
-    ![Shoulder Servo Mounted](assets/base_servo.jpg){:class="w-100 card-hover card-shadow rounded-3"}
+> **Teachers**: Hot glue guns burn skin and glue strings stick to everything, so set up a glue station with a heat-proof mat and have one adult or confident student in charge of it per table. Pilot holes in sticks are best made with a bradawl or a hand drill with a 1 to 2mm bit, never with a craft knife. Cutting foam board needs a craft knife, so pre-cut the bases if you are short on supervision. Glue needs a minute or two to set, so plan a break in the lesson.
 
 ---
 
-## Step 2: Building the  Inner Arm
+## Step 1: Build the base
 
-1. Mark a line on the center of the popsicle stick, 8cm end to end.
+1. Cut the foam core board or card to roughly A4 size. The paper we draw on will be A5 (an A4 sheet cut in half).
+2. Print the [base template](assets/template-grid.pdf) [^1] and stick it to the board with a glue stick. The grid has the 0,0 point marked on it, and the plotter's coordinates are measured from there.
+3. Lift the shoulder servo 4 to 6mm above the board so the arm can swing freely. A few layers of card work well, or you can 3D print a [small spacer](assets/base.stl).
+4. Hot glue the shoulder servo down, with the centre of its spindle exactly over the 0,0 point on the grid.
 
-1. Drill a small pilot hole (1-2mm drill bit) on either side of the line; this will enable the servo horn to be securely screwed to the stick.
+![Shoulder](assets/shoulder.jpg){:class="w-100 card-hover card-shadow rounded-3"}
 
-1. Glue the two servo horns to the popsicle stick, ensuring the center of the horn is aligned with the center of mark the stick.
-
-    ![Inner Arm](assets/inner_arm.jpg){:class="w-100 card-hover card-shadow rounded-3"}
+![Shoulder Servo Mounted](assets/base_servo.jpg){:class="w-100 card-hover card-shadow rounded-3"}
 
 ---
 
-## Step 3: Building the Outer arm
+## Step 2: Build the inner arm
 
-1. Attach a servo with hot glue to the other popsicle stick; the servo mountings should be roughly in the center of the stick.
+1. Draw a line along the middle of a lolly stick.
+2. Glue the two servo horns to the stick so that their rotation centres are exactly 8cm apart. One horn will go on the shoulder servo, the other on the elbow servo.
+3. If you like, drill a small pilot hole (1 to 2mm) either side and screw the horns on as well as gluing. This makes the joint less floppy.
 
-    ![Outer Arm](assets/outer_arm.jpg){:class="w-100 card-hover card-shadow rounded-3"}
+![Inner Arm](assets/inner_arm.jpg){:class="w-100 card-hover card-shadow rounded-3"}
 
-1. Attach the clothes peg with hot glue to the end of the outer arm; this will hold the pen; be sure to make the center point of the pen and the center point of the elbow servo are 8cm a part.
+---
 
-1. Attach the pen servo with hot glue to the end of the outer arm. The servo horn should be able to move the pen up and down freely.
+## Step 3: Build the outer arm
 
-    ![Pen Servo](assets/pen_servo.jpg){:class="w-100 card-hover card-shadow rounded-3"}
+1. Glue the elbow servo to the second stick, with the servo's spindle in the right place for the 8cm distance.
+2. Glue the clothes peg to the far end of the outer arm. The centre of the pen, once it is in the peg, should be exactly 8cm from the elbow spindle.
+3. Glue the pen servo near the end of the outer arm. Its horn must be able to lift the pen clear of the paper and let it come back down.
 
-[^1]: Provided by <https://brachiograph.art>
+![Outer Arm](assets/outer_arm.jpg){:class="w-100 card-hover card-shadow rounded-3"}
+
+![Pen Servo](assets/pen_servo.jpg){:class="w-100 card-hover card-shadow rounded-3"}
+
+Don't attach the arms to the servo spindles yet. That happens in lesson 4, after the servos have been moved to a known position by the code.
+
+---
+
+## Try it Yourself
+
+1. Measure both arms from centre to centre with a ruler marked in millimetres. Write the lengths down. Are they within 1mm of 8cm?
+2. Press the clothes peg onto a pen and check the pen tip sits where you measured 8cm. Adjust if not.
+3. Challenge: the arm's reach decides the drawing area. Sketch the area two 8cm arms can reach from the 0,0 point. Then work out roughly why the official docs describe the drawing area as about 14cm wide and 9cm high.
 
 ---
 
 ## Common Issues
 
-- **Problem**: Hot glue doesn't hold the servos in place
-- **Solution**: Roughen the surfaces with sandpaper before gluing. Apply glue to both surfaces and hold firmly for 30 seconds
-- **Why**: Smooth plastic surfaces don't bond well with hot glue without preparation
+- **Problem**: Hot glue doesn't hold a servo in place.
+- **Solution**: Roughen the surfaces with sandpaper, glue both sides, and hold the part for about 30 seconds.
+- **Why**: Smooth plastic does not bond well with hot glue until it has been keyed.
 
-- **Problem**: The arm lengths aren't exactly 8cm
-- **Solution**: Precision matters! Measure carefully from center to center. Use a ruler with mm markings for accuracy
-- **Why**: The BrachioGraph library assumes 8cm arms - different lengths will cause drawing inaccuracy
+- **Problem**: The arm lengths are not 8cm.
+- **Solution**: Re-measure from centre to centre, not edge to edge, and reposition the part while the glue is warm.
+- **Why**: The library assumes 8cm arms, and different lengths distort every drawing.
 
-- **Problem**: Servo horn won't attach securely to popsicle stick
-- **Solution**: Use small screws through the pilot holes you drilled, plus hot glue. Screws alone or glue alone may not hold under movement
-- **Why**: The servo applies torque to the horn - it needs mechanical fastening, not just adhesive
+- **Problem**: A servo horn comes loose from the stick.
+- **Solution**: Add small screws through pilot holes as well as glue.
+- **Why**: The servo pushes with real torque on the horn, and glue alone can peel away.
 
-- **Problem**: The foam board base bends or warps
-- **Solution**: Use thicker foam board (5mm minimum) or reinforce with a second layer. Keep it flat while gluing
-- **Why**: A warped base affects drawing accuracy and servo positioning
+- **Problem**: The foam board bends.
+- **Solution**: Use thicker board or glue a second layer underneath, and keep it flat while it sets.
+- **Why**: A warped base moves the servos and ruins the drawing geometry.
 
-- **Problem**: Popsicle sticks crack when drilling
-- **Solution**: Use a very small drill bit (1-2mm), drill slowly, and support the stick on scrap wood underneath
-- **Why**: Popsicle sticks are thin wood that can split easily if drilled too aggressively
+- **Problem**: The clothes peg won't hold the pen firmly.
+- **Solution**: Wrap a little tape around the pen, or use a spring peg.
+- **Why**: A pen that wiggles draws wiggly lines.
 
-- **Problem**: The clothes peg won't hold the pen firmly
-- **Solution**: Try a spring-loaded peg instead of a flat wooden one. You can also wrap tape around the pen for a tighter fit
-- **Why**: The pen must be held firmly to maintain consistent contact with the paper
+[^1]: Provided by <https://brachiograph.art>
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? How far apart should the rotation centres be on each BrachioGraph arm?
+- [ ] 4cm
+- [x] 8cm
+- [ ] 14cm
+> Both arms are 8cm between centres, which is what the library assumes by default.
+
+? Where should the shoulder servo's spindle sit on the template?
+- [ ] At the bottom left corner of the paper
+- [x] At the 0,0 point on the grid
+- [ ] At the centre of the pen servo
+> The plotter's coordinates are measured from the shoulder spindle at 0,0.
+
+? Why is the shoulder servo raised 4 to 6mm above the base?
+- [ ] To make it easier to reach the wires
+- [x] So the arm can swing freely over the board
+- [ ] To keep the servo cool
+> Lifting the servo stops the arm from rubbing on the board as it moves.
+{% endquiz %}
