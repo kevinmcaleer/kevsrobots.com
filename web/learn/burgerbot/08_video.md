@@ -10,7 +10,7 @@ next: 08_pen.html
 description: Learn how to upgrade your BurgerBot with a new feature.
 percent: 66
 duration: 44
-quiz_total: 11
+quiz_total: 33
 video_id: jnPR6XAuJ2U
 navigation:
 - name: Build your own BurgerBot

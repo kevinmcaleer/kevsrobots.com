@@ -4,9 +4,14 @@ description: Learn how to use the BurgerBot MicroPython library to control the r
 layout: lesson
 type: page
 cover: /learn/burgerbot/assets/banners/03_getting_the_code.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to describe what the BurgerBot library controls, and name the Pico pins its code expects.
 
 ---
 
@@ -29,6 +34,15 @@ The library works with the standard [MicroPython firmware for the Pico](/learn/h
 > ## Older versions
 >
 > Earlier versions of the library needed Pimoroni's MicroPython build and used method names like `turnleft()`. If you're following an old video, grab the latest `burgerbot.py` and use the names below.
+
+```mermaid
+flowchart LR
+    P["Your program"] --> B["Burgerbot class"]
+    B --> M["2 x Motor (speed pin and direction pin)"]
+    B --> R["RangeFinder (trigger and echo)"]
+    B --> S["Servo (pen)"]
+    B --> L["Line sensor pin"]
+```
 
 ---
 
@@ -68,6 +82,10 @@ Pen servo | GP16
 Line sensor | GP17
 {:class="table table-code-fit"}
 
+> ## Check your motor driver board
+>
+> In `burgerbot.py` each motor has one PWM speed pin and one direction pin (GP5 and GP6, GP12 and GP13). The Pimoroni Motor SHIM for Pico in the parts list is controlled differently, with two PWM inputs per motor, and Pimoroni's own library puts its motors on GP6, GP7, GP26 and GP27. GP6 is used for different things, so the Motor SHIM is not a drop-in match for this library as it stands. Check your driver board's documentation against the table before wiring, and change the `MOTOR_PINS` line in `burgerbot.py` if you wire to different pins. The custom PCB version of the robot, with its own libraries, is described on the [BurgerBot project pages](/projects/burgerbot/).
+
 ---
 
 ## Example demo
@@ -88,6 +106,28 @@ print("Distance ahead:", bot.distance)
 
 ---
 
+## Try it Yourself
+
+1. Look at the pins table. Which pin does the left motor use for direction?
+2. Open `burgerbot.py` in Thonny and find the `MOTOR_PINS` line and the `RangeFinder(trigger_pin=0, echo_pin=1)` line. What would you change to move the range finder to different pins?
+3. Challenge: the `speed` setter raises a `ValueError` if you give it a number outside -1 to 1. Read the code and write the line you would type to trigger it.
+
+---
+
+## Common Issues
+
+- **Problem**: `ImportError: no module named 'burgerbot'` when you run a program
+- **Solution**: Save `burgerbot.py` onto the Pico itself, not just your computer, as shown in the next lesson
+- **Why**: Python can only import modules that are on the board it is running on
+
+- **Problem**: `ValueError: Speed value should be between -1 and +1`
+- **Solution**: Give `speed` a number from -1 to 1, such as `0.5`
+- **Why**: The library checks the value to protect the motors from nonsense speeds
+
+---
+
+## Check your understanding
+
 {% quiz %}
 ? What happens after `bot.forward(2)` finishes?
 - [ ] The robot stops automatically
@@ -100,6 +140,12 @@ print("Distance ahead:", bot.distance)
 - [x] `bot.speed = 0.3`
 - [ ] `bot.left_motor(3)`
 > `speed` sets how fast the motors run. The number passed to `forward()` is how long to drive for.
+
+? Which two pins does the library use for the range finder?
+- [x] GP0 (trigger) and GP1 (echo)
+- [ ] GP5 and GP6
+- [ ] GP16 and GP17
+> The pins table lists GP0 and GP1 for the range finder.
 {% endquiz %}
 
 ---

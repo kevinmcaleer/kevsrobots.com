@@ -9,8 +9,9 @@ previous: 04_loading_the_code.html
 next: 06_measuring_distance.html
 description: Learn how to move the robot forward, backward, left and right.
 percent: 48
-duration: 6
-quiz_total: 11
+duration: 7
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Build your own BurgerBot
 - content:
@@ -61,6 +62,10 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to drive BurgerBot forward, backward and in turns, change its speed, and combine moves into a pattern.
+
+---
+
 ## Understanding Differential Drive
 
 BurgerBot uses **differential drive** - a system where two wheels are controlled independently to create movement. By varying the speed and direction of each motor, you can make the robot move forward, backward, and turn.
@@ -70,6 +75,16 @@ BurgerBot uses **differential drive** - a system where two wheels are controlled
 - **Backward**: Both motors spin backward at the same speed
 - **Turning on the spot**: One motor spins forward and the other spins backward
 - **Gentle curve**: One motor spins faster than the other
+
+```mermaid
+flowchart TD
+    A["Both motors forward"] --> F["Robot drives forward"]
+    B["Both motors backward"] --> K["Robot reverses"]
+    C["Left forward, right backward"] --> L["Robot spins on the spot"]
+    D["Left faster than right"] --> R["Robot curves"]
+```
+
+> **Teachers**: this is the first lesson where the robot drives, and robots drive off desks. Run the programs on the floor or in a tray with a lip, keep a hand ready to pick the robot up, and remind learners that `forward()` does not stop the motors. Start with short durations. Calibrating turns takes a few goes, so allow time.
 
 ---
 
@@ -181,6 +196,9 @@ You can also drive each wheel separately with `bot.left_motor()` and `bot.right_
 bot.left_motor(0.6)
 bot.right_motor(0.3)   # the slower right wheel makes the robot curve right
 ```
+{: .no-snakie }
+
+Those two lines are a fragment: put them after `bot = Burgerbot()` in a complete program, and finish with `bot.stop()`.
 
 ---
 
@@ -228,6 +246,10 @@ print("Square complete!")
 - **Solution**: Adjust the turn duration. More time = bigger turn. Start with `bot.turn_left(0.4)` or `bot.turn_left(0.6)` and fine-tune
 - **Why**: Turn angle depends on motor speed, battery charge, and surface friction - it requires calibration
 
+- **Problem**: `turn_left()` makes the robot turn right, or the other way round
+- **Solution**: Swap the two entries in the `MOTOR_PINS` line in `burgerbot.py`, so the other motor is treated as the left one
+- **Why**: The library calls the first motor the left one, so which way a turn goes depends on which motor you wired to which side
+
 - **Problem**: Robot jerks or stutters during movement
 - **Solution**: Ensure battery is fully charged. Weak batteries cause inconsistent motor performance
 - **Why**: Motors need stable voltage to maintain smooth, consistent speed
@@ -250,6 +272,8 @@ Congratulations! Your BurgerBot is moving! Now let's practice:
 
 ---
 
+## Check your understanding
+
 {% quiz %}
 ? How does BurgerBot turn on the spot?
 - [ ] Both motors spin forward
@@ -262,6 +286,12 @@ Congratulations! Your BurgerBot is moving! Now let's practice:
 - [ ] Moves the robot forward for 0.25 seconds
 - [ ] Turns the robot 25 degrees
 > `speed` ranges from -1 to 1. Movement methods use it until you change it.
+
+? Why do the square programs stop the robot with `bot.stop()` after each side?
+- [ ] To save the program
+- [x] Because `forward()` and `turn_right()` leave the motors running
+- [ ] Because the robot cannot turn while moving
+> The movement methods start the motors and wait, so you stop them yourself.
 {% endquiz %}
 
 ---

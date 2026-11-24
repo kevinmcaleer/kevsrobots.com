@@ -4,9 +4,14 @@ description: Add a pen to BurgerBot and make it draw shapes.
 layout: lesson
 type: page
 cover: /learn/burgerbot/assets/banners/08_pen.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to fit the pen mechanism, wire the servo to GP16, and make BurgerBot draw a square.
 
 ---
 
@@ -63,6 +68,15 @@ bot.pen_middle()
 
 If the pen doesn't reach the paper, or lifts too far, loosen the cog, turn it a few teeth and refit it.
 
+```mermaid
+flowchart LR
+    A["pen_down()"] --> B["sleep(0.5)"]
+    B --> C["forward, then turn"]
+    C --> D{"4 sides drawn?"}
+    D -- "no" --> C
+    D -- "yes" --> E["pen_up()"]
+```
+
 ---
 
 ## Drawing a square
@@ -92,11 +106,33 @@ bot.pen_up()
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
 1. Draw a triangle. How long does a 120-degree turn take?
 2. Draw a dashed line by lifting and lowering the pen as you drive
 3. Write a `polygon(sides)` function that draws any regular shape
+
+---
+
+## Common Issues
+
+- **Problem**: The pen doesn't touch the paper, or lifts too far
+- **Solution**: Loosen the cog, turn it a few teeth and refit it
+- **Why**: The servo's angle is fixed by the code, so the cog's position sets how far the pen moves
+
+- **Problem**: The servo jitters or the robot resets when the pen moves
+- **Solution**: Check the servo is powered from VBUS and GND as in the wiring table, and the battery is charged
+- **Why**: Servos draw a burst of current when they move, which a weak battery or loose wire can't supply
+
+- **Problem**: The corners are not 90 degrees
+- **Solution**: Change the `turn_right(0.8)` time and test again
+- **Why**: Turn time depends on speed, battery charge and the surface
+
+> **Teachers**: use washable felt-tip pens rather than permanent markers, and draw on large sheets of paper taped to the floor so the robot does not drive off a desk or mark furniture. Keep the cap on the pen when the robot is not drawing so it doesn't dry out.
+
+---
+
+## Check your understanding
 
 {% quiz %}
 ? Why do we `sleep()` after `pen_down()` before driving?
@@ -104,6 +140,18 @@ bot.pen_up()
 - [x] To give the servo time to move the pen onto the paper
 - [ ] Because `forward()` won't work straight after a servo command
 > Servos take a moment to move. Driving straight away would leave a gap at the start of the line.
+
+? Which Pico pin does the servo's signal wire connect to?
+- [ ] GP17
+- [x] GP16
+- [ ] GP0
+> The wiring table connects the orange signal wire to GP16.
+
+? Why does the square program call `pen_up()` at the end?
+- [x] So the robot doesn't leave a trail when you pick it up
+- [ ] To recharge the servo
+- [ ] To make the last side longer
+> Lifting the pen at the end stops it marking the paper while you move the robot.
 {% endquiz %}
 
 ---

@@ -7,11 +7,29 @@ date: 2023-04-27
 description: Build, program and upgrade BurgerBot, a simple 3D printed robot powered
   by a Raspberry Pi Pico and MicroPython
 level: beginner
-course_duration: 2h 26m
+course_duration: 2h 49m
 lesson_count: 15
 first_lesson: 00_intro.html
-quiz_total: 11
+quiz_total: 33
 video: 5G6psAuTYT4
+outcomes:
+- Assemble a differential drive robot from 3D printed parts, motors, a range finder
+  and a Raspberry Pi Pico
+- Copy the BurgerBot library onto a Pico and run MicroPython programs from Thonny
+- Drive the robot forward, backward and in turns, and tune its speed and turn times
+- Read an ultrasonic range finder and use the distance to avoid or follow objects
+- Add a pen, a line sensor or a camera upgrade
+- Diagnose common wiring, units and motor direction problems
+prerequisites:
+- No robotics or MicroPython experience needed
+- Helpful but not required, Python for Beginners and Learn MicroPython, the Basics
+you_need:
+- A 3D printer, or pre-printed BurgerBot parts
+- A Raspberry Pi Pico or Pico W with headers, and a USB cable
+- A motor driver board, two micro metal (N20) gearmotors, wheels and a LiPo battery
+  (see the parts list in the introduction)
+- A 3.3V ultrasonic range finder (HC-SR04P) and female to female Dupont cables
+- A computer with Thonny installed
 navigation:
 - name: Build your own BurgerBot
 - content:

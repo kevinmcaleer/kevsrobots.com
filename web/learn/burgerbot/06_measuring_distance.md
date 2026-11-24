@@ -9,8 +9,9 @@ previous: 05_basic_movement.html
 next: 07_object_avoidance.html
 description: Learn how to measure distance using the range finder on BurgerBot.
 percent: 54
-duration: 6
-quiz_total: 11
+duration: 8
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Build your own BurgerBot
 - content:
@@ -61,6 +62,10 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to wire the range finder, read `bot.distance`, and check that its readings match a ruler.
+
+---
+
 ## Ultrasonic Range Finder
 
 BurgerBot has an ultrasonic range finder at the front of the robot: those are the two 'eyes'. Ultrasonic range finders measure distance using sound, and they're used everywhere from robots to car parking sensors.
@@ -85,6 +90,17 @@ Ultrasonic range finders operate using the basic principles of echolocation, a t
 Distance = (Time of Flight x Speed of Sound) / 2
 
 The division by 2 accounts for the fact that the sound waves travel to the object and back, covering twice the actual distance.
+
+```mermaid
+sequenceDiagram
+    participant P as Pico
+    participant S as Range finder
+    participant O as Object
+    P->>S: Trigger pulse on GP0
+    S->>O: Ultrasonic burst
+    O-->>S: Echo
+    S->>P: Echo pulse on GP1, as long as the round trip
+```
 
 ---
 
@@ -126,6 +142,25 @@ print(f"Distance to object: {distance} cm")
 - The sensor measures time-of-flight automatically
 - Returns the distance as a number
 - The HC-SR04 works from about 2cm to 4m. Readings outside that range aren't reliable
+
+---
+
+## Check the units first
+
+Hold a ruler or a flat book exactly 10 cm in front of the range finder and run this complete program:
+
+```python
+from burgerbot import Burgerbot
+from time import sleep
+
+bot = Burgerbot()
+
+while True:
+    print("Reading:", bot.distance)
+    sleep(0.5)
+```
+
+You should see a number close to 10. If you see about 100, your copy of `burgerbot.py` is reporting millimetres. The `distance` property of `RangeFinder` in the current file works out `(elapsed_microseconds * 0.343) / 2`, which is millimetres, even though its comment says centimetres. Change `0.343` to `0.0343` in that line, save `burgerbot.py` to the Pico again, and the readings will be in centimetres, which is what the rest of this course assumes.
 
 ---
 
@@ -209,6 +244,12 @@ else:
 - **Solution**: Check the Echo wire. If the sensor never sends an echo pulse, the library waits for one forever
 - **Why**: The library loops until the Echo pin changes, so a loose wire stops the program
 
+- **Problem**: Distances look ten times too big (100 for an object 10 cm away)
+- **Solution**: Change `0.343` to `0.0343` in the `RangeFinder.distance` property of `burgerbot.py`
+- **Why**: The original arithmetic gives millimetres, but our programs treat readings as centimetres
+
+> **Teachers**: ultrasonic sensors listen for their own echo, so several robots in one room can confuse each other, and soft clothing or curtains can swallow the echo. Test in small groups with a hard flat wall or book as the target, and keep the 3.3V rule from lesson 1 in mind when swapping sensors between kits.
+
 ---
 
 ## Try it Yourself
@@ -230,6 +271,8 @@ Now that you can measure distance, let's practice:
 
 ---
 
+## Check your understanding
+
 {% quiz %}
 ? Why does the distance formula divide by 2?
 - [ ] The sensor has two transducers
@@ -242,6 +285,12 @@ Now that you can measure distance, let's practice:
 - [ ] GP16 and GP17
 - [ ] GP5 and GP6
 > GP16 and GP17 are the pen servo and line sensor, and GP5/GP6 drive the left motor.
+
+? Why must you use the 3.3V HC-SR04P?
+- [ ] It is cheaper
+- [ ] It reads further
+- [x] A standard 5V version sends a 5V echo signal that can damage the Pico
+> The wiring section warns that a 5V echo signal can damage the Pico.
 {% endquiz %}
 
 ---

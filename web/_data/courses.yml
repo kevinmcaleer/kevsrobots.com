@@ -131,9 +131,10 @@
   date_published: 2023-04-27
   description: Build, program and upgrade BurgerBot, a simple 3D printed robot powered
     by a Raspberry Pi Pico and MicroPython
-  duration: 2h 26m
+  duration: 2h 49m
   groups:
-  - robotics
+  - robots
+  - 3dprinting
   - micropython
   - pico
   lessons: 15
