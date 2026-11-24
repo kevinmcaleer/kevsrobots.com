@@ -3,9 +3,12 @@ title: I2C vs SPI - Choosing the Right Protocol
 description: Learn when to use I2C vs SPI for your projects with practical decision-making guidance
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/10_i2c-vs-spi.jpg
 ---
 
-<!-- ![I2C vs SPI Comparison](/learn/i2c_spi/assets/i2c-vs-spi.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Making the Right Choice
 

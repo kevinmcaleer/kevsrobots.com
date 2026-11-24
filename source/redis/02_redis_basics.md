@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Basics
 type: page
 description: Learn the basics of Redis and how to use it with Python.
+cover: /learn/redis/assets/banners/02_redis_basics.jpg
 ---
 
-<!-- ![Cover photo of Redis basics](assets/redis-basics.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

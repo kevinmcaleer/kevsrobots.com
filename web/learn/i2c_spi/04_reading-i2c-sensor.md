@@ -3,7 +3,7 @@ layout: lesson
 title: Reading I2C Sensors
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/04_reading-i2c-sensor.jpg
 date: 2026-01-15
 previous: 03_scanning-i2c-devices.html
 next: 05_demystifying-datasheets.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![BME280 Reading Data](/learn/i2c_spi/assets/bme280-reading.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Reading Real Sensor Data
 

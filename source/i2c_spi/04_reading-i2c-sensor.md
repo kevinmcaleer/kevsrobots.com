@@ -3,9 +3,12 @@ title: Reading I2C Sensors
 description: Learn how to read temperature, humidity, and pressure data from the BME280 sensor using I2C
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/04_reading-i2c-sensor.jpg
 ---
 
-<!-- ![BME280 Reading Data](/learn/i2c_spi/assets/bme280-reading.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Reading Real Sensor Data
 

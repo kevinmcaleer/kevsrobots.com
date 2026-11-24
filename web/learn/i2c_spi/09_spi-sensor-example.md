@@ -3,7 +3,7 @@ layout: lesson
 title: SPI Sensor Example
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/09_spi-sensor-example.jpg
 date: 2026-01-15
 previous: 08_spi-hardware-setup.html
 next: 10_i2c-vs-spi.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![Temperature Monitoring](/learn/i2c_spi/assets/max31855-monitor.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Building a Temperature Monitor
 

@@ -9,7 +9,7 @@ previous: 00_intro.html
 next: 02_creating_the_base.html
 description: Master the 3D workspace - the foundation skill for efficient CAD work
 percent: 18
-duration: 5
+duration: 4
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
@@ -89,8 +89,6 @@ Look in the **top right corner** of the 3D view. That little cube is incredibly 
 - **Click a corner** → Isometric view from that corner
 
 **When to use it**: When you need a precise orthographic view - like when sketching on the XY plane or checking alignment.
-
-![Navigation Cube](assets/nav02.png){:class="img-fluid w-100"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Scanning I2C Devices
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/03_scanning-i2c-devices.jpg
 date: 2026-01-15
 previous: 02_i2c-hardware-setup.html
 next: 04_reading-i2c-sensor.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![I2C Scanner Output](/learn/i2c_spi/assets/i2c-scanner.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Finding Devices on the I2C Bus
 

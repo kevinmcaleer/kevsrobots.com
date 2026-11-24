@@ -3,7 +3,7 @@ layout: lesson
 title: What is SPI?
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/07_what-is-spi.jpg
 date: 2026-01-15
 previous: 06_bme280-deep-dive.html
 next: 08_spi-hardware-setup.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![SPI Communication](/learn/i2c_spi/assets/spi-diagram.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding SPI
 

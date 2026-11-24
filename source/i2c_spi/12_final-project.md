@@ -3,9 +3,12 @@ title: Final Project - Environmental Monitoring Station
 description: Build a complete environmental monitoring station combining I2C sensors, data logging, and everything learned in this course
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/12_final-project.jpg
 ---
 
-<!-- ![Environmental Monitor](/learn/i2c_spi/assets/final-project.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Your Capstone Project
 

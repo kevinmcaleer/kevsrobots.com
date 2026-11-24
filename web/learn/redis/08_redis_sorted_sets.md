@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Sorted Sets
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/08_redis_sorted_sets.jpg
 date: 2023-04-12
 previous: 07_redis_hashes.html
 next: 09_redis_pub_sub.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis sorted sets](assets/redis-sorted-sets.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

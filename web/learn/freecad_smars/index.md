@@ -9,7 +9,7 @@ description: Learn to design a complete 3D-printable robot chassis from scratch 
   techniques, and design-for-manufacturing principles while building the iconic SMARS
   robot base. Perfect for makers who want to design their own robot parts.
 level: beginner
-course_duration: 1h 6m
+course_duration: 1h 5m
 lesson_count: 11
 first_lesson: 00_intro.html
 navigation:

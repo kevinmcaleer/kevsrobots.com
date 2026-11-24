@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Hashes
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/07_redis_hashes.jpg
 date: 2023-04-12
 previous: 06_redis_sets.html
 next: 08_redis_sorted_sets.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis hashes](assets/redis-hashes.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

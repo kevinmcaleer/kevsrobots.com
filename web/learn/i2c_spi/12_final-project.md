@@ -3,7 +3,7 @@ layout: lesson
 title: Final Project - Environmental Monitoring Station
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/12_final-project.jpg
 date: 2026-01-15
 previous: 11_common-issues.html
 description: Build a complete environmental monitoring station combining I2C sensors,
@@ -54,7 +54,9 @@ navigation:
 ---
 
 
-<!-- ![Environmental Monitor](/learn/i2c_spi/assets/final-project.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Your Capstone Project
 

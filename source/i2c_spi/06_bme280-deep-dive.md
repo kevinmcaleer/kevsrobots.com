@@ -3,9 +3,12 @@ title: BME280 Deep Dive
 description: Explore advanced BME280 features including power modes, filtering, and optimization techniques
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/06_bme280-deep-dive.jpg
 ---
 
-<!-- ![BME280 Advanced Features](/learn/i2c_spi/assets/bme280-advanced.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Mastering the BME280
 

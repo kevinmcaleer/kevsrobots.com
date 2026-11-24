@@ -49,8 +49,6 @@ Look in the **top right corner** of the 3D view. That little cube is incredibly 
 
 **When to use it**: When you need a precise orthographic view - like when sketching on the XY plane or checking alignment.
 
-![Navigation Cube](assets/nav02.png){:class="img-fluid w-100"}
-
 ---
 
 ## Keyboard Shortcuts - Speed Up Your Workflow
