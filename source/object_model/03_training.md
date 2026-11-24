@@ -1,402 +1,178 @@
 ---
 title: Training Custom Object Detection Models
 description: >-
-    Train a custom PyTorch object detection model using transfer learning with Faster R-CNN to detect your own objects
+    Fine-tune a small pre-trained YOLO model on your own dataset with transfer learning, then read the results to see whether it learned.
 type: page
 layout: lesson
 cover: /learn/object_model/assets/banners/03_training.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Overview
+By the end of this lesson you will be able to fine-tune a pre-trained YOLO model on your dataset, find the trained weights, and read the training results to judge whether the model learned.
 
-Now comes the exciting part - training your model! In this lesson, you'll use PyTorch and transfer learning to create a custom object detector. You'll start with a pre-trained Faster R-CNN model and fine-tune it on your dataset. By the end, you'll have a working model that can detect your custom objects.
+## Why transfer learning?
 
----
+Training a detector from nothing needs enormous numbers of images. **Transfer learning** starts from a model that has already learned edges, shapes and textures from a huge dataset, and only teaches it your classes.
 
-## Objectives
+**Real-world analogy:** you do not teach a new robot builder what a screw is. You hand them a screwdriver and show them your particular robot.
 
-By the end of this lesson, you will be able to:
+For this course we start from `yolo11n.pt`, the smallest "nano" YOLO11 model. We choose it deliberately. The Raspberry Pi AI Camera runs a model on a small neural processor inside the sensor, so the model must be small. Big detectors such as Faster R-CNN with a ResNet-50 backbone are great on a desktop but are far too large for this camera, and you cannot simply convert them later. At the time of writing, the Ultralytics export for the IMX500 supports the **YOLOv8n and YOLO11n** detection models, so start there.
 
-- Understand transfer learning and why it's powerful
-- Load and prepare your dataset for PyTorch
-- Modify a pre-trained Faster R-CNN model for custom classes
-- Train the model with proper monitoring
-- Evaluate model performance
-- Save your trained model
-
----
-
-## Why Transfer Learning?
-
-Training a detection model from scratch requires millions of images and weeks of compute time. Transfer learning lets you leverage a model pre-trained on millions of images and adapt it to your specific objects in hours.
-
-**Real-world analogy:**
-Instead of learning to recognize objects from birth, you're teaching an expert photographer to recognize your specific items. They already know what edges, shapes, and textures are - they just need to learn your unique classes.
-
-**Benefits:**
-- **Faster training** - Hours instead of weeks
-- **Less data needed** - 200-500 images instead of millions
-- **Better accuracy** - Pre-trained features generalize well
-- **Lower compute cost** - Works on laptop CPUs (though GPU is faster)
-
----
-
-## Install Required Packages
-
-First, install PyTorch and related libraries:
-
-```bash
-# Install PyTorch (CPU version - works on any computer)
-pip install torch torchvision
-
-# Or for NVIDIA GPU support (much faster training)
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-
-# Install additional tools
-pip install matplotlib pillow tqdm
+```mermaid
+flowchart LR
+    P[yolo11n.pt pre-trained on a big dataset] --> T[Fine-tune on your robot_dataset]
+    T --> B[best.pt your detector]
+    B --> V[Check results on validation photos]
 ```
 
-**Verify installation:**
+## Train it
+
+Save this as `train.py` next to your `robot_dataset` folder. The `if __name__` line matters on Windows and macOS, where training starts helper processes that re-import your script.
 
 ```python
-import torch
-import torchvision
+from ultralytics import YOLO
 
-print(f"✓ PyTorch version: {torch.__version__}")
-print(f"✓ Torchvision version: {torchvision.__version__}")
-print(f"✓ CUDA available: {torch.cuda.is_available()}")
 
-if torch.cuda.is_available():
-    print(f"✓ GPU: {torch.cuda.get_device_name(0)}")
-else:
-    print("  Using CPU (training will be slower)")
+def main():
+    model = YOLO("yolo11n.pt")  # downloads the pre-trained weights the first time
+    model.train(
+        data="robot_dataset/data.yaml",
+        epochs=50,   # passes over the whole training set
+        imgsz=640,   # images are resized to 640 by 640 pixels
+        batch=16,    # photos per step; lower it if you run out of memory
+    )
+
+
+if __name__ == "__main__":
+    main()
 ```
+{: .no-snakie }
 
----
+Run it with `python train.py`. Each epoch prints a line of losses and scores. When it finishes, Ultralytics prints where it saved things, normally under `runs/detect/train/`. If you train again it makes `train2`, `train3` and so on, so read the path it prints rather than assuming.
 
-## Create Dataset Loader
+Inside that folder:
 
-PyTorch needs a custom dataset class to load your images and annotations:
+- `weights/best.pt` is the checkpoint with the best validation score. **This is the one you keep.**
+- `weights/last.pt` is the most recent checkpoint.
+- `results.csv` has the numbers for every epoch.
+- `results.png` plots them, and there are confusion matrix and prediction images too.
+
+Rough timings: a modern laptop with no GPU can take an hour or more for a small dataset, and a decent GPU a few minutes. Start small with `epochs=10` for a test run.
+
+## Read the results
+
+Two kinds of number matter. **Losses** should fall as the model learns. **mAP50** is a score from 0 to 1 for how well predicted boxes overlap real ones (a prediction counts as correct when its box overlaps the true box by at least 50%). Higher is better.
+
+This complete program reads a `results.csv` and tells you what happened. It uses a sample so you can run it right now, and the last line shows how to point it at your own file:
 
 ```python
-import torch
-from torch.utils.data import Dataset
-from PIL import Image
-import xml.etree.ElementTree as ET
-import os
+import csv
+import io
 
-class CustomDataset(Dataset):
-    """Dataset loader for object detection with PascalVOC annotations"""
+SAMPLE = """epoch,train/box_loss,metrics/precision(B),metrics/recall(B),metrics/mAP50(B)
+1,1.90,0.20,0.15,0.12
+2,1.50,0.45,0.40,0.38
+3,1.20,0.62,0.55,0.60
+4,1.05,0.70,0.66,0.71
+5,0.98,0.74,0.69,0.74
+"""
 
-    def __init__(self, image_dir, annotation_dir, transforms=None):
-        self.image_dir = image_dir
-        self.annotation_dir = annotation_dir
-        self.transforms = transforms
-        self.images = [f for f in os.listdir(image_dir) if f.endswith('.jpg')]
 
-    def __len__(self):
-        return len(self.images)
+def summarise(csv_text):
+    rows = list(csv.DictReader(io.StringIO(csv_text)))
+    # older versions pad column names with spaces, so strip them
+    rows = [{k.strip(): float(v) for k, v in row.items()} for row in rows]
+    first, last = rows[0], rows[-1]
+    best = max(rows, key=lambda r: r["metrics/mAP50(B)"])
+    print(f"Epochs run: {len(rows)}")
+    print(f"Box loss: {first['train/box_loss']:.2f} -> {last['train/box_loss']:.2f}")
+    print(f"Best mAP50: {best['metrics/mAP50(B)']:.2f} at epoch {int(best['epoch'])}")
+    if last["metrics/mAP50(B)"] < best["metrics/mAP50(B)"] - 0.05:
+        print("Score has dropped from its best: the model may be overfitting.")
+    elif last["metrics/mAP50(B)"] < 0.5:
+        print("Low score: add more varied photos or train for longer.")
+    else:
+        print("Looks healthy. Now test on photos it has never seen.")
 
-    def __getitem__(self, idx):
-        # Load image
-        img_name = self.images[idx]
-        img_path = os.path.join(self.image_dir, img_name)
-        image = Image.open(img_path).convert("RGB")
 
-        # Load annotation
-        xml_name = img_name.replace('.jpg', '.xml')
-        xml_path = os.path.join(self.annotation_dir, xml_name)
-
-        boxes = []
-        labels = []
-
-        tree = ET.parse(xml_path)
-        root = tree.getroot()
-
-        for obj in root.findall('object'):
-            label = obj.find('name').text
-            bbox = obj.find('bndbox')
-
-            xmin = int(bbox.find('xmin').text)
-            ymin = int(bbox.find('ymin').text)
-            xmax = int(bbox.find('xmax').text)
-            ymax = int(bbox.find('ymax').text)
-
-            boxes.append([xmin, ymin, xmax, ymax])
-            labels.append(self.class_to_idx[label])
-
-        # Convert to tensors
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        labels = torch.as_tensor(labels, dtype=torch.int64)
-
-        target = {
-            'boxes': boxes,
-            'labels': labels,
-            'image_id': torch.tensor([idx])
-        }
-
-        if self.transforms:
-            image = self.transforms(image)
-
-        return image, target
-
-    # Map class names to indices
-    class_to_idx = {
-        'background': 0,
-        'mug': 1,
-        'laptop': 2,
-        'keyboard': 3,
-        # Add your classes here
-    }
+summarise(SAMPLE)
+# For your own run: summarise(open("runs/detect/train/results.csv").read())
 ```
 
----
+Output:
 
-## Complete Training Script
+```text
+Epochs run: 5
+Box loss: 1.90 -> 0.98
+Best mAP50: 0.74 at epoch 5
+Looks healthy. Now test on photos it has never seen.
+```
 
-Here's a complete, production-ready training script:
+**Overfitting** means the model memorises your training photos. Training loss keeps falling but the validation score stops improving or drops. More varied photos fix it better than more epochs.
+
+## Test on a new photo
+
+Take a photo that is in neither set and run the trained weights on it:
 
 ```python
-import torch
-import torchvision
-from torchvision.models.detection import fasterrcnn_resnet50_fpn
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torch.utils.data import DataLoader
-import time
-from tqdm import tqdm
+from ultralytics import YOLO
 
-# ===== Configuration =====
-NUM_CLASSES = 4  # Background + 3 object classes
-NUM_EPOCHS = 50
-BATCH_SIZE = 4
-LEARNING_RATE = 0.005
+model = YOLO("runs/detect/train/weights/best.pt")
+results = model.predict("new_photo.jpg", conf=0.5)
 
-# ===== Load Dataset =====
-print("Loading dataset...")
-train_dataset = CustomDataset(
-    image_dir='custom_dataset/train/images',
-    annotation_dir='custom_dataset/train/annotations'
-)
-
-train_loader = DataLoader(
-    train_dataset,
-    batch_size=BATCH_SIZE,
-    shuffle=True,
-    num_workers=4,
-    collate_fn=lambda x: tuple(zip(*x))
-)
-
-print(f"✓ Loaded {len(train_dataset)} training images")
-
-# ===== Create Model =====
-print("Creating model...")
-
-# Load pre-trained Faster R-CNN
-model = fasterrcnn_resnet50_fpn(pretrained=True)
-
-# Replace the classifier head for our custom classes
-in_features = model.roi_heads.box_predictor.cls_score.in_features
-model.roi_heads.box_predictor = FastRCNNPredictor(in_features, NUM_CLASSES)
-
-# Move model to GPU if available
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model.to(device)
-
-print(f"✓ Model loaded on {device}")
-
-# ===== Setup Optimizer =====
-params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.SGD(
-    params,
-    lr=LEARNING_RATE,
-    momentum=0.9,
-    weight_decay=0.0005
-)
-
-# Learning rate scheduler (reduces LR over time)
-lr_scheduler = torch.optim.lr_scheduler.StepLR(
-    optimizer,
-    step_size=15,
-    gamma=0.1
-)
-
-# ===== Training Loop =====
-print(f"\nStarting training for {NUM_EPOCHS} epochs...")
-print("=" * 50)
-
-model.train()
-losses_per_epoch = []
-start_time = time.time()
-
-for epoch in range(NUM_EPOCHS):
-    epoch_loss = 0
-    progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{NUM_EPOCHS}")
-
-    for images, targets in progress_bar:
-        # Move data to device
-        images = [img.to(device) for img in images]
-        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-
-        # Forward pass
-        loss_dict = model(images, targets)
-        losses = sum(loss for loss in loss_dict.values())
-
-        # Backward pass
-        optimizer.zero_grad()
-        losses.backward()
-        optimizer.step()
-
-        # Track loss
-        epoch_loss += losses.item()
-        progress_bar.set_postfix({'loss': f'{losses.item():.4f}'})
-
-    # Calculate average loss for epoch
-    avg_loss = epoch_loss / len(train_loader)
-    losses_per_epoch.append(avg_loss)
-
-    # Update learning rate
-    lr_scheduler.step()
-
-    # Print epoch summary
-    elapsed = time.time() - start_time
-    print(f"\nEpoch {epoch+1}/{NUM_EPOCHS}")
-    print(f"  Average Loss: {avg_loss:.4f}")
-    print(f"  Time Elapsed: {elapsed/60:.1f} min")
-    print(f"  Learning Rate: {optimizer.param_groups[0]['lr']:.6f}")
-    print("-" * 50)
-
-# ===== Save Model =====
-torch.save(model.state_dict(), 'custom_detector.pth')
-print(f"\n✓ Training complete!")
-print(f"✓ Model saved to 'custom_detector.pth'")
-print(f"✓ Total time: {elapsed/60:.1f} minutes")
+for box in results[0].boxes:
+    name = results[0].names[int(box.cls)]
+    print(f"{name}: {float(box.conf):.2f} at {box.xyxy[0].tolist()}")
 ```
+{: .no-snakie }
 
-**Expected training times:**
-- MacBook Pro M1 (GPU): ~1 hour for 50 epochs
-- Mac/PC (CPU only): ~3-4 hours for 50 epochs
-- Linux with NVIDIA RTX 3080: ~30 minutes for 50 epochs
+`conf=0.5` hides anything the model is less than 50% sure of. `box.xyxy` gives the corners as pixels: left, top, right, bottom.
 
----
+> **Teachers**: Training on school laptops without a GPU can take an hour or more, which will not fit one lesson. Run a 10 epoch test in class, then let one shared machine or an overnight run do the full 50 epochs, and give every group the resulting `best.pt`. A shared GPU machine for the class is much better value than a GPU in every laptop.
 
-## Monitor Training Progress
+## Try it Yourself
 
-Add visualization to track how well training is going:
-
-```python
-import matplotlib.pyplot as plt
-
-# After training completes, plot the loss curve
-plt.figure(figsize=(10, 5))
-plt.plot(losses_per_epoch, linewidth=2)
-plt.xlabel('Epoch', fontsize=12)
-plt.ylabel('Loss', fontsize=12)
-plt.title('Training Loss Over Time', fontsize=14)
-plt.grid(True, alpha=0.3)
-plt.savefig('training_loss.png', dpi=150, bbox_inches='tight')
-plt.show()
-
-print("✓ Loss plot saved to 'training_loss.png'")
-```
-
-**What to look for:**
-- **Good:** Smooth downward curve that plateaus
-- **Bad:** Loss stays flat → learning rate too low
-- **Bad:** Loss jumps around wildly → learning rate too high
-- **Bad:** Loss increases → data problem or bug
-
----
-
-## Test Your Trained Model
-
-Let's verify the model works:
-
-```python
-from PIL import Image
-import torchvision.transforms as T
-
-# Load trained model
-model = fasterrcnn_resnet50_fpn(pretrained=False, num_classes=NUM_CLASSES)
-model.load_state_dict(torch.load('custom_detector.pth'))
-model.eval()
-model.to(device)
-
-# Load test image
-test_image = Image.open('custom_dataset/test/images/test_001.jpg')
-transform = T.ToTensor()
-image_tensor = transform(test_image).to(device)
-
-# Run inference
-with torch.no_grad():
-    predictions = model([image_tensor])
-
-# Print results
-boxes = predictions[0]['boxes'].cpu().numpy()
-labels = predictions[0]['labels'].cpu().numpy()
-scores = predictions[0]['scores'].cpu().numpy()
-
-print(f"\nDetections on test image:")
-for box, label, score in zip(boxes, labels, scores):
-    if score > 0.5:  # Only show confident detections
-        print(f"  Class {label}: {score:.2f} - Box: {box}")
-```
-
----
-
-## Try It Yourself
-
-1. **Modify hyperparameters** - Try `LEARNING_RATE = 0.001` or `NUM_EPOCHS = 100`
-2. **Add data augmentation** - Flip images horizontally during training
-3. **Track validation loss** - Create a validation dataset and monitor overfitting
-
-**Challenge:** Implement early stopping that saves the best model when validation loss stops improving.
-
----
+1. Train for `epochs=10`, then for `epochs=50`, and compare `mAP50` in each `results.csv`.
+2. Change `imgsz` to 320 and see how the training time and score change.
+3. Run `model.predict` on five new photos and count how many detections are correct.
+4. Challenge: take photos in a lighting condition you did not train on, and note which class fails first. This tells you what photos to add.
 
 ## Common Issues
 
-**Problem**: "CUDA out of memory" error
-**Solution**: Reduce `BATCH_SIZE` to 2 or 1, or use CPU
-**Why**: GPU has limited RAM, smaller batches use less memory
+- **Problem**: "CUDA out of memory" during training.
+- **Solution**: Lower `batch`, for example to 4 or 2, or train on CPU with `device="cpu"`.
+- **Why**: Each photo in a batch uses graphics memory.
 
-**Problem**: Loss is NaN or very high (>100)
-**Solution**: Check annotations are correct, reduce learning rate to 0.001
-**Why**: Bad data or learning rate too high causes numerical instability
+- **Problem**: Training on Windows fails with a multiprocessing or "bootstrapping" error.
+- **Solution**: Make sure your code is inside `main()` with the `if __name__ == "__main__":` guard.
+- **Why**: Helper processes import your script again, which would restart training forever.
 
-**Problem**: Training is very slow (>8 hours)
-**Solution**: Use GPU, reduce image resolution, or use fewer epochs
-**Why**: CPU training is 10-20x slower than GPU
+- **Problem**: mAP50 stays near zero.
+- **Solution**: Check your labels with a few photos opened by hand, and confirm `data.yaml` paths and class names.
+- **Why**: Wrong paths or shifted boxes mean the model has nothing real to learn from.
 
-**Problem**: Model detects nothing on test images
-**Solution**: Train for more epochs, check if classes match between train/test
-**Why**: Model hasn't learned enough, or label mismatch
+## Check your understanding
 
-**Problem**: "KeyError" when loading annotations
-**Solution**: Verify all images have matching XML files with correct class names
-**Why**: Dataset loader can't find expected files or class names
+{% quiz %}
+? Why do we fine-tune `yolo11n.pt` instead of training from scratch?
+- [ ] Scratch training is not allowed
+- [x] The pre-trained model already knows general shapes, so far fewer photos and less time are needed
+- [ ] It makes the model larger and more accurate
+> Transfer learning reuses what a big dataset already taught the model.
 
----
+? Which saved file should you keep and export?
+- [ ] `last.pt`
+- [x] `best.pt`
+- [ ] `results.png`
+> `best.pt` is the checkpoint with the best validation score.
 
-## Summary
-
-You've learned:
-- How transfer learning accelerates training
-- Creating PyTorch dataset loaders for object detection
-- Modifying pre-trained models for custom classes
-- Training with proper monitoring and learning rate scheduling
-- Visualizing training progress
-- Testing your trained model
-
-You now have a trained object detection model! In the next lesson, you'll convert it to ONNX format for deployment on the Raspberry Pi.
-
----
-
-## Next Lesson
-
-In the next lesson, you'll learn how to convert your PyTorch model to ONNX format for efficient deployment on edge devices like the Raspberry Pi AI Camera.
-
----
+? Training loss keeps falling but the validation score drops. What is likely happening?
+- [ ] The camera is broken
+- [x] The model is overfitting to the training photos
+- [ ] The learning rate is zero
+> Overfitting is memorising the training set while getting worse on photos it has not seen.
+{% endquiz %}

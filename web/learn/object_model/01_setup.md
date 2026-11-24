@@ -7,10 +7,12 @@ cover: /learn/object_model/assets/banners/01_setup.jpg
 date: 2025-12-04
 previous: 00_intro.html
 next: 02_dataset_prep.html
-description: Set up Jupyter Lab and create a Python virtual environment for training
-  custom object detection models with PyTorch
+description: Create a Python virtual environment with Jupyter Lab and Ultralytics,
+  and check it is ready for training and exporting an object detection model.
 percent: 22
 duration: 5
+quiz_total: 24
+date_updated: 2026-11-24
 navigation:
 - name: Building Object Detection Models with Raspberry Pi AI Camera
 - content:
@@ -28,17 +30,17 @@ navigation:
     content:
     - name: Training Custom Object Detection Models
       link: 03_training.html
-    - name: Converting Models to ONNX Format
+    - name: Exporting and Quantising for the IMX500
       link: 04_onnx_conversion.html
   - section: Deployment
     content:
-    - name: Deploying to Raspberry Pi AI Camera
+    - name: Deploying to the Raspberry Pi AI Camera
       link: 05_deployment.html
     - name: Real-Time Object Detection
       link: 06_realtime_detection.html
   - section: Advanced Topics
     content:
-    - name: Troubleshooting and Optimization
+    - name: Troubleshooting and Improving Your Model
       link: 07_troubleshooting.html
     - name: Course Summary and Next Steps
       link: 08_summary.html
@@ -49,206 +51,151 @@ navigation:
 
 ---
 
-## Overview
+By the end of this lesson you will be able to create a virtual environment, install the tools this course uses, and check that your Python version suits the IMX500 export step.
 
-To build a custom object detection model, you'll need a proper development environment. In this lesson, you'll set up Jupyter Lab, which provides an interactive workspace perfect for machine learning experimentation. You'll also create an isolated Python environment to keep your project dependencies organized.
+## What a detector gives you
 
----
+Before we install anything, let's be clear about what we are building towards. An object detection model looks at one image and returns a list. Each item in the list has three parts: a **bounding box** (where), a **class** (what) and a **confidence score** between 0 and 1 (how sure).
 
-## Why Jupyter Lab?
-
-Jupyter Lab provides an interactive environment perfect for machine learning work:
-
-- **Iterative development** - Test code snippets quickly without running entire scripts
-- **Visualization** - See your dataset, training progress, and results inline
-- **Documentation** - Mix code, notes, and images in one place
-- **Reproducibility** - Share notebooks with your team or community
-- **Debugging** - Inspect variables and outputs at each step
-
-Professional ML engineers use Jupyter for prototyping before deploying to production. It's the industry standard for exploratory data analysis and model development.
-
----
-
-## Creating a Virtual Environment
-
-A virtual environment keeps your project dependencies separate from your system Python installation. This prevents version conflicts and makes your project portable.
-
-```bash
-# Create a new virtual environment named 'venv'
-python -m venv venv
+```mermaid
+flowchart LR
+    I[Camera frame] --> M[Detection model]
+    M --> D1["mug, 0.92, box 120,80 to 340,420"]
+    M --> D2["laptop, 0.71, box 0,240 to 320,480"]
 ```
 
-**What this does:**
-- Creates a new directory called `venv` containing a fresh Python installation
-- Isolates your project dependencies from other Python projects
-- Allows you to use specific package versions without affecting other projects
+Everything in this course is about getting a model that produces a good list, and getting that list onto a robot.
 
----
+## Why a virtual environment?
 
-## Activating the Virtual Environment
+A virtual environment is a private folder of Python packages for one project. Training tools are fussy about versions, so keeping them away from your system Python saves you from "it worked yesterday" problems.
 
-Activate your virtual environment before installing packages:
+**Real robot example:** you might have an old robot project that needs one version of NumPy, while Ultralytics wants another. With a virtual environment each project gets its own.
 
-**On macOS/Linux:**
+**Common mistake:** installing packages without activating the environment first. They land in your system Python and Jupyter cannot find them.
+
+## Create and activate it
+
+Check your Python first. The Ultralytics IMX export, which we use in lesson 04, supports **Python 3.10 to 3.12** on **Linux**. If you use Windows, the simplest route is WSL (Windows Subsystem for Linux). Training itself works on Windows and macOS, so you can still do lessons 01 to 03 there.
+
 ```bash
+python3 --version
+python3 -m venv venv
+```
+
+Activate it:
+
+```bash
+# Linux and macOS
 source venv/bin/activate
-```
 
-**On Windows:**
-```bash
+# Windows (PowerShell)
 venv\Scripts\activate
 ```
 
-**You'll know it worked when:**
-- Your terminal prompt shows `(venv)` at the beginning
-- Running `which python` shows the path to your venv Python
+You know it worked when your prompt starts with `(venv)`.
 
----
-
-## Install Required Packages
-
-Now install Jupyter Lab and supporting tools:
+## Install the tools
 
 ```bash
-pip install jupyterlab ipykernel label-studio
+pip install ultralytics jupyterlab
 ```
 
-**What each package does:**
-- `jupyterlab` - Interactive development environment
-- `ipykernel` - Allows Jupyter to run Python code
-- `label-studio` - Tool for annotating images (we'll use this later)
+- `ultralytics` is the library that trains, exports and runs YOLO models. It installs PyTorch for you.
+- `jupyterlab` gives you notebooks for looking at images and loss curves.
 
-**Installation time:** About 2-3 minutes depending on your internet speed.
+Installing PyTorch is a big download, so expect a few minutes.
 
----
-
-## Add the Virtual Environment to Jupyter Lab
-
-Register your virtual environment as a Jupyter kernel:
+If you want Jupyter to offer your environment as a kernel, register it:
 
 ```bash
+pip install ipykernel
 python -m ipykernel install --user --name=venv --display-name "Python (venv)"
+jupyter lab
 ```
 
-**What this does:**
-- Makes your virtual environment available in Jupyter Lab
-- Allows you to select "Python (venv)" as your notebook kernel
-- Ensures notebooks use the correct Python environment with your installed packages
+`jupyter lab` prints a local address with a token. Open it in your browser. Leave out `--ip=0.0.0.0` unless you really want other machines on your network to reach it, because anyone who gets the token can run code on your computer.
 
----
+## Check everything
 
-## Running Jupyter Lab
+Save this as `check_setup.py` and run it with `python check_setup.py`. It needs nothing but the standard library, so it works even if an install failed.
 
-Start Jupyter Lab with this command:
+```python
+import shutil
+import sys
+
+major, minor = sys.version_info[:2]
+print(f"Python version: {major}.{minor}")
+
+if (3, 10) <= (major, minor) <= (3, 12):
+    print("Good: this Python suits the Ultralytics IMX export.")
+else:
+    print("Heads up: the IMX export expects Python 3.10 to 3.12.")
+
+java = shutil.which("java")
+if java:
+    print(f"Java found at {java}")
+else:
+    print("Java not found (only needed on the machine that runs the export).")
+```
+
+Example output on Python 3.11:
+
+```text
+Python version: 3.11
+Good: this Python suits the Ultralytics IMX export.
+Java not found (only needed on the machine that runs the export).
+```
+
+Now check Ultralytics itself:
 
 ```bash
-jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
+yolo checks
 ```
 
-**Command options explained:**
-- `--ip=0.0.0.0` - Allows access from any network interface (useful for remote access)
-- `--port=8888` - Runs on port 8888 (default Jupyter port)
-- `--no-browser` - Doesn't auto-open a browser (you'll open it manually)
+It prints your Ultralytics, Python and PyTorch versions and whether a GPU was found. No GPU is fine, just slower.
 
-**Expected output:**
-```
-[I 2024-10-16 10:30:00.000 ServerApp] Jupyter Server is running at:
-[I 2024-10-16 10:30:00.000 ServerApp] http://localhost:8888/lab?token=abc123...
-```
+> **Teachers**: Installing PyTorch needs a few GB of downloads and some school networks block package sites or limit disk quotas. Test one machine first, or ask IT to build the environment once on a shared machine. Learners without admin rights can still use a virtual environment in their home folder. Hosted notebook services also work for training, but check their terms for under-18s.
 
-Copy the URL with the token and paste it into your browser.
+## Try it Yourself
 
----
-
-## Verify Your Setup
-
-Let's confirm everything is installed correctly. Create a new notebook in Jupyter Lab and run this code:
-
-```python
-# test_setup.py
-import sys
-import jupyterlab
-import ipykernel
-
-print("✓ Python version:", sys.version)
-print("✓ Jupyter Lab version:", jupyterlab.__version__)
-print("✓ IPyKernel version:", ipykernel.__version__)
-print("\nSetup successful! You're ready to go.")
-```
-
-**Expected output:**
-```
-✓ Python version: 3.10.12 (main, Jun 11 2023, 05:26:28)
-✓ Jupyter Lab version: 4.0.0
-✓ IPyKernel version: 6.25.0
-
-Setup successful! You're ready to go.
-```
-
----
-
-## Try It Yourself
-
-1. **Create a new notebook** - In Jupyter Lab, click the "+" button and select "Python (venv)"
-2. **Test basic Python** - Type `print("Hello, AI Camera!")` in a cell and press Shift+Enter
-3. **Install matplotlib** - In a new cell, run `!pip install matplotlib`
-
-**Challenge:** Create a simple plot to verify matplotlib is working:
-
-```python
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(8, 4))
-plt.plot([1, 2, 3, 4], [1, 4, 2, 3])
-plt.title('Test Plot')
-plt.xlabel('X axis')
-plt.ylabel('Y axis')
-plt.show()
-```
-
-You should see a line graph appear below the cell!
-
----
+1. Create the environment, activate it, then run `pip list` and find `ultralytics` in the output.
+2. Run `check_setup.py` outside the environment (open a fresh terminal without activating) and compare the Python version.
+3. Edit `check_setup.py` to also print whether the `ultralytics` package is importable, using `importlib.util.find_spec("ultralytics")`.
+4. Challenge: make the script exit with an error message if Python is outside 3.10 to 3.12.
 
 ## Common Issues
 
-**Problem**: "python: command not found"
-**Solution**: Install Python from [python.org](https://python.org) or use your package manager (`brew install python3` on Mac, `sudo apt install python3` on Linux)
-**Why**: Python needs to be installed on your system first
+- **Problem**: `python: command not found` on Linux or macOS.
+- **Solution**: Use `python3` and `python3 -m pip`, or install Python from your package manager.
+- **Why**: Many systems only provide `python3`.
 
-**Problem**: "pip: command not found"
-**Solution**: Try `python -m pip` instead of `pip`, or reinstall Python with pip included
-**Why**: pip might not be in your PATH, or wasn't installed with Python
+- **Problem**: PowerShell refuses to run `venv\Scripts\activate`.
+- **Solution**: Run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`, then try again.
+- **Why**: Windows blocks unsigned scripts by default.
 
-**Problem**: Virtual environment won't activate on Windows
-**Solution**: Run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` in PowerShell
-**Why**: Windows security policy blocks script execution by default
+- **Problem**: Packages install but Jupyter cannot import them.
+- **Solution**: Pick the "Python (venv)" kernel from the top right of the notebook.
+- **Why**: Jupyter may be running a different Python from the one you installed into.
 
-**Problem**: Can't access Jupyter Lab from browser
-**Solution**: Check firewall settings, or use `localhost:8888` instead of `0.0.0.0:8888` in the URL
-**Why**: Firewall may be blocking the port or network configuration issue
+## Check your understanding
 
-**Problem**: "Kernel dead" or "Kernel error" in Jupyter
-**Solution**: Restart the kernel (Kernel → Restart Kernel), or recreate the ipykernel installation
-**Why**: Package conflict or incomplete installation
+{% quiz %}
+? What are the three parts of one detection?
+- [ ] Image, label and file name
+- [x] Bounding box, class and confidence score
+- [ ] Class, colour and size
+> A detection says where the object is (box), what it is (class) and how sure the model is (confidence).
 
----
+? Which Python versions does the Ultralytics IMX export support?
+- [ ] Any version
+- [ ] Python 2.7 only
+- [x] Python 3.10 to 3.12 on Linux
+> Training works more widely, but the IMX export step needs Linux and Python 3.10 to 3.12.
 
-## Summary
-
-You've learned:
-- Why Jupyter Lab is essential for ML development
-- How to create isolated Python environments with venv
-- Installing and configuring Jupyter Lab
-- Verifying your setup with test code
-- Troubleshooting common installation issues
-
-Your development environment is now ready! In the next lesson, you'll learn how to prepare a custom dataset for training your object detection model.
-
----
-
-## Next Lesson
-
-In the next lesson, you'll learn how to collect and annotate images to create a custom object detection dataset.
-
----
+? Why use a virtual environment?
+- [x] It keeps this project's package versions separate from other projects
+- [ ] It makes training run faster
+- [ ] It is required to use a camera
+> Isolation prevents version clashes between projects.
+{% endquiz %}

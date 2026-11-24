@@ -599,12 +599,11 @@
     Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment,
     and run real-time detection on Raspberry Pi hardware. Complete hands-on course
     from dataset creation to production deployment.
-  duration: 1h 1m
+  duration: 0h 55m
   groups:
   - python
   - ai
-  - raspberry pi
-  - computer vision
+  - raspberrypi
   lessons: 9
   level: intermediate
   link: /learn/object_model/00_intro.html

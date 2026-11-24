@@ -1,426 +1,172 @@
 ---
-title: Deploying to Raspberry Pi AI Camera
+title: Deploying to the Raspberry Pi AI Camera
 description: >-
-    Learn how to deploy your trained object detection model to the Raspberry Pi AI Camera for edge inference
+    Install the IMX500 software on the Pi, test the camera with a stock model, package your own model as network.rpk and load it for the first time.
 type: page
 layout: lesson
 cover: /learn/object_model/assets/banners/05_deployment.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Overview
+By the end of this lesson you will be able to install the AI Camera software on a Raspberry Pi, package your exported model as `network.rpk`, and load it from Python.
 
-Now that you have a trained model in ONNX format, let's deploy it to the Raspberry Pi AI Camera! This lesson covers transferring your model, installing dependencies, converting for IMX500 hardware, and running your first inference on the Pi.
+## Why run it on the camera?
 
----
+Running detection on the camera has real advantages for a robot. The images never leave the device, there is no internet delay, it works with the Wi-Fi off, and because the IMX500 does the neural network work, the Pi's own processor is free for driving motors and everything else.
 
-## Objectives
+Here is where each piece lives:
 
-By the end of this lesson, you will:
+```mermaid
+flowchart LR
+    subgraph Computer
+      A[best.pt] --> B[best_imx_model/packerOut.zip]
+    end
+    B -- scp --> C
+    subgraph Raspberry Pi
+      C[imx500-package] --> D[network.rpk]
+    end
+    D -- loaded by Picamera2 --> E[IMX500 camera]
+    E -- boxes, scores, classes --> F[Your Python program]
+```
 
-- Transfer your ONNX model to the Raspberry Pi
-- Install IMX500 tools and dependencies
-- Convert the model for IMX500 hardware acceleration
-- Run a test inference on a sample image
-- Understand the deployment workflow
-- Verify camera and model integration
+## Step 1: install the camera software
 
----
-
-## Prerequisites
-
-Before starting:
-- [ ] Raspberry Pi 5 or 4 with Raspberry Pi OS installed (latest version)
-- [ ] Raspberry Pi AI Camera connected to CSI port
-- [ ] Your ONNX model file from Lesson 04
-- [ ] SSH access to your Pi (or keyboard/monitor connected)
-- [ ] Internet connection on the Pi
-
----
-
-## Why Deploy to the Edge?
-
-Running object detection on the Raspberry Pi (edge device) instead of the cloud offers huge advantages:
-
-**Benefits of edge deployment:**
-- **Privacy** - Images never leave the device
-- **Speed** - No network latency (10-100ms vs 500-2000ms)
-- **Reliability** - Works without internet connection
-- **Cost** - No cloud API fees
-- **Power** - Low power consumption (~5W total)
-
-**Real-world uses:**
-- Security cameras that work offline
-- Factory quality control on the production line
-- Agricultural robots in fields without connectivity
-- Privacy-focused home automation
-
----
-
-## Transfer Your Model
-
-First, get your ONNX model onto the Pi.
-
-### Option 1: Using SCP (Recommended)
-
-From your computer's terminal:
+Connect the AI Camera to the Pi with the Pi powered off, then boot and run:
 
 ```bash
-# Replace 'raspberrypi.local' with your Pi's hostname or IP address
-scp custom_detector.onnx pi@raspberrypi.local:~/models/
-
-# You'll be prompted for the Pi's password
-```
-
-**Can't find your Pi's address?**
-```bash
-# On the Pi, run:
-hostname -I
-
-# Or use:
-ping raspberrypi.local
-```
-
-### Option 2: Using USB Drive
-
-1. Copy `custom_detector.onnx` to a USB drive
-2. Insert the drive into your Pi
-3. On the Pi, copy the file:
-
-```bash
-# Find the USB drive
-lsblk
-
-# Mount if needed (usually auto-mounts to /media/pi/)
-sudo mount /dev/sda1 /mnt
-
-# Copy the model
-mkdir -p ~/models
-cp /media/pi/YOUR_USB_NAME/custom_detector.onnx ~/models/
-
-# Verify it copied
-ls -lh ~/models/custom_detector.onnx
-```
-
-### Option 3: Direct Download
-
-If your model is hosted somewhere:
-
-```bash
-mkdir -p ~/models
-cd ~/models
-wget https://your-server.com/custom_detector.onnx
-```
-
----
-
-## Install IMX500 Tools
-
-On your Raspberry Pi, install the required tools:
-
-```bash
-# Update package list (important!)
-sudo apt update
-
-# Install IMX500 tools and Python bindings
-sudo apt install -y imx500-tools python3-imx500-tools
-
-# Install additional Python packages
-sudo apt install -y python3-picamera2 python3-opencv python3-numpy
-
-# Verify installation
-imx500-package.sh --version
-```
-
-**Expected output:**
-```
-imx500-package version 1.0.2
-```
-
-**If installation fails:**
-Make sure you're on the latest Raspberry Pi OS:
-```bash
-sudo apt update
-sudo apt full-upgrade -y
+sudo apt update && sudo apt full-upgrade
+sudo apt install imx500-all
 sudo reboot
 ```
 
----
-
-## Convert Model for IMX500
-
-The IMX500 sensor has its own neural processor. Convert your model to its optimized format:
+The `imx500-all` package installs the camera firmware, a set of ready-made models in `/usr/share/imx500-models/` and the post-processing files. You also need the packaging tool, which the official docs install separately:
 
 ```bash
-# Navigate to your models directory
-cd ~/models
-
-# Convert ONNX to IMX500 format (.rpk file)
-imx500-package.sh -i custom_detector.onnx -o detector_imx500
-
-# This takes 2-5 minutes depending on model size
+sudo apt install imx500-tools
 ```
 
-**What's happening:**
-- Model is optimized for IMX500 neural processor
-- Converted from floating-point to fixed-point (INT8/INT16)
-- Packaged with metadata (input/output specs, normalization params)
-- Creates `.rpk` (Raspberry Pi Package) file
-
-**Expected output:**
-```
-Processing custom_detector.onnx...
-Analyzing model structure...
-Converting layers to IMX500 format...
-Quantizing weights...
-✓ Conversion successful
-✓ Created detector_imx500/network.rpk
-✓ Model size: 12.3 MB (reduced from 45.3 MB)
-```
-
-**Check the output:**
-```bash
-ls -lh detector_imx500/
-```
-
-You should see:
-- `network.rpk` - The converted model
-- `labels.txt` - Class names (if you provided them)
-- `metadata.json` - Model configuration
-
----
-
-## Verify Camera Connection
-
-Make sure your AI Camera is properly connected:
+Check the Pi can see the camera:
 
 ```bash
-# List available cameras
-libcamera-still --list-cameras
-
-# Should show the IMX500 camera
+rpicam-hello --list-cameras
 ```
 
-**Expected output:**
-```
-Available cameras:
-0 : imx500 [4056x3040] (/base/axi/pcie@120000/rp1/i2c@88000/imx500@1a)
-```
+You should see an `imx500` entry in the list.
 
-**If camera not found:**
+## Step 2: test with a stock model first
 
-1. **Check physical connection:**
-   - Cable fully inserted in both camera and Pi
-   - Blue side of cable faces USB ports on Pi
-   - Camera module LED should light up on boot
-
-2. **Enable camera in config:**
-```bash
-sudo raspi-config
-# Navigate to: Interface Options → Camera → Enable
-# Reboot: sudo reboot
-```
-
-3. **Check cable:**
-```bash
-vcgencmd get_camera
-# Should return: detected=1
-```
-
----
-
-## Test Camera Capture
-
-Take a test photo to verify everything works:
+Before using your own model, prove the hardware works with one that Raspberry Pi provides. With a monitor connected to the Pi, run:
 
 ```bash
-# Capture a still image
-libcamera-still -o test.jpg --width 640 --height 480
-
-# View the file
-ls -lh test.jpg
+rpicam-hello -t 0s --post-process-file /usr/share/rpi-camera-assets/imx500_mobilenet_ssd.json --viewfinder-width 1920 --viewfinder-height 1080 --framerate 30
 ```
 
-**If successful**, you'll have a `test.jpg` file. Transfer it to your computer to view:
+This is the command from the official Raspberry Pi AI Camera documentation. The first run can take several minutes because the camera has to load its firmware and the network, so be patient. You should see a live preview with boxes drawn around everyday objects.
+
+This split matters. If the stock model works but your model does not, the fault is in your model or packaging, not the camera. If neither works, check the cable and software first.
+
+## Step 3: copy your model across
+
+From your training computer:
 
 ```bash
-# On your computer:
-scp pi@raspberrypi.local:~/test.jpg ./
+scp -r best_imx_model <username>@raspberrypi.local:~/models/
 ```
 
----
+Replace `<username>` with the user name you chose when you set up the Pi. On the Pi, `hostname -I` shows its address if `raspberrypi.local` does not resolve.
 
-## Test Inference
+## Step 4: package it
 
-Now let's run your model on a test image:
+On the Pi:
+
+```bash
+imx500-package -i ~/models/best_imx_model/packerOut.zip -o ~/models/robot_package
+ls ~/models/robot_package
+```
+
+This produces `network.rpk` in the output folder. That is the file the camera loads. Keep `labels.txt` from the export folder somewhere handy, because the `.rpk` only knows class numbers.
+
+## Step 5: load it from Python
+
+Save this as `first_inference.py` and run it with `python3 first_inference.py`. It loads your network and prints the shape of what the camera sends back, which tells you how to read detections in the next lesson.
 
 ```python
-# test_deployment.py
+import os
+
 from picamera2 import Picamera2
 from picamera2.devices.imx500 import IMX500
-import numpy as np
-import time
 
-print("Initializing camera and model...")
+MODEL = os.path.expanduser("~/models/robot_package/network.rpk")
 
-# Initialize camera
-picam2 = Picamera2()
+imx500 = IMX500(MODEL)                 # create this BEFORE Picamera2
+picam2 = Picamera2(imx500.camera_num)  # attach to the IMX500 camera
+config = picam2.create_preview_configuration(buffer_count=12)
 
-# Load IMX500 model
-imx500 = IMX500(picam2)
-imx500.load_network("/home/pi/models/detector_imx500/network.rpk")
+imx500.show_network_fw_progress_bar()  # shows the model loading
+picam2.start(config, show_preview=False)
 
-# Configure camera
-config = picam2.create_still_configuration()
-picam2.configure(config)
-picam2.start()
-
-print("✓ Camera initialized")
-print("✓ Model loaded")
-
-# Capture and process
-print("\nCapturing image...")
-start_time = time.time()
-
-image = picam2.capture_array()
-print(f"✓ Image captured: {image.shape}")
-
-# Run inference
-results = imx500.get_inference_result()
-
-inference_time = (time.time() - start_time) * 1000
-print(f"✓ Inference complete in {inference_time:.1f} ms")
-
-# Print detections
-if results and len(results['boxes']) > 0:
-    print(f"\nDetected {len(results['boxes'])} objects:")
-    for i, (box, label, score) in enumerate(zip(
-        results['boxes'],
-        results['labels'],
-        results['scores']
-    )):
-        if score > 0.5:  # Confidence threshold
-            print(f"  {i+1}. Class {label}: {score:.2f} - {box}")
+for attempt in range(60):
+    metadata = picam2.capture_metadata()
+    outputs = imx500.get_outputs(metadata)
+    if outputs is not None:
+        print(f"Got {len(outputs)} output tensors:")
+        for i, tensor in enumerate(outputs):
+            print(f"  output {i}: shape {tensor.shape}")
+        break
 else:
-    print("\nNo objects detected")
+    print("No network output received. Check the model loaded correctly.")
 
 picam2.stop()
-print("\n✓ Test complete!")
 ```
+{: .no-snakie }
 
-**Run it:**
-```bash
-python3 test_deployment.py
-```
+`get_outputs()` returns the model's output tensors as NumPy arrays, or `None` while the first frames are still arriving. Most exported YOLO detectors with on-chip non-maximum suppression give boxes, scores and class numbers as separate tensors. Print the shapes on your own model rather than trusting that: lesson 06 builds on what you see here.
 
-**Expected output:**
-```
-Initializing camera and model...
-✓ Camera initialized
-✓ Model loaded
+> **Teachers**: One Pi and one AI Camera per group of two to four works well. The first run of each new model takes minutes, so load it before the lesson starts. Use a shared hostname scheme and a shared account on classroom Pis, and check that the school network lets learners SSH and `scp` between machines, because many school networks block that. A USB stick is a fine fallback for moving `packerOut.zip`. The camera is delicate: remind learners to power off before touching the ribbon cable.
 
-Capturing image...
-✓ Image captured: (480, 640, 3)
-✓ Inference complete in 45.3 ms
+## Try it Yourself
 
-Detected 2 objects:
-  1. Class 1: 0.92 - [120, 80, 340, 420]
-  2. Class 2: 0.78 - [400, 150, 580, 380]
-
-✓ Test complete!
-```
-
----
-
-## Performance Expectations
-
-On Raspberry Pi 5 with AI Camera:
-
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Inference speed** | 10-30 FPS | Depends on model complexity |
-| **Latency** | 30-100ms | Per frame processing |
-| **Power consumption** | ~5W | Total system power |
-| **Accuracy** | Same as validation | Should match your test set results |
-| **Startup time** | 2-3 seconds | Model loading time |
-{:class="table table-single"}
-
-**Raspberry Pi 4 will be slightly slower** (~20-50% depending on model).
-
----
-
-## Try It Yourself
-
-1. **Test different lighting** - Capture images in bright, dim, and mixed lighting
-2. **Measure FPS** - Modify script to process 100 frames and calculate average FPS
-3. **Compare models** - Deploy different model sizes and compare speed vs accuracy
-
-**Challenge:** Create a script that automatically takes a photo when it detects your target object.
-
----
+1. Run the stock model test and hold up three different objects. Which does it recognise?
+2. Time how long `first_inference.py` takes on its first and second run, and explain the difference.
+3. Edit the script to print `outputs[0][0]`, the first row of the first tensor.
+4. Challenge: copy `labels.txt` to the Pi and print your class names at the start of the script.
 
 ## Common Issues
 
-**Problem**: "imx500-tools: command not found"
-**Solution**: Update OS: `sudo apt update && sudo apt full-upgrade`, then reinstall
-**Why**: IMX500 support is recent, requires latest Raspberry Pi OS (Bookworm or newer)
+- **Problem**: `rpicam-hello --list-cameras` shows no cameras.
+- **Solution**: Power off, reseat the ribbon cable at both ends with the contacts facing the right way, and check the Pi's own camera documentation for which way round your cable goes.
+- **Why**: A half-seated cable is the most common cause.
 
-**Problem**: "Conversion failed: unsupported operator"
-**Solution**: Some PyTorch operations aren't supported by IMX500. Simplify your model
-**Why**: Edge hardware has limited operator support compared to full PyTorch
+- **Problem**: The first run seems frozen for minutes.
+- **Solution**: Wait. Watch the firmware progress bar in your script or the terminal.
+- **Why**: The camera loads firmware and your network on first use, and a bigger network takes longer.
 
-**Problem**: "Camera not detected"
-**Solution**: Check cable connection, run `sudo raspi-config` and enable camera, reboot
-**Why**: Camera interface needs to be enabled in system configuration
+- **Problem**: `imx500-package: command not found`.
+- **Solution**: Run `sudo apt install imx500-tools` and try again.
+- **Why**: The packaging tool is a separate package from `imx500-all`.
 
-**Problem**: Model loads but gets no detections
-**Solution**: Check class mappings, verify confidence threshold isn't too high, test on training images first
-**Why**: Mismatched class indices or overly strict filtering
+## Check your understanding
 
-**Problem**: "Permission denied" when accessing camera
-**Solution**: Add user to video group: `sudo usermod -a -G video $USER`, then logout/login
-**Why**: Camera devices require video group membership
+{% quiz %}
+? Why test with the stock MobileNet SSD model before your own?
+- [ ] It is faster than your model
+- [x] It shows the camera and software work, so any later failure points at your model or packaging
+- [ ] Your model will not load otherwise
+> Changing one thing at a time makes faults easy to find.
 
-**Problem**: Very slow inference (>500ms)
-**Solution**: Verify model was converted to .rpk format, check you're using IMX500 not CPU inference
-**Why**: ONNX model runs on CPU, .rpk runs on dedicated neural processor
+? What does `imx500-package` produce from `packerOut.zip`?
+- [ ] `best.pt`
+- [x] `network.rpk`
+- [ ] `data.yaml`
+> `network.rpk` is the file the camera loads.
 
----
-
-## Verify Deployment Checklist
-
-Before moving to the next lesson:
-
-- [ ] Model file transferred to Pi
-- [ ] IMX500 tools installed successfully
-- [ ] Model converted to .rpk format
-- [ ] Camera detected by system
-- [ ] Test photo captured successfully
-- [ ] Test inference script runs without errors
-- [ ] Getting reasonable detection results
-- [ ] Inference time <100ms
-
----
-
-## Summary
-
-You've learned:
-- Multiple methods to transfer models to Raspberry Pi
-- Installing and using IMX500 tools
-- Converting ONNX models for edge deployment with hardware acceleration
-- Verifying camera connection and configuration
-- Running test inference on the AI Camera
-- Expected performance metrics and troubleshooting
-
-Your model is now running on the edge! In the next lesson, you'll build a complete real-time detection application.
-
----
-
-## Next Lesson
-
-In the next lesson, you'll build a real-time object detection application with live camera feed, bounding box visualization, and performance monitoring.
-
----
+? In the Python script, what must be created before the Picamera2 object?
+- [ ] The preview window
+- [x] The `IMX500` object
+- [ ] The labels file
+> Creating `IMX500` first loads the network and gives you the right camera number.
+{% endquiz %}
