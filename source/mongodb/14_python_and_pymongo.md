@@ -4,18 +4,39 @@ description: Connect to MongoDB from Python with PyMongo and read, add, change a
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/14_python_and_pymongo.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
+code_target: cpython
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to connect to MongoDB from Python with PyMongo, and find, add, change and delete documents from a script.
+
 So far we have talked to MongoDB by typing into `mongosh`. That is brilliant for exploring, but nobody wants to type `db.parts.updateOne(...)` every time they pull a servo out of a drawer. The real power comes when a **program** talks to the database for you.
 
 In this lesson we connect to the Parts Bin from **Python**, using a library called **PyMongo**. By the end you will be able to find, add, change and delete parts from a script - which is everything we need to build the full Parts Bin app in the next lesson.
 
 If Python is new to you, the [Python for beginners course](/learn/python/) covers everything used here. If your data has drifted from the original 13 parts, reset it first (`db.parts.drop()` then re-run the `insertMany` from [lesson 05](05_inserting_documents)).
+
+---
+
+## The big picture
+
+Your Python script is just another client. PyMongo turns method calls into the same commands you typed in mongosh.
+
+```mermaid
+sequenceDiagram
+    participant Script as Your Python script
+    participant Driver as PyMongo
+    participant Server as MongoDB server
+    Script->>Driver: parts.find_one with a dict
+    Driver->>Server: find command over port 27017
+    Server-->>Driver: BSON document
+    Driver-->>Script: Python dict
+```
 
 ---
 
@@ -409,6 +430,8 @@ Is the server running? Try: docker start mongodb
 
 ---
 
+> **Teachers**: learners need Python with permission to create a virtual environment and run `pip install pymongo`. On locked-down school machines, pip may be blocked: ask IT to pre-install PyMongo, or prepare the virtual environment on a shared drive. The Python is computer-side, so no Raspberry Pi or Pico is needed.
+
 ## Try it Yourself
 
 1. Write a script that prints the name and price of every part on shelf "D", most expensive first.
@@ -438,25 +461,55 @@ parts.update_one({"name": "BME280 Sensor"}, {"$push": {"used_in": "Weather Stati
 
 ## Common Issues
 
-**Problem:** `SyntaxError: invalid syntax` pointing at a `$`.  
-**Solution:** Put quotes around the operator: `{"$inc": {"quantity": -1}}`, not `{$inc: ...}`.  
-**Why:** In Python an operator is just a dictionary key, and keys that are text must be quoted.
+- **Problem**: `SyntaxError: invalid syntax` pointing at a `$`.
+- **Solution**: Put quotes around the operator: `{"$inc": {"quantity": -1}}`, not `{$inc: ...}`.
+- **Why**: In Python an operator is just a dictionary key, and keys that are text must be quoted.
 
-**Problem:** `NameError: name 'true' is not defined. Did you mean: 'True'?`  
-**Solution:** Use `True`, `False` and `None` in Python.  
-**Why:** `true`, `false` and `null` are JavaScript spellings that only work in `mongosh`.
+- **Problem**: `NameError: name 'true' is not defined. Did you mean: 'True'?`
+- **Solution**: Use `True`, `False` and `None` in Python.
+- **Why**: `true`, `false` and `null` are JavaScript spellings that only work in `mongosh`.
 
-**Problem:** `find_one({"_id": "6ad5..."})` returns `None` even though the id is right.  
-**Solution:** Wrap it: `{"_id": ObjectId("6ad5...")}` after `from bson import ObjectId`.  
-**Why:** An ObjectId is its own type. A string with the same characters is not equal to it.
+- **Problem**: `find_one({"_id": "6ad5..."})` returns `None` even though the id is right.
+- **Solution**: Wrap it: `{"_id": ObjectId("6ad5...")}` after `from bson import ObjectId`.
+- **Why**: An ObjectId is its own type. A string with the same characters is not equal to it.
 
-**Problem:** `ModuleNotFoundError: No module named 'pymongo'`.  
-**Solution:** Activate your virtual environment (`source venv/bin/activate`) and run `pip install pymongo` again.  
-**Why:** PyMongo was installed into the virtual environment, so Python can only see it while that environment is switched on.
+- **Problem**: `ModuleNotFoundError: No module named 'pymongo'`.
+- **Solution**: Activate your virtual environment (`source venv/bin/activate`) and run `pip install pymongo` again.
+- **Why**: PyMongo was installed into the virtual environment, so Python can only see it while that environment is switched on.
 
-**Problem:** Dates come back without a time zone, like `datetime.datetime(2026, 1, 12, 0, 0)`.  
-**Solution:** Create the client with `MongoClient(uri, tz_aware=True)` if you need time zone aware dates.  
-**Why:** MongoDB always stores dates in UTC. PyMongo hands them back without a time zone label unless you ask.
+- **Problem**: Dates come back without a time zone, like `datetime.datetime(2026, 1, 12, 0, 0)`.
+- **Solution**: Create the client with `MongoClient(uri, tz_aware=True)` if you need time zone aware dates.
+- **Why**: MongoDB always stores dates in UTC. PyMongo hands them back without a time zone label unless you ask.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does find() return in PyMongo?
+- [ ] A list
+- [x] A cursor you can loop over once
+- [ ] A dictionary
+> Loop over it, or wrap it in list() if you need the results more than once.
+
+? Why does {"_id": "6ad5..."} find nothing?
+- [x] The _id is an ObjectId, not a string, so wrap it with ObjectId()
+- [ ] find_one cannot search by _id
+- [ ] The string is too long
+> An ObjectId is its own type. A string with the same characters is not equal to it.
+
+? Which Python value matches mongosh's true, false and null?
+- [ ] true, false, null
+- [x] True, False, None
+- [ ] 1, 0, ""
+> Python spells them with capitals, and None for null.
+
+? Why set serverSelectionTimeoutMS=2000?
+- [x] So the program fails fast when the server is down, instead of waiting 30 seconds
+- [ ] To make queries faster
+- [ ] To cap document size
+> PyMongo only connects on the first command, and by default keeps trying for 30 seconds.
+{% endquiz %}
 
 ---
 

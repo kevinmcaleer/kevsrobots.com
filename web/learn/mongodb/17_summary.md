@@ -9,8 +9,9 @@ previous: 16_keeping_your_data_safe.html
 description: What you built, what you learned, and where to take your MongoDB skills
   next
 percent: 100
-duration: 5
-date_updated: 2026-10-18
+duration: 7
+quiz_total: 64
+date_updated: 2026-11-24
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -71,7 +72,24 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to recap what each MongoDB tool does, and choose a next project for your own workshop or robot.
+
 You started this course possibly never having made a database. You are finishing it with a working app, backed by MongoDB, that knows exactly how many SG90 servos you have and which bin they are in. Nicely done.
+
+## Your journey so far
+
+Here is the whole course as a path, from storing a first document to a database you can back up and lock down.
+
+```mermaid
+flowchart LR
+    A["Documents and mongosh"] --> B["CRUD: insert, find, update, delete"]
+    B --> C["Nested data and design"]
+    C --> D["Aggregation and indexes"]
+    D --> E["PyMongo and Parts Bin"]
+    E --> F["Backups and security"]
+```
+
+---
 
 ## What you built
 
@@ -130,6 +148,49 @@ python parts_bin.py value                            # what it's all worth
 **Put it on the web.** Wrap Parts Bin in a small web API so you can check your stock from your phone in the shop. The [FastAPI](/learn/fastapi/) course shows you how, and the `pymongo` code you have already written drops straight in.
 
 **Run it in the cloud.** If you used Docker locally, try moving your data to a free MongoDB Atlas cluster with `mongodump` and `mongorestore`. Then your parts list goes wherever you go.
+
+---
+
+## Try it Yourself
+
+Pick one and have a go. They use only things you have already learnt.
+
+1. **Count your own drawer.** Add ten real parts from your own workshop with the `add` command, then run `value` and `low`. Is anything on the shopping list that surprises you?
+2. **Log a robot.** Write a Python script that inserts one document every two seconds, such as `{"sensor": "distance", "cm": 23.4, "at": datetime.now(timezone.utc)}`. Fake the reading with `random.uniform`, or read a real sensor on a Raspberry Pi. Then use `$group` to work out the average reading per sensor.
+3. **Prove the index.** Insert 100,000 readings into a scratch collection, run `explain("executionStats")` on a query, add an index, and compare `totalDocsExamined` before and after.
+4. **Lock it down.** Take a backup with `mongodump`, restart your container with `--auth`, and run `parts_bin.py` with a `readWrite` user from a `.env` file.
+
+---
+
+## Common Issues
+
+- **Problem**: Your Parts Bin app works on your laptop but not on another machine.
+- **Solution**: Check that the second machine can reach the server and has the right `MONGODB_URI`, and that the port is not bound to `127.0.0.1` only.
+- **Why**: Binding to `127.0.0.1` is exactly what keeps the database private, so a remote machine cannot connect unless you deliberately change it, preferably with authentication switched on first.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does CRUD stand for?
+- [x] Create, Read, Update, Delete
+- [ ] Copy, Run, Undo, Drop
+- [ ] Collect, Record, Upload, Download
+> They are the four jobs every database does, and you can now do all four in mongosh and Python.
+
+? What is the rule of thumb for designing documents?
+- [x] Things you read together belong together
+- [ ] Always keep one collection per field
+- [ ] Never embed anything
+> Design follows use: embed what is read together, reference what is shared or grows without limit.
+
+? Which course helps you put a web API in front of your database?
+- [x] FastAPI
+- [ ] Docker Swarm
+- [ ] Linux intro
+> FastAPI is suggested for checking your stock from your phone.
+{% endquiz %}
 
 ---
 

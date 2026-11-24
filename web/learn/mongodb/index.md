@@ -8,9 +8,27 @@ description: Never made a database before? Start here. Learn what a database is,
   MongoDB, and store, find, update and organise your data - then build Parts Bin,
   a Python app that keeps track of every servo, sensor and screw in your workshop.
 level: beginner
-course_duration: 2h 42m
+course_duration: 3h 12m
 lesson_count: 18
 first_lesson: 00_intro.html
+quiz_total: 64
+outcomes:
+- Explain what a document database is, and read and write MongoDB documents
+- Start a MongoDB server with Docker, Atlas or a native install and connect with mongosh
+- Insert, find, update and delete documents, using query and update operators safely
+- Design documents with embedding, references and schema validation
+- Summarise data with the aggregation pipeline and speed up queries with indexes
+- Build a Python app with PyMongo, then back up and secure the database
+prerequisites:
+- No database experience needed
+- Helpful but not required, basic Python (variables, lists, dictionaries and functions)
+  for the last part
+you_need:
+- A computer running Windows, macOS or Linux, or a Raspberry Pi 5 with 64-bit Raspberry
+  Pi OS
+- Docker, or a free MongoDB Atlas account, or a native MongoDB install
+- Python 3.10 or newer for the PyMongo lessons
+- A terminal
 navigation:
 - name: MongoDB - Your First Database
 - content:

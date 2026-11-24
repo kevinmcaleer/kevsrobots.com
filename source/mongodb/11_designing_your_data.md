@@ -4,18 +4,36 @@ description: Learn when to embed data inside a document and when to reference an
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/11_designing_your_data.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to decide when to embed data and when to reference it, and add $jsonSchema validation so bad documents are rejected.
+
 So far we've added fields wherever it felt handy - MongoDB never forces a layout on you. But sooner or later you'll ask "should this live inside the part, or somewhere else?", and you'll make a typo that quietly creates a brand new field.
 
 In this lesson we'll look at the two big design choices - **embedding** and **referencing** - and then add some rules to the `parts` collection so MongoDB itself refuses bad data.
 
 > **Starting fresh:** the outputs below assume the original 13 parts, so run `db.parts.drop()` and re-run the `insertMany` from [lesson 05](05_inserting_documents) before you begin.
+
+---
+
+## The big picture
+
+The embed or reference question comes down to how you read the data and whether it grows. Here are the two shapes side by side.
+
+```mermaid
+flowchart LR
+    subgraph EMB["Embedded: read together, small"]
+      P1["Part"] --- L1["location: shelf and bin"]
+    end
+    subgraph REF["Referenced: shared or growing"]
+      PR["Project: BurgerBot"] -->|"parts: list of part _ids"| PA["Part documents in parts"]
+    end
+```
 
 ---
 
@@ -347,17 +365,41 @@ The first insert works. The second fails with `reason: 'type did not match'`, `c
 
 ## Common Issues
 
-**Problem:** `MongoServerError: Document failed validation` on an insert that looks fine.  
-**Solution:** Read the `details` section - it names the field (`propertyName` or `missingProperties`) and the rule it broke.  
-**Why:** Usually it's a typo in a field name, or a number typed in quotes so it became a string.
+- **Problem**: `MongoServerError: Document failed validation` on an insert that looks fine.
+- **Solution**: Read the `details` section - it names the field (`propertyName` or `missingProperties`) and the rule it broke.
+- **Why**: Usually it's a typo in a field name, or a number typed in quotes so it became a string.
 
-**Problem:** A project's `part_id` finds nothing after you reset the `parts` collection.  
-**Solution:** Recreate the project after resetting, looking the IDs up again.  
-**Why:** The reset inserted brand new parts with brand new ObjectIds. A reference is only a stored ID - MongoDB doesn't check that it points at anything, and won't fix it for you.
+- **Problem**: A project's `part_id` finds nothing after you reset the `parts` collection.
+- **Solution**: Recreate the project after resetting, looking the IDs up again.
+- **Why**: The reset inserted brand new parts with brand new ObjectIds. A reference is only a stored ID - MongoDB doesn't check that it points at anything, and won't fix it for you.
 
-**Problem:** Your rules don't seem to apply any more.  
-**Solution:** Run the `collMod` command again.  
-**Why:** Dropping a collection deletes its validation rules too.
+- **Problem**: Your rules don't seem to apply any more.
+- **Solution**: Run the `collMod` command again.
+- **Why**: Dropping a collection deletes its validation rules too.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? When should you embed data inside a document?
+- [x] When you always read it together and it stays small
+- [ ] When it grows forever
+- [ ] When many documents share it
+> Embedding keeps related data in one read. Reference data that is shared or grows without limit.
+
+? What is a reference in MongoDB?
+- [x] An _id stored in another document
+- [ ] A copy of the whole document
+- [ ] A special index
+> Following a reference takes a second query, or a $lookup.
+
+? What happens when you insert a part with quantiy instead of quantity, after adding a $jsonSchema validator that requires quantity?
+- [x] MongoDB rejects it with a validation error
+- [ ] It is stored with a new field
+- [ ] It is stored with quantity set to 0
+> Validation turns silent typos into loud errors.
+{% endquiz %}
 
 ---
 

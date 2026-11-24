@@ -4,12 +4,14 @@ description: Ask MongoDB questions with find() and findOne() - filters, projecti
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/06_finding_documents.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find documents with find and findOne, narrow them with filters and projections, and control order and count with sort, limit and skip.
 
 Our Parts Bin now holds 13 parts. Storing data is only half the job though - the real fun starts when we ask it questions. "Which servos do I have?" "What's the most expensive thing on my shelves?" "How many sensors are there?"
 
@@ -185,6 +187,21 @@ The one rule: pick a style. Mixing `1`s and `0`s in the same projection is an er
 
 ---
 
+## The big picture
+
+A query is a small pipeline. The filter picks the documents, then the shell shapes what comes back.
+
+```mermaid
+flowchart LR
+    A["All parts"] --> B["Filter<br/>category: servo"]
+    B --> C["sort<br/>price descending"]
+    C --> D["skip<br/>0"]
+    D --> E["limit<br/>3"]
+    E --> F["Projection<br/>name and price only"]
+```
+
+---
+
 ## Sorting, limiting and skipping
 
 You can tack extra instructions onto the end of `find()`. `sort()` orders the results: `1` means smallest first (A to Z), `-1` means largest first.
@@ -324,17 +341,47 @@ That's a shopping list for building another SMARS. We'll dig much deeper into ar
 
 ## Common Issues
 
-**Problem:** A query you're sure is right returns nothing.  
-**Solution:** Check the spelling, the capital letters and the type. `"Servo"` is not `"servo"`, and `"12"` is not `12`.  
-**Why:** Equality filters are exact matches. We'll learn case-insensitive searching in the next lesson.
+- **Problem**: A query you're sure is right returns nothing.
+- **Solution**: Check the spelling, the capital letters and the type. `"Servo"` is not `"servo"`, and `"12"` is not `12`.
+- **Why**: Equality filters are exact matches. We'll learn case-insensitive searching in the next lesson.
 
-**Problem:** `MongoServerError[Location31254]: Cannot do exclusion on field quantity in inclusion projection`  
-**Solution:** Use only `1`s or only `0`s in a projection (apart from `_id: 0`).  
-**Why:** MongoDB can't guess what you want when you say "show only these" and "hide those" at the same time.
+- **Problem**: `MongoServerError[Location31254]: Cannot do exclusion on field quantity in inclusion projection`
+- **Solution**: Use only `1`s or only `0`s in a projection (apart from `_id: 0`).
+- **Why**: MongoDB can't guess what you want when you say "show only these" and "hide those" at the same time.
 
-**Problem:** My projection is being treated as a filter and nothing comes back.  
-**Solution:** If you want every document, put an empty `{}` first: `find({}, { name: 1 })`.  
-**Why:** The first argument is always the filter, the second is always the projection.
+- **Problem**: My projection is being treated as a filter and nothing comes back.
+- **Solution**: If you want every document, put an empty `{}` first: `find({}, { name: 1 })`.
+- **Why**: The first argument is always the filter, the second is always the projection.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does findOne return when nothing matches?
+- [ ] An empty list
+- [x] null
+- [ ] An error
+> findOne gives back a single document, or null if there is no match.
+
+? What does find({ category: "servo", quantity: 4 }) mean?
+- [ ] Either condition can match
+- [x] Both conditions must match
+- [ ] Only the first condition is used
+> Several fields in one filter means all of them must match, which is AND.
+
+? How do you hide the _id field in the results?
+- [x] Add _id: 0 to the projection
+- [ ] Add _id: false to the filter
+- [ ] Call find().hide()
+> _id is the one field you may exclude even in an inclusion projection.
+
+? find({ tags: "servo" }) where tags is a list. What does it match?
+- [ ] Only lists that equal ["servo"] exactly
+- [x] Documents whose list contains servo
+- [ ] Nothing
+> Filtering an array field with a single value finds documents where the list contains that value.
+{% endquiz %}
 
 ---
 

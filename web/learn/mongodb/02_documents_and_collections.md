@@ -10,8 +10,9 @@ next: 03_installing_mongodb.html
 description: Learn to read JSON, and see how MongoDB organises data into databases,
   collections, documents and fields
 percent: 15
-duration: 7
-date_updated: 2026-10-18
+duration: 9
+quiz_total: 64
+date_updated: 2026-11-24
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -71,6 +72,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read a JSON document, name the parts of a MongoDB document, and explain what BSON and a flexible schema add.
 
 Before we install anything, let's learn to read the format MongoDB uses for its data. Once you can read a document, every command in the rest of the course will make a lot more sense.
 
@@ -132,6 +135,23 @@ So the hierarchy, from biggest to smallest, is:
 **server** > **databases** > **collections** > **documents** > **fields**
 
 In workshop terms: the server is the whole workshop, a database is one set of shelves, a collection is a drawer, each document is a labelled card in that drawer, and the fields are the lines written on the card.
+
+---
+
+## The big picture
+
+Everything in MongoDB nests inside something bigger, from the server at the top down to a single field.
+
+```mermaid
+flowchart TD
+    S["Server"] --> DB["Database: workshop"]
+    DB --> C1["Collection: parts"]
+    DB --> C2["Collection: projects"]
+    C1 --> D1["Document: SG90 Micro Servo"]
+    C1 --> D2["Document: HC-SR04 Sensor"]
+    D1 --> F1["Field: quantity = 12"]
+    D1 --> F2["Field: location = shelf A, bin 1"]
+```
 
 ---
 
@@ -241,13 +261,43 @@ That freedom is lovely, but it cuts both ways. MongoDB won't stop you misspellin
 
 ## Common Issues
 
-**Problem:** A number is behaving like text (for example, sorting puts `"10"` before `"9"`).  
-**Solution:** Remove the quotes so it is stored as a real number: `quantity: 10`, not `quantity: "10"`.  
-**Why:** Anything in quotes is a string, and strings sort letter by letter, not by value.
+- **Problem**: A number is behaving like text (for example, sorting puts `"10"` before `"9"`).
+- **Solution**: Remove the quotes so it is stored as a real number: `quantity: 10`, not `quantity: "10"`.
+- **Why**: Anything in quotes is a string, and strings sort letter by letter, not by value.
 
-**Problem:** You get an error about an unexpected token when writing JSON.  
-**Solution:** Check for a missing comma between pairs, or an extra comma after the last one.  
-**Why:** Strict JSON is fussy about commas. `mongosh` is more forgiving about trailing commas, but it is a good habit to get right.
+- **Problem**: You get an error about an unexpected token when writing JSON.
+- **Solution**: Check for a missing comma between pairs, or an extra comma after the last one.
+- **Why**: Strict JSON is fussy about commas. `mongosh` is more forgiving about trailing commas, but it is a good habit to get right.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What is the difference between 12 and "12" in a document?
+- [ ] There is none
+- [x] 12 is a number you can do sums with; "12" is text
+- [ ] "12" is a number and 12 is text
+> Anything in quotes is a string. Strings sort letter by letter, so "10" lands before "9".
+
+? Which order is correct, biggest to smallest?
+- [x] Server, database, collection, document, field
+- [ ] Collection, database, server, field, document
+- [ ] Database, server, document, collection, field
+> A server holds databases, a database holds collections, a collection holds documents, and a document is made of fields.
+
+? What two extras does BSON add to JSON?
+- [ ] Comments and functions
+- [x] Real dates and ObjectIds
+- [ ] Colours and images
+> BSON has a proper date type and ObjectIds, plus the difference between whole numbers and decimals.
+
+? What does a flexible schema mean?
+- [x] Documents in one collection can have different fields
+- [ ] MongoDB never stores numbers
+- [ ] Every document must match exactly
+> A servo's specs can hold torque while a battery's holds capacity, and nobody has to add empty boxes to the screws.
+{% endquiz %}
 
 ---
 

@@ -10,8 +10,9 @@ next: 08_updating_documents.html
 description: Go beyond exact matches with $gt, $lt, $in, $or, $exists and $regex -
   and build low-stock and search queries
 percent: 40
-duration: 9
-date_updated: 2026-10-18
+duration: 11
+quiz_total: 64
+date_updated: 2026-11-24
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -71,6 +72,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use comparison, list, logical and text operators to ask questions such as which parts are low on stock.
 
 So far every filter has been an exact match: "category is servo", "quantity is 2". But the questions we really want to ask our Parts Bin sound more like this:
 
@@ -186,6 +189,21 @@ db.parts.find({ tags: { $in: ["i2c", "wifi"] } }, { name: 1, tags: 1, _id: 0 })
   },
   { name: 'PCA9685 Servo Driver', tags: [ 'servo', 'i2c' ] }
 ]
+```
+
+---
+
+## The big picture
+
+Operators all start with a dollar sign and sit inside a small document. This map shows which one to reach for.
+
+```mermaid
+flowchart TD
+    Q{"What do you want to ask?"} -->|"bigger or smaller than"| C["$gt $gte $lt $lte $ne"]
+    Q -->|"one of several values"| I["$in and $nin"]
+    Q -->|"this or that condition"| O["$or"]
+    Q -->|"is the field there at all"| E["$exists"]
+    Q -->|"contains a word"| R["$regex with i option"]
 ```
 
 ---
@@ -342,21 +360,51 @@ Time to order some LEDs. Operators work with everything from the last lesson, so
 
 ## Common Issues
 
-**Problem:** A query with `{ quantity: { gt: 5 } }` returns nothing, with no error.  
-**Solution:** Don't forget the dollar sign: `$gt`.  
-**Why:** Without the `$`, MongoDB thinks you want `quantity` to be the exact document `{ gt: 5 }`. No part matches that, so you get nothing back.
+- **Problem**: A query with `{ quantity: { gt: 5 } }` returns nothing, with no error.
+- **Solution**: Don't forget the dollar sign: `$gt`.
+- **Why**: Without the `$`, MongoDB thinks you want `quantity` to be the exact document `{ gt: 5 }`. No part matches that, so you get nothing back.
 
-**Problem:** `MongoServerError[BadValue]: $or argument must be an array`  
-**Solution:** Wrap the conditions in square brackets: `{ $or: [ {...}, {...} ] }`.  
-**Why:** `$or`, `$and` and `$in` all take a list.
+- **Problem**: `MongoServerError[BadValue]: $or argument must be an array`
+- **Solution**: Wrap the conditions in square brackets: `{ $or: [ {...}, {...} ] }`.
+- **Why**: `$or`, `$and` and `$in` all take a list.
 
-**Problem:** `Regular expression is invalid: missing closing parenthesis` when searching for "(pack".  
-**Solution:** Put a backslash before special characters: `/\(pack/`.  
-**Why:** Characters like `( ) . * + ? [ ]` have special meanings in a regex.
+- **Problem**: `Regular expression is invalid: missing closing parenthesis` when searching for "(pack".
+- **Solution**: Put a backslash before special characters: `/\(pack/`.
+- **Why**: Characters like `( ) . * + ? [ ]` have special meanings in a regex.
 
-**Problem:** I wrote `{ category: "sensor", category: "board" }` and only got boards.  
-**Solution:** Use `$in` instead: `{ category: { $in: ["sensor", "board"] } }`.  
-**Why:** A field can only appear once in a document, so the second `category` quietly replaces the first.
+- **Problem**: I wrote `{ category: "sensor", category: "board" }` and only got boards.
+- **Solution**: Use `$in` instead: `{ category: { $in: ["sensor", "board"] } }`.
+- **Why**: A field can only appear once in a document, so the second `category` quietly replaces the first.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which filter finds parts with fewer than 3 in stock?
+- [x] { quantity: { $lt: 3 } }
+- [ ] { quantity: < 3 }
+- [ ] { $lt: { quantity: 3 } }
+> Operators go inside a small document after the field name.
+
+? What does $or take as its value?
+- [ ] A single filter
+- [x] A list of filters
+- [ ] A number
+> $or takes a list of filters and matches documents that satisfy any of them.
+
+? How do you search for "servo" ignoring capital letters?
+- [x] $regex with the i option
+- [ ] $exists
+- [ ] $in with one value
+> The i option makes the pattern case-insensitive. /servo/i is the shorthand.
+
+? What does { notes: { $exists: false } } find?
+- [ ] Documents where notes is null
+- [x] Documents that have no notes field at all
+- [ ] Documents where notes is empty text
+> $exists checks whether the field is present, not what it holds.
+{% endquiz %}
 
 ---
 
