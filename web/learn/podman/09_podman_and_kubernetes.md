@@ -87,7 +87,7 @@ This includes:
 
 ---
 
-## ▶Running Kubernetes YAML with Podman
+## Running Kubernetes YAML with Podman
 
 Test Kubernetes manifests locally using:
 

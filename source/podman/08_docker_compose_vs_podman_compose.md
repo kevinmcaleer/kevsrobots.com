@@ -43,7 +43,7 @@ podman-compose version
 
 ---
 
-## ▶Running a Compose File with Podman
+## Running a Compose File with Podman
 
 Assume you have this `docker-compose.yml`:
 
