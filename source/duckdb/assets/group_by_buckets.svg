@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="260" viewBox="0 0 760 260" role="img" aria-labelledby="title desc">
   <title id="title">GROUP BY buckets mental model</title>
-  <desc id="desc">Rows are grouped into buckets by key values; aggregates summarize each bucket.</desc>
+  <desc id="desc">Robot sensor rows are grouped into buckets by robot and state; aggregates summarise each bucket.</desc>
   <defs>
     <style>
       .label{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;font-size:14px;fill:#1f2937}
@@ -17,26 +17,26 @@
   <!-- Input rows -->
   <rect x="20" y="40" width="180" height="160" rx="8" class="box"/>
   <text x="30" y="62" class="label">rows</text>
-  <text x="30" y="88" class="small">day, time, total_bill, tip</text>
-  <text x="30" y="108" class="small">Thur, Lunch, 12.3, 2.0</text>
-  <text x="30" y="128" class="small">Fri, Dinner, 21.5, 3.8</text>
-  <text x="30" y="148" class="small">Sat, Dinner, 30.1, 4.2</text>
-  <text x="30" y="168" class="small">Sun, Dinner, 15.0, 2.5</text>
+  <text x="30" y="88" class="small">robot, state, temp_c</text>
+  <text x="30" y="108" class="small">smars-1, driving, 28.3</text>
+  <text x="30" y="128" class="small">rover-3, driving, 32.4</text>
+  <text x="30" y="148" class="small">smars-1, driving, 27.7</text>
+  <text x="30" y="168" class="small">rover-3, driving, 31.6</text>
 
   <!-- Arrow to buckets -->
   <line x1="210" y1="120" x2="290" y2="120" class="arrow"/>
-  <text x="220" y="110" class="small">GROUP BY day, time</text>
+  <text x="220" y="110" class="small">GROUP BY robot, state</text>
 
   <!-- Buckets -->
   <rect x="300" y="30" width="190" height="90" rx="8" class="bucket"/>
   <text x="312" y="52" class="label">bucket A</text>
-  <text x="312" y="76" class="small">day=Fri, time=Dinner</text>
-  <text x="312" y="96" class="small">rows → SUM, AVG, COUNT</text>
+  <text x="312" y="76" class="small">robot=smars-1, state=driving</text>
+  <text x="312" y="96" class="small">rows → AVG, COUNT</text>
 
   <rect x="300" y="140" width="190" height="90" rx="8" class="bucket"/>
   <text x="312" y="162" class="label">bucket B</text>
-  <text x="312" y="186" class="small">day=Sat, time=Dinner</text>
-  <text x="312" y="206" class="small">rows → SUM, AVG, COUNT</text>
+  <text x="312" y="186" class="small">robot=rover-3, state=driving</text>
+  <text x="312" y="206" class="small">rows → AVG, COUNT</text>
 
   <!-- Arrow to result -->
   <line x1="500" y1="120" x2="580" y2="120" class="arrow"/>
@@ -45,8 +45,8 @@
   <!-- Result table -->
   <rect x="590" y="40" width="150" height="160" rx="8" class="box"/>
   <text x="600" y="62" class="label">result</text>
-  <text x="600" y="88" class="small">day, time, revenue,</text>
-  <text x="600" y="106" class="small">orders, avg_bill</text>
-  <text x="600" y="136" class="small">Fri, Dinner, …</text>
-  <text x="600" y="156" class="small">Sat, Dinner, …</text>
+  <text x="600" y="88" class="small">robot, state, avg_temp,</text>
+  <text x="600" y="106" class="small">samples</text>
+  <text x="600" y="136" class="small">smars-1, driving, 28.0, 2</text>
+  <text x="600" y="156" class="small">rover-3, driving, 32.0, 2</text>
 </svg>

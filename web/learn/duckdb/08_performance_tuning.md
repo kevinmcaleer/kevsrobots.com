@@ -6,11 +6,15 @@ type: page
 cover: /learn/duckdb/assets/banners/08_performance_tuning.jpg
 date: 2025-09-04
 previous: 07_parquet.html
-next: 09_conclusion.html
-description: 'Quick wins to keep queries fast: schema, files, PRAGMAs, stats, EXPLAIN,
-  profiling.'
+next: 10_additional_resources.html
+description: 'Measure before you tune: time CSV against Parquet, read EXPLAIN ANALYZE,
+  profile a query and set threads and memory on a two-million-row robot log.'
 percent: 77
-duration: 3
+duration: 8
+quiz_total: 39
+code_target: cpython
+snakie: false
+date_updated: 2026-11-24
 navigation:
 - name: DuckDB - Fast, free analytics
 - content:
@@ -38,7 +42,7 @@ navigation:
       link: 05_data_analysis.html
   - section: Datalakes, Parquet, and Performance
     content:
-    - name: Querying data lakes (HTTP/S3)
+    - name: Data lakes - many files, one query
       link: 06_datalakes.html
     - name: 'Parquet: fast columnar files'
       link: 07_parquet.html
@@ -46,12 +50,12 @@ navigation:
       link: 08_performance_tuning.html
   - section: Conclusion and Next Steps
     content:
-    - name: Conclusion and Next Steps
-      link: 09_conclusion.html
     - name: Additional Resources
       link: 10_additional_resources.html
-    - name: 'Mini capstone: local analytics project'
+    - name: 'Mini capstone: the workshop report'
       link: 11_mini_capstone.html
+    - name: Conclusion and Next Steps
+      link: 09_conclusion.html
 ---
 
 
@@ -59,122 +63,191 @@ navigation:
 
 ---
 
-This lesson is a checklist of practical steps you can apply to most DuckDB analytics workloads.
+By the end of this lesson you will be able to time a query fairly, read an `EXPLAIN ANALYZE` plan, record a profile, and choose between a CSV, a Parquet file, a view and a table.
 
-> Seeing new terms (threads, memory limit, statistics, EXPLAIN)? See the [Beginner glossary](09_conclusion#beginner-glossary-the-language-of-data).
+Our robot log has 3,456 rows, which DuckDB chews through in a blink however you ask. To feel real differences we need more data. Let's make **two million readings** (a robot reporting every second for about three weeks) and measure. The golden rule of tuning: **measure first, then change one thing at a time.**
 
----
-
-## PRAGMAs: threads and memory
-
-```sql
-PRAGMA threads = 8;          -- use more CPU cores
-PRAGMA memory_limit = '2GB'; -- cap memory usage
+```mermaid
+flowchart LR
+    A[Slow query?] --> B[Time it]
+    B --> C[EXPLAIN ANALYZE: where does the time go?]
+    C --> D{Reading too much?}
+    D -->|yes| E[Parquet, fewer columns, filter early]
+    D -->|no| F{Recomputing the same thing?}
+    F -->|yes| G[Save it as a table]
+    F -->|no| H[Check threads and memory]
 ```
 
-> You try it
-> - Set threads to the number of cores you have; re-run a heavy aggregation and time it
+## Time it fairly
 
----
+Save this as `bench.py` and run it from your project folder (the `exports/` folder must exist). It builds the big table, writes it as CSV and as Parquet, and times the same query on each. It takes the best of three runs, because the first run of anything is slower than the rest:
 
-## Create the right objects
+```python
+import time
 
-- Views for logic reuse; Tables for persistence and faster reuse.
-- Materialize expensive subqueries to tables when reused in multiple steps.
+import duckdb
 
-```sql
-CREATE OR REPLACE VIEW v_orders_clean AS
-SELECT * FROM orders WHERE order_status = 'COMPLETE';
+con = duckdb.connect()  # in-memory, nothing to clean up
 
-CREATE OR REPLACE TABLE orders_daily AS
-SELECT order_date, SUM(amount) AS revenue
-FROM v_orders_clean
-GROUP BY order_date;
+# Make 2 million fake readings (about 23 days at one per second)
+con.execute("""
+    CREATE TABLE big AS
+    SELECT
+        TIMESTAMP '2025-01-01 00:00:00' + INTERVAL (i) SECOND AS ts,
+        (['smars-1', 'smars-2', 'rover-3'])[1 + (i % 3)] AS robot,
+        ROUND(24 + 6 * random(), 2) AS temp_c,
+        ROUND(6.6 + 1.8 * random(), 3) AS battery_v
+    FROM range(2000000) t(i)
+""")
+con.execute("COPY big TO 'exports/big.csv' (HEADER)")
+con.execute("COPY big TO 'exports/big.parquet' (FORMAT parquet)")
+
+
+def best_of(label, sql, repeats=3):
+    """Run a query a few times and report the fastest, in milliseconds."""
+    times = []
+    for _ in range(repeats):
+        start = time.perf_counter()
+        con.execute(sql).fetchall()
+        times.append(time.perf_counter() - start)
+    print(f"{label:<28}{min(times) * 1000:8.1f} ms")
+
+
+query = "SELECT robot, AVG(temp_c) FROM {} GROUP BY robot"
+best_of("CSV file", query.format("'exports/big.csv'"))
+best_of("Parquet file", query.format("'exports/big.parquet'"))
+best_of("DuckDB table", query.format("big"))
+
+con.execute("SET threads = 1")
+best_of("table, 1 thread", query.format("big"))
+con.execute("SET threads = 4")
+best_of("table, 4 threads", query.format("big"))
+
+# A view reruns its query every time; a table keeps the answer
+con.execute("""
+    CREATE VIEW v_daily AS
+    SELECT CAST(ts AS DATE) AS day, robot, AVG(temp_c) AS avg_temp
+    FROM big GROUP BY day, robot
+""")
+con.execute("CREATE TABLE daily AS SELECT * FROM v_daily")
+best_of("view (recomputed)", "SELECT * FROM v_daily WHERE day = '2025-01-05'")
+best_of("table (materialised)", "SELECT * FROM daily WHERE day = '2025-01-05'")
 ```
 
-> You try it
-> - Convert one reused view in your project into a materialized table and compare timings
+On my 4-core test machine it printed:
 
----
-
-## Statistics and ANALYZE
-
-DuckDB can collect column stats to guide the optimizer.
-
-```sql
-ANALYZE;            -- whole database
--- or
-ANALYZE my_table;   -- a specific table
+```
+CSV file                       197.9 ms
+Parquet file                     5.9 ms
+DuckDB table                    18.1 ms
+table, 1 thread                 60.7 ms
+table, 4 threads                16.4 ms
+view (recomputed)                5.7 ms
+table (materialised)             0.8 ms
 ```
 
-> You try it
-> - Run `ANALYZE` after bulk loads; compare query plans before/after with `EXPLAIN`
+Your numbers will differ (that is the point: they depend on your machine), but the *shape* should match:
 
----
+- **CSV is the slowest by a mile.** DuckDB must parse text and work out types every time. Here, about 30 times slower than Parquet. The CSV is also 79.6 MB against 17.7 MB for the Parquet file.
+- **Parquet and tables are both fast.** Do not assume a table always beats a Parquet file: on this query Parquet won.
+- **More threads helped.** One thread was about 4 times slower than four on four cores. Set `threads` to your core count or leave the default.
+- **Saving the answer wins.** The materialised `daily` table was several times quicker than the view, which has to recompute its query.
 
-## EXPLAIN basics (read the plan)
+> **Teachers**: The two data files add up to about 100 MB, so run the script from local disk rather than a network home folder, and delete `exports/big.csv` afterwards. Timings differ from machine to machine, which makes a good class discussion: collect everyone's results and ask why the order stayed the same. On a Raspberry Pi, expect all times to be larger, and use `range(500000)` if it runs low on memory.
+
+## Read the plan with EXPLAIN ANALYZE
+
+`EXPLAIN` shows the plan DuckDB intends to use. `EXPLAIN ANALYZE` actually runs the query and adds real row counts and timings. In the shell (`duckdb`, in the same folder):
 
 ```sql
-EXPLAIN
-SELECT c.category, SUM(o.amount) AS revenue
-FROM orders o
-JOIN customers c USING (customer_id)
-WHERE o.order_date >= DATE '2024-01-01'
-GROUP BY c.category;
+EXPLAIN ANALYZE
+SELECT robot, AVG(temp_c)
+FROM 'exports/big.parquet'
+WHERE temp_c > 29.5
+GROUP BY robot;
 ```
 
-How to read:
-- Look for Scan nodes: are they filtered early? (predicate pushdown)
-- Join order: small/selective inputs should be on the build side for hash joins.
-- Aggregation: ideally after filters and joins, not earlier.
+Read the boxes from the bottom up. The `TABLE_SCAN` box at the bottom shows `Function: PARQUET_SCAN`, `Projections: temp_c, robot` (only two columns are read) and `Filters: temp_c>29.5` (the filter is applied inside the scan). It reports `165,338 rows`: of two million, only about 8 percent come out of the scan, and that is all the rest of the plan has to handle. If a scan returned millions of rows before a filter, you would know the filter was not being pushed down.
 
-> You try it
-> - Add an index-like hint via materialization: create a filtered table `orders_2024` and re-check `EXPLAIN`
+Add `.timer on` to the shell and it prints `Run Time (s): real ...` after every statement, a quick way to time things without Python.
 
----
+## Record a profile
 
-## Profiling walkthrough (operator timings)
-
-Enable profiling per session, run a query, then inspect timings.
+For more detail, turn on profiling and write it to a file:
 
 ```sql
-PRAGMA enable_profiling = json;                 -- or query_tree / query_profile
+PRAGMA enable_profiling = 'json';
 PRAGMA profiling_output = 'exports/profile.json';
 
-SELECT c.category, SUM(o.amount) AS revenue
-FROM orders o
-JOIN customers c USING (customer_id)
-WHERE o.order_date >= DATE '2024-01-01'
-GROUP BY c.category;
+SELECT robot, AVG(temp_c)
+FROM 'exports/big.parquet'
+WHERE temp_c > 29.5
+GROUP BY robot;
+
+PRAGMA disable_profiling;
 ```
 
-Then open `exports/profile.json` in your editor. Look for:
-- The slowest operator by time (e.g., `Hash Join`, `Aggregate Hash`)
-- Bytes read vs returned (column pruning effective?)
-- Whether filters reduced rows early (good) or late (optimize)
+Open `exports/profile.json` in your editor. Near the top you will find `latency` (total time), `cpu_time`, `rows_returned` and the `query_name`, followed by a tree of the operators with their own timings. Look for the single slowest operator and fix that one first.
 
-> You try it
-> - Turn profiling off: `PRAGMA enable_profiling = none;`
-> - Change the filter to a tighter range and compare operator timings
+## Settings that matter
 
----
+```sql
+SET threads = 2;
+SET memory_limit = '1GB';
+SELECT current_setting('threads') AS threads, current_setting('memory_limit') AS memory_limit;
+```
 
-## File/layout tips
+`threads` is how many cores DuckDB may use, and by default it uses them all. Lower it if the machine must stay responsive for other work. `memory_limit` caps memory use, which matters on a Raspberry Pi with 2 or 4 GB. (A `'1GB'` limit shows up as `953.6 MiB`, because GB means a thousand million bytes and MiB is binary.)
 
-- Parquet: prefer bigger files (tens-hundreds MB) over thousands of tiny ones.
-- Partition by low-cardinality keys you filter on (year, month, region).
-- Avoid wide rows with many rarely-used columns; split into slim tables when helpful.
+`ANALYZE;` recomputes table statistics. DuckDB keeps statistics up to date as you load data, so you rarely need it, but it is harmless after a big bulk load.
 
-> You try it
-> - Rewrite a CSV dataset to Parquet and compare read time for a simple aggregation
+## A tuning checklist
 
----
+1. Use **Parquet** instead of CSV for anything you query more than once.
+2. **Select only the columns you need** and filter early.
+3. **Partition** big datasets by something you filter on (lesson 6).
+4. **Materialise** (save as a table) results you reuse.
+5. **Measure** with timing, `EXPLAIN ANALYZE` or a profile before and after every change.
 
-## Recap
-- Control parallelism and memory with PRAGMAs.
-- Use ANALYZE and EXPLAIN to understand and improve plans.
-- Profile occasionally to find real bottlenecks; fix the biggest one first.
+## Try it Yourself
 
-See also: [Troubleshooting DuckDB](troubleshooting) for quick fixes that impact performance (file formats, partitions, stats).
+1. Change `range(2000000)` to `range(200000)` and rerun `bench.py`. Does the CSV-to-Parquet gap shrink or grow?
+2. Run `EXPLAIN ANALYZE` on `SELECT * FROM 'exports/big.parquet' WHERE temp_c > 29.5` and compare the `Projections` with the earlier plan.
+3. Write the Parquet file again sorted by `robot, ts` (`ORDER BY robot, ts` inside the `COPY`) and compare the timing of a `WHERE robot = 'rover-3'` query.
+4. Challenge: record a profile for a query with a `GROUP BY day, robot` and find the operator with the highest time in the JSON.
 
----
+## Common Issues
+
+- **Problem**: The first run of a query is much slower than the rest.
+- **Solution**: Run it a few times and take the best, as `best_of` does.
+- **Why**: The first run loads files into the operating system's cache and warms up memory.
+
+- **Problem**: `Out of Memory Error` on a small machine.
+- **Solution**: Select fewer columns, filter earlier, or lower the row count. Check your `memory_limit` setting is not too tight.
+- **Why**: Big joins and group-bys hold data in memory, and a low limit or a 2 GB Pi can run out.
+
+- **Problem**: A tweak seems to make no difference.
+- **Solution**: Check the plan: the setting may not touch the slow part.
+- **Why**: Tuning a part that takes 2 percent of the time gives at most a 2 percent gain.
+
+## Check your understanding
+
+{% quiz %}
+? Why does `best_of` run each query three times and keep the fastest?
+- [ ] DuckDB gives different answers each time
+- [x] The first run is slowed by cold caches, so the best run is fairer
+- [ ] It makes the query cheaper
+> Cold files and caches slow the first run, so repeating and taking the minimum compares like with like.
+
+? In `EXPLAIN ANALYZE`, what does `Filters: temp_c>29.5` inside the scan tell you?
+- [ ] The query failed
+- [x] The filter is applied while reading the file, so fewer rows move up the plan
+- [ ] The column is missing
+> A filter pushed into the scan means less data is passed to later steps.
+
+? When is a table better than a view for a summary?
+- [ ] When the summary is tiny and never reused
+- [x] When the summary is slow to compute and you read it often
+- [ ] Never, views are always faster
+> A table stores the answer, so reading it is quick. A view recomputes the query each time.
+{% endquiz %}

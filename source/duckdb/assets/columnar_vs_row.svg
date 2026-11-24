@@ -14,16 +14,16 @@
   <text x="20" y="28" class="label">Row-oriented (rows stored contiguously)</text>
 
   <!-- Row store rows -->
-  <rect x="20" y="40" width="320" height="50" rx="6" class="rowbox"/>
-  <text x="30" y="60" class="small">row1: [id=1, day=Fri, total_bill=21.5, tip=3.8]</text>
+  <rect x="20" y="40" width="430" height="50" rx="6" class="rowbox"/>
+  <text x="30" y="60" class="small">row1: [id=1, robot=smars-1, temp_c=24.5, battery_v=8.39]</text>
 
-  <rect x="20" y="100" width="320" height="50" rx="6" class="rowbox"/>
-  <text x="30" y="120" class="small">row2: [id=2, day=Sat, total_bill=30.1, tip=4.2]</text>
+  <rect x="20" y="100" width="430" height="50" rx="6" class="rowbox"/>
+  <text x="30" y="120" class="small">row2: [id=2, robot=rover-3, temp_c=27.0, battery_v=8.40]</text>
 
-  <rect x="20" y="160" width="320" height="50" rx="6" class="rowbox"/>
-  <text x="30" y="180" class="small">row3: [id=3, day=Sun, total_bill=15.0, tip=2.5]</text>
+  <rect x="20" y="160" width="430" height="50" rx="6" class="rowbox"/>
+  <text x="30" y="180" class="small">row3: [id=3, robot=smars-1, temp_c=28.1, battery_v=8.37]</text>
 
-  <text x="20" y="240" class="small">Reading total_bill, tip → read full rows (includes unused columns)</text>
+  <text x="20" y="240" class="small">Reading temp_c, battery_v → read full rows (includes unused columns)</text>
 
   <text x="460" y="28" class="label">Columnar (columns stored contiguously)</text>
 
@@ -32,13 +32,13 @@
   <text x="470" y="65" class="small">id: 1, 2, 3, ...</text>
 
   <rect x="460" y="90" width="360" height="40" rx="6" class="colbox"/>
-  <text x="470" y="115" class="small">day: Fri, Sat, Sun, ...</text>
+  <text x="470" y="115" class="small">robot: smars-1, rover-3, smars-1, ...</text>
 
   <rect x="460" y="140" width="360" height="40" rx="6" class="hilite"/>
-  <text x="470" y="165" class="small">total_bill: 21.5, 30.1, 15.0, ...</text>
+  <text x="470" y="165" class="small">temp_c: 24.5, 27.0, 28.1, ...</text>
 
   <rect x="460" y="190" width="360" height="40" rx="6" class="hilite"/>
-  <text x="470" y="215" class="small">tip: 3.8, 4.2, 2.5, ...</text>
+  <text x="470" y="215" class="small">battery_v: 8.39, 8.40, 8.37, ...</text>
 
-  <text x="460" y="260" class="small">Reading total_bill, tip → read just those columns (skip others)</text>
+  <text x="460" y="260" class="small">Reading temp_c, battery_v → read just those columns (skip others)</text>
 </svg>

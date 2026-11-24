@@ -6,10 +6,12 @@ type: page
 cover: /learn/duckdb/assets/banners/00_intro.jpg
 date: 2025-09-04
 next: quickstart.html
-description: Start here to learn what DuckDB is, why it shines for analytics, and
-  how this course is structured.
+description: Meet DuckDB, the free database you embed in your own scripts, and see
+  how this course turns a pile of robot sensor logs into answers.
 percent: 7
-duration: 3
+duration: 5
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: DuckDB - Fast, free analytics
 - content:
@@ -37,7 +39,7 @@ navigation:
       link: 05_data_analysis.html
   - section: Datalakes, Parquet, and Performance
     content:
-    - name: Querying data lakes (HTTP/S3)
+    - name: Data lakes - many files, one query
       link: 06_datalakes.html
     - name: 'Parquet: fast columnar files'
       link: 07_parquet.html
@@ -45,12 +47,12 @@ navigation:
       link: 08_performance_tuning.html
   - section: Conclusion and Next Steps
     content:
-    - name: Conclusion and Next Steps
-      link: 09_conclusion.html
     - name: Additional Resources
       link: 10_additional_resources.html
-    - name: 'Mini capstone: local analytics project'
+    - name: 'Mini capstone: the workshop report'
       link: 11_mini_capstone.html
+    - name: Conclusion and Next Steps
+      link: 09_conclusion.html
 ---
 
 
@@ -58,108 +60,72 @@ navigation:
 
 ---
 
-## DuckDB for Analytics — Introduction
+By the end of this lesson you will be able to explain what DuckDB is, say when you would pick it over a spreadsheet or a server database, and describe the robot data project you will build.
 
-DuckDB is an in-process, [columnar](/resources/glossary.html#columnar) [SQL](/resources/glossary.html#sql) database that runs anywhere you can run your app. It excels at fast analytical queries on local files like [Parquet](/resources/glossary.html#parquet) and CSV, without needing a server, a cluster, or cloud credits.
+Ahoy there makers! Your robots are quietly collecting data: temperatures, distances, battery voltages, print times. Most of us dump it into a CSV file and never look again. DuckDB is the tool that makes that pile of files answer questions in a fraction of a second, on the laptop or Raspberry Pi you already own.
 
-> New to terms like Parquet, CTE, or materialize? See the [Beginner glossary](09_conclusion#beginner-glossary-the-language-of-data).
+## Overview
 
-This course is part of the [Databases learning pathway](/learn/learning_pathways/databases.html), focused on practical analytics: querying files, creating small analytical datasets, and integrating with Python.
+DuckDB is an in-process, [columnar](/resources/glossary.html#columnar) [SQL](/resources/glossary.html#sql) database. "In-process" means there is no server to install or run: the database lives inside your Python script (or the little command line tool) and reads files such as CSV and [Parquet](/resources/glossary.html#parquet) directly. It is built for *analytics*: summing, averaging and comparing millions of rows, rather than updating one row at a time.
 
-## What you’ll learn
-- Install and run DuckDB (CLI and Python)
-- Query CSV/Parquet directly with SQL
-- Create and persist a local analytics database
-- Work with DuckDB from Python and Pandas/Polars
-- Read data from data lakes (local, HTTP/S3) and tune performance
-- Use extensions and best practices for analytical workloads
+This course follows one project. A small fleet of robots logs a reading every five minutes, and you also have a parts inventory and a 3D print history. By the end you will have a repeatable analytics workspace that answers questions like "which robot runs hottest?", "when does each battery hit its limit?" and "which printer wastes the most filament?".
 
-## Who this is for
-- Makers, analysts, and developers who want fast local analytics
-- Beginners to databases and data lakes who prefer practical examples
-
-## Prerequisites
-- Basic command line and Python familiarity
-- macOS, Linux, or Windows
-- Optional: Python 3.10+ and VS Code for notebook-style work
-
-## Why DuckDB
-- No server: embed it in your scripts and apps
-- Fast analytical SQL: vectorized, columnar execution
-- File-first: query Parquet/CSV directly, no ETL required
-- Great with Python: query DataFrames and return results as DataFrames
-- Portable: a single .duckdb file you can version and ship
-
-When to choose it:
-- You need quick, local analytics (OLAP) on files
-- You want to prototype or build repeatable data workflows without infra
-- You want SQL over DataFrames, or to complement Pandas/Polars
-
-## Quick start (macOS)
-- CLI: `brew install duckdb`
-- Python: `python -m pip install duckdb`
-
-Try the CLI:
-
-```bash
-duckdb
+```mermaid
+flowchart LR
+    A[Pico robot logs] --> B[CSV files]
+    B --> C[DuckDB]
+    P[Parts inventory] --> C
+    J[Print job history] --> C
+    C --> D[Summary tables]
+    C --> E[Parquet files]
+    C --> F[Python charts]
 ```
 
-Then run a tiny analytics query directly on a CSV from the web:
+This course is part of the [Databases learning pathway](/learn/learning_pathways/databases.html). If you have not used SQL before, the [SQL course](/learn/sql/) is a gentle warm-up, but every query here is explained from scratch.
 
-```sql
--- Create a table from a remote CSV
-CREATE TABLE tips AS
-SELECT * FROM read_csv_auto('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv');
+## Course Content
 
--- Simple aggregate
-SELECT day, ROUND(SUM(total_bill), 2) AS revenue, COUNT(*) AS orders
-FROM tips
-GROUP BY day
-ORDER BY revenue DESC;
-```
+- Install DuckDB and make the sample robot data
+- Query it with SELECT, WHERE, GROUP BY and JOIN
+- Build pipelines with CTEs, views, saved databases and COPY
+- Use DuckDB from Python with Pandas, Polars and parameters
+- Run an end-to-end analysis and draw a chart
+- Treat a folder of files as a small data lake
+- Write and read Parquet, including partitions and schema changes
+- Tune performance with EXPLAIN, profiling and settings
+- Finish with a capstone project of your own
 
-Exit with `.quit`.
+## Key Results
 
-Or from Python:
+After completing this course, you will:
 
-```python
-import duckdb, pandas as pd
+- Query CSV and Parquet files with SQL without loading them into a server
+- Save results in a `.duckdb` database file and share them as Parquet
+- Run DuckDB from Python and move data to and from Pandas
+- Read a folder of partitioned files and explain why it is fast
+- Use `EXPLAIN` and timing to find out why a query is slow
+- Build a small analytics project you can reuse on your own sensor logs
 
-df = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv')
+## What you'll need
 
-# Query a DataFrame directly
-result = duckdb.query("""
-  SELECT day, AVG(total_bill) AS avg_bill
-  FROM df
-  GROUP BY day
-  ORDER BY avg_bill DESC
-""").df()
+- A computer running Windows, macOS or Linux (a Raspberry Pi 4 or 5 with a 64-bit OS works too)
+- Python 3.11 or newer, because the DuckDB Python package needs it
+- A text editor and a terminal
+- About 50 MB of free disk space
+- No robot required: the lessons generate their own sample data
 
-print(result)
-```
+Tested with DuckDB Python package 2.0.1 and command line shell 1.5.2. If your version is newer, the queries here should still work; if one does not, check the DuckDB release notes for what changed.
 
-## What we’ll build in this course
-- A small, local analytics workspace using DuckDB
-- Reproducible queries over CSV/Parquet (local and remote)
-- A persisted .duckdb database and lightweight “data mart”
-- Python integrations for analysis and notebooks (like Jupyter notebooks)
-- Practical performance tips (statistics, Parquet predicate pushdown, and more)
+## How the course works
 
-## Course structure
-- **00 intro**: *what DuckDB is and why use it*
-- **01 installing**: *CLI, Python, VS Code setup*
-- **02 basic queries**: *selecting, filtering, aggregations, joins*
-- **03 advanced features**: *views, CTEs, extensions, persistence*
-- **04 python integration**: *DataFrames, results, notebooks*
-- **05 data analysis**: *end-to-end mini analysis*
-- **06 data lakes**: *reading from local/remote object storage*
-- **07 parquet**: *formats, partitioning, predicates*
-- **08 performance tuning**: *tips for speed and memory*
-- **09 conclusion**: *recap and patterns*
-- **10 additional resources**: *docs, tools, datasets*
+Each lesson opens with what you will be able to do, teaches one idea, then ends with `## Try it Yourself` exercises, a `## Common Issues` list and a short quiz. SQL goes in code blocks marked `sql`, and you can type it into the DuckDB shell or run it from Python. Program output is shown in plain boxes so you can compare it with your own.
+
+Lessons 1 to 3 build up the shell, 4 and 5 move to Python, and 6 to 8 handle bigger data and speed. The sample data is generated by a script with a fixed random seed, so your numbers match the ones printed here.
+
+New words are explained as they appear, and there is a [beginner glossary](09_conclusion#beginner-glossary-the-language-of-data) in the summary lesson. If you only have ten minutes, the [Quickstart](quickstart) is a one-page tour, and [Troubleshooting](troubleshooting) collects the usual fixes.
+
+> **Teachers**: This course suits ages 14 and up who are comfortable with a terminal, in a computing or physics club or a college data unit. Allow 30 to 45 minutes per lesson. Each learner needs a computer with Python 3.11 or newer; nothing needs an account, a login or a classroom internet connection beyond the one-off `pip install`, so a locked-down school network is fine once the package is installed. The remote-file part of lesson 6 can be done entirely on one machine. With no robots, the generated data does everything, and classes can compare results because the random seed is fixed.
 
 ## Next up
-If you want a one-page setup and first queries, see the [Quickstart](quickstart). Otherwise, head to [01 installing](01_installing) to set up DuckDB and the Python environment.
 
----
+Head to [01 installing](01_installing) to set up DuckDB and create your data. Prefer a quick taste first? Try the [Quickstart](quickstart).

@@ -7,9 +7,12 @@ cover: /learn/duckdb/assets/banners/troubleshooting.jpg
 date: 2025-09-04
 previous: quickstart.html
 next: 01_installing.html
-description: Common issues and quick fixes for CLI, Python, httpfs, exports, and performance.
+description: The error messages beginners hit most often in DuckDB, what they mean,
+  and how to fix them.
 percent: 21
-duration: 2
+duration: 6
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: DuckDB - Fast, free analytics
 - content:
@@ -37,7 +40,7 @@ navigation:
       link: 05_data_analysis.html
   - section: Datalakes, Parquet, and Performance
     content:
-    - name: Querying data lakes (HTTP/S3)
+    - name: Data lakes - many files, one query
       link: 06_datalakes.html
     - name: 'Parquet: fast columnar files'
       link: 07_parquet.html
@@ -45,12 +48,12 @@ navigation:
       link: 08_performance_tuning.html
   - section: Conclusion and Next Steps
     content:
-    - name: Conclusion and Next Steps
-      link: 09_conclusion.html
     - name: Additional Resources
       link: 10_additional_resources.html
-    - name: 'Mini capstone: local analytics project'
+    - name: 'Mini capstone: the workshop report'
       link: 11_mini_capstone.html
+    - name: Conclusion and Next Steps
+      link: 09_conclusion.html
 ---
 
 
@@ -58,63 +61,126 @@ navigation:
 
 ---
 
-## Export and file paths
-- Error: `No such file or directory` when using `COPY ... TO 'exports/...'`
-  - Fix: Create the folder first (e.g., `exports/`). DuckDB won’t auto-create parent folders.
-- Relative paths
-  - The path is relative to the current working directory (CLI or script). Use absolute paths if in doubt.
+By the end of this lesson you will be able to read a DuckDB error message, find its cause in this list, and apply the fix.
 
-## SSL / HTTPS on macOS
-- Error: `certificate verify failed`
-  - Option A (system Python): Run the installer once: `bash "/Applications/Python 3.13/Install Certificates.command"`
-  - Option B (venv): `pip install certifi` then set `SSL_CERT_FILE=$(python -c 'import certifi; print(certifi.where())')`
-  - Option C: Use DuckDB’s `httpfs` so DuckDB fetches the file directly:
-    ```sql
-    INSTALL httpfs; LOAD httpfs;
-    SELECT COUNT(*) FROM read_csv_auto('https://example.com/data.csv');
-    ```
+Errors are a normal part of making, not a sign you did something wrong. DuckDB's messages are quite helpful: they usually name the problem, show the line and often suggest a fix. Every message quoted below is a real one, produced while writing this course.
 
-## S3 access
-- Permission denied or timeouts
-  - Ensure correct AWS credentials in environment or config file
-  - Region mismatches can cause slowdowns; set `s3_region` if needed
+```mermaid
+flowchart TD
+    A[Error message] --> B{First word?}
+    B -->|IO Error| C[Files, folders, locks, downloads]
+    B -->|Binder Error| D[Column or clause is wrong]
+    B -->|Catalog Error| E[Table or view does not exist]
+    B -->|Python exception| F[Packages and versions]
+```
 
-## Schema mismatch when combining files
-- Error: column not found or incompatible types
-  - Align schemas by selecting matching columns and explicit casts
-  - Example:
-    ```sql
-    SELECT a, b, CAST(NULL AS DOUBLE) AS c FROM read_parquet('old/*.parquet')
-    UNION ALL
-    SELECT a, b, c FROM read_parquet('new/*.parquet');
-    ```
+Reading the first word helps a lot: an **IO Error** is about files and the outside world, a **Binder Error** means DuckDB could not match your query to the columns it found, and a **Catalog Error** means a table, view or function was not found.
 
-## Performance quick wins
-- Prefer Parquet over CSV for repeated reads
-- Filter early, select only needed columns
-- Partition on low-cardinality keys you filter by
-- Set PRAGMAs for parallelism/memory:
-  ```sql
-  PRAGMA threads = 8; PRAGMA memory_limit = '2GB';
-  ```
-- Collect statistics after bulk loads:
-  ```sql
-  ANALYZE;
-  ```
+## Common Issues
 
-## Python integration
-- `ModuleNotFoundError: polars` → `pip install polars`
-- Connection locked by another process → close other connections/restart kernel
-- Use parameter binding to avoid string formatting bugs:
-  ```python
-  duckdb.query("SELECT * FROM tips WHERE total_bill > ?", [20]).df()
-  ```
+### Files and folders
 
-## Notebook hiccups
-- If you change queries a lot, restart the kernel to clear state
-- Materialize expensive views into tables if cells depend on them often
+- **Problem**: `IO Error: Cannot open file "missingdir/mini.parquet": No such file or directory`, or `Failed to create directory "lake/readings"`
+- **Solution**: Create the folder first (`mkdir exports`), or run `python make_data.py`, which creates `exports/` and `lake/`.
+- **Why**: DuckDB writes the file but does not create the folders above it.
+
+- **Problem**: `IO Error: No files found that match the pattern "data/readings.csv"`
+- **Solution**: Check your working folder (`pwd`, or `import os; print(os.getcwd())`) and the spelling. For globs, `*` matches one folder level and `**` matches any depth.
+- **Why**: Relative paths start from where you launched the shell or script, not from where the file lives.
+
+### Databases and versions
+
+- **Problem**: `IO Error: Could not set lock on file "robots.duckdb": Conflicting lock is held in ...`
+- **Solution**: Close the other shell, notebook or script that has the file open (the message names the program and its process number).
+- **Why**: A database file can have only one writing process at a time.
+
+- **Problem**: `Trying to read a database file with version number ..., but we can only read versions between ... The database file was created with an newer version of DuckDB.`
+- **Solution**: Upgrade the older program so the shell and Python package match: `python -m pip install --upgrade duckdb`, or download the latest shell.
+- **Why**: Newer DuckDB releases can change the file format, and older ones cannot read it.
+
+### Queries
+
+- **Problem**: `Binder Error: column "robot" must appear in the GROUP BY clause or must be part of an aggregate function.`
+- **Solution**: Add the column to `GROUP BY`, or wrap it in an aggregate such as `MAX(robot)`.
+- **Why**: A summary query can only show bucket labels and summaries.
+
+- **Problem**: `Binder Error: Referenced column "driving" not found in FROM clause!`
+- **Solution**: Use single quotes for text values: `state = 'driving'`.
+- **Why**: Double quotes mean a column or table name.
+
+- **Problem**: `Binder Error: WHERE clause cannot contain aggregates!`
+- **Solution**: Use `HAVING` for tests on `AVG`, `COUNT` and so on.
+- **Why**: `WHERE` runs before grouping, so there are no group totals yet.
+
+- **Problem**: `Catalog Error: Table with name print_jobs does not exist!`
+- **Solution**: Load the table first (`CREATE TABLE print_jobs AS SELECT * FROM read_csv('data/print_jobs.csv')`), and check you opened the right `.duckdb` file.
+- **Why**: A fresh shell starts with an empty in-memory database unless you pass a file name or use `.open`.
+
+### Combining files
+
+- **Problem**: A column is missing after reading several Parquet files together, with no error.
+- **Solution**: Use `read_parquet([...], union_by_name = true)`.
+- **Why**: Without it DuckDB follows the first file's columns and silently ignores extras in the others.
+
+- **Problem**: Columns have clashing types when files are combined.
+- **Solution**: Cast explicitly, for example `CAST(id AS BIGINT)`, and fill gaps with `CAST(NULL AS DOUBLE) AS new_col`.
+- **Why**: Every part of a `UNION ALL` must have matching column types.
+
+### Extensions and remote files
+
+- **Problem**: `IO Error: Failed to download extension "httpfs" at URL ...`
+- **Solution**: Check your internet connection or school proxy, or avoid the extension and use local files.
+- **Why**: `INSTALL` fetches the extension from DuckDB's servers once per version.
+
+- **Problem**: S3 reads give permission errors or time out.
+- **Solution**: Check your access key, secret and region in `CREATE SECRET`, and that the bucket path is right.
+- **Why**: S3 refuses requests that are not signed with valid credentials, and a wrong region can add delay.
+
+### Python
+
+- **Problem**: `ModuleNotFoundError: No module named 'duckdb'` (or `polars`, `pandas`, `matplotlib`)
+- **Solution**: Install it with the Python you are running: `python -m pip install duckdb`.
+- **Why**: A computer can have several Pythons, each with its own packages.
+
+- **Problem**: `Catalog Error: Table with name df does not exist!` when querying a DataFrame
+- **Solution**: Make sure the DataFrame is a variable in the same scope as the query and spelled the same way, or use `con.register("df", df)`.
+- **Why**: DuckDB finds DataFrames by looking up Python variable names.
+
+- **Problem**: A query is slower than you expected.
+- **Solution**: Use Parquet instead of CSV, select only the columns you need, and filter early. Lesson 8 shows how to measure.
+- **Why**: Reading less data is almost always the biggest win.
 
 ## Where to get help
-- DuckDB docs: https://duckdb.org/docs/
-- GitHub issues: https://github.com/duckdb/duckdb
-- Course Quickstart: quick setup and common patterns
+
+- The DuckDB documentation home page, [duckdb.org/docs/stable](https://duckdb.org/docs/stable/)
+- The DuckDB project on GitHub at `github.com/duckdb/duckdb`, where you can search past issues
+- The [Quickstart](quickstart) in this course for a clean example that you can compare against yours
+
+## Try it Yourself
+
+1. Break a query on purpose: run `SELECT robot, AVG(temp_c) FROM 'data/readings.csv';` and read the message from the first word to the last.
+2. Misspell a table name and see the Catalog Error, then read the "Did you mean" suggestion it prints.
+3. Open `robots.duckdb` in two terminals at once to see the lock message, then close one.
+4. Challenge: write a `COPY` to a folder that does not exist, fix it with `mkdir`, and run it again.
+
+## Check your understanding
+
+{% quiz %}
+? An error starts with `Binder Error`. What does that mostly mean?
+- [ ] The file could not be opened
+- [x] The query does not match the columns or rules, for example a missing GROUP BY column
+- [ ] The network is down
+> Binder errors are about names and rules in the SQL itself.
+
+? You get `Could not set lock on file`. What is the usual cause?
+- [ ] The disk is full
+- [x] Another program already has that database file open
+- [ ] The file is a CSV
+> The message names the program holding the lock, so you can close it.
+
+? Why can reading several Parquet files together silently lose a column?
+- [x] Without `union_by_name`, DuckDB uses the first file's columns
+- [ ] Parquet cannot hold extra columns
+- [ ] Extra columns are always renamed
+> That is why the lesson on Parquet recommends `union_by_name = true`.
+{% endquiz %}

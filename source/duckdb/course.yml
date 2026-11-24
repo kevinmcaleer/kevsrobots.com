@@ -7,10 +7,26 @@
   cover: assets/cover.jpg
   description: >-
       Learn how to use DuckDB, the fast, free, and embeddable database designed for analytics.
+      Query robot sensor logs, parts lists and print histories with SQL, from the shell and from Python,
+      then save them as Parquet and tune the speed.
+  outcomes:
+    - Query CSV and Parquet files with SQL, with no database server
+    - Summarise, filter and join robot sensor logs, parts lists and print histories
+    - Save results in a .duckdb file and share them as Parquet
+    - Run DuckDB from Python with Pandas, Polars and safe query parameters
+    - Query a folder of partitioned files and show that DuckDB skips the ones it does not need
+    - Time and profile a query, and choose between CSV, Parquet, views and tables
+  prerequisites:
+    - Basic comfort with a terminal and with running a Python script
+    - Helpful but not required, the SQL course and the Python course
+  you_need:
+    - A Windows, macOS or Linux computer, or a 64-bit Raspberry Pi 4 or 5
+    - Python 3.11 or newer, with pip
+    - A text editor and a terminal
+    - Optional, for the last lesson's data logger, a Raspberry Pi Pico and Thonny
   groups:
-    - databases
     - python
-    - raspberry pi
+    - raspberrypi
   content:
   - section:
       name: Introduction
@@ -38,7 +54,6 @@
   - section:
       name: Conclusion and Next Steps
       content:
-      - 09_conclusion.md
       - 10_additional_resources.md
       - 11_mini_capstone.md
-
+      - 09_conclusion.md
