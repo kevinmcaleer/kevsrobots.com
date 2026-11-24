@@ -7,11 +7,12 @@ cover: /learn/reinforcement_learning/assets/banners/12_discretizing_real_sensors
 date: 2026-06-13
 previous: 11_the_sim_to_real_gap.html
 next: 13_deploying_the_brain.html
-description: Read the HC-SR04 reliably in MicroPython, filter out noise with a median-of-three
-  approach, and map live readings into the same state bins used during training.
+description: Read the HC-SR04 reliably in MicroPython, filter out noise with a median
+  of three, and map live readings into the same three bands used in training.
 percent: 78
 duration: 7
-date_updated: 2026-06-13
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning for Beginners
 - content:
@@ -64,249 +65,177 @@ navigation:
 
 ---
 
-The bridge between simulation and reality is the discretisation function. In training, `_read_sensor()` returned a nice clean label from a perfect model. On the Pico, we need real MicroPython code that reads an actual HC-SR04, filters out noise, and produces exactly the same "near" / "medium" / "far" labels — so the Q-table we trained still makes sense.
-
-This lesson is the first one that targets the Pico directly. If you haven't set up MicroPython on your Pico yet, follow the [MicroPython Robotics Projects](/learn/micropython_robotics/) course first — lesson 5 covers the HC-SR04 wiring we use here.
+By the end of this lesson you will be able to read an HC-SR04 on a Raspberry Pi Pico, filter its readings with a median of three, and turn each reading into the same `near`, `medium` or `far` label the simulator used.
 
 ---
 
-## Wiring Recap
+This is the first lesson that runs on the **Pico**, in MicroPython. In training, `sense()` handed the robot a tidy label from a perfect model. On the real robot we have to produce the *same* labels from a real, noisy sensor. If the labels disagree, the Q-table we trained means nothing.
 
-For this course, use the same pin assignments as the MicroPython Robotics course:
+If you have not set up MicroPython on a Pico yet, start with the [MicroPython Robotics Projects](/learn/micropython_robotics/) course, whose ultrasonic lesson uses the same pins as here.
 
-| HC-SR04 pin | Pico pin |
-|---|---|
-| VCC | 3.3V (use 3.3V-compatible sensor) |
-| GND | GND |
-| TRIG | GP8 |
-| ECHO | GP9 (via voltage divider if using 5V sensor) |
+---
+
+## Wiring
+
+| HC-SR04 pin | Pico pin | Notes |
+|---|---|---|
+| VCC | 3.3 V for a 3.3 V sensor such as the HC-SR04P, or 5 V for a classic HC-SR04 | Check the sensor's markings |
+| GND | GND | |
+| TRIG | GP8 | Output from the Pico |
+| ECHO | GP9 | Through the voltage divider below if the sensor runs at 5 V |
 {:class="table table-single"}
 
-**Voltage divider for 5V ECHO (protects the Pico):**
+A classic HC-SR04 runs at 5 V and its ECHO pin outputs 5 V, but the Pico's pins are only 3.3 V tolerant. A divider of 1k and 2k brings 5 V down to about 3.3 V:
 
+```text
+HC-SR04 ECHO ──┬── 1k ──── Pico GP9
+               │
+              2k
+               │
+              GND
 ```
-HC-SR04 ECHO  ──┬── 1kΩ ──── Pico GP9
-                │
-               2kΩ
-                │
-               GND
+
+```mermaid
+flowchart LR
+    T["Pico GP8<br/>TRIG"] --> S["HC-SR04"]
+    S --> D["1k + 2k divider"]
+    D --> E["Pico GP9<br/>ECHO"]
+    E --> R["time_pulse_us<br/>pulse width in microseconds"]
+    R --> F["median of 3"]
+    F --> B["near, medium or far"]
 ```
+
+> **Teachers**: the divider is the one place a wiring slip can damage a Pico, so check each group's ECHO wiring before power-up. A 3.3 V sensor needs no divider and is the safer choice for a class set.
 
 ---
 
-## Raw HC-SR04 Reading in MicroPython
+## The complete sensor program
 
-The basic driver from lesson 5 of the robotics course:
+This program reads the sensor 20 times, filters each reading, and prints the distance and the band. Run it on the Pico in Thonny and wave your hand in front of the sensor. The thresholds are the ones from lesson 4 and the simulator: one grid cell was about 30 cm, so `near` is under 30 cm and `far` is 90 cm or more.
 
 ```python
 from machine import Pin, time_pulse_us
 from time import sleep_us, sleep_ms
 
-# Pin setup
 TRIG = Pin(8, Pin.OUT)
 ECHO = Pin(9, Pin.IN)
 
-def get_distance_cm():
-    """
-    Fire the HC-SR04 and return distance in centimetres.
+NEAR_CM = 30        # below this is "near"   (matches the simulator)
+FAR_CM = 90         # this or more is "far"
 
-    Returns:
-        float: distance in cm, or -1.0 if the reading timed out
-    """
-    # Ensure trigger is low before starting
+
+def get_distance_cm():
+    """Fire the sensor once. Returns centimetres, or -1.0 if no echo came back."""
     TRIG.low()
     sleep_us(2)
-
-    # 10 µs trigger pulse
     TRIG.high()
-    sleep_us(10)
+    sleep_us(10)                          # a 10 microsecond trigger pulse
     TRIG.low()
-
-    # Measure the echo pulse width; timeout after 30 ms
-    # (30 ms covers distances up to ~5 m, plenty for our use)
-    duration_us = time_pulse_us(ECHO, 1, 30000)
-
+    duration_us = time_pulse_us(ECHO, 1, 30000)   # wait up to 30 ms for the echo
     if duration_us < 0:
-        return -1.0   # timeout — no echo received
+        return -1.0                       # timeout: no echo received
+    return duration_us / 58.0             # sound travels about 1 cm per 58 us there and back
 
-    # Speed of sound: ~343 m/s = 0.0343 cm/µs
-    # Distance = (duration / 2) * 0.0343
-    # Simplified: duration_us / 58
-    distance_cm = duration_us / 58.0
-    return distance_cm
-```
 
----
-
-## Median-of-Three Filtering
-
-Raw readings from the HC-SR04 occasionally contain outliers: reflections off a moving object, a brief dropout, or a glitch from a nearby motor. Taking three readings in quick succession and returning the middle value removes most of these without adding significant latency.
-
-```python
 def get_distance_filtered():
-    """
-    Take three HC-SR04 readings and return the median.
-
-    Three readings take approximately 60 ms total (20 ms each).
-    This latency is acceptable for our 100 ms control loop.
-
-    Returns:
-        float: median distance in cm, or -1.0 if all readings failed
-    """
+    """Take three readings and return the middle one. Returns -1.0 if all failed."""
     readings = []
-
     for _ in range(3):
         d = get_distance_cm()
-        if d > 0:   # ignore timeout readings
+        if d > 0:
             readings.append(d)
-        sleep_ms(20)   # wait between pulses to avoid echo interference
-
+        sleep_ms(20)                      # let the old echo die away
     if not readings:
-        return -1.0   # all readings failed
-
+        return -1.0
     readings.sort()
-    return readings[len(readings) // 2]   # median
-```
+    return readings[len(readings) // 2]
 
-> **Tip:** If you find three readings too slow (e.g. the robot is moving fast), you can use two readings and return the minimum (conservative: treat the closer reading as correct). Never use just one raw reading without filtering.
 
----
-
-## Mapping to the Same State Bins as Training
-
-The discretisation function must use exactly the same thresholds you set in `train.py`. The real-world version uses centimetres instead of grid cells, so we need to translate:
-
-In the simulation:
-- "near"   = 0–1 grid cells ahead
-- "medium" = 2–3 grid cells ahead
-- "far"    = 4+ grid cells ahead
-
-Each grid cell in our simulation represents roughly one robot-body-length. For a BurgerBot-sized robot (about 15–20 cm long), a sensible translation is:
-
-| Simulation | Real world |
-|---|---|
-| "near"   (≤ 1 cell) | < 15 cm |
-| "medium" (≤ 3 cells) | 15–40 cm |
-| "far"    (> 3 cells) | > 40 cm |
-{:class="table table-single"}
-
-```python
 def discretize_distance(distance_cm):
-    """
-    Map a real HC-SR04 reading to the same state labels used in training.
-
-    The thresholds here MUST match what the simulation used.
-    If training used near=1 cell and each cell ~= 15 cm of real space,
-    then near_threshold_cm = 15.
-
-    Args:
-        distance_cm (float): filtered distance reading in centimetres
-                             Use -1.0 to signal "sensor failed"
-
-    Returns:
-        str: 'near', 'medium', or 'far'
-    """
+    """Map a reading to the same labels the simulator used."""
     if distance_cm < 0:
-        # Sensor failed or timed out — treat as obstacle very close
-        # (conservative: assume something is there)
+        return "near"                     # no echo: be cautious and assume something is close
+    if distance_cm < NEAR_CM:
         return "near"
-
-    if distance_cm < 15:
-        return "near"
-    elif distance_cm < 40:
+    if distance_cm < FAR_CM:
         return "medium"
-    else:
-        return "far"
+    return "far"
+
+
+for _ in range(20):
+    d = get_distance_filtered()
+    print(f"{d:6.1f} cm  ->  {discretize_distance(d)}")
+    sleep_ms(200)
 ```
 
----
+Typical output as a hand moves towards the sensor (your numbers will differ):
 
-## Tracking Heading Without Encoders
-
-In simulation, we tracked heading perfectly. On the real robot without encoders or a gyroscope, heading is estimated by counting turns:
-
-```python
-# Heading tracking without sensors
-HEADINGS = ["north", "east", "south", "west"]
-current_heading_idx = 1   # start facing east
-
-def turn_left_and_track():
-    global current_heading_idx
-    # Execute the physical turn (motor code below)
-    do_turn_left()
-    # Update our heading estimate
-    current_heading_idx = (current_heading_idx - 1) % 4
-
-def turn_right_and_track():
-    global current_heading_idx
-    do_turn_right()
-    current_heading_idx = (current_heading_idx + 1) % 4
-
-def get_heading():
-    return HEADINGS[current_heading_idx]
+```
+ 112.4 cm  ->  far
+  81.0 cm  ->  medium
+  44.7 cm  ->  medium
+  22.3 cm  ->  near
 ```
 
-This is an approximation — physical turns won't be exactly 90°. As discussed in lesson 11, this is part of the sim-to-real gap. For best results, calibrate your turn duration carefully and run on a consistent floor surface.
+**Why a median?** One bad reading, from a stray reflection or a dropout, is common. The median of three throws away the odd one out, and costs only about 60 ms. The `d > 0` test also drops failed readings before sorting.
+
+**Why does `-1.0` map to "near"?** When no echo arrives, the sensor has not seen the world: maybe the surface soaked up the sound. Treating that as "something is close" is the cautious choice, at the price of the occasional needless turn.
 
 ---
 
-## Putting It Together: The State Reader
+## Why there is no heading or position
 
-Combining position tracking, heading tracking, and sensor reading into a single `get_state()` function that the Q-table lookup expects:
-
-```python
-# Pico state reader (simplified — no grid position tracking)
-# For the real robot we use heading + sensor only,
-# since we can't accurately track (row, col) without encoders.
-
-def get_state():
-    """
-    Read the current state for Q-table lookup.
-
-    On the real robot, we omit (row, col) because we can't track
-    grid position accurately without encoders. The Q-table was trained
-    with position, so we need a modified lookup that uses only
-    the heading and distance band.
-
-    Returns:
-        tuple: (heading, distance_band)
-    """
-    distance_cm = get_distance_filtered()
-    band = discretize_distance(distance_cm)
-    heading = get_heading()
-    return (heading, band)
-```
-
-> **Note:** we're dropping (row, col) from the state on the real robot because we can't track grid position accurately without encoders. In lesson 13, we'll load a Q-table that was retrained in simulation using only (heading, distance_band) as the state — a simpler representation that works well on the real hardware. We'll make that change in `train.py` before the final deployment.
+In simulation the robot knew where it was and which way it faced. The reflex policy from lesson 11 uses neither. Its whole state is the band, so there is nothing to track and no drift to worry about. That is a deliberate trade: less capable, but it works with only the parts on the robot.
 
 ---
 
-## Try It Yourself
+## Try it Yourself
 
-1. Connect your HC-SR04 to the Pico and copy `get_distance_filtered()` to a new file. Test it by holding objects at known distances (use a ruler). Verify that readings within 5% of the true distance at 10 cm, 25 cm, and 60 cm.
-
-2. Write a loop that calls `get_state()` every 200 ms and prints the result. Move your hand toward and away from the sensor. Confirm that the state transitions through "far" → "medium" → "near" at the expected distances.
-
-3. Add a voltage check: measure the battery voltage using the ADC on GP26 (or use a multimeter) and add a warning if it drops below 6V (for a 2-cell LiPo) or 5V (for 4×AA). Print "LOW BATTERY — policy may degrade" if the threshold is crossed.
-
----
+1. Hold a ruler or tape measure next to the sensor and check readings at 10, 25 and 60 cm. How far off are they? Note the error for each.
+2. Move your hand slowly towards the sensor and write down the distances where the band flips from `far` to `medium` and `medium` to `near`. Do they match 90 and 30?
+3. Change `NEAR_CM` to 40 and rerun. Does the label flicker less when you hold a hand near 30 cm?
+4. Challenge: add a rule that only accepts a new band if it appears twice in a row, to stop flicker at the boundaries (this is called hysteresis).
 
 ## Common Issues
 
-**"The sensor always returns -1.0 (timeout)."**
-Check the TRIG and ECHO wiring. Verify the TRIG pin can drive the sensor (measure with a logic probe or LED). Check that the ECHO line voltage is safe for the Pico (max 3.3V — use a voltage divider if needed).
+- **Problem**: Every reading is `-1.0`.
+- **Solution**: Check TRIG is on GP8 and ECHO on GP9, power and ground are connected, and the sensor's voltage matches its wiring.
+- **Why**: `time_pulse_us` returns a negative number when it times out, which means no pulse ever arrived.
 
-**"Readings jump wildly between 2 cm and 400 cm."**
-The echo is reflecting off something behind the sensor (wiring, chassis). Move the sensor to the front of the robot with a clear forward view. The median filter will catch occasional outliers, but not systematic double-bounce echoes.
+- **Problem**: Readings jump between about 3 cm and 400 cm.
+- **Solution**: Move the sensor to the very front of the chassis with a clear view, and keep wires out of its beam.
+- **Why**: Echoes bouncing off the robot's own body or wires arrive early, and the median filter cannot fix a repeatable bounce.
 
-**"The robot changes state too quickly — 'near' then 'far' then 'near' in quick succession."**
-Increase the delay between readings from 20 ms to 50 ms, and consider only accepting a new state if it's been stable for two consecutive readings (hysteresis).
+- **Problem**: The band flickers between `near` and `medium` at a boundary.
+- **Solution**: Increase the delay between reads and require two agreeing readings before changing state.
+- **Why**: A reading that hovers near 30 cm flips across the threshold with a little noise.
 
-**"My distance readings are consistently 20% too long."**
-The speed of sound varies with temperature. At 20°C the constant is 58 µs/cm; at 0°C it's about 61 µs/cm. For most indoor use this doesn't matter, but if accuracy is critical, add a temperature correction term.
+- **Problem**: The distances are a few per cent off even though the wiring is right.
+- **Solution**: Measure against a ruler and adjust the `58.0` constant slightly, or accept the error.
+- **Why**: Sound travels faster in warm air, about 58.3 microseconds per centimetre round trip at 20 C and about 60 at 0 C, so the constant is only approximate. That is a few per cent, not enough to matter for three bands.
+
+## Check your understanding
+
+{% quiz %}
+? Why must the real thresholds match the ones used in training?
+- [ ] The Pico is faster that way
+- [x] The Q-table was trained on those labels, so different cut-offs would mean different situations
+- [ ] MicroPython requires it
+> The table maps labels to actions. If a label means something else on the robot, the action is wrong.
+
+? What does the median of three readings do?
+- [x] Throws away a single outlier reading
+- [ ] Makes the sensor see further
+- [ ] Doubles the range
+> If one of three readings is wild, the middle value is still sensible.
+
+? Why do we use a voltage divider on ECHO for a 5 V HC-SR04?
+- [ ] To slow the pulse down
+- [x] The Pico's pins are 3.3 V devices and the sensor outputs 5 V
+- [ ] To improve accuracy
+> 1k and 2k resistors bring 5 V down to about 3.3 V, which protects GP9.
+{% endquiz %}
 
 ---
 
-Next up: putting it all together — loading the Q-table on the Pico and running the full motor control loop.
-
----
+Next up: loading the Q-table on the Pico and running the whole sense, decide and drive loop.

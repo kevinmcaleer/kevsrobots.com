@@ -1,30 +1,33 @@
 ---
 title: Training in Simulation
-description: Build a complete grid-world simulator, train your Q-learning agent over hundreds of episodes, and watch the policy improve — all in plain Python.
+description: Build a complete grid-world simulator, train your Q-learning agent over hundreds of episodes, and watch the policy improve, all in plain Python.
 layout: lesson
+code_target: cpython
 type: page
 cover: /learn/reinforcement_learning/assets/banners/10_training_in_simulation.jpg
-date_updated: 2026-06-13
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-This is the lesson everything has been building toward. We're going to write a complete, runnable Python program that:
-
-1. Simulates a differential-drive robot on a 2-D grid with obstacles
-2. Trains a Q-learning agent over hundreds of episodes
-3. Prints the learning progress so you can watch the policy improve
-4. Saves the finished Q-table to JSON, ready for the Pico
-
-This program uses nothing beyond the Python standard library. Copy it into a file called `train.py` and run it with `python3 train.py`.
+By the end of this lesson you will be able to run a complete Q-learning trainer on a grid world, read its learning curve, and test the finished policy.
 
 ---
 
-## The Grid World
+This is the lesson everything has been building toward. We will write one program, using only the Python standard library, that:
 
-Our simulated BurgerBot navigates a 7×7 grid. Obstacles (O) block certain cells. The robot starts at the top-left corner and must reach the goal (G) at the bottom-right corner without hitting obstacles or walls.
+1. Simulates a robot on a 7 by 7 grid with obstacles
+2. Trains a Q-learning agent over 600 episodes
+3. Prints progress so you can watch the policy improve
+4. Runs the finished policy once and draws the route it takes
+
+---
+
+## The grid world
+
+The robot starts at the top-left and must reach the goal `G` at the bottom-right, without driving into an obstacle `O` or the wall. It has a position, a heading (north, east, south or west) and a simulated ultrasonic sensor that reports "near", "medium" or "far" for what is straight ahead.
 
 ```
 . . . O . . .
@@ -36,16 +39,24 @@ O . . O . . .
 . . . . . . G
 ```
 
-The robot has:
-- A **position** (row, col)
-- A **heading** (north, east, south, west)
-- A **simulated ultrasonic sensor** — it "reads" the distance to the nearest obstacle directly ahead, within the grid, up to 5 cells away
+```mermaid
+flowchart TD
+    A["reset(): robot at start"] --> B["state = row, col, heading, sensor band"]
+    B --> C["choose_action(): epsilon-greedy"]
+    C --> D["step(): move, reward, done?"]
+    D --> E["update_q(): learn from the step"]
+    E --> F{"done or step limit?"}
+    F -- "no" --> B
+    F -- "yes" --> G["decay epsilon, next episode"]
+```
+
+The state is the tuple `(row, col, heading, band)`. The reward comes from lesson 3: -10 for a crash, +50 for the goal, +1 per forward move and -0.1 for anything else. A crash ends the episode.
 
 ---
 
-## The Complete Training Program
+## The complete training program
 
-Save this entire file as `train.py`:
+Save this whole listing as `train.py` and run it with `python3 train.py`. Notice how little is new: `choose_action`, `update_q` and the training loop are the functions from lessons 8 and 9.
 
 ```python
 """
@@ -70,7 +81,7 @@ from collections import defaultdict
 GRID_ROWS = 7
 GRID_COLS = 7
 
-# Obstacle positions (row, col) — cannot be start or goal
+# Obstacle positions (row, col): cannot be start or goal
 OBSTACLES = {
     (0, 3), (1, 1), (1, 5),
     (3, 0), (3, 3), (4, 5),
@@ -104,7 +115,7 @@ DECAY_RATE     = 0.995  # epsilon decay per episode
 EPSILON_MIN    = 0.01   # minimum exploration probability
 MAX_STEPS      = 150    # max steps per episode before giving up
 
-Q_TABLE_FILE   = "q_table.json"
+Q_TABLE_FILE   = "grid_q_table.json"
 
 
 # ---------------------------------------------------------------------------
@@ -170,10 +181,10 @@ class GridWorld:
         Execute an action and return (next_state, reward, done).
 
         Actions:
-          'forward'    — move one cell in the current heading direction
-          'turn_left'  — rotate 90° anticlockwise (no position change)
-          'turn_right' — rotate 90° clockwise (no position change)
-          'stop'       — do nothing (accumulates step cost)
+          'forward'   : move one cell in the current heading direction
+          'turn_left' : rotate 90° anticlockwise (no position change)
+          'turn_right': rotate 90° clockwise (no position change)
+          'stop'      : do nothing (accumulates step cost)
         """
         if self.done:
             # Environment is already in a terminal state
@@ -206,7 +217,7 @@ class GridWorld:
             idx = HEADINGS.index(self.heading)
             self.heading = HEADINGS[(idx + 1) % 4]   # clockwise
 
-        # "stop" — no state change
+        # "stop": no state change
 
         # Check for goal
         reached_goal = (self.row, self.col) == GOAL
@@ -231,28 +242,9 @@ class GridWorld:
             return +1.0
         return -0.1   # small penalty for turning or stopping
 
-    def render(self):
-        """Print the current grid state to the terminal."""
-        print()
-        for r in range(GRID_ROWS):
-            row_str = ""
-            for c in range(GRID_COLS):
-                if (r, c) == (self.row, self.col):
-                    # Show heading arrow
-                    arrow = {"north": "^", "east": ">", "south": "v", "west": "<"}
-                    row_str += arrow[self.heading] + " "
-                elif (r, c) in OBSTACLES:
-                    row_str += "O "
-                elif (r, c) == GOAL:
-                    row_str += "G "
-                else:
-                    row_str += ". "
-            print(row_str)
-        print()
-
 
 # ---------------------------------------------------------------------------
-# Agent helpers  (from lessons 7, 8, 9)
+# Agent helpers  (from lessons 7, 8 and 9)
 # ---------------------------------------------------------------------------
 
 def make_q_table():
@@ -260,7 +252,7 @@ def make_q_table():
 
 
 def choose_action(q_table, state, epsilon):
-    """ε-greedy action selection."""
+    """epsilon-greedy action selection."""
     if random.random() < epsilon:
         return random.choice(ACTIONS)
     action_values = q_table[state]
@@ -315,10 +307,10 @@ def load_q_table(filename):
 # Training
 # ---------------------------------------------------------------------------
 
-def print_progress_bar(recent_avg, width=30):
+def print_progress_bar(recent_avg, width=20):
     """Simple ASCII progress indicator based on recent average reward."""
-    # Map [-10, 50] reward range to [0, width]
-    filled = int((recent_avg + 10) / 60 * width)
+    # Map the [-10, 60] reward range onto the bar
+    filled = int((recent_avg + 10) / 70 * width)
     filled = max(0, min(width, filled))
     bar = "#" * filled + "-" * (width - filled)
     return f"[{bar}] {recent_avg:7.2f}"
@@ -362,28 +354,39 @@ def train():
 # ---------------------------------------------------------------------------
 
 def demo_policy(q_table, max_steps=50):
-    """Run a single greedy episode (epsilon=0) and print each step."""
+    """Run one greedy episode (epsilon = 0) and print what the robot did."""
     env = GridWorld()
     state = env.reset()
-    print("\n--- Demo: greedy policy (epsilon = 0) ---")
-    env.render()
-
-    for step in range(max_steps):
+    trail = [(env.row, env.col)]
+    actions = []
+    reached_goal = False
+    for _ in range(max_steps):
         action = choose_action(q_table, state, epsilon=0.0)
-        next_state, reward, done = env.step(action)
-        print(f"Step {step+1:3d}: action={action:<12s}  reward={reward:+6.1f}  "
-              f"state={next_state}")
-        env.render()
-        state = next_state
+        state, reward, done = env.step(action)
+        actions.append(action)
+        trail.append((env.row, env.col))
         if done:
-            if reward == 50.0:
-                print("  *** Robot reached the goal! ***")
-            else:
-                print("  *** Robot hit an obstacle ***")
+            reached_goal = (env.row, env.col) == GOAL
             break
-    else:
-        print("  (reached step limit)")
-
+    print("\n--- Demo: greedy policy (epsilon = 0) ---")
+    print("Actions:", " ".join(a[0] if a == "forward" else
+                               {"turn_left": "L", "turn_right": "R", "stop": "S"}[a]
+                               for a in actions))
+    print(f"Steps taken: {len(actions)}")
+    print("Reached the goal!" if reached_goal else "Did not reach the goal.")
+    print()
+    for r in range(GRID_ROWS):
+        row_str = ""
+        for c in range(GRID_COLS):
+            if (r, c) in OBSTACLES:
+                row_str += "O "
+            elif (r, c) == GOAL:
+                row_str += "G "
+            elif (r, c) in trail:
+                row_str += "* "
+            else:
+                row_str += ". "
+        print(row_str)
 
 # ---------------------------------------------------------------------------
 # Entry point
@@ -397,13 +400,9 @@ if __name__ == "__main__":
 
 ---
 
-## Running the Trainer
+## What you should see
 
-```bash
-python3 train.py
-```
-
-You should see output like this:
+With `random.seed(0)` fixed, you get this output every time:
 
 ```
 ============================================================
@@ -411,69 +410,108 @@ You should see output like this:
   Grid: 7x7  |  Obstacles: 7
   Episodes: 600  |  alpha=0.2  gamma=0.9
 ============================================================
-   Episode  Avg reward (50 ep)   Epsilon
+   Episode    Avg reward (50 ep)   Epsilon
 ------------------------------------------------------------
-        50  [----------] -5.42    0.7783
-       100  [##--------]  2.11    0.6058
-       150  [####------]  8.34    0.4724
-       200  [######----] 15.21    0.3679
-       300  [########--] 24.56    0.2231
-       400  [##########] 31.80    0.1353
-       500  [##########] 38.42    0.0820
-       600  [##########] 42.17    0.0497
+        50  [--------------------]   -8.58    0.7783
+       100  [#-------------------]   -5.75    0.6058
+       150  [##------------------]   -1.38    0.4715
+       200  [#######-------------]   14.74    0.3670
+       250  [########------------]   19.68    0.2856
+       300  [##############------]   41.44    0.2223
+       350  [##################--]   54.14    0.1730
+       400  [##################--]   54.29    0.1347
+       450  [###################-]   58.63    0.1048
+       500  [###################-]   59.75    0.0816
+       550  [##################--]   53.66    0.0635
+       600  [###################-]   59.53    0.0494
 ============================================================
-  Training complete. Final Q-table: 187 states
-  Saved 187 states to 'q_table.json'
+  Training complete. Final Q-table: 156 states
+
+Saved 156 states to 'grid_q_table.json'
+
+--- Demo: greedy policy (epsilon = 0) ---
+Actions: R f f L f f f f R f f f f L f f
+Steps taken: 16
+Reached the goal!
+
+* . . O . . .
+* O . . . O .
+* * * * * . .
+O . . O * . .
+. . . . * O .
+. O . . * . .
+. . . . * * G
 ```
 
-The average reward rising from negative (early crashes) to a high positive (consistently reaching the goal) is the signature of successful learning.
+The `*` marks show the route the finished policy takes, and the line `R f f L f ...` lists its actions (`f` forward, `L` and `R` turn left and right, `S` stop). The average reward starts at about -8.6 (frequent crashes) and rises to about 60. The best possible route is 12 moves, which scores about 60, so the robot has learned a near-perfect route. That climb is the signature of learning.
 
-After the training summary, the demo runs a greedy episode and prints each step with an ASCII grid — you can watch the robot navigate around obstacles.
+The seed pins everything down for this lesson. With a different seed, the exact numbers and the Q-table size change from run to run, though the shape holds. In our own tests, seeds 1 to 6 all produced a policy that reached the goal in 14 to 16 steps.
+
+> **Note:** this robot knows its exact row and column, and the simulator never lies about them. A real robot would not know either. Lesson 11 deals with that, and lesson 13 builds a policy that uses only the distance sensor.
 
 ---
 
-## Understanding the Learning Curve
-
-If your curve doesn't look like the above, here's what the common shapes mean:
+## Reading the learning curve
 
 | Pattern | Likely cause | Fix |
 |---|---|---|
-| Stays near -10 for 400+ episodes | Reward too sparse / maze too hard | Add a shaping reward for moving toward goal |
-| Shoots up fast then drops | Epsilon decaying too fast | Slow down `decay_rate` to 0.999 |
-| Never improves at all | Bug in update_q or reward function | Print (state, action, reward) for first 20 steps |
-| Reaches ~20 then plateaus | Good but not optimal policy | Increase `NUM_EPISODES` to 1000 |
+| Stays negative for hundreds of episodes | Goal too hard to find by chance | Shape the reward, or shrink the grid |
+| Rises, then drops and stays low | Epsilon fell too fast | Raise `DECAY_RATE` to 0.999 |
+| Never improves | Bug in the update or the reward | Print the first 20 `(state, action, reward)` steps |
+| Plateaus below the best | Needs more experience | Raise `NUM_EPISODES` to 1000 |
 {:class="table table-single"}
 
 ---
 
-## Try It Yourself
+## Try it Yourself
 
-1. Change the grid to 5×5 with fewer obstacles and retrain. How many episodes does it take to reach an average reward of +30? Compare to the 7×7 version.
-
-2. Modify `OBSTACLES` to create a maze that forces the robot through a narrow corridor. Does Q-learning still find the path? How many episodes does it need?
-
-3. Change the reward for `hit_obstacle` from -10 to -1. What happens to the final policy? Does the robot become more or less willing to take risks?
-
-4. After training, load the Q-table and count how many states have `forward` as their best action. Is this a higher or lower fraction than you'd expect in an open space?
-
----
+1. Shrink the world: set `GRID_ROWS` and `GRID_COLS` to 5, `GOAL` to `(4, 4)`, and delete any obstacle outside the 5 by 5 grid. How many episodes does it take for the average reward to pass +30?
+2. Edit `OBSTACLES` to make a wall with a one-cell gap, so the robot must find the gap. Does it still learn the route?
+3. Change the collision penalty from -10 to -1. Does the final policy get riskier?
+4. Challenge: after training, count how many states have `forward` as the best action. Is that higher or lower than you expected?
 
 ## Common Issues
 
-**"Python error: No module named 'collections.defaultdict'"**
-Make sure you're importing from `collections`: `from collections import defaultdict`. This is a standard library module.
+- **Problem**: The demo robot crashes or spins and never reaches the goal.
+- **Solution**: Check `NUM_EPISODES` is at least 400, and that your obstacles leave a path from start to goal.
+- **Why**: Too little training leaves many states at zero, so the greedy choice is almost arbitrary.
 
-**"The demo always crashes immediately."**
-Training didn't converge. Check that `NUM_EPISODES` is at least 300 and that your obstacle layout doesn't completely block the path from START to GOAL. Try the exact obstacle set from the lesson first.
+- **Problem**: `RuntimeError: dictionary changed size during iteration`.
+- **Solution**: Loop over `list(q_table.items())` if you also read new states inside the loop.
+- **Why**: A `defaultdict` adds a row when you look up a new state, which changes the dictionary mid-loop.
 
-**"The Q-table file is empty or very small."**
-The agent may not have explored many states. Check that `EPSILON_START = 1.0` and that the first several episodes aren't all hitting obstacles on step 1 (which would leave most of the grid unexplored).
+- **Problem**: My numbers differ from the lesson.
+- **Solution**: Make sure `random.seed(0)` is still in the `if __name__` block and that you copied the whole file.
+- **Why**: Every random choice flows from the seed, so any edit to the environment or to the order of random calls changes the numbers.
 
-**"RuntimeError: dictionary changed size during iteration"**
-This can happen if you iterate over `q_table` while also inserting into it (which `defaultdict` does on first access). Use `list(q_table.items())` in any loop that reads and writes simultaneously, or access `q_table[state]` only in the update function.
+- **Problem**: The saved JSON file is large.
+- **Solution**: That is normal. It is a plain text file you can open and read.
+- **Why**: One row is written for every state visited, with four numbers each.
+
+## Check your understanding
+
+{% quiz %}
+? What ends an episode in this simulation?
+- [ ] Only reaching the goal
+- [x] Reaching the goal, a collision, or the step limit
+- [ ] Epsilon reaching its minimum
+> A crash and the goal both end the episode, and so does hitting the step limit.
+
+? What does a rising average reward over the 600 episodes show?
+- [x] The policy is improving as the Q-table fills in
+- [ ] The obstacles are moving
+- [ ] Epsilon is increasing
+> More reward per episode means more goals reached and fewer crashes.
+
+? Why is `random.seed(0)` in the program?
+- [ ] To make the robot learn faster
+- [x] So the printed results are the same every time you run it
+- [ ] Python requires it
+> Fixing the seed makes the random choices repeatable, which is handy for comparing changes.
+{% endquiz %}
+
+> **Teachers**: the run takes a second or two on any laptop, so it suits a class working in pairs. A good activity is for each pair to change one setting (grid size, penalty, decay rate), predict the effect, run it, and report back.
 
 ---
 
-Next up: the sim-to-real gap — why our perfectly trained simulation policy might struggle on the actual robot, and what to do about it.
-
----
+Next up: the sim-to-real gap, and why a policy that works perfectly here can struggle on a real robot.

@@ -833,7 +833,7 @@
     \ obstacles on its own. Train a policy in a pure-Python grid-world simulation\
     \ on your laptop, then export the frozen Q-table as JSON and deploy it to a Pico-powered\
     \ differential-drive robot running MicroPython."
-  duration: 1h 45m
+  duration: 1h 57m
   groups:
   - robotics
   - micropython

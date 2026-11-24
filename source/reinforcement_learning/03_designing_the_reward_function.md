@@ -1,207 +1,193 @@
 ---
 title: Designing the Reward Function
-description: Craft rewards that teach the right behaviour — and discover the sneaky ways a poorly designed reward can backfire.
+description: Craft rewards that teach the right behaviour, and discover the sneaky ways a poorly designed reward can backfire.
 layout: lesson
+code_target: cpython
 type: page
 cover: /learn/reinforcement_learning/assets/banners/03_designing_the_reward_function.jpg
-date_updated: 2026-06-13
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-The reward function is the most powerful lever you have in reinforcement learning — and the most dangerous one. It's the entire channel through which you communicate your goals to the agent. Get it right and the robot learns exactly what you want. Get it subtly wrong and you end up with a robot that scores top marks by doing something completely useless.
-
-This lesson is about designing rewards deliberately. We'll use our obstacle-avoiding BurgerBot as the running example.
+By the end of this lesson you will be able to write a reward function for a robot task, predict which loopholes it leaves open, and check it by scoring different behaviours before you ever train.
 
 ---
 
-## What Makes a Good Reward?
-
-A reward signal should answer one question clearly: **was that a step toward the goal?**
-
-Good rewards are:
-
-- **Immediate** — the agent receives feedback close in time to the action that caused it
-- **Proportional** — bigger positive or negative values for more significant outcomes
-- **Specific** — tied to observable facts about the state, not to vague intentions
-- **Sparse enough to avoid confusion, dense enough to provide signal** — a balance we'll discuss below
+The reward function is the most powerful lever you have in reinforcement learning, and the most dangerous. It is the whole channel through which you tell the agent what you want. Get it right and the robot learns what you meant. Get it subtly wrong and you get a robot that scores top marks by doing something completely useless.
 
 ---
 
-## Rewards for Obstacle Avoidance
+## What makes a good reward?
 
-Let's think through the task. Our BurgerBot should:
+A reward should answer one question: **was that a step toward the goal?** Good rewards are:
 
-1. Move forward to explore the space
-2. Avoid hitting obstacles
-3. Ideally, reach a designated goal area
+- **Immediate**: feedback arrives close in time to the action that earned it
+- **Proportional**: bigger outcomes get bigger numbers
+- **Specific**: tied to facts the environment can observe, not to vague intentions
+- **Balanced**: dense enough to give a signal, not so noisy that it confuses
 
-Here's a first attempt at a reward function:
+For our obstacle-avoiding BurgerBot we want three things: keep moving, do not hit anything, and reach the goal.
+
+---
+
+## Test rewards before you train
+
+Here is a habit worth building: before training anything, write down a few behaviours and score them with your reward function. If a useless behaviour beats a useful one, the reward is broken.
+
+This program scores four hand-written behaviours (30 steps each) under two reward functions: one that only punishes crashes, and a balanced one.
 
 ```python
-def compute_reward(next_state, hit_obstacle, reached_goal, moved_forward):
-    """
-    Returns a float reward value based on what just happened.
+def collision_only(event):
+    return -10.0 if event == "crash" else 0.0
 
-    next_state:     string label for the new sensor reading
-    hit_obstacle:   bool — did the robot collide?
-    reached_goal:   bool — did the robot reach the target cell?
-    moved_forward:  bool — was the chosen action 'forward'?
-    """
-    if hit_obstacle:
-        return -10.0    # strong penalty for collision
 
-    if reached_goal:
-        return +50.0    # large bonus for success
-
-    if moved_forward:
-        return +1.0     # small bonus: we want forward progress
-
-    return -0.1         # tiny penalty for standing still or turning
-                        # discourages aimless spinning
-```
-
-The small penalty for non-forward actions (-0.1) is subtle but important. Without it, a robot might learn that the safest strategy is to turn on the spot indefinitely — no collisions, no negative rewards. With it, doing nothing slowly accumulates cost, so the robot is nudged toward making progress.
-
----
-
-## Reward Hacking: When Robots Find Loopholes
-
-Here's where things get interesting. Agents are ruthlessly literal. They optimise for whatever you measure, not for what you *meant* to measure.
-
-### The Statue Problem
-
-Suppose you only penalise collisions. The agent quickly discovers the perfect strategy: **never move**. A stationary robot never crashes. Reward: zero collisions, maximum score.
-
-```python
-# Reward that seems fine but creates a statue
-def naive_reward(hit_obstacle):
-    if hit_obstacle:
+def balanced(event):
+    if event == "crash":
         return -10.0
-    return 0.0          # no penalty for standing still
-                        # so the agent just... stands still
+    if event == "goal":
+        return 50.0
+    if event == "forward":
+        return 1.0
+    return -0.1          # turning or idling costs a little
+
+
+BEHAVIOURS = {
+    "statue (never moves)": ["idle"] * 30,
+    "spinner (turns forever)": ["turn"] * 30,
+    "driver (reaches the goal)": ["forward"] * 8 + ["goal"],
+    "bumper (hits a wall)": ["forward"] * 3 + ["crash"],
+}
+
+print(f"{'behaviour':<28}{'collision-only':>16}{'balanced':>10}")
+for name, events in BEHAVIOURS.items():
+    naive = sum(collision_only(e) for e in events)
+    good = sum(balanced(e) for e in events)
+    print(f"{name:<28}{naive:>16.1f}{good:>10.1f}")
 ```
 
-The robot isn't stupid. It genuinely found the optimal policy for *this* reward function. The problem is the reward function didn't capture what we actually wanted.
+The output:
 
-### The Spinner Problem
+```
+behaviour                     collision-only  balanced
+statue (never moves)                     0.0      -3.0
+spinner (turns forever)                  0.0      -3.0
+driver (reaches the goal)                0.0      58.0
+bumper (hits a wall)                   -10.0      -7.0
+```
 
-Suppose you reward forward progress (cells moved toward the goal) without penalising turning:
+Look at the first column. Under the collision-only reward the statue, the spinner and the driver all score exactly 0, so the agent has **no reason to drive**. In the second column the driver wins by a mile and both useless behaviours lose points.
+
+---
+
+## Reward hacking: when robots find loopholes
+
+Agents are ruthlessly literal. They optimise what you *measure*, not what you *meant*.
+
+**The statue problem.** Only punish crashes and the safest strategy is never to move. The robot is not stupid; it found the best policy for the reward you wrote.
+
+**The spinner problem.** Reward "progress" without any cost for turning and a symmetric arena may let the robot collect small rewards for wobbling back and forth. Again the reward, not the robot, is at fault.
+
+The fix is a reward with several signals at carefully chosen scales:
+
+| Event | Reward | Why |
+|---|---|---|
+| Crash | -10 | Avoiding damage comes first |
+| Reach the goal | +50 | Finishing is worth some risk |
+| Move forward | +1 | Encourages progress |
+| Turn, stop or idle | -0.1 | Small cost so idling never wins |
+{:class="table table-single"}
+
+The relative scale matters as much as the signs. A crash penalty of -10 against a goal bonus of +50 says that reaching the goal is worth some risk, but not unlimited risk.
+
+---
+
+## Reward shaping
+
+Sometimes the goal is so far away that a random agent never reaches it, so it never sees the big reward and cannot learn. This is the **sparse reward problem**. The cure is **reward shaping**: add small intermediate rewards that point the way.
 
 ```python
-# Slightly better, but still exploitable
-def progress_only_reward(cells_toward_goal):
-    return cells_toward_goal * 2.0  # only reward forward progress
+distances = [6, 5, 4, 3, 2, 1, 0]      # distance to the goal after each forward move
+
+
+def sparse_reward(distance):
+    return 50.0 if distance == 0 else 0.0
+
+
+def shaped_reward(distance, previous_distance):
+    if distance == 0:
+        return 50.0
+    progress = previous_distance - distance      # positive when we got closer
+    return progress * 2.0 - 0.05                 # reward progress, tiny step cost
+
+
+print("move  distance  sparse  shaped")
+for move in range(1, len(distances)):
+    d, prev = distances[move], distances[move - 1]
+    print(f"{move:>4}  {d:>8}  {sparse_reward(d):>6.1f}  {shaped_reward(d, prev):>6.2f}")
 ```
 
-A clever agent on a symmetric map might discover that spinning in a tight circle accumulates tiny amounts of "progress" on each half-rotation. Again, technically optimal for the measured reward.
-
-### The Fix: Balance Multiple Signals
-
-A robust reward function usually combines several signals with carefully chosen scales:
-
-```python
-def balanced_reward(hit_obstacle, reached_goal, moved_forward, steps_taken):
-    """
-    A more robust reward function for BurgerBot navigation.
-
-    The scales matter: collision penalty >> goal bonus >> progress bonus
-    >> idleness penalty. This ordering ensures the agent prioritises
-    safety first, then success, then efficiency.
-    """
-    if hit_obstacle:
-        return -10.0    # largest penalty: avoid crashes above all
-
-    if reached_goal:
-        return +50.0    # largest bonus: completing the task is the goal
-
-    reward = 0.0
-
-    if moved_forward:
-        reward += 1.0   # small bonus per forward step
-
-    # Tiny per-step penalty to discourage unnecessarily long routes.
-    # Without this, the agent might reach the goal but take 200 steps
-    # when 20 would do.
-    reward -= 0.05
-
-    return reward
+```
+move  distance  sparse  shaped
+   1         5     0.0    1.95
+   2         4     0.0    1.95
+   3         3     0.0    1.95
+   4         2     0.0    1.95
+   5         1     0.0    1.95
+   6         0    50.0   50.00
 ```
 
-The key insight: **the relative scale of rewards matters as much as their sign**. A collision penalty of -10 vs a goal bonus of +50 tells the agent that reaching the goal is worth enduring some risk, but not unlimited risk.
+The sparse reward says nothing until the very last move. The shaped reward says "yes, closer" at every step. But shaping can open new loopholes, for example a robot that oscillates to farm "progress", so always re-test after adding it.
+
+> **Note:** our simulated robot knows its distance to the goal because the simulator tells it. A real robot would need a way to measure that, which is another reason this course trains in simulation.
 
 ---
 
-## Reward Shaping
+## Try it Yourself
 
-Sometimes the goal is so far away that the agent never stumbles upon it by chance, so it never receives the large positive reward and can't learn anything useful. This is the **sparse reward problem**.
-
-The solution is **reward shaping**: adding intermediate rewards that guide the agent toward the goal without completely specifying the solution.
-
-```python
-def shaped_reward(distance_to_goal, prev_distance_to_goal,
-                  hit_obstacle, reached_goal):
-    """
-    Potential-based shaping: reward the agent for reducing distance
-    to the goal, not just for arriving.
-
-    This gives the agent a useful gradient to follow even when
-    the goal is far away and rarely reached early in training.
-    """
-    if hit_obstacle:
-        return -10.0
-
-    if reached_goal:
-        return +50.0
-
-    # Progress toward goal (can be negative if moving away)
-    progress = prev_distance_to_goal - distance_to_goal
-    shaping_bonus = progress * 2.0
-
-    return shaping_bonus - 0.05   # progress bonus minus small step cost
-```
-
-> **Warning:** Reward shaping is powerful but can introduce new reward-hacking opportunities. Always test your shaped reward in simulation and watch for unexpected behaviours before deploying.
-
----
-
-## Reward Design Checklist
-
-Before finalising a reward function, ask:
-
-- Does the agent get positive reward for *doing something useful*, not just for *avoiding bad things*?
-- Is there a per-step cost that prevents the agent from idling?
-- Is the goal reward large enough that reaching it is always worth the effort?
-- Could an agent score well without actually solving the task?
-- Are the reward magnitudes in a sensible ratio to each other?
-
----
-
-## Try It Yourself
-
-1. Write a reward function for a different task: a robot arm that must pick up a block and place it in a bin. What events earn positive reward? What earns a penalty?
-
-2. Take the naive "collision-only" reward function above and predict: what policy will an agent learn? Run it in your head for ten "episodes" where the agent acts randomly.
-
-3. Modify `balanced_reward()` to add an extra penalty when the robot turns more than three times in a row without going forward. Why might this be useful? What risk does it introduce?
-
----
+1. Add a fifth behaviour called `"dither"` to `BEHAVIOURS`: alternate `"forward"` and `"turn"` for 30 steps. How does it score under `balanced`? Is that what you wanted?
+2. Change the turning cost from `-0.1` to `0.0` and rerun. Which useless behaviour now ties with the best one?
+3. Write a reward for a robot arm that must pick up a block and drop it in a bin. List the events and give each a number, then invent two behaviours and score them.
+4. Challenge: in the shaping example, change `progress * 2.0` to `abs(progress) * 2.0`. What loophole does that open?
 
 ## Common Issues
 
-**"My agent learned to stay still — it never moves at all."**
-You're missing a per-step cost or a forward-progress bonus. Add a small negative reward for each time step and a small positive reward for the "forward" action.
+- **Problem**: My agent learned to stay still and never moves.
+- **Solution**: Add a small negative reward for idling and a positive reward for moving forward.
+- **Why**: With no cost for doing nothing, standing still is a perfectly good strategy.
 
-**"My agent crashes immediately every episode and never improves."**
-The collision penalty might be dominating before the agent has any chance to learn. Try temporarily reducing its magnitude, or make the goal closer to the start in early training.
+- **Problem**: My agent crashes constantly and never improves.
+- **Solution**: Make sure the goal reward is reachable, by placing the goal closer in early tests or adding shaping.
+- **Why**: If the agent never sees a positive reward, it has nothing to move toward.
 
-**"The agent reaches the goal but takes forever to get there."**
-Add a small per-step cost (e.g. -0.05 per step) to incentivise efficiency without making steps so costly that the agent avoids moving at all.
+- **Problem**: It reaches the goal but takes a silly route.
+- **Solution**: Add a tiny cost per step, such as `-0.05`.
+- **Why**: Without a cost for time, a 200-step route and a 20-step route earn the same.
+
+## Check your understanding
+
+{% quiz %}
+? Under the collision-only reward, why did the statue and the driver score the same?
+- [ ] The driver crashed
+- [x] Neither crashed, and nothing rewarded reaching the goal
+- [ ] The statue moved forward
+> The collision-only reward is 0 unless you crash, so useless and useful behaviours tie.
+
+? What is reward shaping for?
+- [x] Giving small intermediate rewards so the agent can find the goal
+- [ ] Making the goal reward smaller
+- [ ] Removing the crash penalty
+> Shaping helps with sparse rewards by giving signal on the way to the goal.
+
+? Why score hand-written behaviours before training?
+- [ ] It makes training faster
+- [x] It reveals loopholes where a useless behaviour beats a useful one
+- [ ] The agent needs the scores to start
+> If a statue outscores a driver, no amount of training will fix the reward.
+{% endquiz %}
 
 ---
 
-Next up: we'll look at how to translate the continuous physical world into the discrete states a Q-table can work with.
-
----
+Next up: how to turn continuous sensor readings into the discrete states a Q-table can use.

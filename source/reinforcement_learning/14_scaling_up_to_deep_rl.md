@@ -1,188 +1,181 @@
 ---
 title: Scaling Up to Deep RL
-description: Discover where lookup tables run out of road, how neural networks take over as Q-function approximators, and where to go next.
+description: See where lookup tables run out of road, how a learned function replaces the table, and be honest about what carries over to real robot learning.
 layout: lesson
+code_target: cpython
 type: page
 cover: /learn/reinforcement_learning/assets/banners/14_scaling_up_to_deep_rl.jpg
-date_updated: 2026-06-13
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-You've built something real: a robot that learned its behaviour from experience. Tabular Q-learning is a complete, working, understandable solution for problems where the state space is small enough to fit in a dictionary.
-
-But what happens when it isn't?
-
-This lesson takes an honest look at where tabular methods break down and introduces the intuition behind **Deep Q-Learning (DQN)** — the extension that scales to much harder problems. We won't implement it here (it needs a proper deep learning framework), but you'll understand what it is and what you'd need to learn next.
+By the end of this lesson you will be able to explain why a Q-table cannot scale to camera images, describe how a learned function replaces it, and say honestly what from this course carries over to real robots.
 
 ---
 
-## The Scaling Wall
+You have built something real: a robot running a policy it learned from experience. Tabular Q-learning is a complete, understandable solution when the state space is small enough for a dictionary. But what happens when it is not?
 
-Recall the state-space size calculation from lesson 4. Our BurgerBot simulation used:
-
-```python
-# 7x7 grid × 4 headings × 3 distance bands = 588 possible states
-total_states = 7 * 7 * 4 * 3   # = 588
-
-# With 4 actions: 588 * 4 = 2352 Q-table entries
-# Easily fits in RAM, trained in minutes
-```
-
-Now imagine a robot with a camera instead of an ultrasonic sensor. A 64×64 greyscale image has 4,096 pixels, each with 256 possible values. The number of possible states is 256^4096 — a number so large that even if you used every atom in the observable universe as a memory cell, you couldn't store one row of that table.
-
-This is not a memory-engineering problem — it is a fundamental limit of the lookup-table approach.
-
-```python
-# State space for a camera-equipped robot:
-camera_states = 256 ** (64 * 64)  # incomprehensibly large
-# A lookup table is impossible.
-# We need a function that *generalises* across similar states.
-```
+This lesson looks at where tables break down and what **deep reinforcement learning** does instead. We will not build a deep network here; that needs a proper framework. The aim is to understand what you would learn next.
 
 ---
 
-## Neural Networks as Q-Function Approximators
+## The scaling wall
 
-The insight behind Deep RL is this: instead of storing Q-values in a lookup table, **approximate the Q-function with a neural network**.
-
-```python
-# Tabular Q-learning:
-# Q(state, action) = lookup q_table[state][action]
-
-# Deep Q-learning (DQN):
-# Q(state, action) = neural_network.predict(state)[action_index]
-```
-
-The neural network takes a state (e.g. a raw pixel image) as input and outputs a Q-value for each possible action. You train it with gradient descent, using the same Bellman target we used in lesson 6 and 9:
+Our grid world had 588 states. Now give the robot a camera instead of an ultrasonic sensor. Run this to see the size of the problem, and a first taste of the cure.
 
 ```python
-# DQN loss (conceptual Python — not runnable without a deep learning library):
-def dqn_loss(network, state, action, reward, next_state, gamma):
-    """
-    Compute the loss for one experience.
+import math
 
-    The network predicts Q-values for all actions given a state.
-    We compare its prediction for the taken action against the
-    Bellman target, and compute mean-squared error.
-    """
-    # Predict Q-values for all actions in current state
-    predicted_q_values = network.predict(state)
-    predicted_q = predicted_q_values[action]
+digits = int(4096 * math.log10(256)) + 1
+print(f"A 64x64 greyscale camera image has a state space of 256^4096, a number with {digits} digits.")
+print(f"Our 7x7 grid world has {7 * 7 * 4 * 3} states.")
 
-    # Compute Bellman target (same formula as lesson 9)
-    next_q_values = network.predict(next_state)
-    td_target = reward + gamma * max(next_q_values)
+# Table versus function: learn Q(forward) from distance readings
+# Pretend experience: for each distance, the value of going forward is 3 * (d / 100) - 3
+train_distances = [10, 20, 30, 40, 60, 70, 80, 90, 100]      # note: no 50 cm reading
+true_q = lambda d: 3 * (d / 100) - 3
 
-    # Loss: squared TD error
-    loss = (td_target - predicted_q) ** 2
-    return loss
+# 1. A table can only answer for distances it has seen
+table = {d: true_q(d) for d in train_distances}
 
-# Gradient descent nudges the network's weights to reduce this loss
-# over many thousands of training steps.
+# 2. A tiny function q = w * x + b, nudged toward each example (gradient descent)
+w, b, lr = 0.0, 0.0, 0.1
+for _ in range(2000):
+    for d in train_distances:
+        x = d / 100
+        error = (w * x + b) - true_q(d)
+        w -= lr * error * x
+        b -= lr * error
+
+query = 50
+print(f"\nAsked about {query} cm, which was never seen:")
+print(f"  table says     {table.get(query, 0.0):+.2f}  (no row, so it guesses 0)")
+print(f"  function says  {w * (query / 100) + b:+.2f}  (true value {true_q(query):+.2f})")
 ```
 
-The magic: once trained, the network **generalises**. Two pixel images that look similar will produce similar Q-value estimates, even if the agent has never seen exactly that image before. A lookup table can't do this — it treats every new state as completely foreign.
+Output:
+
+```
+A 64x64 greyscale camera image has a state space of 256^4096, a number with 9865 digits.
+Our 7x7 grid world has 588 states.
+
+Asked about 50 cm, which was never seen:
+  table says     +0.00  (no row, so it guesses 0)
+  function says  -1.50  (true value -1.50)
+```
+
+A number with nearly 10,000 digits cannot be stored, and no robot could ever visit every such state. That is the wall. The second half shows the idea that gets around it: instead of one stored number per state, learn a **function** from state to value. A table has nothing to say about a 50 cm reading it never saw. The function answers sensibly, because similar inputs give similar outputs. We cheated here: the true relationship was a straight line, so a straight-line function fits it perfectly. Real problems are not that kind, which is why deep RL uses neural networks, flexible functions with millions of adjustable numbers.
 
 ---
 
-## Where DQN Came From
+## Deep Q-learning in one picture
 
-In 2013, DeepMind published a paper showing that a single DQN agent — given only raw pixels and a game score — could learn to play 49 Atari games at human or superhuman level. The state space (210×160 pixels, 128 colours) is astronomically larger than anything a lookup table could handle.
+```mermaid
+flowchart LR
+    I["State<br/>e.g. camera pixels"] --> N["Neural network"]
+    N --> Q1["Q(forward)"]
+    N --> Q2["Q(turn_left)"]
+    N --> Q3["Q(turn_right)"]
+    Q1 --> P["Pick the largest<br/>(or explore)"]
+    Q2 --> P
+    Q3 --> P
+```
 
-The key ideas that made it work:
+This is a **Deep Q-Network (DQN)**. It takes a state and outputs one Q-value per action. It is trained with the very same target as lesson 9, in plain text: `target = reward + gamma * max(Q(next state))`. The loss is the squared gap between the network's prediction and that target, and gradient descent nudges the network's weights to shrink it. The idea is identical to what you wrote; only the storage is different.
 
-**Experience replay**: instead of learning from each experience immediately, store experiences in a buffer and sample them randomly during training. This breaks correlations between consecutive observations and stabilises training.
+Making that stable took extra tricks:
 
-**Target network**: use a second, slower-updating copy of the network to compute the Bellman target. Without this, the target moves every step, making training unstable.
+- **Experience replay**: store past steps in a buffer and train on random samples from it, which breaks the link between consecutive steps.
+- **A target network**: a slow-moving copy of the network used to compute the target, so the target does not chase its own tail.
+- **Convolutional layers**: layers designed for images that find useful visual features automatically.
 
-**Convolutional layers**: the network processes the raw pixels through convolutional layers (the same architecture used in image recognition) that learn to detect relevant visual features automatically.
-
-None of these are needed for tabular Q-learning — but all three are essential for DQN to work reliably.
+DeepMind's 2013 paper showed this idea on a handful of Atari games, and their 2015 Nature paper (Mnih and colleagues) extended it to 49 games, reaching human-level or better scores on many of them, from raw screen pixels.
 
 ---
 
-## The RL Landscape Beyond DQN
+## The wider landscape
 
-DQN was a landmark, but the field has kept moving:
-
-| Algorithm | What it adds | When to use it |
-|---|---|---|
-| Double DQN | Reduces overestimation of Q-values | Most DQN tasks |
-| Dueling DQN | Separate value and advantage streams | Sparse rewards |
-| PPO | Policy gradient instead of Q-learning | Continuous actions |
-| SAC | Off-policy + entropy bonus for exploration | Robotics with continuous control |
-| AlphaGo/MuZero | Model-based: learns to plan using a learned world model | Complex strategy |
+| Method | What it adds |
+|---|---|
+| Double DQN | Reduces Q-value overestimation |
+| Dueling DQN | Separates "how good is this state" from "how much do the actions differ" |
+| PPO | Learns a policy directly, and handles continuous actions such as motor torques |
+| SAC | Off-policy learning with an entropy bonus, popular for continuous robot control |
+| MuZero | Learns a model of the world and plans with it |
 {:class="table table-single"}
 
-For robotics tasks with **continuous action spaces** (e.g. direct torque control of servo motors rather than "turn left / turn right"), policy gradient methods like **PPO** (Proximal Policy Optimisation) and **SAC** (Soft Actor-Critic) generally work better than DQN-style methods.
+For robot control with **continuous actions** (an exact motor torque rather than "turn left"), policy-gradient and actor-critic methods such as PPO and SAC are generally preferred over DQN.
 
 ---
 
-## What You'd Need to Learn Next
+## What carries over to real robots, and what does not
 
-To implement DQN yourself, the skills to acquire next are:
+This is the honest part. A Q-table on a toy grid is **not** how a real robot learns to walk.
 
-1. **NumPy** — efficient numerical arrays; almost all deep learning code uses it
-2. **A deep learning framework** — PyTorch is the most popular for research; TensorFlow/Keras is common in production
-3. **OpenAI Gymnasium** — the standard environment API for RL training (similar to our `GridWorld` class but standardised)
-4. **A GPU** (or Google Colab) — DQN training on Atari can take millions of steps; a GPU makes this practical
+**What carries over:** the agent-environment loop, rewards and the trouble with reward hacking, exploration versus exploitation, the Bellman target, the need to test for the sim-to-real gap, and the habit of adding a hard safety override.
 
-A good first DQN project: train a DQN to play CartPole (a simple balancing task) using PyTorch and the Gymnasium `CartPole-v1` environment. It's the "hello world" of deep RL and achieves a working solution in hundreds of thousands of steps on a laptop CPU.
+**What does not:**
 
----
+- Real robot tasks have continuous states and actions, so a table is out.
+- Learning from scratch on real hardware is slow and can break things. Researchers who teach legged robots to walk typically train in fast simulation with many parallel copies and heavy randomisation of the physics (a grown-up version of the noise we added in lesson 11), then transfer the result.
+- Our tiny reflex policy is no cleverer than a hand-written rule. Learning pays off when the rules are too hard to write, not for a three-line `if`.
 
-## Tabular vs Deep: Knowing Which to Reach For
-
-Before upgrading to deep RL, ask:
-
-```python
-def should_i_use_deep_rl(task):
-    """
-    A rough decision guide.
-    """
-    state_is_images_or_raw_sensors = True   # e.g. camera, lidar point cloud
-    state_space_too_large_for_table = True  # > ~10,000 states
-    need_continuous_actions = False         # e.g. exact servo angle vs 4 directions
-    have_compute_and_time = False           # GPU + days of training
-
-    if (not state_is_images_or_raw_sensors and
-        not state_space_too_large_for_table and
-        not need_continuous_actions):
-        return "Tabular Q-learning — simpler, faster, more interpretable"
-
-    if have_compute_and_time:
-        return "Deep RL (DQN, PPO, SAC) — scales to complex problems"
-
-    return "Reconsider the state space — can you discretise more aggressively?"
-```
-
-For most maker-scale robot projects, tabular Q-learning is the right choice. The Q-table is readable — you can print it, inspect it, and understand *why* the robot does what it does. That interpretability is genuinely valuable.
+> **Note:** training a deep network on a Pico is not practical. Running a very small trained network on a microcontroller is possible with specialised tools, but that is beyond this course.
 
 ---
 
-## Try It Yourself
+## Where to go next
 
-1. Increase the grid size to 10×10 with more obstacles and retrain. At what point does training time become impractical? Estimate the maximum grid size you could train comfortably on your laptop in under 5 minutes.
-
-2. Look up the Gymnasium `FrozenLake-v1` environment (a 4×4 or 8×8 grid-world task). It has the same structure as our `GridWorld`. Try adapting your Q-learning code to use it — the only change is calling `env.step()` and `env.reset()` in the standard Gymnasium API style.
-
-3. Read the abstract and first page of the original DQN paper: "Human-level control through deep reinforcement learning", Mnih et al., Nature 2015. What did the authors claim was new about their approach? How does it compare to what you've built in this course?
+The sibling course, [Reinforcement Learning with Gymnasium](/learn/gymnasium/), takes the same BurgerBot grid world onto the standard Gymnasium environment API and the Stable-Baselines3 library, so you can swap in neural-network agents. A good "hello world" for deep RL after that is the `CartPole` balancing task. You will also want NumPy (see the [Pandas and NumPy](/learn/pandas_and_numpy/) course) and, later, a framework such as PyTorch.
 
 ---
+
+## Try it Yourself
+
+1. In the program, change `query` to 5 and then 120. Both are outside the training range. How good is the function there, and is a table any better?
+2. Change `true_q` to something curved, such as `lambda d: 3 * ((d / 100) ** 2) - 3`, and rerun. The straight line can no longer fit it perfectly. What does that tell you about why we need networks?
+3. Write down three robot tasks and mark each "table is fine" or "needs a learned function". Explain your choices.
+4. Challenge: read the first page of the 2015 Nature DQN paper. What did the authors claim was new?
 
 ## Common Issues
 
-**"I tried PyTorch DQN tutorials and they don't look like the code in this course."**
-That's expected. DQN requires a lot of scaffolding (experience replay buffer, target network, batch training) that tabular Q-learning doesn't need. The *core idea* (Bellman target, TD error, greedy action selection) is identical — but the implementation is much more involved.
+- **Problem**: A deep RL tutorial looks nothing like this course's code.
+- **Solution**: Look for the same four ideas: a state, an action, a reward and a Bellman-style target.
+- **Why**: The frameworks add networks, batches and replay buffers around an update that is the one you already know.
 
-**"Is there a way to run DQN on the Pico?"**
-Not practically. DQN requires floating-point matrix operations (the neural network forward pass) that are too slow on the Pico's microcontroller. The Pico is excellent for *executing* a trained tabular policy; Deep RL training must happen on a laptop or cloud GPU, with only the final model deployed to embedded hardware.
+- **Problem**: I want to train a deep network on my Pico.
+- **Solution**: Train on a computer, and treat the microcontroller as a place to run a small finished model, if at all.
+- **Why**: Training needs far more memory and arithmetic than a Pico has.
+
+- **Problem**: Should I always use deep RL for a real robot?
+- **Solution**: No. Use rules or a small table when they work, and a learned function only when they cannot.
+- **Why**: Deep RL costs training time, compute and tuning, and is harder to verify as safe.
+
+## Check your understanding
+
+{% quiz %}
+? Why can a Q-table not handle camera images?
+- [ ] Python dictionaries cannot hold images
+- [x] The number of possible states is astronomically large, far beyond any table
+- [ ] Cameras are too slow
+> A 64 by 64 greyscale image has 256 to the power 4096 possible states, which no table could store.
+
+? What does a DQN network replace?
+- [ ] The reward function
+- [x] The Q-table, by predicting a Q-value for each action from the state
+- [ ] The environment
+> The Bellman target is the same, but the values come from a function instead of a lookup.
+
+? Which carries over from this course to real robot learning?
+- [x] Rewards, exploration and testing for the sim-to-real gap
+- [ ] Storing every state in a dictionary
+- [ ] A four-action grid
+> The ideas carry over. The tabular grid does not.
+{% endquiz %}
 
 ---
 
-Next up: the summary — a recap of everything you've built, a key concepts checklist, and pointers to what to explore next.
-
----
+Next up: the summary, and a few ideas for where to take your robot next.

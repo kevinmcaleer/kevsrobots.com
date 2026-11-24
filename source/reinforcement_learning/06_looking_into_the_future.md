@@ -1,183 +1,167 @@
 ---
 title: Looking Into the Future
-description: Discover why future rewards are worth less than immediate ones, and use discount factors and the Bellman equation to see the idea working in Python.
+description: Discover why future rewards are worth less than immediate ones, and use the discount factor and the Bellman idea in Python.
 layout: lesson
+code_target: cpython
 type: page
 cover: /learn/reinforcement_learning/assets/banners/06_looking_into_the_future.jpg
-date_updated: 2026-06-13
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Here's a thought experiment. Would you rather have £10 right now, or £10 in six months? Most people take the money now. There's an element of uncertainty about the future (what if something changes?), and there's an opportunity cost (you could invest it). Future rewards are, in some sense, worth less than equivalent immediate rewards.
-
-Reinforcement learning captures this intuition with a single number called the **discount factor**, written as γ (gamma).
+By the end of this lesson you will be able to calculate a discounted return, explain what the discount factor gamma does, and use the Bellman idea to spread a goal's value backwards along a path.
 
 ---
 
-## The Discount Factor (γ)
-
-The discount factor γ is a number between 0 and 1. It controls how much the agent cares about future rewards relative to immediate ones.
-
-```python
-gamma = 0.9   # the agent values future rewards at 90% of their face value per step
-
-# Reward at time 0 (now):       worth  reward * 1.0
-# Reward at time 1 (1 step):    worth  reward * gamma       = reward * 0.9
-# Reward at time 2 (2 steps):   worth  reward * gamma**2    = reward * 0.81
-# Reward at time 3 (3 steps):   worth  reward * gamma**3    = reward * 0.729
-# ...
-# Reward at time n (n steps):   worth  reward * gamma**n
-```
-
-With γ = 0.9, a reward earned five steps from now is worth 0.9⁵ ≈ 0.59 of its face value. Ten steps away: 0.9¹⁰ ≈ 0.35. The further in the future, the less it weighs in today's decision.
+Would you rather have £10 now, or £10 in six months? Most people take it now. The future is uncertain, and money in hand can be put to work. Reinforcement learning captures that intuition with one number called the **discount factor**, written **gamma** (the Greek letter γ).
 
 ---
 
-## Discounted Return: A Worked Example
+## The discount factor
 
-The **discounted return** from a given time step is the sum of all future rewards, each multiplied by the appropriate power of γ.
+Gamma is a number between 0 and 1 that says how much the agent cares about future rewards compared with immediate ones. A reward that arrives `k` steps from now is multiplied by `gamma ** k`. With gamma = 0.9:
 
-Let's trace through a tiny corridor episode. The robot starts at position 0 (left) and needs to reach position 4 (the goal), taking one step right per time step.
+| Steps away | Weight | A reward of 10 is worth |
+|---|---|---|
+| 0 (now) | 1.00 | 10.0 |
+| 1 | 0.90 | 9.0 |
+| 5 | 0.59 | 5.9 |
+| 10 | 0.35 | 3.5 |
+{:class="table table-single"}
+
+The further away a reward is, the less it pulls on today's decision. That is what makes a robot prefer the *short* route to a goal: the same prize, fewer steps of shrinking.
+
+---
+
+## Discounted return
+
+The **return** is the total of all the rewards that follow, each discounted. We will trace a corridor where the robot takes four small-cost steps, then reaches the goal for +10, and compare three values of gamma.
 
 ```python
 gamma = 0.9
+rewards = [-0.1, -0.1, -0.1, -0.1, 10.0]    # four small costs, then the goal
 
-# Rewards received at each time step
-rewards = [-0.1, -0.1, -0.1, -0.1, 10.0]
-# step 0: move right (small cost)
-# step 1: move right (small cost)
-# step 2: move right (small cost)
-# step 3: move right (small cost)
-# step 4: reach goal (big reward)
 
-# Calculate discounted return from step 0
 def discounted_return(rewards, gamma, start_step=0):
-    """
-    Compute the total discounted return starting from start_step.
-
-    G_t = r_t + gamma * r_{t+1} + gamma^2 * r_{t+2} + ...
-
-    In plain English: sum up all future rewards, but shrink each
-    one by gamma^k where k is how many steps in the future it is.
-    """
+    """Sum the future rewards, shrinking each by gamma for every step away."""
     total = 0.0
     for k, r in enumerate(rewards[start_step:]):
         total += (gamma ** k) * r
     return total
 
-G0 = discounted_return(rewards, gamma, start_step=0)
-G1 = discounted_return(rewards, gamma, start_step=1)
-G4 = discounted_return(rewards, gamma, start_step=4)
 
-print(f"Return from step 0 (start): {G0:.4f}")
-print(f"Return from step 1:         {G1:.4f}")
-print(f"Return from step 4 (goal):  {G4:.4f}")
+for start in (0, 1, 4):
+    print(f"Return from step {start}: {discounted_return(rewards, gamma, start):.4f}")
 
-# Output:
-# Return from step 0 (start): 6.2201
-# Return from step 1:         6.9112
-# Return from step 4 (goal): 10.0000
-```
+print()
+for g in (0.5, 0.9, 0.99):
+    print(f"gamma = {g:<4}: return from step 0 = {discounted_return(rewards, g):.3f}")
 
-Notice that G1 > G0: being one step closer to the goal is more valuable, because the big +10 reward is discounted by one fewer factor of γ. This is exactly the gradient the Q-learning algorithm will follow.
 
----
-
-## The Bellman Equation (in Python)
-
-Richard Bellman gave us an elegant recursion that expresses the value of a state in terms of the value of the next state. It's the foundation of Q-learning, and it says:
-
-> The value of being in a state is the immediate reward plus the (discounted) value of the next state.
-
-Here's the Bellman equation written as commented Python:
-
-```python
 def bellman_value(reward, gamma, next_state_value):
-    """
-    Bellman equation for state values.
-
-    V(s) = r + gamma * V(s')
-
-    - V(s)  : value of the current state  (what we want to compute)
-    - r     : reward received this step    (known immediately)
-    - gamma : discount factor              (how much we trust the future)
-    - V(s') : value of the next state      (estimated from experience)
-
-    In plain English:
-    "How good is being here?" =
-        "What I just got" + "a bit less than how good the next place is"
-    """
+    """V(s) = r + gamma * V(s')"""
     return reward + gamma * next_state_value
 
-# Example: one step from the goal (next_state_value = 10.0, reward = -0.1)
-v_one_step_from_goal = bellman_value(reward=-0.1, gamma=0.9, next_state_value=10.0)
-print(f"Value of being one step from goal: {v_one_step_from_goal:.2f}")
-# Output: 8.90
 
-# Two steps from the goal
-v_two_steps = bellman_value(reward=-0.1, gamma=0.9, next_state_value=v_one_step_from_goal)
-print(f"Value of being two steps from goal: {v_two_steps:.2f}")
-# Output: 7.91
+one_away = bellman_value(-0.1, 0.9, 10.0)
+two_away = bellman_value(-0.1, 0.9, one_away)
+print()
+print(f"One step from the goal:  {one_away:.2f}")
+print(f"Two steps from the goal: {two_away:.2f}")
 ```
 
-The value decreases smoothly as we move further from the goal. This smooth gradient is what Q-learning exploits: every small update propagates the goal's value backward through the state space, step by step, episode by episode.
+Output:
+
+```
+Return from step 0: 6.2171
+Return from step 1: 7.0190
+Return from step 4: 10.0000
+
+gamma = 0.5 : return from step 0 = 0.438
+gamma = 0.9 : return from step 0 = 6.217
+gamma = 0.99: return from step 0 = 9.212
+
+One step from the goal:  8.90
+Two steps from the goal: 7.91
+```
+
+Being one step closer is worth more (7.02 against 6.22), because the big +10 is discounted one fewer time. That gradient is what Q-learning follows. Notice also how gamma changes the picture: at 0.5 the goal is almost invisible from the start, while at 0.99 it is almost fully felt.
 
 ---
 
-## Choosing Your Gamma
+## The Bellman idea
 
-The choice of γ significantly changes the agent's behaviour:
+Richard Bellman noticed that the value of a situation can be written in terms of the next one. Here **V(s)** means "the value of being in state s", and **s'** (read "s prime") means the state you land in next:
 
 ```python
-# High gamma = patient agent, plans far ahead
-gamma_patient = 0.99
-# - Good for tasks where the goal is many steps away
-# - Slower to train (longer credit assignment chain)
-# - Can be unstable early in training
+# V(s) = r + gamma * V(s')
+# "How good is it here?" = "what I get now" + "a bit less than how good the next place is"
+```
+{: .no-snakie }
 
-# Medium gamma = balanced agent
-gamma_balanced = 0.9
-# - Works well for most grid-world tasks
-# - Reasonable training stability
-# - Our default for the BurgerBot simulation
+The last lines of the program use it. A state one step from the goal is worth `-0.1 + 0.9 * 10 = 8.90`. A state two steps away is worth `-0.1 + 0.9 * 8.90 = 7.91`. The value fades smoothly with distance, and each update passes the goal's value one step further back. Q-learning does exactly this, bit by bit, over many episodes.
 
-# Low gamma = impatient agent, lives for now
-gamma_impatient = 0.5
-# - Essentially ignores anything more than 3-4 steps ahead
-# - Very stable training, quick to learn simple tasks
-# - Poor for tasks requiring long-term planning
+---
+
+## Choosing gamma
+
+```mermaid
+flowchart LR
+    L["gamma 0.5<br/>impatient"] --> M["gamma 0.9<br/>balanced"] --> H["gamma 0.99<br/>patient"]
 ```
 
-For our obstacle-avoidance task, γ = 0.9 is a good default. The goal is rarely more than 10–15 steps away in our 5×5 grid, and 0.9¹⁵ ≈ 0.2 means the agent still cares meaningfully about reaching it.
+- **Low (around 0.5)**: ignores anything more than a few steps away. Stable, but poor at long tasks.
+- **Medium (0.9)**: our default. A goal 15 steps away still carries about 0.9 to the power 15, roughly 0.2, of its value.
+- **High (0.99)**: plans far ahead, but learning is slower because the value has to travel further.
 
 ---
 
-## Try It Yourself
+## Try it Yourself
 
-1. Run `discounted_return()` with γ = 0.5, 0.9, and 0.99 on the same reward sequence `[-0.1, -0.1, -0.1, -0.1, 10.0]`. How does the return from step 0 change? Which γ makes the agent most eager to reach the goal?
-
-2. Modify the corridor to add an obstacle that causes a -10 reward at step 2. How does this change the discounted return from step 0 with γ = 0.9?
-
-3. Write a function `bellman_sequence(rewards, gamma)` that applies the Bellman equation backward through a full reward sequence, starting from the last step and working to the first. Print the value at each step. Verify it matches `discounted_return()`.
-
----
+1. Use `discounted_return` with gamma 0.9 on `[-0.1, -10.0, -0.1, -0.1, 10.0]` (a bump at step 1). How much does the bump cost, compared with the original sequence?
+2. Find the smallest gamma where the return from step 0 is positive for the original rewards. Try values by hand or loop over them.
+3. Write `bellman_sequence(rewards, gamma)` that works backwards from the last reward and prints the value at each step. Check it matches `discounted_return`.
+4. Challenge: a goal 30 steps away with a +10 reward. At gamma 0.9, what is its value from the start, ignoring step costs? What does that say about using 0.9 on big arenas?
 
 ## Common Issues
 
-**"My agent seems to ignore the goal because it's too far away."**
-Try increasing γ toward 0.99. This extends the agent's effective planning horizon and makes distant rewards matter more during early training.
+- **Problem**: My agent seems to ignore a far-off goal.
+- **Solution**: Raise gamma toward 0.95 or 0.99, or add shaping rewards.
+- **Why**: With a low gamma a distant reward shrinks to almost nothing.
 
-**"Training seems very unstable — huge swings in total reward per episode."**
-Try reducing γ toward 0.8 or 0.7. A shorter horizon makes the value estimates more stable, at the cost of some long-term planning ability.
+- **Problem**: Training swings wildly.
+- **Solution**: Try a lower gamma such as 0.8.
+- **Why**: A shorter horizon makes value estimates depend on fewer uncertain future steps.
 
-**"Should gamma ever be exactly 1.0?"**
-Only for **finite horizon** tasks where you know every episode terminates in a bounded number of steps. In our setting, γ = 1.0 can lead to infinite discounted returns if the agent never reaches the goal, which breaks the value estimates. Stick to γ < 1.0.
+- **Problem**: Can gamma be exactly 1?
+- **Solution**: Only for tasks that always end. Keep gamma below 1 otherwise.
+- **Why**: With gamma = 1 an endless task can add up rewards (or costs) without limit, so the values never settle.
+
+## Check your understanding
+
+{% quiz %}
+? With gamma = 0.9, roughly how much is a reward worth that arrives 5 steps away?
+- [ ] 90% of its face value
+- [x] About 59% of its face value
+- [ ] 10% of its face value
+> The weight is 0.9 to the power 5, which is about 0.59.
+
+? Why is the return from step 1 larger than from step 0 in our corridor?
+- [ ] The step costs are smaller
+- [x] The big reward is discounted one fewer time
+- [ ] Gamma is larger at step 1
+> One step closer to the goal means one fewer factor of gamma on the +10.
+
+? What does the Bellman idea say?
+- [x] The value here is the reward now plus the discounted value of the next state
+- [ ] The value here is the sum of all past rewards
+- [ ] The value here is always the goal reward
+> It links each state's value to its neighbour's, so value spreads backwards from the goal.
+{% endquiz %}
 
 ---
 
-Next up: we'll build the Q-table itself — the robot's "cheat sheet" that stores everything it has learned.
-
----
+Next up: the Q-table itself, the robot's cheat sheet.

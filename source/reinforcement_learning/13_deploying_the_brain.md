@@ -1,429 +1,320 @@
 ---
 title: Deploying the Brain
-description: Export the trained Q-table to JSON, load it on the Pico, and run the complete MicroPython control loop that reads sensors, looks up the best action, and drives the motors.
+description: Copy the trained Q-table to the Pico and run the complete MicroPython loop that reads the sensor, looks up the best action and drives the motors.
 layout: lesson
 type: page
 cover: /learn/reinforcement_learning/assets/banners/13_deploying_the_brain.jpg
-date_updated: 2026-06-13
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-{% include youtubeplayer.html id="HJYdGICcw0k" %}
-
-This is the payoff lesson. We've trained a policy, understood its limitations, and built the sensor infrastructure. Now we put it all together: the Q-table travels from the laptop to the Pico as a JSON file, and a MicroPython script runs the greedy policy in a continuous loop, reading sensors and driving motors in real time.
-
-Let's go.
+By the end of this lesson you will be able to copy a trained Q-table to a Raspberry Pi Pico and run a MicroPython program that uses it to drive an obstacle-avoiding robot.
 
 ---
 
-## Step 1 — Retrain for the Simplified State Space
+{% include youtubeplayer.html id="HJYdGICcw0k" %}
 
-Before deploying, we need to retrain using the **simplified state** (heading + distance only, no grid position). This is necessary because the real robot can't track (row, col) without encoders.
+This is the payoff lesson. We trained a policy, learned where simulation misleads us, and built the sensor code. Now the Q-table travels from your computer to the Pico as a small JSON file, and a MicroPython script runs it in a loop: sense, look up, act.
 
-In your `train.py`, update `_get_state()`:
+> **Teachers**: this lesson needs a built robot, so plan one per group of two to four. Allow about 45 minutes, most of it for wiring and calibration. If you have no robots, run the lesson as a demonstration, or stop after lesson 11 with the simulation.
 
-```python
-def _get_state(self):
-    """Simplified state: heading + sensor only (no grid position)."""
-    sensor = self._read_sensor()
-    return (self.heading, sensor)   # 4 headings × 3 bands = 12 states
-```
+---
 
-The Q-table now has at most 12 rows — small enough to fit comfortably on the Pico. Retrain and save:
+## Step 1: Get the Q-table
 
-```bash
-python3 train.py
-# Creates q_table.json in the current directory
-```
-
-Verify the saved file looks reasonable:
+Run the trainer from lesson 11 (`python3 avoid_sim.py`) on your computer. It writes `q_table.json` beside the script. It holds the three-state, noise-trained policy, and looks like this (values are rounded here):
 
 ```json
 {
-  "('east', 'far')":   {"forward": 3.21, "turn_left": 0.15, ...},
-  "('east', 'near')":  {"forward": -4.50, "turn_left": 1.21, ...},
-  "('north', 'far')":  {"forward": 2.80, "turn_left": 0.10, ...},
-  ...
+  "near":   {"forward": -6.77, "turn_left": 2.85, "turn_right": -0.29, "stop": -0.97},
+  "medium": {"forward":  0.24, "turn_left": 3.17, "turn_right":  0.78, "stop":  1.39},
+  "far":    {"forward":  4.27, "turn_left": 1.93, "turn_right":  1.09, "stop":  2.23}
 }
 ```
+{: .no-snakie }
 
----
+The keys are plain words, so the Pico can read the file with `json.load` and nothing more. (We avoided tuple keys and `eval()` on purpose: running `eval()` on file contents is a bad habit to teach.)
 
-## Step 2 — Copy Files to the Pico
+## Step 2: Copy it to the Pico
 
-Using Thonny (or `mpremote`):
-
-1. Open Thonny, connect to the Pico
-2. Go to **Files → Open** → choose `q_table.json` from your laptop
-3. **Save to Pico** as `q_table.json`
-4. Create a new file called `main.py` on the Pico with the code below
-
-Alternatively, with `mpremote`:
+In Thonny, open `q_table.json`, choose **File, Save as**, pick **Raspberry Pi Pico**, and save it as `q_table.json`. Or, with the `mpremote` tool installed on your computer:
 
 ```bash
-mpremote connect auto cp q_table.json :q_table.json
+mpremote cp q_table.json :q_table.json
+```
+{: .no-snakie }
+
+## Step 3: Wire the motors
+
+Use the same pins as the [MicroPython Robotics Projects](/learn/micropython_robotics/) course. The sensor stays on GP8 and GP9 from lesson 12.
+
+| L298N pin | Pico pin | Job |
+|---|---|---|
+| IN1 | GP0 | Left motor direction A |
+| IN2 | GP1 | Left motor direction B |
+| ENA | GP2 | Left motor speed (PWM) |
+| IN3 | GP3 | Right motor direction A |
+| IN4 | GP4 | Right motor direction B |
+| ENB | GP5 | Right motor speed (PWM) |
+{:class="table table-single"}
+
+Power the motors from the battery pack, not from the Pico, and join the grounds. If a wheel spins the wrong way, swap that motor's two wires.
+
+```mermaid
+flowchart TD
+    A["Read filtered distance"] --> B{"Closer than 10 cm?"}
+    B -- "yes" --> C["Safety stop,<br/>then turn away"]
+    B -- "no" --> D["Convert to near, medium or far"]
+    D --> E["Look up best action in q_table.json"]
+    E --> F["Drive or turn"]
+    F --> A
+    C --> A
 ```
 
 ---
 
-## The Deployment Code
+## Step 4: The complete program
 
-Save this as `main.py` on the Pico. It is the complete, standalone deployment — no training, no exploration, just the greedy policy:
+Save this on the Pico as `main.py`. It runs the greedy policy for at most `MAX_STEPS` loops, then stops the motors, so the robot cannot run off forever.
+
+> **Warning:** a file named `main.py` runs as soon as the Pico gets power. For the first tests keep the wheels off the ground, or run it from Thonny with the Run button instead.
 
 ```python
-"""
-BurgerBot RL Deployment
-========================
-Loads a trained Q-table from q_table.json and runs the greedy
-policy on a Raspberry Pi Pico with:
-  - L298N H-bridge motor driver
-  - HC-SR04 ultrasonic sensor (3.3V compatible or voltage-divided)
-
-Hardware pin assignments match the MicroPython Robotics Projects course:
-  Motor driver ENA  -> GP0  (PWM speed control, left motor)
-  Motor driver IN1  -> GP1  (left motor direction A)
-  Motor driver IN2  -> GP2  (left motor direction B)
-  Motor driver IN3  -> GP3  (right motor direction A)
-  Motor driver IN4  -> GP4  (right motor direction B)
-  Motor driver ENB  -> GP5  (PWM speed control, right motor)
-  HC-SR04 TRIG      -> GP8
-  HC-SR04 ECHO      -> GP9
-"""
-
 import json
 import time
 from machine import Pin, PWM, time_pulse_us
 
-# ---------------------------------------------------------------------------
-# Pin configuration
-# ---------------------------------------------------------------------------
+# --- Settings you may need to tune ---------------------------------------
+NORMAL_SPEED = 40000      # PWM duty, 0 to 65535 (about 61 per cent)
+TURN_SPEED = 35000
+TURN_MS = 500             # how long a 90 degree spin takes: calibrate this
+NEAR_CM = 30              # same cut-offs as the simulator
+FAR_CM = 90
+EMERGENCY_CM = 10         # stop and turn away regardless of the Q-table
+MAX_STEPS = 300           # the robot stops by itself after this many loops
+CALIBRATE = False         # set True to test turns only (see below)
 
-# Left motor
-ENA = PWM(Pin(0)); ENA.freq(1000)
-IN1 = Pin(1, Pin.OUT)
-IN2 = Pin(2, Pin.OUT)
-
-# Right motor
-ENB = PWM(Pin(5)); ENB.freq(1000)
+# --- Pins ----------------------------------------------------------------
+IN1 = Pin(0, Pin.OUT)
+IN2 = Pin(1, Pin.OUT)
+ENA = PWM(Pin(2))
+ENA.freq(1000)
 IN3 = Pin(3, Pin.OUT)
 IN4 = Pin(4, Pin.OUT)
-
-# Ultrasonic sensor
+ENB = PWM(Pin(5))
+ENB.freq(1000)
 TRIG = Pin(8, Pin.OUT)
 ECHO = Pin(9, Pin.IN)
 
-# ---------------------------------------------------------------------------
-# Motor constants
-# ---------------------------------------------------------------------------
 
-# Duty cycle for "normal" forward speed (0–65535 on Pico PWM)
-NORMAL_SPEED = 40000   # ~61% duty cycle
-TURN_SPEED   = 35000   # slightly slower for turns
-
-# Turn duration in milliseconds — calibrate for your robot
-# A 90° turn at TURN_SPEED on a smooth floor ≈ 400–600 ms
-TURN_DURATION_MS = 500
-
-# ---------------------------------------------------------------------------
-# Motor control
-# ---------------------------------------------------------------------------
-
+# --- Motors --------------------------------------------------------------
 def set_motors(left_duty, left_fwd, right_duty, right_fwd):
-    """
-    Set both motors simultaneously.
-
-    left_duty  (int)  : PWM duty cycle for left motor (0–65535)
-    left_fwd   (bool) : True = forward, False = reverse
-    right_duty (int)  : PWM duty cycle for right motor (0–65535)
-    right_fwd  (bool) : True = forward, False = reverse
-    """
-    # Left motor
     ENA.duty_u16(left_duty)
     IN1.value(1 if left_fwd else 0)
     IN2.value(0 if left_fwd else 1)
-
-    # Right motor
     ENB.duty_u16(right_duty)
     IN3.value(1 if right_fwd else 0)
     IN4.value(0 if right_fwd else 1)
 
+
 def motor_stop():
     ENA.duty_u16(0)
     ENB.duty_u16(0)
-    IN1.value(0); IN2.value(0)
-    IN3.value(0); IN4.value(0)
+    IN1.value(0)
+    IN2.value(0)
+    IN3.value(0)
+    IN4.value(0)
 
-def motor_forward():
+
+def forward():
     set_motors(NORMAL_SPEED, True, NORMAL_SPEED, True)
 
-def motor_turn_left():
-    """Spin in place: left motor backward, right motor forward."""
-    set_motors(TURN_SPEED, False, TURN_SPEED, True)
-    time.sleep_ms(TURN_DURATION_MS)
-    motor_stop()
-    time.sleep_ms(50)   # brief pause before next command
 
-def motor_turn_right():
-    """Spin in place: left motor forward, right motor backward."""
-    set_motors(TURN_SPEED, True, TURN_SPEED, False)
-    time.sleep_ms(TURN_DURATION_MS)
+def turn(direction):
+    """Spin on the spot for TURN_MS. 'left' = left wheel back, right wheel forward."""
+    if direction == "left":
+        set_motors(TURN_SPEED, False, TURN_SPEED, True)
+    else:
+        set_motors(TURN_SPEED, True, TURN_SPEED, False)
+    time.sleep_ms(TURN_MS)
     motor_stop()
     time.sleep_ms(50)
 
-# ---------------------------------------------------------------------------
-# Ultrasonic sensor
-# ---------------------------------------------------------------------------
 
+# --- Sensor (from lesson 12) ----------------------------------------------
 def get_distance_cm():
-    """Return distance in cm, or -1.0 on timeout."""
     TRIG.low()
     time.sleep_us(2)
     TRIG.high()
     time.sleep_us(10)
     TRIG.low()
-
     duration = time_pulse_us(ECHO, 1, 30000)
     if duration < 0:
         return -1.0
     return duration / 58.0
 
+
 def get_distance_filtered():
-    """Median of three readings for noise rejection."""
     readings = []
     for _ in range(3):
         d = get_distance_cm()
         if d > 0:
             readings.append(d)
         time.sleep_ms(20)
-
     if not readings:
         return -1.0
-
     readings.sort()
     return readings[len(readings) // 2]
 
+
 def discretize_distance(distance_cm):
-    """
-    Map raw distance to the state label used during training.
-    Thresholds must match train.py.
-    """
-    if distance_cm < 0:
-        return "near"   # conservative: treat failure as obstacle
-    if distance_cm < 15:
+    if distance_cm < 0 or distance_cm < NEAR_CM:
         return "near"
-    elif distance_cm < 40:
+    if distance_cm < FAR_CM:
         return "medium"
-    else:
-        return "far"
+    return "far"
 
-# ---------------------------------------------------------------------------
-# Heading tracking
-# ---------------------------------------------------------------------------
 
-HEADINGS = ["north", "east", "south", "west"]
-_heading_idx = 1   # start facing east
-
-def get_heading():
-    return HEADINGS[_heading_idx]
-
-def update_heading(direction):
-    global _heading_idx
-    if direction == "left":
-        _heading_idx = (_heading_idx - 1) % 4
-    else:
-        _heading_idx = (_heading_idx + 1) % 4
-
-# ---------------------------------------------------------------------------
-# Q-table loading
-# ---------------------------------------------------------------------------
-
+# --- Policy --------------------------------------------------------------
 def load_q_table(filename="q_table.json"):
-    """
-    Load Q-table from JSON. Keys are stored as strings; convert back
-    to tuples using eval() — safe here because we generated the file.
-    """
-    with open(filename, "r") as f:
-        raw = json.load(f)
+    with open(filename) as f:
+        return json.load(f)
 
-    q_table = {}
-    for k, v in raw.items():
-        # Key looks like "('east', 'far')" — evaluate it as a Python literal
-        # MicroPython doesn't have ast.literal_eval, but the format is safe
-        # (we generated the file ourselves from trusted training code)
-        key = eval(k)   # noqa: S307 — trusted source only
-        q_table[key] = v
-    return q_table
 
-# ---------------------------------------------------------------------------
-# Policy execution
-# ---------------------------------------------------------------------------
+def best_action(q_table, band):
+    values = q_table[band]
+    return max(values, key=lambda a: values[a])
 
-def choose_action_greedy(q_table, state):
-    """
-    Return the action with the highest Q-value.
-    Falls back to 'forward' if state not found in table.
-    """
-    if state not in q_table:
-        print(f"Unknown state {state} — defaulting to 'forward'")
-        return "forward"
 
-    action_values = q_table[state]
-    return max(action_values, key=lambda a: action_values[a])
-
-def execute_action(action):
-    """Execute an action on the real motors and update heading."""
+def execute(action):
     if action == "forward":
-        motor_forward()
+        forward()
     elif action == "turn_left":
         motor_stop()
-        motor_turn_left()
-        update_heading("left")
+        turn("left")
     elif action == "turn_right":
         motor_stop()
-        motor_turn_right()
-        update_heading("right")
-    elif action == "stop":
+        turn("right")
+    else:                       # "stop"
         motor_stop()
         time.sleep_ms(200)
 
-def get_state():
-    """Compose the current state tuple for Q-table lookup."""
-    distance_cm = get_distance_filtered()
-    band = discretize_distance(distance_cm)
-    heading = get_heading()
-    return (heading, band)
 
-# ---------------------------------------------------------------------------
-# Safety override
-# ---------------------------------------------------------------------------
-
-EMERGENCY_STOP_CM = 8   # stop unconditionally if closer than this
-
-def safety_check(distance_cm):
-    """
-    Return True if the robot is too close to stop, False otherwise.
-    Call before executing any forward action.
-    """
-    return distance_cm < EMERGENCY_STOP_CM and distance_cm > 0
-
-# ---------------------------------------------------------------------------
-# Main control loop
-# ---------------------------------------------------------------------------
-
+# --- Main loop -----------------------------------------------------------
 def run():
-    """
-    Load the Q-table and run the greedy policy continuously.
-    Press Ctrl+C to stop.
-    """
-    print("Loading Q-table...")
     try:
-        q_table = load_q_table("q_table.json")
+        q_table = load_q_table()
     except OSError:
-        print("ERROR: q_table.json not found on Pico! Copy it first.")
+        print("q_table.json not found on the Pico. Copy it over first.")
         return
-
-    print(f"Q-table loaded: {len(q_table)} states")
-    print("Starting policy execution. Ctrl+C to stop.")
-    time.sleep_ms(1000)   # brief pause before starting
-
-    step = 0
+    print("Q-table loaded:", len(q_table), "states")
+    time.sleep_ms(1000)
     try:
-        while True:
-            # 1. Read sensor
-            distance_cm = get_distance_filtered()
-
-            # 2. Safety override
-            if safety_check(distance_cm):
-                print(f"SAFETY STOP: {distance_cm:.1f} cm")
+        for step in range(MAX_STEPS):
+            distance = get_distance_filtered()
+            if 0 < distance < EMERGENCY_CM:
+                print(f"SAFETY STOP at {distance:.1f} cm")
                 motor_stop()
-                time.sleep_ms(500)
-                # Force a turn to escape
-                motor_turn_right()
-                update_heading("right")
+                turn("right")
                 continue
-
-            # 3. Get state and look up best action
-            state = get_state()
-            action = choose_action_greedy(q_table, state)
-
-            # 4. Execute action
-            execute_action(action)
-
-            # 5. Log to console
-            print(f"Step {step:4d} | dist={distance_cm:5.1f}cm | "
-                  f"state={state} | action={action}")
-            step += 1
-
-            # 6. Brief pause between control cycles
+            band = discretize_distance(distance)
+            action = best_action(q_table, band)
+            execute(action)
+            print(f"Step {step:3d} | {distance:6.1f} cm | {band:<6} | {action}")
             time.sleep_ms(100)
+    finally:
+        motor_stop()            # always leave the motors off, even on Ctrl+C
+        print("Stopped.")
 
-    except KeyboardInterrupt:
-        motor_stop()
-        print("\nStopped.")
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
+if CALIBRATE:
+    for _ in range(4):
+        turn("right")
+        time.sleep_ms(1000)
+    motor_stop()
+else:
+    run()
+```
 
-run()
+Typical console output (distances will differ):
+
+```
+Q-table loaded: 3 states
+Step   0 |  112.0 cm | far    | forward
+Step   1 |   96.4 cm | far    | forward
+Step   2 |   71.3 cm | medium | turn_left
+Step   3 |  118.9 cm | far    | forward
 ```
 
 ---
 
-## Running It
+## Calibrate the turn first
 
-1. Copy `q_table.json` and `main.py` to the Pico using Thonny
-2. In Thonny, press **Run** (or press the Pico's reset button if `main.py` is the startup file)
-3. The robot will pause for 1 second, then begin executing the policy
-4. Watch the Thonny console for step-by-step state and action logs
-5. Press **Ctrl+C** (or the Stop button in Thonny) to halt
+Set `CALIBRATE = True`, run the file, and watch. The robot makes four right turns. If each is exactly 90 degrees it ends up facing the way it started. Too short a turn: raise `TURN_MS`. Overshoot: lower it. Aim for roughly 80 to 100 degrees, which is plenty for this policy, then set `CALIBRATE` back to `False`.
 
 ---
 
-## Calibrating Turn Duration
+## What to expect, and what not to
 
-The `TURN_DURATION_MS = 500` constant controls how long the robot spins to execute a 90° turn. This value varies by robot:
+The robot should wander the room, turning away from obstacles it sees ahead. That is all. It has no map, no goal and no memory, just three rows of numbers. Be ready for these honest limits:
 
-```python
-# To calibrate: test turns manually
-# Start with 500 ms. If the robot turns less than 90°, increase.
-# If it overshoots, decrease. Aim for 85–95° — close enough for the policy.
-
-# Quick calibration test (run in Thonny REPL):
-motor_turn_right()   # should turn approximately 90° clockwise
-```
+- It cannot see to the side, so it can clip a corner it never sensed.
+- It reacts only once per loop, so a fast robot may see an obstacle late.
+- It may circle: with no memory, a repeating pattern is possible.
+- The policy is not "smarter" than the hand rule from lesson 11. What you have gained is the method, which is the same idea that scales when the state and action sets get bigger.
 
 ---
 
-## Try It Yourself
+## Try it Yourself
 
-1. Run the robot in a large, clear space first. Observe which actions it takes most often. Does the distribution of actions make sense given the Q-table?
-
-2. Place a single obstacle (a box) directly in front of the robot at 30 cm. Observe how it detects and avoids it. Move the obstacle to different positions and watch the policy adapt.
-
-3. Modify `run()` to keep a count of successful forward steps and turns. After 200 steps, print the ratio. A good policy should show more than 50% forward steps (the robot is making progress, not just spinning).
-
----
+1. Run in a big clear space first. Which action does the console show most often, and does that fit the Q-table?
+2. Place a box about 50 cm ahead and watch the robot approach it. At what distance does it turn? Does that match your `FAR_CM` and `NEAR_CM`?
+3. Count how many of the 300 steps are `forward`. A healthy wanderer should be well over half.
+4. Challenge: copy the policy trained with clean (noise-free) settings from lesson 11 into `q_table.json` instead, and compare the two on the real floor. Which bumps less?
 
 ## Common Issues
 
-**"The robot just spins in circles."**
-The Q-table may not have good coverage of the heading + "far" states. Retrain with more episodes (800+) or check that the state used in training matches the state in `get_state()` exactly.
+- **Problem**: The robot spins in circles.
+- **Solution**: Check the console. If it is always `near`, the sensor is blocked or the wiring is wrong. If bands change but it keeps turning, raise `TURN_SPEED` to match the floor.
+- **Why**: A sensor stuck at `near` tells the policy to keep turning, and a weak turn may not clear the obstacle.
 
-**"It hits an obstacle before the safety fallback triggers."**
-Increase `EMERGENCY_STOP_CM` from 8 to 12 cm, and shorten the `TURN_DURATION_MS` so turns complete faster.
+- **Problem**: It bumps into obstacles before the safety stop fires.
+- **Solution**: Raise `EMERGENCY_CM` to about 15, slow down `NORMAL_SPEED`, and shorten the loop delay.
+- **Why**: The robot keeps rolling during the three-reading filter, so it needs more margin at speed.
 
-**"eval() raises an error when loading the Q-table."**
-The key string format from `save_q_table()` on your laptop must exactly match what `eval()` expects. Check that strings inside the tuple use single quotes (Python's default `repr()` uses them). Alternatively, use the `ast.literal_eval()` equivalent on MicroPython: the `ujson` module parses JSON fine but can't handle tuple-as-string keys directly — this is why we use `eval()` in the deployment code.
+- **Problem**: A wheel spins the wrong way, or only one wheel turns.
+- **Solution**: Swap that motor's two wires, check the pin table, and check each enable pin is wired to a PWM-capable GPIO.
+- **Why**: Direction pins set which way the current flows, and the enable pin sets how hard the motor is driven.
 
-**"The motors don't move at all."**
-Check your motor driver wiring and that the PWM duty cycle isn't 0 (the Pico PWM duty_u16 range is 0–65535, not 0–100). Verify ENA and ENB are connected and receiving PWM signal with a voltmeter or LED test.
+- **Problem**: "q_table.json not found".
+- **Solution**: Copy the file to the Pico's own storage (not just your computer), and check the name matches.
+- **Why**: The Pico reads files from its own flash, not from your computer's folders.
+
+## Check your understanding
+
+{% quiz %}
+? Why does the Pico code store plain keys like "near" instead of tuples?
+- [ ] MicroPython cannot use tuples
+- [x] It lets us load the file with `json.load` and no `eval()`
+- [ ] The table would be too big otherwise
+> Text keys avoid evaluating text from a file, which is a safety and simplicity win.
+
+? What does the safety check do?
+- [ ] It retrains the Q-table
+- [x] It stops and turns away when something is very close, whatever the Q-table says
+- [ ] It slows the loop down
+> The override catches cases where noise or delay let the policy miss a close obstacle.
+
+? Why is a file called `main.py` risky during testing?
+- [x] It starts running as soon as the Pico is powered
+- [ ] It deletes the Q-table
+- [ ] It disables Thonny
+> Keep the wheels off the ground, or run from Thonny, until you trust the robot.
+{% endquiz %}
 
 ---
 
-Congratulations — your robot is now learning-enabled! Next up: a brief look at where tabular Q-learning runs out of road, and what Deep RL does differently.
-
----
+Congratulations, your robot is now running a policy it learned. Next up: where tabular Q-learning runs out of road, and what deep RL does instead.
