@@ -719,6 +719,26 @@
   name: OctaPi
   video: cIq2AEbYotA
 - author: Kevin McAleer
+  cover: /learn/open_duck_mini/assets/cover.jpg
+  date_published: 2026-11-24
+  description: Build an Open Duck Mini, the open-source walking robot inspired by
+    Disney's BDX droid. Print and assemble it, wire up a Raspberry Pi Zero 2W, 14
+    serial bus servos and an IMU, get it walking with the pretrained policy, then
+    learn how its reinforcement learning brain was trained and train your own.
+  duration: 1h 17m
+  groups:
+  - robots
+  - ai
+  - raspberrypi
+  - 3dprinting
+  lessons: 16
+  level: intermediate
+  link: /learn/open_duck_mini/00_intro.html
+  name: Build an Open Duck Mini Walking Robot
+  projects:
+  - /projects/kev/open-duck-mini
+  video: _YHOQFOzjKg
+- author: Kevin McAleer
   cover: /learn/openclaw_raspberry_pi/assets/openclaw.jpg
   date_published: 2026-01-31
   description: Run OpenClaw, the open-source personal AI agent, on a Raspberry Pi

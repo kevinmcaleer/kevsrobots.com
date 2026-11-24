@@ -22,6 +22,7 @@ stages:
   - BrachioGraph Tutorial
   - Wall Drawing Robot Tutorial
   - Build a SMARS Quad Walking Robot
+  - Build an Open Duck Mini Walking Robot
   - Robot Eye Mechanism
   - Bottango Basics
   - Learn ROS with me
