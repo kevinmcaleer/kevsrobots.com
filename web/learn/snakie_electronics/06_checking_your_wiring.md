@@ -10,9 +10,9 @@ next: 07_drivers_help_and_code.html
 description: Use Snakie's Electrical Rules Check to catch short circuits and clashing
   power supplies before you build, and learn what it can't check
 percent: 56
-duration: 5
+duration: 6
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the Electrical Rules Check, use Show me to find a faulty wire, and explain why a green tick is not a guarantee.
 
 Snakie has been quietly reading your wiring all along. Every time you add a wire it runs an **Electrical Rules Check**, or ERC, and the badge at the top right shows the result.
 
@@ -129,6 +131,8 @@ The ERC is a safety net, not a guarantee. It knows about electricity, not about 
 It won't notice if Trigger and Echo are swapped, because both are valid signal wires. It won't notice a missing shared ground, because a circuit with a wire missing isn't breaking a rule, it just doesn't work. And it only knows as much about a part as the library does.
 
 So treat a green tick as "nothing obviously dangerous", and still read your wiring through once before you build. The Connections table in lesson 8 makes that easy.
+
+> **Teachers**: This lesson is a safe place to make dangerous mistakes: a short circuit on screen costs nothing, while on real hardware it can overheat a wire or a regulator. It needs no hardware, so it works well as a stand-alone starter or a cover lesson. Remind learners that the same faults are real on a bench, and that a battery should never be connected to a circuit that has not been checked.
 
 ---
 

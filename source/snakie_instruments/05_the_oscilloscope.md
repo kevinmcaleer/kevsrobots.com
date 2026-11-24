@@ -4,12 +4,14 @@ description: Use Snakie's Oscilloscope to see a PWM signal, read its frequency, 
 layout: lesson
 type: page
 cover: /learn/snakie_instruments/assets/banners/05_the_oscilloscope.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read a PWM signal's frequency, period and duty cycle on the Oscilloscope and use it to check a servo signal.
 
 Some signals change far too fast to plot point by point. For those, engineers use an oscilloscope: an instrument that draws the *shape* of a signal.
 

@@ -10,9 +10,9 @@ next: 03_the_plotter.html
 description: Understand the two ways a reading reaches a Snakie instrument, telemetry
   lines printed by your program and LIVE polling by Snakie itself
 percent: 27
-duration: 5
+duration: 6
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -52,6 +52,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how a reading reaches an instrument, by telemetry or by LIVE, and choose the right one for the job.
 
 An instrument is only as good as the readings it's given. There are two ways to get a reading to one, and knowing which is which saves a lot of confusion.
 
@@ -134,6 +136,8 @@ The catch is in the brackets. A board can only do one thing at a time, so LIVE *
 {:class="table table-single"}
 
 For the rest of this course we use telemetry, because we want to watch programs *while they run*.
+
+> **Teachers**: Everything in this lesson runs on the simulated device, so no board is needed. If learners do connect real boards, the one-off Download & install step copies the instruments library onto each board, so allow a few minutes for it, and remind them that LIVE interrupts a running program.
 
 ---
 

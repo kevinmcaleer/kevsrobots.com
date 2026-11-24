@@ -10,9 +10,9 @@ next: 04_the_multimeter.html
 description: Chart values from a running MicroPython program with Snakie's Plotter
   and learn to read trends, compare series and spot problems
 percent: 36
-duration: 4
+duration: 5
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -52,6 +52,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to chart one or more values from a running program on the Plotter and read the trends, spikes and flat lines it shows.
 
 The Plotter is the instrument you'll reach for most. If a number changes over time, plot it.
 

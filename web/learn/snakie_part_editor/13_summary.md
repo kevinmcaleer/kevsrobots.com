@@ -11,7 +11,7 @@ description: Review everything you built in the Snakie Part Editor course and ta
 percent: 100
 duration: 4
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -57,6 +57,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to review everything a finished part contains and pick a part of your own to make next.
 
 You started with a board Snakie had never heard of. You finish with a part that draws itself, wires itself, checks its own voltage, installs its own driver and brings its own blocks. Nice work.
 

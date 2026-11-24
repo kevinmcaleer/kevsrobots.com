@@ -12,6 +12,20 @@
       - robots
   description: >-
     Plan a circuit on screen before you touch a wire. Use Snakie's Electronics workspace to pick parts, wire them to a Raspberry Pi Pico, check the wiring for mistakes and print a build guide, then wire and code a two-wheeled obstacle-avoiding robot.
+  outcomes:
+    - Find any part in the Snakie library and read its pinout
+    - Wire a sensor and a motor driver to a Raspberry Pi Pico on screen
+    - Explain what power, ground and signal wires do, and why a shared ground matters
+    - Use the Electrical Rules Check to catch a short circuit before you build
+    - Export a picture, a parts list and a printable PDF build guide
+    - Write MicroPython whose pin numbers match your wiring diagram
+  prerequisites:
+    - Getting Started with Snakie
+    - Snakie Blocks - From Blocks to Python (helpful, not required)
+  you_need:
+    - A web browser, or the Snakie desktop app
+    - Nothing else for the on-screen lessons
+    - For the real build, a Raspberry Pi Pico, an HC-SR04 sensor, an MX1508 motor driver, two TT motors, a 4xAA battery pack and jumper wires
   content:
   - section:
       name: Overview

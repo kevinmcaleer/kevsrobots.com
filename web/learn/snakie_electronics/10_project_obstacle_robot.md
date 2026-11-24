@@ -10,9 +10,9 @@ next: 11_summary.html
 description: Wire a two-wheeled robot in Snakie, check it, print its build guide,
   and program it in MicroPython to drive forward and turn away from walls
 percent: 88
-duration: 8
+duration: 9
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to plan, wire, check, document and program a two-wheeled obstacle-avoiding robot, using pin numbers taken from your own wiring diagram.
 
 You've met every tool. Now let's use them in order, the way you would on a real project: plan, wire, check, document, code, build.
 
@@ -219,6 +221,8 @@ If a wheel turns the wrong way, swap that motor's two wires at the driver. If th
 - **Back up first.** Reverse for a moment before turning
 - **Turn a random way.** Pick left or right with `random.choice`
 - **Watch it think.** The next course, [Snakie Instruments](/learn/snakie_instruments/), shows how to plot the distance live while the robot runs
+
+> **Teachers**: The simulator version needs no hardware and is safe. For the real build, wire with everything unpowered and run the first test with the wheels off the desk. The battery pack goes to the motor driver only, never to the Pico, and motors draw a lot of current, so a short on the battery side can get hot. Groups of two to four sharing one robot kit keeps costs down.
 
 ---
 

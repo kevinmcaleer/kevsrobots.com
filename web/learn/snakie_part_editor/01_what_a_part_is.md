@@ -10,9 +10,9 @@ next: 02_tour_of_the_part_editor.html
 description: Understand how Snakie stores a part as a folder with a parts.yml file,
   and how parts are grouped into libraries
 percent: 14
-duration: 4
+duration: 5
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to describe what a Snakie part is, name the files in a part folder, and find your parts folder on your computer.
 
 Before you open the editor, it helps to know what you're making. A Snakie part isn't hidden inside the app. It's a **folder of plain files** that you could open in any text editor.
 
@@ -151,6 +153,8 @@ version: 0.1.0
 2. In the **Library** panel on the right, click the folder button, **Reveal the parts folder**.
 
 Your file manager opens at the parts folder. On Linux it is `~/.config/Snakie/parts`. On Windows and macOS it's in Snakie's application data folder, and the button takes you straight there.
+
+> **Teachers**: Parts are saved as plain files in a folder on the computer, so on shared machines each learner's parts end up in the same place unless they use separate user accounts. Ask learners to give their parts distinct names, and to copy their part folder to their own storage before they leave.
 
 ---
 

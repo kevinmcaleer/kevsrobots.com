@@ -4,12 +4,14 @@ description: Switch a Snakie wiring project to the Schematic view, learn to read
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/05_the_schematic_view.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to switch to the Schematic view, read the robot's circuit from it, and tidy a diagram so that it is easy to follow.
 
 The Breadboard view shows what your circuit *looks* like. The Schematic view shows what it *does*. Same circuit, same wires, drawn a different way.
 

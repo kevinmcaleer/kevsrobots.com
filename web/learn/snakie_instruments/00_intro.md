@@ -11,7 +11,7 @@ description: Learn to use Snakie's built-in plotter, multimeter, oscilloscope an
 percent: 9
 duration: 4
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -116,6 +116,8 @@ Each lesson introduces one instrument with a short program. The programs are in 
 > **A note about the simulator.** Snakie's simulated device streams a little demo data of its own, so the instruments have something to show before you've written a line. You'll see series called `temp` and `light` on the plotter, and channels called `ch1`, `pwm` and `adc0` elsewhere. In this course we give our own readings different names so you can tell them apart. On a real board, only your program's readings appear.
 
 Every lesson ends with things to try, fixes for common problems and a short quiz.
+
+> **Teachers**: every lesson runs on Snakie's simulated device in a browser with no install, so the whole course works with no hardware. Allow about 30 to 45 minutes per lesson. Learners save CSV files to the computer they are using, so on shared machines ask them to move their files before they log off. Real circuits, in the final project, need the correct voltage (3.3 V maximum on the Pico's analog pins) and should be wired while unpowered.
 
 ## Prerequisites
 

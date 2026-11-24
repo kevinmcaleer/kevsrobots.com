@@ -1033,7 +1033,7 @@
     workspace to pick parts, wire them to a Raspberry Pi Pico, check the wiring for
     mistakes and print a build guide, then wire and code a two-wheeled obstacle-avoiding
     robot.
-  duration: 1h 2m
+  duration: 1h 7m
   groups:
   - micropython
   - pico
@@ -1066,7 +1066,7 @@
     plotter, multimeter, oscilloscope and data logger to watch sensors and signals
     live, then scan a room for its brightest spot with a servo and a light sensor
     and log the results to a file.
-  duration: 0h 48m
+  duration: 0h 54m
   groups:
   - micropython
   - pico
@@ -1082,7 +1082,7 @@
   description: Add any sensor, breakout or microcontroller board to Snakie with the
     Part Editor. Draw the board, place its pins, trace a photo, attach a driver and
     give it its own blocks, by building a VL53L0X distance sensor part from scratch.
-  duration: 1h 7m
+  duration: 1h 14m
   groups:
   - electronics
   - micropython

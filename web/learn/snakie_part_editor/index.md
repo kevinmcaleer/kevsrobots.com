@@ -8,11 +8,27 @@ description: Add any sensor, breakout or microcontroller board to Snakie with th
   Part Editor. Draw the board, place its pins, trace a photo, attach a driver and
   give it its own blocks, by building a VL53L0X distance sensor part from scratch.
 level: intermediate
-course_duration: 1h 7m
+course_duration: 1h 14m
 lesson_count: 14
 first_lesson: 00_intro.html
 quiz_total: 41
 video: QVe9meIHZtk
+outcomes:
+- Create a part in the Part Editor and save it to your My Parts library
+- Place and describe pins so Snakie can wire, check and label them
+- Turn a photo of a board into a clean, correctly sized part
+- Attach a driver so Snakie offers to install it when the part is used
+- Write a small blocks.yml that adds blocks for your part
+- Make a custom microcontroller board and share your parts as a library
+prerequisites:
+- Getting Started with Snakie
+- Wire It Up - Electronics in Snakie
+- Snakie Blocks - From Blocks to Python (for the blocks lessons)
+you_need:
+- The Snakie desktop app, because saving a part writes files to your computer
+- A board to add, such as a VL53L0X breakout, though you can follow along without
+  owning one
+- Optional, a ruler or calipers and a photo of your board taken from straight above
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:

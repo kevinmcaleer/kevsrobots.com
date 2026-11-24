@@ -4,12 +4,14 @@ description: Read a sensor voltage on Snakie's on-screen Multimeter with minimum
 layout: lesson
 type: page
 cover: /learn/snakie_instruments/assets/banners/04_the_multimeter.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read a pin's voltage on the Multimeter with inst.read_adc() and use MIN, MAX and AVG to catch a brief dip.
 
 A plot shows the shape of a signal. Sometimes you just want the number. That's a multimeter's job.
 
@@ -82,6 +84,8 @@ inst.meter(21.5, ch="room", unit="C")
 ```
 
 Use it for a temperature from an I²C sensor, a current you've calculated, or a distance.
+
+> **Teachers**: On the simulator this lesson is completely safe. On real boards the Pico's analog pins only measure 0 to 3.3 V, and a higher voltage can damage them, so check what is wired to a pin before connecting it. Keep learners to sensors and the 3V3 and GND pins for first tests, and leave batteries and mains-derived supplies to a supervised session.
 
 ---
 

@@ -12,7 +12,7 @@ description: Install a part's MicroPython driver from Snakie's Electronics works
 percent: 64
 duration: 6
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to install a part's driver, use a part's help page, and write MicroPython whose pin numbers come from your wiring diagram.
 
 A wired circuit does nothing until code runs on it. This lesson is about the bridge between the two: drivers, the help that ships with each part, and code that uses the pins you actually wired.
 
