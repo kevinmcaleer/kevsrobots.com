@@ -12,7 +12,7 @@ description: Catch MicroPython mistakes before you run them with Snakie's Python
 percent: 30
 duration: 6
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the squiggles and the Problems panel, and fix what the linter finds.
 
 > **Desktop app**: Python linting with ruff needs the Snakie desktop app. In the browser the Problems panel still works, and shows the MicroPython hints from the next lesson.
 
@@ -145,6 +147,8 @@ When ruff knows how to fix something, a lightbulb appears on that line. Click it
 
 ---
 
+> **Teachers**: Python linting with ruff needs the Snakie desktop app, and ruff has to be installed once on the computer with `pip install ruff`. On school machines you may need IT to install both. In the browser the Problems panel still works and shows the MicroPython hints.
+
 ## Try it Yourself
 
 1. Add `import os` to the top of a file and don't use it. Which code appears in Problems?
@@ -153,17 +157,17 @@ When ruff knows how to fix something, a lightbulb appears on that line. Click it
 
 ## Common Issues
 
-**Problem**: There are no ruff rows at all.
-**Solution**: Check you're in the desktop app, that **LINT** is ticked, and that `ruff --version` works in a terminal.
-**Why**: The linter runs on your computer. Without ruff or pyflakes installed there's nothing to run.
+- **Problem**: There are no ruff rows at all.
+- **Solution**: Check you're in the desktop app, that **LINT** is ticked, and that `ruff --version` works in a terminal.
+- **Why**: The linter runs on your computer. Without ruff or pyflakes installed there's nothing to run.
 
-**Problem**: ruff complains about `machine` or `micropython`.
-**Solution**: Nothing to fix. Those modules exist on the board.
-**Why**: ruff is a general Python tool. It checks your code's logic, and doesn't need the hardware modules to do that.
+- **Problem**: ruff complains about `machine` or `micropython`.
+- **Solution**: Nothing to fix. Those modules exist on the board.
+- **Why**: ruff is a general Python tool. It checks your code's logic, and doesn't need the hardware modules to do that.
 
-**Problem**: The rows in the Problems panel are hard to read.
-**Solution**: Hover over the squiggle in the editor to read the same message, or click the row to jump to the line.
-**Why**: In the light theme of this version the message text is low in contrast against the dark panel.
+- **Problem**: The rows in the Problems panel are hard to read.
+- **Solution**: Hover over the squiggle in the editor to read the same message, or click the row to jump to the line.
+- **Why**: In the light theme of this version the message text is low in contrast against the dark panel.
 
 ## Check your understanding
 

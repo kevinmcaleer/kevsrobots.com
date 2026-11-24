@@ -11,6 +11,21 @@
       - python
   description: >-
     Get more from Snakie's editor. Use MicroPython-aware autocomplete, hover help, linting and one-click refactors, install packages, compile to .mpy and keep your project under Git, then put it all to work on an ultrasonic sensor driver.
+  outcomes:
+    - Write MicroPython with fewer trips to the documentation
+    - Read the Problems panel and fix what it finds
+    - Apply a refactoring safely, with a preview of every change
+    - Decide whether a library needs installing or is already on the board
+    - Shrink a module by compiling it to .mpy
+    - Commit your work in Git and see exactly what changed since
+  prerequisites:
+    - Getting Started with Snakie
+    - Learn MicroPython - The basics, or the ability to write a short MicroPython program with functions and a loop
+  you_need:
+    - Snakie, in your browser or the desktop app
+    - The Snakie desktop app for the linting, Git, AI chat and full menus lessons
+    - Git installed on your computer (for the version control lesson)
+    - No hardware needed. A Raspberry Pi Pico is useful for the packages lesson
   content:
   - section:
       name: Overview
