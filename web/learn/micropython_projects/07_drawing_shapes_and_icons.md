@@ -60,7 +60,7 @@ navigation:
     content:
     - name: The full gadget
       link: 14_the_full_gadget.html
-    - name: 15_troubleshooting.md
+    - name: Troubleshooting
       link: 15_troubleshooting.html
     - name: Summary
       link: 16_summary.html

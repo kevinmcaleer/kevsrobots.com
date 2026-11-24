@@ -22,7 +22,7 @@ navigation:
       link: 00_intro.html
     - name: Setting Up Your Raspberry Pi
       link: 02_raspberry_pi_setup.html
-    - name: 03_python_basics_for_robotics.md
+    - name: Python Basics for Robotics
       link: 03_python_basics_for_robotics.html
   - section: Understanding the PCA9685 Servo Driver
     content:
