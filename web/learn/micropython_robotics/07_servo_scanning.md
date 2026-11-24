@@ -3,7 +3,7 @@ layout: lesson
 title: Servo Scanning with Ultrasonic Sensors
 author: Kevin McAleer
 type: page
-cover: assets/servo_scanning.jpg
+cover: /learn/micropython_robotics/assets/banners/07_servo_scanning.jpg
 date: 2025-05-20
 previous: 06_build_robot.html
 next: 08_bluetooth_control.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

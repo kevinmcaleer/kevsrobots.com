@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Jekyll Features
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/05_advanced.jpg
 date: 2024-01-24
 previous: 04_customizing.html
 next: 06_deploy.html
@@ -38,6 +38,10 @@ navigation:
       link: 08_bonus.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Docker Install
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/04_docker_install.jpg
 date: 2023-01-07
 previous: 03_install_updates.html
 next: 05_get_cubie.html
@@ -75,7 +75,9 @@ navigation:
 ---
 
 
-![Screenshot of the imager tool](assets/rpi_desktop.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Get Docker
 

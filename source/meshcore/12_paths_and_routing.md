@@ -3,6 +3,11 @@ title: Paths and Routing
 description: Flood routing, path routing, hops and trace - how MeshCore stays quiet as it grows
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/12_paths_and_routing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 This is the lesson that explains why MeshCore behaves the way it does. Once routing clicks, everything else - why clients do not repeat, why adverts matter, why the network stays usable - falls into place.

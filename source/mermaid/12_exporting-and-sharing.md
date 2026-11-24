@@ -4,6 +4,11 @@ description: >-
     Put Mermaid diagrams in READMEs and notes, export them as PNG or SVG images, and render them from the command line with mermaid-cli
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/12_exporting-and-sharing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Two ways to share a diagram

@@ -3,6 +3,11 @@ title: The Hardware
 description: Boards and sensors for both builds, and which sensors MeshCore actually supports
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/02_hardware.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Good news first: you already know the board. Both builds in this course run on the same Heltec WiFi LoRa 32 V3 you used in part one. The new spending is on sensors, and it is small.

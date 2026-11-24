@@ -3,7 +3,7 @@ layout: lesson
 title: Bluetooth Control with HC-05
 author: Kevin McAleer
 type: page
-cover: assets/bluetooth_control.jpg
+cover: /learn/micropython_robotics/assets/banners/08_bluetooth_control.jpg
 date: 2025-05-20
 previous: 07_servo_scanning.html
 next: 09_wifi_control.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

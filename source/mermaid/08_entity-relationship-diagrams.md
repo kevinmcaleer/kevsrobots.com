@@ -4,6 +4,11 @@ description: >-
     Design database tables and the links between them, like a parts inventory, with Mermaid entity relationship diagrams
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/08_entity-relationship-diagrams.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Planning a database

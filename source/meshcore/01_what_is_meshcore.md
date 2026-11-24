@@ -3,6 +3,11 @@ title: What is MeshCore?
 description: Understand what MeshCore is, the four device roles, and how it differs from Meshtastic
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/01_what_is_meshcore.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 MeshCore is a lightweight, hybrid-routing mesh protocol for packet radios. In plain English: it is firmware that turns a cheap LoRa board into a node on a self-organising, encrypted text messaging network.

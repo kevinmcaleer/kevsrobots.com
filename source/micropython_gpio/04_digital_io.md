@@ -3,6 +3,11 @@ layout: lesson
 title: Digital I/O
 type: page
 description: Learn about digital input and output with Raspberry Pi Pico using MicroPython.
+cover: /learn/micropython_gpio/assets/banners/04_digital_io.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

@@ -3,7 +3,7 @@ layout: lesson
 title: Course Summary
 author: Kevin McAleer
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/18_summary.jpg
 date: 2025-06-01
 previous: 17_final_project.html
 description: "Review what you've learned, what you\u2019ve built, and where to go\
@@ -69,7 +69,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

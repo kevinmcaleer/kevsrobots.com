@@ -3,7 +3,7 @@ layout: lesson
 title: Basic Git Commands
 author: Kevin McAleer
 type: page
-cover: /learn/linux_intro/assets/git.jpg
+cover: /learn/linux_intro/assets/banners/15_basic_git_commands.jpg
 date: 2024-08-23
 previous: 14_intro_git.html
 next: 16_final_project_overview.html
@@ -77,7 +77,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

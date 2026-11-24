@@ -3,11 +3,11 @@ title: Installing the Operating System
 description: Prepare your Raspberry Pi nodes with a lightweight, 64-bit Linux OS ready for Kubernetes and K3s.
 layout: lesson
 type: page
-cover: assets/k3s02.jpg
+cover: /learn/k3s/assets/banners/03_os_installation.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

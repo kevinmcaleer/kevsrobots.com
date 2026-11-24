@@ -3,6 +3,11 @@ title: The Hardware
 description: Choosing and buying two Heltec WiFi LoRa 32 V3 boards for around £15 each
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/03_the_hardware.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Time to spend some money. The good news is that this is one of the cheapest useful radio projects you can build.

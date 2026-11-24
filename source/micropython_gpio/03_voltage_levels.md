@@ -3,6 +3,11 @@ layout: lesson
 title: Voltage Levels
 type: page
 description: Learn about the voltage levels of Raspberry Pi Pico pins and how to work with them safely.
+cover: /learn/micropython_gpio/assets/banners/03_voltage_levels.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

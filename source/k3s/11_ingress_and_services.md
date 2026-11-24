@@ -3,11 +3,11 @@ title: Ingress and Services
 description: Learn how to expose Kubernetes applications to your network using Services and Ingress controllers in K3s.
 layout: lesson
 type: page
-cover: assets/k3s04.jpg
+cover: /learn/k3s/assets/banners/11_ingress_and_services.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

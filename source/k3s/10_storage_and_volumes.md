@@ -3,11 +3,11 @@ title: Storage and Volumes
 description: Learn how storage works in Kubernetes, how to use persistent volumes in K3s, and set up storage that survives pod restarts.
 layout: lesson
 type: page
-cover: assets/k3s03.jpg
+cover: /learn/k3s/assets/banners/10_storage_and_volumes.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,11 +3,11 @@ title: CI/CD on K3s
 description: Learn how to set up continuous integration and deployment workflows for your K3s cluster using GitHub Actions and GitOps tools like ArgoCD or Flux.
 layout: lesson
 type: page
-cover: assets/k3s01.jpg
+cover: /learn/k3s/assets/banners/14_ci_cd_on_k3s.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

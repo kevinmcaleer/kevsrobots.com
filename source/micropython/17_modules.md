@@ -2,6 +2,11 @@
 title: Modules
 description: Learn about the built-in Modules
 layout: lesson
+cover: /learn/micropython/assets/banners/17_modules.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Picture of a honeycomb close up](assets/modules.jpg){:.cover}

@@ -3,6 +3,11 @@ layout: lesson
 title: How to use the Learning Platform
 description: Orientation
 type: page
+cover: /learn/learning_platform/assets/banners/01_how_to_use.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Accessing courses

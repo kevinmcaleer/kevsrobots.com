@@ -2,6 +2,11 @@
 title: Decrypting a message
 description: 
 layout: lesson
+cover: /learn/octapi/assets/banners/02_lesson02.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Decrypting a message

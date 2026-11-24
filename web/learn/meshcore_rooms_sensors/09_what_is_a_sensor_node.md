@@ -3,7 +3,7 @@ layout: lesson
 title: What is a Sensor Node?
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/09_what_is_a_sensor_node.jpg
 date: 2026-08-05
 previous: 08_room_operations.html
 next: 10_flashing_the_sensor.html
@@ -57,6 +57,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Half way. The room server is built; now we turn to the role that lets your mesh measure things rather than just carry conversation.
 

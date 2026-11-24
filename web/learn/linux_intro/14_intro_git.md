@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Git
 author: Kevin McAleer
 type: page
-cover: /learn/linux_intro/assets/git.jpg
+cover: /learn/linux_intro/assets/banners/14_intro_git.jpg
 date: 2024-08-23
 previous: 13_basic_scripting_constructs.html
 next: 15_basic_git_commands.html
@@ -77,7 +77,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

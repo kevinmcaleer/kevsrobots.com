@@ -3,11 +3,11 @@ title: Cluster Networking
 description: Set up reliable networking for your Raspberry Pi K3s cluster, including static IPs, hostnames, and local DNS options.
 layout: lesson
 type: page
-cover: assets/k3s03.jpg
+cover: /learn/k3s/assets/banners/04_cluster_networking.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

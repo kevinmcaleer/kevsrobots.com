@@ -3,7 +3,7 @@ layout: lesson
 title: The Hardware
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/02_hardware.jpg
 date: 2026-08-05
 previous: 01_beyond_repeaters.html
 next: 03_what_is_a_room_server.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Good news first: you already know the board. Both builds in this course run on the same Heltec WiFi LoRa 32 V3 you used in part one. The new spending is on sensors, and it is small.
 

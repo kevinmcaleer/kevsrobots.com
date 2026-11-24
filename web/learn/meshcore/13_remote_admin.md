@@ -3,14 +3,14 @@ layout: lesson
 title: Remote Administration
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/13_remote_admin.jpg
 date: 2026-08-05
 previous: 12_paths_and_routing.html
 next: 14_troubleshooting.html
 description: Log into your repeater over the air from your phone, change settings
   and read its stats
 percent: 84
-duration: 4
+duration: 5
 navigation:
 - name: Off-Grid Messaging with MeshCore
 - content:
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Your repeater is in the loft, on a pole, or in a weatherproof box on a roof. Fetching a ladder and a laptop every time you want to change a setting would get old fast. It is a good job you do not have to.
 

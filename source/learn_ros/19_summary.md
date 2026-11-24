@@ -3,6 +3,11 @@ layout: lesson
 title: Summary and next steps
 type: page
 description: What you've learned about ROS 2 and where to go next
+cover: /learn/learn_ros/assets/banners/19_summary.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What you've learned

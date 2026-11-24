@@ -3,7 +3,7 @@ layout: lesson
 title: Securing Your Cluster
 author: Kevin McAleer
 type: page
-cover: assets/k3s03.jpg
+cover: /learn/k3s/assets/banners/16_securing_your_cluster.jpg
 date: 2025-06-01
 previous: 15_custom_cni.html
 next: 17_final_project.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

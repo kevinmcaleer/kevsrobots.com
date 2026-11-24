@@ -3,7 +3,7 @@ layout: lesson
 title: Flashing the Firmware
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/05_flashing.jpg
 date: 2026-08-05
 previous: 04_antennas_and_the_law.html
 next: 06_radio_settings.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 This is the moment the two identical boards become two different things. Node 1 gets **repeater** firmware; node 2 gets **companion** firmware. Everything else in the course follows from this choice.
 

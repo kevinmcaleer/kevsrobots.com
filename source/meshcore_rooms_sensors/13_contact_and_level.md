@@ -3,6 +3,11 @@ title: Contact and Level Sensing
 description: Doors, water tanks and switches - what works out of the box and what needs custom firmware
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/13_contact_and_level.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 "Is the shed door open?" and "how full is the water tank?" are two of the most requested things people want from a remote sensor. This lesson is an honest account of how to get them, because the obvious approach is not the supported one.

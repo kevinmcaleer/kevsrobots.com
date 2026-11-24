@@ -3,6 +3,11 @@ title: Print the parts
 description: Learn how to print the parts for the mini-rack
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/07_print.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Tips

@@ -3,7 +3,7 @@ layout: lesson
 title: Setting up Your Development Environment
 author: Kevin McAleer
 type: page
-cover: /learn/object_model/assets/cover.jpg
+cover: /learn/object_model/assets/banners/01_setup.jpg
 date: 2025-12-04
 previous: 00_intro.html
 next: 02_dataset_prep.html
@@ -44,6 +44,10 @@ navigation:
       link: 08_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Graph View in Obsidian
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/12_graph_view.jpg
 date: 2025-08-24
 previous: 09_properties.html
 next: 10_markdown_in_obsidian.html
@@ -52,6 +52,10 @@ navigation:
       link: 11_markdown_course_link.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Graph View in Obsidian
 

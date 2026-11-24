@@ -3,11 +3,11 @@ title: Wi-Fi Control with the Raspberry Pi Pico W
 description: Control your robot using a smartphone or browser over Wi-Fi with the Raspberry Pi Pico W.
 layout: lesson
 type: page
-cover: assets/wifi_control.jpg
+cover: /learn/micropython_robotics/assets/banners/09_wifi_control.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/03.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

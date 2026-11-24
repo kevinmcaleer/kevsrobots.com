@@ -4,6 +4,11 @@ description: >-
     Use the Mermaid Live Editor, learn how every diagram is put together, and add a diagram to a Markdown file
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/02_your-first-diagram.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## The Mermaid Live Editor

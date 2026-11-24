@@ -3,7 +3,7 @@ layout: lesson
 title: Wi-Fi Control with the Raspberry Pi Pico W
 author: Kevin McAleer
 type: page
-cover: assets/wifi_control.jpg
+cover: /learn/micropython_robotics/assets/banners/09_wifi_control.jpg
 date: 2025-05-20
 previous: 08_bluetooth_control.html
 next: 10_autonomous_robot.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/03.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,6 +3,11 @@ title: Troubleshooting
 description: A systematic checklist for a mesh that will not talk, from dead boards to silent networks
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/14_troubleshooting.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Something is not working. Do not start randomly changing settings - work down this list in order. Nine times out of ten it is one of the first four items.

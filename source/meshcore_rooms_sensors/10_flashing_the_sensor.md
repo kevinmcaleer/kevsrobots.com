@@ -3,6 +3,11 @@ title: Flashing the Sensor Node
 description: Load sensor firmware, confirm the role, and let the board auto-detect what you have wired up
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/10_flashing_the_sensor.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Third board, third firmware variant. The process is identical; the interesting part comes at first boot, when the firmware goes looking for sensors.

@@ -3,6 +3,11 @@ title: Where to Go Next
 description: Room servers, sensors, solar repeaters, T-Decks and joining the wider MeshCore community
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/15_next_steps.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 You have a working mesh. A repeater extending your range, a client in your pocket, and a network that owes nothing to anybody's infrastructure. Here is where to take it.

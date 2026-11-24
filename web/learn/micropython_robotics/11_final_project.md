@@ -3,7 +3,7 @@ layout: lesson
 title: "Final Project \u2013 Build Your Own Robot"
 author: Kevin McAleer
 type: page
-cover: assets/final_project.jpg
+cover: /learn/micropython_robotics/assets/banners/11_final_project.jpg
 date: 2025-05-20
 previous: 10_autonomous_robot.html
 next: 12_summary.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

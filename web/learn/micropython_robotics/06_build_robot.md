@@ -3,7 +3,7 @@ layout: lesson
 title: Building a Two-Wheel Drive Robot
 author: Kevin McAleer
 type: page
-cover: assets/robot_assembly.jpg
+cover: /learn/micropython_robotics/assets/banners/06_build_robot.jpg
 date: 2025-05-20
 previous: 05_ultrasonic_sensor.html
 next: 07_servo_scanning.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/04.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

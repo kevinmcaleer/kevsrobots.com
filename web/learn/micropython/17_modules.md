@@ -3,7 +3,7 @@ layout: lesson
 title: Modules
 author: Kevin McAleer
 type: page
-cover: /learn/micropython/assets/micropython.jpg
+cover: /learn/micropython/assets/banners/17_modules.jpg
 date: 2022-12-04
 previous: 16_repl.html
 next: 18_summary.html
@@ -67,6 +67,10 @@ navigation:
       link: 18_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Picture of a honeycomb close up](assets/modules.jpg){:.cover}
 

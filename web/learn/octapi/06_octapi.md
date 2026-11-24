@@ -3,7 +3,7 @@ layout: lesson
 title: Cracking Enigma with OctaPi
 author: Kevin McAleer
 type: page
-cover: /learn/octapi/assets/octapi.jpg
+cover: /learn/octapi/assets/banners/06_octapi.jpg
 date: 2024-02-18
 previous: 05_dispy.html
 description: Learn how to use DisPy and a Cluster of Raspberry Pis to perform a Bruteforce
@@ -37,6 +37,10 @@ navigation:
       link: 06_octapi.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Cluster Setup
 

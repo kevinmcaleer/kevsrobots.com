@@ -3,7 +3,7 @@ layout: lesson
 title: Deploying Apps
 author: Kevin McAleer
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/12_deploying_apps.jpg
 date: 2025-06-01
 previous: 11_ingress_and_services.html
 next: 13_using_helm.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

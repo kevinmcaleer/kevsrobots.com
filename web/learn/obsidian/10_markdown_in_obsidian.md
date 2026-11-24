@@ -3,7 +3,7 @@ layout: lesson
 title: Markdown in Obsidian
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/10_markdown_in_obsidian.jpg
 date: 2025-08-24
 previous: 12_graph_view.html
 next: 11_markdown_course_link.html
@@ -51,6 +51,10 @@ navigation:
       link: 11_markdown_course_link.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Markdown in Obsidian
 

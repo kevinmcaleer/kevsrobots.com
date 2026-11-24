@@ -3,7 +3,7 @@ layout: lesson
 title: Gantt Charts and Timelines
 author: Kevin McAleer
 type: page
-cover: /learn/mermaid/assets/cover.jpg
+cover: /learn/mermaid/assets/banners/09_gantt-and-timeline.jpg
 date: 2026-11-04
 previous: 08_entity-relationship-diagrams.html
 next: 10_more-diagram-types.html
@@ -61,6 +61,10 @@ navigation:
       link: 14_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Planning a build
 

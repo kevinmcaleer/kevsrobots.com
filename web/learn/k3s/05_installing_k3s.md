@@ -3,7 +3,7 @@ layout: lesson
 title: Installing K3s
 author: Kevin McAleer
 type: page
-cover: assets/k3s04.jpg
+cover: /learn/k3s/assets/banners/05_installing_k3s.jpg
 date: 2025-06-01
 previous: 04_cluster_networking.html
 next: 06_adding_nodes.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

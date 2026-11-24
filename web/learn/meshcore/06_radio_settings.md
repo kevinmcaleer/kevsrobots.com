@@ -3,7 +3,7 @@ layout: lesson
 title: Radio Settings for the UK
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/06_radio_settings.jpg
 date: 2026-08-05
 previous: 05_flashing.html
 next: 07_repeater_setup.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Both boards are flashed. Now we make sure they can actually hear each other - and that they can hear everybody else in the UK too.
 

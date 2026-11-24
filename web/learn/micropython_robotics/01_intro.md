@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to MicroPython Robotics Projects
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/micropython_robotics/assets/banners/01_intro.jpg
 date: 2025-05-20
 next: 02_dc_motors.html
 description: "Get started with building robots using the Raspberry Pi Pico and MicroPython\
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

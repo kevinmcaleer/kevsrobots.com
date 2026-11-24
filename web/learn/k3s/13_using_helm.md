@@ -3,7 +3,7 @@ layout: lesson
 title: Using Helm
 author: Kevin McAleer
 type: page
-cover: assets/k3s06.jpg
+cover: /learn/k3s/assets/banners/13_using_helm.jpg
 date: 2025-06-01
 previous: 12_deploying_apps.html
 next: 14_ci_cd_on_k3s.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

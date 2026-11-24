@@ -3,7 +3,7 @@ layout: lesson
 title: Configuring the Room Server
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/05_room_server_config.jpg
 date: 2026-08-05
 previous: 04_flashing_the_room_server.html
 next: 06_joining_a_room.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The board is flashed and on the right frequency. Now we give it an identity and lock it down, because the passwords it shipped with are printed in the public documentation.
 

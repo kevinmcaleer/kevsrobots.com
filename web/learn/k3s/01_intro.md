@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to K3s on Raspberry Pi
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/k3s/assets/banners/01_intro.jpg
 date: 2025-06-01
 next: 02_hardware_requirements.html
 description: Learn what K3s is, why it's a great fit for the Raspberry Pi, and what
@@ -69,7 +69,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

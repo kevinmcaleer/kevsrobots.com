@@ -3,7 +3,7 @@ layout: lesson
 title: "Final Project \u2013 Deploying a Multi-Service App"
 author: Kevin McAleer
 type: page
-cover: assets/k3s04.jpg
+cover: /learn/k3s/assets/banners/17_final_project.jpg
 date: 2025-06-01
 previous: 16_securing_your_cluster.html
 next: 18_summary.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Create a ROS2 Python Publisher
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/12_create_publisher.jpg
 date: 2023-01-07
 previous: 11_create_py_package.html
 next: 13_create_subscriber.html
@@ -74,6 +74,10 @@ navigation:
       link: 19_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Create a new Python file called pub.py
 

@@ -3,11 +3,11 @@ title: Dashboard and Monitoring
 description: Learn how to deploy the Kubernetes Dashboard, access metrics, and monitor your K3s cluster using lightweight tools.
 layout: lesson
 type: page
-cover: assets/k3s02.jpg
+cover: /learn/k3s/assets/banners/09_dashboard_and_monitoring.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

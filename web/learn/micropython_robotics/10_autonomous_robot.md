@@ -3,7 +3,7 @@ layout: lesson
 title: Creating Simple Autonomous Behavior
 author: Kevin McAleer
 type: page
-cover: assets/autonomous_robot.jpg
+cover: /learn/micropython_robotics/assets/banners/10_autonomous_robot.jpg
 date: 2025-05-20
 previous: 09_wifi_control.html
 next: 11_final_project.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/04.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

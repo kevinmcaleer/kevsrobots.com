@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to UART
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/11_uart.jpg
 date: 2023-04-14
 previous: 10_temperature_sensors.html
 next: 12_i2c.html
@@ -69,6 +69,10 @@ navigation:
       link: 17_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

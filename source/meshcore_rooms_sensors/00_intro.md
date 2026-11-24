@@ -3,9 +3,12 @@ title: Introduction
 description: Build the other two MeshCore node types - a room server and a sensor node
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/00_intro.jpg
 ---
 
-![MeshCore room servers and sensors](assets/cover.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Ahoy there makers! In [part one](/learn/meshcore/) we built a repeater and a client, and got a message across town for about £30. That course covered conversation. This one covers the other two things a mesh can do: **remember**, and **measure**.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Components
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/01_components.jpg
 date: 2025-02-16
 previous: 00_intro.html
 next: 02_2u_design.html
@@ -42,6 +42,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Components](/learn/mini_rack/assets/components.jpg){:class="img-fluid w-100"}
 

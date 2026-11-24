@@ -3,7 +3,7 @@ layout: lesson
 title: What is a Room Server?
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/03_what_is_a_room_server.jpg
 date: 2026-08-05
 previous: 02_hardware.html
 next: 04_flashing_the_room_server.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 A room server is the closest thing MeshCore has to an inbox. It is a node that keeps recent posts and hands them over to people who were not around when they were made.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: /learn/octapi/assets/octapi.jpg
+cover: /learn/octapi/assets/banners/00_intro.jpg
 date: 2024-02-18
 next: 01_lesson01.html
 description: What you'll learn in this course
@@ -37,7 +37,9 @@ navigation:
 ---
 
 
-![Course Image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this course you will learn about `OctaPi` and how to crack the Enigma machine using Python, a bunch of Raspberry Pi's and a little bit of parallel computing.
 

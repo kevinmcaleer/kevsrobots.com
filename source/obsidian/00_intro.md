@@ -3,6 +3,11 @@ title: Introduction
 description: Learn about this introduction to Obsidian course.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/00_intro.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 # Introduction to Obsidian

@@ -3,6 +3,11 @@ layout: lesson
 title: Build the ROS2 Container
 type: page
 description: Use the official docker images to build our ROS2 container
+cover: /learn/learn_ros/assets/banners/07_build_container.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Dockerfile & Docker-Compose.yml

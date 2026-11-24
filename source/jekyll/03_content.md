@@ -3,6 +3,11 @@ title: Content Management in Jekyll
 description: Learn how to effectively manage content in Jekyll, including writing posts, using Markdown, and understanding front matter.
 layout: lesson
 type: page
+cover: /learn/jekyll/assets/banners/03_content.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

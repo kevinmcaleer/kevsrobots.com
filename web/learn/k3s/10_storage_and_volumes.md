@@ -3,7 +3,7 @@ layout: lesson
 title: Storage and Volumes
 author: Kevin McAleer
 type: page
-cover: assets/k3s03.jpg
+cover: /learn/k3s/assets/banners/10_storage_and_volumes.jpg
 date: 2025-06-01
 previous: 09_dashboard_and_monitoring.html
 next: 11_ingress_and_services.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -4,6 +4,11 @@ description: >-
     Build a real-time object detection application using your custom model and the Raspberry Pi AI Camera with live video feed
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/06_realtime_detection.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

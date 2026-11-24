@@ -3,11 +3,11 @@ title: Advanced Networking & Custom CNI
 description: Explore Kubernetes Container Network Interfaces (CNI) in K3s and learn how to replace the default Flannel with more advanced CNIs like Calico or Cilium.
 layout: lesson
 type: page
-cover: assets/k3s02.jpg
+cover: /learn/k3s/assets/banners/15_custom_cni.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

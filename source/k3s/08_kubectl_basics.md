@@ -3,11 +3,11 @@ title: Kubectl Basics
 description: Learn the essential `kubectl` commands to interact with your K3s Kubernetes cluster from the command line.
 layout: lesson
 type: page
-cover: assets/k3s01.jpg
+cover: /learn/k3s/assets/banners/08_kubectl_basics.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

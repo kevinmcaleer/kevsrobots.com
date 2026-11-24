@@ -3,11 +3,11 @@ title: Deploying Apps
 description: Learn how to deploy real-world applications on your K3s cluster using Deployments, Services, and Ingress.
 layout: lesson
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/12_deploying_apps.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

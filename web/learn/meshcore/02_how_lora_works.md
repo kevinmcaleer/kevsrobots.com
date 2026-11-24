@@ -3,7 +3,7 @@ layout: lesson
 title: How LoRa Works
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/02_how_lora_works.jpg
 date: 2026-08-05
 previous: 01_what_is_meshcore.html
 next: 03_the_hardware.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Before we buy anything, it is worth five minutes understanding what LoRa actually does, because three settings decide whether your mesh reaches the end of the street or the next town.
 

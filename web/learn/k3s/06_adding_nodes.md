@@ -3,7 +3,7 @@ layout: lesson
 title: Adding Nodes
 author: Kevin McAleer
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/06_adding_nodes.jpg
 date: 2025-06-01
 previous: 05_installing_k3s.html
 next: 07_troubleshooting_install.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

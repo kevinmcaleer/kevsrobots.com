@@ -3,10 +3,12 @@ layout: lesson
 title: Recap and Review
 type: page
 description: Consolidate your learning journey in data manipulation with Pandas and NumPy, reviewing key concepts and discussing how to continue developing your data analysis skills.
-cover: /learn/pandas_and_numpy/assets/pandas.png
+cover: /learn/pandas_and_numpy/assets/banners/12_recap.jpg
 ---
 
-![Cover photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

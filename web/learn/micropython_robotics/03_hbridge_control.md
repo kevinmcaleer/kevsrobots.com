@@ -3,7 +3,7 @@ layout: lesson
 title: Using H-Bridge Motor Drivers
 author: Kevin McAleer
 type: page
-cover: assets/hbridge.jpg
+cover: /learn/micropython_robotics/assets/banners/03_hbridge_control.jpg
 date: 2025-05-20
 previous: 02_dc_motors.html
 next: 04_line_following.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Line Following with IR Sensors
 author: Kevin McAleer
 type: page
-cover: assets/line_following.jpg
+cover: /learn/micropython_robotics/assets/banners/04_line_following.jpg
 date: 2025-05-20
 previous: 03_hbridge_control.html
 next: 05_ultrasonic_sensor.html
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -4,6 +4,11 @@ description: >-
     Review what you've learned and discover exciting next steps for advancing your computer vision and edge AI skills
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/08_summary.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

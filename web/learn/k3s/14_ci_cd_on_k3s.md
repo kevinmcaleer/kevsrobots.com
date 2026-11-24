@@ -3,7 +3,7 @@ layout: lesson
 title: CI/CD on K3s
 author: Kevin McAleer
 type: page
-cover: assets/k3s01.jpg
+cover: /learn/k3s/assets/banners/14_ci_cd_on_k3s.jpg
 date: 2025-06-01
 previous: 13_using_helm.html
 next: 15_custom_cni.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

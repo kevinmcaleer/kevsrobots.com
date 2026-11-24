@@ -3,7 +3,7 @@ layout: lesson
 title: Create the Handle
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/05_handle.jpg
 date: 2025-02-16
 previous: 04_top.html
 next: 06_panel.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Handle Design](assets/handle_design.png){:class="img-fluid w-100"}
 

@@ -3,11 +3,11 @@ title: Controlling DC Motors with the Raspberry Pi Pico
 description: Learn how to connect and control DC motors using MicroPython and the L298N motor driver.
 layout: lesson
 type: page
-cover: assets/dc_motors.jpg
+cover: /learn/micropython_robotics/assets/banners/02_dc_motors.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,11 +3,11 @@ title: Securing Your Cluster
 description: Learn how to secure your K3s cluster with role-based access control (RBAC), secrets management, TLS, and best practices for running in a trusted environment.
 layout: lesson
 type: page
-cover: assets/k3s03.jpg
+cover: /learn/k3s/assets/banners/16_securing_your_cluster.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

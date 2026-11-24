@@ -3,6 +3,11 @@ title: Running a Room Server
 description: Power, placement, the repeat question, and keeping a room alive long term
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/08_room_operations.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 A room server is infrastructure. Once your group depends on it, the interesting problems stop being about firmware and start being about electricity.

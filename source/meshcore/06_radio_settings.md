@@ -3,6 +3,11 @@ title: Radio Settings for the UK
 description: The EU/UK Narrow preset, what the numbers mean, and why both nodes must match exactly
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/06_radio_settings.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Both boards are flashed. Now we make sure they can actually hear each other - and that they can hear everybody else in the UK too.

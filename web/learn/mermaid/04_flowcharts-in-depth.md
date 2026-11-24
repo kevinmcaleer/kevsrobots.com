@@ -3,7 +3,7 @@ layout: lesson
 title: Flowcharts in Depth
 author: Kevin McAleer
 type: page
-cover: /learn/mermaid/assets/cover.jpg
+cover: /learn/mermaid/assets/banners/04_flowcharts-in-depth.jpg
 date: 2026-11-04
 previous: 03_flowcharts.html
 next: 05_sequence-diagrams.html
@@ -61,6 +61,10 @@ navigation:
       link: 14_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Grouping with subgraphs
 

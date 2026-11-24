@@ -3,11 +3,11 @@ title: Introduction to K3s on Raspberry Pi
 description: Learn what K3s is, why it's a great fit for the Raspberry Pi, and what this course will help you build.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/k3s/assets/banners/01_intro.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

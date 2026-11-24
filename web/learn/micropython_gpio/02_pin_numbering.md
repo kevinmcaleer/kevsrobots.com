@@ -3,7 +3,7 @@ layout: lesson
 title: Pin Numbering
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/02_pin_numbering.jpg
 date: 2023-04-14
 previous: 01_gpio_pin_types.html
 next: 03_voltage_levels.html
@@ -69,6 +69,10 @@ navigation:
       link: 17_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 
