@@ -9,8 +9,9 @@ previous: 06_measuring_distance.html
 next: 08_video.html
 description: Learn how to avoid objects with BurgerBot.
 percent: 60
-duration: 5
-quiz_total: 11
+duration: 6
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Build your own BurgerBot
 - content:
@@ -61,6 +62,10 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to write a program that makes BurgerBot back away from obstacles, and one that follows your hand.
+
+---
+
 ## Avoiding an object
 
 To prevent collisions with obstacles, use `bot.distance` to measure the distance between the object and your bot. If the measured distance is less than a threshold (for example 15 cm), stop the bot, back up and turn to maintain a safe distance from the obstacle.
@@ -99,6 +104,17 @@ while True:  # Infinite loop - runs forever (note: capital T in True!)
 
 **Why short bursts?** Checking often allows the robot to respond more quickly to obstacles, making navigation smoother and safer.
 
+```mermaid
+flowchart TD
+    A["Read bot.distance"] --> B{"15 cm or less?"}
+    B -- "yes" --> C["Stop, back up, turn left"]
+    B -- "no" --> D["Drive forward for 0.1 s"]
+    C --> A
+    D --> A
+```
+
+> **Teachers**: an avoiding robot still drives off tables if it does not see the edge, because the range finder only looks forwards. Run it on the floor, or in an arena of books or boards, and keep a hand ready to pick the robot up.
+
 ---
 
 ## Common Issues
@@ -106,6 +122,10 @@ while True:  # Infinite loop - runs forever (note: capital T in True!)
 - **Problem**: `bot.distance` returns 0 or very large numbers (like 400)
 - **Solution**: Check that the rangefinder Trigger and Echo pins are wired correctly to GPIO pins
 - **Why**: Incorrect wiring prevents the sensor from sending or receiving ultrasonic signals
+
+- **Problem**: The robot only reacts when an object is almost touching it
+- **Solution**: Check the distance units in the [Measuring Distance](06_measuring_distance.html) lesson, then compare `bot.distance` with a ruler
+- **Why**: If your copy of the library reports millimetres, a 15 cm threshold is really 1.5 cm
 
 - **Problem**: Robot doesn't detect objects closer than 2cm
 - **Solution**: This is normal - ultrasonic sensors have a minimum detection range of about 2cm
@@ -172,6 +192,8 @@ The `MARGIN` gives the robot a 'just right' zone. Without it, the robot would ji
 
 ---
 
+## Check your understanding
+
 {% quiz %}
 ? In the avoidance code, why do we call `bot.forward(0.1)` rather than `bot.forward(2)`?
 - [ ] Short movements use less battery
@@ -184,6 +206,12 @@ The `MARGIN` gives the robot a 'just right' zone. Without it, the robot would ji
 - [x] It creates a 'just right' zone so the robot doesn't jitter
 - [ ] It limits the maximum distance
 > Without a margin the robot would constantly overshoot and correct around the exact target.
+
+? What does the avoidance code do when the distance is 15 cm or less?
+- [ ] Drives faster
+- [x] Stops, backs up and turns left
+- [ ] Prints a message and carries on
+> The `if distance <= 15:` branch calls `stop()`, `backward(0.5)` and `turn_left(0.5)`.
 {% endquiz %}
 
 ---

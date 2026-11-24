@@ -3,11 +3,15 @@ title: Front and Rear Profiles
 description: Create cable routing and component access openings using symmetric constraints
 layout: lesson
 cover: /learn/freecad_smars/assets/banners/05_front_rear_profiles.jpg
+type: page
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to cut a main opening and a shallow cable slot into the front and rear, and choose between Coincident and Symmetric constraints for centring.
 
 ## What We're Building
 
@@ -21,7 +25,7 @@ The front and rear of the SMARS base need openings for:
 | Main opening | 42.5mm × 30mm | Arduino installation, battery access |
 | Cable slot | 52mm × 7.5mm | Route wires to front sensors |
 | Opening position | 14.5mm from bottom | Clears motor area, provides structural lip |
-{: .table .table-single }
+{:class="table table-single"}
 
 ---
 
@@ -225,20 +229,48 @@ Both achieve centering, but Symmetric is powerful when you have two reference po
 ## Common Issues
 
 ### "The pocket cuts the wrong direction"
-**Problem**: The opening goes outside the base instead of inside.
-**Solution**: In the Pocket dialog, check the "Reversed" option if needed. FreeCAD sometimes guesses the wrong direction.
+- **Problem**: The opening goes outside the base instead of inside.
+- **Solution**: In the Pocket dialog, check the "Reversed" option if needed. FreeCAD sometimes guesses the wrong direction.
+- **Why**: FreeCAD guesses the direction from the sketch plane.
 
 ### "Symmetric constraint doesn't work"
-**Problem**: Clicking Constrain Symmetric does nothing or fails.
-**Solution**: Make sure you have exactly 3 elements selected: 1 point to center, and 2 reference points. The center point must be selected first.
+- **Problem**: Clicking Constrain Symmetric does nothing or fails.
+- **Solution**: Make sure you have exactly 3 elements selected: 1 point to center, and 2 reference points. The center point must be selected first.
+- **Why**: The constraint needs a clear selection of one point and two reference points.
 
 ### "The cable slot is too deep"
-**Problem**: The slot cut all the way through.
-**Solution**: Undo and check your pocket depth - it should be 2mm, not 70mm.
+- **Problem**: The slot cut all the way through.
+- **Solution**: Undo and check your pocket depth - it should be 2mm, not 70mm.
+- **Why**: A pocket cuts as deep as its length says.
 
 ### "My rectangle isn't positioned correctly"
-**Problem**: The opening is off-center or at the wrong height.
-**Solution**: Double-click the sketch to edit it. Verify all dimensions and constraints. Green = fully constrained.
+- **Problem**: The opening is off-center or at the wrong height.
+- **Solution**: Double-click the sketch to edit it. Verify all dimensions and constraints. Green = fully constrained.
+- **Why**: A missing dimension lets the shape drift.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? How deep is the cable slot pocket?
+- [ ] 70mm
+- [x] 2mm
+- [ ] 7.5mm
+> A 70mm pocket would cut through the whole base. The slot is shallow.
+
+? When is a Symmetric constraint more useful than a Coincident one?
+- [ ] When centring on a single point
+- [x] When centring a point between two reference points
+- [ ] When making a line vertical
+> We projected the top corners of the base and centred the slot between them.
+
+? Why is the main opening 14.5mm from the bottom?
+- [ ] To make it easier to sketch
+- [x] It leaves a solid lip that adds rigidity and clears the motor area
+- [ ] So the cable slot fits underneath
+> The lip stops the opening weakening the structure.
+{% endquiz %}
 
 ---
 

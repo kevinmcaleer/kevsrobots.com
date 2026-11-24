@@ -4,12 +4,14 @@ description: Draw a 16 by 16 robot eye in the Snakie Sprite editor using the dra
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/03_drawing_your_first_sprite.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to draw a 16 by 16 robot eye with the draw, fill and erase tools.
 
 ## The plan
 

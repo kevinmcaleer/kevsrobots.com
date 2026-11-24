@@ -2,163 +2,168 @@
 title: If, elif, else
 description: Conditional control
 layout: lesson
+type: page
+date_updated: 2026-11-24
 ---
 
 ![If Else Finally Diagram](assets/if_elif_else.jpg){:class="cover"}
 
-## Contolling the flow of our program
-
-So far, our programs have been simple lists of tasks that MicroPython carries out for us. But what if we want the program to do different things depending on the value of a variable?
-
-We can test or check the value of our variables using the `if` statement.
-
 ---
 
-## Conditional Statements
+By the end of this lesson you will be able to make a program choose between actions using `if`, `elif` and `else`, and compare values with `==`.
 
-Using the `if` statement is simple, we need a condition to check, and then an action to follow if that condition is `True`.
+## Controlling the flow of our program
 
-We also need to do something different in our code, we need to indent the code under the `if` statement to tell MicroPython that this block of code is only to be run `if` the condition is `True`.
+So far our programs have been simple lists of jobs that MicroPython does from top to bottom. But a robot needs to react: stop if something is in the way, slow down if it is close, carry on if the path is clear.
 
-##### Example
+We can test the value of a variable with the `if` statement. For this lesson, here's the robot's decision as a flow chart:
 
-```python
-if name == 'Kevin':
-    print('Hi Boss')
+```mermaid
+flowchart TD
+    A["Read distance"] --> B{"distance below 10?"}
+    B -->|Yes| C["Stop"]
+    B -->|No| D{"distance below 30?"}
+    D -->|Yes| E["Slow down"]
+    D -->|No| F["Full speed"]
 ```
-{: .no-snakie }
 
-Notice that there are two equals signs `==`. This is because we use one equal sign `=` to assign values, but two equal signs `==` for comparing two value.
+{% include youtubeplayer.html id="ghAnP18sbl8" %}
+
+## Conditional statements
+
+An `if` statement needs a **condition** to check, and then an action that runs only if the condition is `True`. The action is **indented** underneath (we use 4 spaces):
+
+{% capture snakie_code %}
+distance = 8  # centimetres, pretend this came from a sensor
+
+if distance < 10:
+    print("Obstacle! Stopping.")
+
+print("Program finished")
+{% endcapture %}
+{% include snakie.html code=snakie_code name="if_1.py" %}
+
+The last `print` isn't indented, so it always runs. Try changing `distance` to `50` and run it again.
 
 ### Comparing values
 
-We an also compare values to check if they are the same:
+Notice we write `distance < 10`. The comparison symbols you'll use most are:
+
+| Symbol | Meaning |
+|:--:|---|
+| `==` | is equal to |
+| `!=` | is not equal to |
+| `<` and `>` | less than, greater than |
+| `<=` and `>=` | less than or equal, greater than or equal |
+{:class="table table-single"}
+
+Notice the **two** equals signs `==`. One equals sign `=` assigns a value to a variable, two `==` compare two values.
 
 {% capture snakie_code %}
 a = 1
 b = 1
 
-if a == b: print('They are the same')
+if a == b:
+    print('They are the same')
 {% endcapture %}
-{% include snakie.html code=snakie_code name="if_elif_else.py" %}
-
-In the example above we assign the value `1` to the variable named `a`, and then we assign the value `1` to the variable `b`. We then compare the two using the `if a == b` condition. 
+{% include snakie.html code=snakie_code name="if_2.py" %}
 
 > ## Colons
 >
-> Notice the `:` colon after the condtional statement, this tells MicroPython that what follows is a
-> block of code. We can write the code on the same line if its just one line, otherwise we need to
-> indent the block of code like this:
-
-```python
-if a == b: 
-    print('They are the same')
-    print('a has the value', a, 'and b has the value',b)
-```
-
-This will output:
-
-```bash
->>>
-  They are the same
-  a has the value 1 and b has the value 1
->>>
-```
-
----
-
-## If, Else
-
-So far we've checked for a condition and `if` that condition is `True` then we've run a block of code, but what if we want to run another block of code if the condition is `False`. We ***could*** do this:
-
-```python
-if a == 1:
-    print('a is 1')
-if a != 1:
-    print('a is not 1')
-```
-
-In the code above we check if `a` is equal to `1` (`if a == 1`) and if it is we print the message `a is q`, we then do another check to see if `a` is not equal to 1 (`if a != 1`), and then print the message `a is not 1`.
-
-However, there is a quicker way to do the second test without another `if` statement. We can use the `else` keyword. `else` means run the block below if the first condition was `False`.
-
-```python
-if a == 1:
-    print('a is 1')
-else:
-    print('a is not 1')
-```
-
-> ## Code Blocks & Indentation
->
-> Note that Python and MicroPython recognise blocks of code by their indentation, which is defined by white space (typically `4` spaces per indented block).
-> Other languages like `JavaScript` and `C` use curly braces `{ }` to define blocks of code.
->
-> ##### Python Example
->
-> ```python
-> if a == 1:
->     # this is a code block, notice its indented by 4 spaces
->     print('a = ', a)
-> ```
->
-> ---
->
-> ##### C++ Example
->
-> ```c++
-> #include <iostream>
->
-> void main(){
->  int a;
->  if (a ==1) {
->  std::cout << "a = " << a;
->  }
-> }
-> ```
->
-> You can see in the C++ example blocks of code are defined by the curly braces `{}`, and these are
-> nested. Curly braces make the code more cluttered and also mean to have to remember to close the curly braces otherwise you'll have errors.
+> Notice the `:` colon at the end of the `if` line. It tells MicroPython that an indented block of code follows. Every line in the block must be indented by the same amount.
 {:.bg-blue}
 
----
+## If, else
+
+What if we want a different action when the condition is `False`? We use `else`, which means "otherwise":
+
+{% capture snakie_code %}
+distance = 25
+
+if distance < 10:
+    print('Stop!')
+else:
+    print('Keep going')
+{% endcapture %}
+{% include snakie.html code=snakie_code name="if_3.py" %}
 
 ## elif
 
-We're not done yet; `if` statements have one more trick, it can run another alternative block of code after checking and running the first block of code, or before running the `else` statement.
+`elif`, short for "else if", sits between `if` and `else`, giving us extra checks, each with its own block. MicroPython works down the list and runs only the first block whose condition is `True`.
 
-Elif, a shortening of "else if", sits between the first `if` statement test, and the final `else` statement. It can provide for additional checks each with their own blocks of code.
+{% capture snakie_code %}
+distance = 25
 
-Only one of the blocks of code is run using the `if`, `elif` and `else` statement.
+if distance < 10:
+    print('Stop!')
+elif distance < 30:
+    print('Slow down')
+else:
+    print('Full speed')
+{% endcapture %}
+{% include snakie.html code=snakie_code name="if_4.py" %}
+
+With `distance = 25` this prints `Slow down`. The order matters: if we checked `distance < 30` first, a distance of 5 would also match it, and the robot would only slow down instead of stopping.
+
+> ## Code blocks and indentation
+>
+> Python and MicroPython know where a block of code starts and ends from its indentation, typically `4` spaces per level. Other languages like `C++` and `JavaScript` use curly braces `{ }` instead.
+{:.bg-blue}
+
+## Assumed True
+
+When checking whether a value is `True`, we can shorten the code:
 
 ```python
-if a == 1:
-    print('a is 1')
-elif a <= 1:
-    print('a is less than 1')
-else:
-    print('a is not 1')
+bright = True
+
+if bright == True:
+    print('long way')
+
+if bright:
+    print('short way')
 ```
 
-> ## Assumed True
->
-> When checking to see if a value is `True` or `False` we can could write this:
->
-> ```python
-> a = True
-> if a == True:
->    print('a is True')
-> ```
->
-> However we can shorten this:
->
-> ```python
-> a = True
-> if a:
->   print('a is True')
-> ```
->
-> **Note** `1` is also `True` and `0` is also `False`
->
+Both work. Numbers count too: `0` is treated as `False`, and any other number is `True`.
 
----
+## Try it Yourself
+
+1. Change `distance` to `5`, `20` and `50`. Does the robot behave as you expect each time?
+2. Add a fourth case: if `distance < 3`, print `Emergency stop!`. Where must it go in the list?
+3. Use `input()` to ask for the battery percentage (remember `int()`), and print `Low battery` below 20, otherwise `OK`.
+4. Challenge: turn the age program from lesson 9 into one that prints `Child`, `Teen` or `Adult`.
+
+## Common Issues
+
+- **Problem**: `IndentationError: unexpected indent`, or the code runs when it shouldn't.
+- **Solution**: Indent each line in the block by 4 spaces, and keep the same amount throughout.
+- **Why**: Indentation is how MicroPython knows which lines belong to the `if`.
+
+- **Problem**: `SyntaxError: invalid syntax` on my `if` line.
+- **Solution**: Check that the line ends with a colon, and that you used `==` not `=` for comparing.
+- **Why**: A single `=` is assignment and isn't allowed as a condition.
+
+- **Problem**: The wrong message prints.
+- **Solution**: Put the most specific test first.
+- **Why**: Only the first `True` condition runs.
+
+## Check your understanding
+
+{% quiz %}
+? Which symbol compares two values to see if they are equal?
+- [ ] `=`
+- [x] `==`
+- [ ] `=>`
+> One equals sign assigns, two equals signs compare.
+
+? With `distance = 25`, what does the `if`, `elif`, `else` program above print?
+- [ ] Stop!
+- [x] Slow down
+- [ ] Full speed
+> 25 isn't below 10, but it is below 30, so the `elif` block runs.
+
+? How does MicroPython know which lines belong to an `if`?
+- [ ] They are inside curly braces
+- [x] They are indented below it
+> Python uses indentation to define blocks.
+{% endquiz %}

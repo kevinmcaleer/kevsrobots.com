@@ -4,12 +4,14 @@ description: Make the holes in a downloaded STL editable with BetterCad's Recogn
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/11_from_mesh_to_editable_part.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use Recognise features to make the holes in a downloaded STL editable, and change them like any other step.
 
 You found the perfect sensor bracket online. It's an STL, and its holes are for M4 bolts. You only have M3.
 
@@ -95,17 +97,17 @@ If you want to change the part's overall shape, it's usually quicker to bring th
 
 ## Common Issues
 
-**Problem**: A hole I can see isn't in the list.
-**Solution**: Change **Mesh** to Rough or Very rough.
-**Why**: Coarse or repaired meshes have holes that aren't quite round.
+- **Problem**: A hole I can see isn't in the list.
+- **Solution**: Change **Mesh** to Rough or Very rough.
+- **Why**: Coarse or repaired meshes have holes that aren't quite round.
 
-**Problem**: BetterCad refuses the mesh.
-**Solution**: Open the STL in your slicer, repair it, export it and import that file.
-**Why**: Recognition needs a mesh without gaps.
+- **Problem**: BetterCad refuses the mesh.
+- **Solution**: Open the STL in your slicer, repair it, export it and import that file.
+- **Why**: Recognition needs a mesh without gaps.
 
-**Problem**: I can't find the original mesh after converting.
-**Solution**: It's in the Browser with its eye off. Click the eye to show it.
-**Why**: Convert hides the mesh so you aren't looking at two copies at once.
+- **Problem**: I can't find the original mesh after converting.
+- **Solution**: It's in the Browser with its eye off. Click the eye to show it.
+- **Why**: Convert hides the mesh so you aren't looking at two copies at once.
 
 ## Check your understanding
 

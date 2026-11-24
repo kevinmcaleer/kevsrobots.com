@@ -10,9 +10,9 @@ next: 04_wiring_with_noodles.html
 description: Choose a board, add a sensor, a motor driver, motors and a battery pack
   to a Snakie project, and arrange them on the canvas
 percent: 32
-duration: 5
+duration: 6
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to place a board and parts on the canvas, rotate, rename, duplicate and delete them, and arrange them ready for wiring.
 
 Time to put the robot's parts on the bench. There are six: a Pico, a distance sensor, a motor driver, two motors and a battery pack.
 
@@ -131,6 +133,8 @@ Then hide the Library with the arrow at its top right to make room, and click **
 ![All six parts arranged on the canvas](/learn/snakie_electronics/assets/layout.jpg){:class="img-fluid w-100"}
 
 The Components list now shows six entries. That's the whole robot, waiting to be wired.
+
+> **Teachers**: If learners will build the circuit for real, check the label on each HC-SR04 module before it is wired. Many modules on sale are 5 V parts, and a Pico pin must never see more than 3.3 V, so a classroom set is best bought as the 3.3 V version or fitted with a voltage divider on the Echo wire. On screen, none of this can cause any harm.
 
 ---
 

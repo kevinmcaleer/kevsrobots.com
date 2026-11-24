@@ -4,12 +4,14 @@ description: Use Snakie's joint tool to snap one block onto another and choose h
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/03_joining_blocks.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use the joint tool to snap one block onto another and choose how the joint moves.
 
 ## A better way to place parts
 

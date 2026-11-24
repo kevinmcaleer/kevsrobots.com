@@ -4,12 +4,14 @@ description: Pick the right joint type in Snakie and set its axis and limits so 
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/04_hinges_wheels_and_sliders.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to pick the right joint type for a moving part and set its axis and limits.
 
 ## Four ways to connect two parts
 

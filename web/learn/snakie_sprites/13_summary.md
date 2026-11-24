@@ -11,7 +11,7 @@ description: Review what you have learned about sprites, framebuf and animation 
 percent: 100
 duration: 4
 quiz_total: 39
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:
@@ -57,6 +57,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recap sprites, framebuf and animation, and choose your next project.
 
 ## What you built
 

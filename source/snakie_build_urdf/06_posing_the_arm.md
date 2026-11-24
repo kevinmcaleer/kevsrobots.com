@@ -4,12 +4,14 @@ description: Switch Snakie to Animate mode and pose the robot with joint sliders
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/06_posing_the_arm.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to switch to Animate mode and pose the robot with the joint sliders or by dragging it in 3-D.
 
 ## From building to moving
 

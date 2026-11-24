@@ -12,7 +12,7 @@ description: Draw wires between pins in Snakie, understand power, ground and sig
 percent: 40
 duration: 6
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to draw, reshape, recolour and undo wires, and tell power, ground and signal connections apart.
 
 Snakie's wires are soft, curved and colourful, a bit like noodles. Drawing one takes a single drag.
 

@@ -12,7 +12,7 @@ description: Feed Snakie's Plotter, Multimeter and Oscilloscope from a Blocks pr
 percent: 72
 duration: 4
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -52,6 +52,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use the Instruments drawer in the Blocks workspace and read the Python that the blocks write.
 
 You don't need to type Python to use an instrument. Everything in this course has a block.
 

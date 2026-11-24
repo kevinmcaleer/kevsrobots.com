@@ -4,12 +4,14 @@ description: Read the Connections table in Snakie, understand nets, see the volt
 layout: lesson
 type: page
 cover: /learn/snakie_electronics/assets/banners/08_connections_and_measurements.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the Connections table, explain what a net is, and use node voltages and the on-screen multimeter to check a circuit.
 
 A picture of a circuit is nice. A *list* of its connections is what you check your work against. Snakie keeps one for you, and it can do some measuring on screen as well.
 

@@ -10,9 +10,9 @@ next: 03_board_size_and_details.html
 description: Open the Snakie Part Editor and learn its three views, the toolbar, the
   Layers list and the Inspector
 percent: 21
-duration: 4
+duration: 5
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to open the Part Editor and name its views, toolbars and side panel sections.
 
 Time to open the editor and look around. You won't build anything yet. The goal is to know where everything is, so the next lessons can move quickly.
 

@@ -4,12 +4,14 @@ description: Add your own blocks to the Snakie Blocks workspace from a Python pl
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/10_blocks_from_a_plugin.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add your own blocks to the Blocks workspace from a plugin, with number inputs, dropdowns and value blocks.
 
 ## Blocks for your own robot
 

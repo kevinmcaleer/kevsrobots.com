@@ -12,7 +12,7 @@ description: Generate a 3D printable spur gear in BetterCad and understand teeth
 percent: 56
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Design Robot Parts with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to generate a spur gear and explain module, teeth, pitch diameter and width.
 
 Gears let a small motor do a big job. They trade speed for strength, move a turn from one place to another, and change its direction. Drawing one by hand is miserable, because the curve on each tooth has to be exactly right or the gears grind.
 
@@ -149,17 +151,17 @@ Click a flat face of another body and the gear stands on that face. That's how y
 
 ## Common Issues
 
-**Problem**: I pressed Enter in a number box and the panel closed.
-**Solution**: Right-click the Gear step on the timeline and choose **Edit gear**. Press <kbd>Tab</kbd> to move between boxes.
-**Why**: Enter keeps the gear and finishes the tool.
+- **Problem**: I pressed Enter in a number box and the panel closed.
+- **Solution**: Right-click the Gear step on the timeline and choose **Edit gear**. Press <kbd>Tab</kbd> to move between boxes.
+- **Why**: Enter keeps the gear and finishes the tool.
 
-**Problem**: The teeth print as a blobby ring.
-**Solution**: Use a bigger module, or a smaller nozzle.
-**Why**: A module 1 tooth is only about 1.5 mm thick at the pitch circle, which is close to the limit for a 0.4 mm nozzle.
+- **Problem**: The teeth print as a blobby ring.
+- **Solution**: Use a bigger module, or a smaller nozzle.
+- **Why**: A module 1 tooth is only about 1.5 mm thick at the pitch circle, which is close to the limit for a 0.4 mm nozzle.
 
-**Problem**: I clicked and the gear appeared on a different body.
-**Solution**: Press <kbd>Esc</kbd> and click again with the view turned so your target face is clear.
-**Why**: The gear stands on whichever flat face is under the pointer.
+- **Problem**: I clicked and the gear appeared on a different body.
+- **Solution**: Press <kbd>Esc</kbd> and click again with the view turned so your target face is clear.
+- **Why**: The gear stands on whichever flat face is under the pointer.
 
 ## Check your understanding
 

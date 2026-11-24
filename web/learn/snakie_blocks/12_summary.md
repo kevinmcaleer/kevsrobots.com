@@ -11,7 +11,7 @@ description: Recap of the Snakie Blocks course, with blocks in other languages, 
 percent: 100
 duration: 4
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:
@@ -57,6 +57,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recall how blocks map to Python and choose where to go next.
 
 You started by dragging a square into existence and finished by reading the Python for a game you built. Nice work.
 
@@ -110,7 +112,7 @@ You're ready for:
 - [Raspberry Pi Pico with MicroPython - GPIO Mastery](/learn/micropython_gpio/) goes deeper into pins, PWM and sensors
 - [MicroPython Robotics Projects with the Raspberry Pi Pico](/learn/micropython_robotics/) puts it all on wheels
 
-This course is part of the [Start with Snakie](/learn/learning_pathways/snakie.html) learning pathway. Courses on wiring circuits in the Electronics workspace and on Snakie's instruments are on their way.
+This course is part of the [Start with Snakie](/learn/learning_pathways/snakie.html) learning pathway. Carry on with [Wire It Up - Electronics in Snakie](/learn/snakie_electronics/) to wire circuits in the Electronics workspace, or [Snakie Instruments - Oscilloscope, Multimeter and Plotter](/learn/snakie_instruments/) to look at what your programs do.
 
 If you skipped it, [Getting Started with Snakie](/learn/snakie_getting_started/) covers the rest of the app: the REPL, finding your board, flashing MicroPython and managing files.
 

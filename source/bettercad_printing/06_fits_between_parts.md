@@ -4,12 +4,14 @@ description: Make 3D printed parts press together, slide or drop in using Better
 layout: lesson
 type: page
 cover: /learn/bettercad_printing/assets/banners/06_fits_between_parts.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose between the Press, Sliding and Loose fits, and calibrate the gaps to your printer.
 
 A lid on a box. A peg in a socket. A battery in a holder. Whenever one printed part goes into another, the tiny space between them decides everything. Too little and they jam. Too much and they rattle.
 
@@ -99,17 +101,17 @@ Like holes, each cut remembers the gap it was made with. Change your fits and th
 
 ## Common Issues
 
-**Problem**: The Fit menu doesn't appear in Combine.
-**Solution**: Choose **Cut** first.
-**Why**: A gap only makes sense when one shape is removed from another.
+- **Problem**: The Fit menu doesn't appear in Combine.
+- **Solution**: Choose **Cut** first.
+- **Why**: A gap only makes sense when one shape is removed from another.
 
-**Problem**: My peg presses into a slot but won't come out again.
-**Solution**: That's a press fit doing its job. For parts that come apart, use Sliding.
-**Why**: Press fits rely on the plastic gripping.
+- **Problem**: My peg presses into a slot but won't come out again.
+- **Solution**: That's a press fit doing its job. For parts that come apart, use Sliding.
+- **Why**: Press fits rely on the plastic gripping.
 
-**Problem**: A sliding fit is perfect on small parts but tight on a 150 mm lid.
-**Solution**: Use Loose for large parts.
-**Why**: Long edges are never perfectly straight, and small errors add up along them.
+- **Problem**: A sliding fit is perfect on small parts but tight on a 150 mm lid.
+- **Solution**: Use Loose for large parts.
+- **Why**: Long edges are never perfectly straight, and small errors add up along them.
 
 ## Check your understanding
 

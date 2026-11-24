@@ -4,12 +4,14 @@ description: Look back at the eight stages of the Q Board, keep the rules that m
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/16_summary.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recap the eight stages of the Q Board, recall the rules that matter most, and choose what to build next.
 
 You started with one blinking LED and finished with a board that runs by itself, serves a web page and counts people with a camera. More importantly, you learnt how to split a project between a Linux computer and a real-time microcontroller, and how to make the two talk. That skill carries to every project you build next.
 

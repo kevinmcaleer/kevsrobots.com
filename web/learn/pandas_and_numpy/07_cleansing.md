@@ -11,15 +11,16 @@ description: Learn the essentials of data cleaning and preparation in Pandas, in
   handling missing data, data transformation, and data filtering for effective data
   analysis.
 percent: 56
-duration: 3
-quiz_total: 17
+duration: 5
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
   - section: Overview
     content:
     - name: About this course
-      link: 01_overview.html
+      link: 00_intro.html
   - section: Introduction to Pandas
     content:
     - name: Pandas and NumPy
@@ -55,6 +56,10 @@ navigation:
 
 ![Cover photo]({{page.cover}}){:class="cover"}
 
+---
+
+By the end of this lesson you will be able to find missing readings and then fill or drop them, remove duplicates, and fix column types.
+
 ## Overview
 
 Real data is messy: values go missing, rows get duplicated and text comes in different shapes. In this lesson we'll clean up the robot sensor data from the last lesson.
@@ -70,7 +75,7 @@ df = pd.DataFrame({
 })
 print(df)
 {% endcapture %}
-{% include snakie.html code=snakie_code name="cleansing.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="cleansing.py" engine="pyodide" packages="numpy,pandas" %}
 
 ---
 
@@ -186,9 +191,34 @@ print(df.dtypes)
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
-Fill the Quad's missing reading with the average of the other `distance` readings, then check `df.isna().sum()` shows no missing values.
+1. Fill the Quad's missing reading with the average of the other `distance` readings, then check `df.isna().sum()` shows no missing values.
+2. Add a duplicate of the first row with `pd.concat([df, df.iloc[[0]]])`, then use `drop_duplicates()` to remove it. Compare `df.shape` before and after.
+3. Convert the `reading` column from centimetres to millimetres in one line, without `apply()`.
+4. Challenge: drop every row where the sensor is not `distance`, then count what is left.
+
+---
+
+## Common Issues
+
+- **Problem**: `fillna()` seems to do nothing.
+- **Solution**: Assign the answer back, for example `df['reading'] = df['reading'].fillna(0)`.
+- **Why**: `fillna()` returns a new column and leaves the original alone, unless you tell it otherwise.
+
+- **Problem**: `df['reading'].fillna(0, inplace=True)` gives a `ChainedAssignmentError` or a warning, and the data does not change.
+- **Solution**: Use the assignment form above, or `df.fillna({'reading': 0}, inplace=True)` on the whole Data Frame.
+- **Why**: In current Pandas, `df['reading']` is a copy, so an in-place change on it never reaches `df`.
+
+- **Problem**: `dropna()` removes almost all your rows.
+- **Solution**: Limit it to the column you care about with `df.dropna(subset=['reading'])`.
+- **Why**: By default, a single missing value anywhere in a row drops the whole row.
+
+- **Problem**: `ValueError: could not convert string to float` in `astype()`.
+- **Solution**: Use `pd.to_numeric(df['reading'], errors='coerce')`, which turns unreadable values into `NaN` for you to handle.
+- **Why**: `astype()` stops at the first value it cannot convert, such as the text `'n/a'`.
+
+## Check your understanding
 
 {% quiz %}
 ? What does `df.isna().sum()` tell you?
@@ -201,6 +231,12 @@ Fill the Quad's missing reading with the average of the other `distance` reading
 - [ ] `df['reading'].apply(lambda cm: cm / 2.54)`
 - [x] `df['reading'] / 2.54`
 > Vectorised column operations run in fast compiled code instead of calling a Python function for every value.
+
+? Your sensor sometimes drops out, leaving gaps in a smooth reading over time. Which approach estimates the missing values from their neighbours?
+- [ ] `dropna()`
+- [x] `interpolate()`
+- [ ] `drop_duplicates()`
+> `interpolate()` fills each gap using the readings either side, which suits values that change gradually.
 {% endquiz %}
 
 ---

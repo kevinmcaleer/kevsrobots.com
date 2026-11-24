@@ -9,8 +9,9 @@ previous: 00_intro.html
 next: 02_getting_started_with_sqlite3.html
 description: What are databases and why do we need them?
 percent: 10
-duration: 8
-quiz_total: 24
+duration: 10
+quiz_total: 60
+date_updated: 2026-11-24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -66,6 +67,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain what a database is, and name the parts of a table: rows, columns, data types and keys.
 
 ## Overview of Databases
 
@@ -170,7 +173,7 @@ Popular RDBMS examples include:
 
 ## Overview of SQLite
 
-SQLite is a software library that provides a relational database management system. Unlike traditional client-server databases, SQLite operates directly on disk files, making it serverless and ideal for embedded systems, mobile applications, and small-scale projects.
+SQLite is a software library that provides a relational database management system. Unlike traditional client-server databases, SQLite operates directly on disk files, making it serverless and ideal for embedded systems, mobile applications, and small-scale projects. One thing to remember for later: SQLite has no user accounts or passwords of its own, so whoever can read the `.db` file can read the data. We'll come back to this in lesson 10.
 
 ---
 
@@ -230,7 +233,7 @@ Type          | Description                                                     
 **Real**      | Floating-point numbers                                                   | `3.14`
 **Date/Time** | Dates and times. SQLite stores these as text or numbers                  | `2023-07-14 23:02:01`
 **Blob**      | Binary large objects, used for storing binary data (e.g., images, files) | `x'000102'`
-{:class="table table-striped"}
+{:class="table table-single"}
 
 Columns can also have constraints that define additional rules for the data they store. Constraints include:
 
@@ -241,7 +244,26 @@ Columns can also have constraints that define additional rules for the data they
 
 Understanding these concepts is crucial for designing effective database schemas and manipulating data efficiently.
 
+## Try it Yourself
+
+1. On paper, sketch a table for the parts in your robot box. Choose five columns (for example `name`, `quantity`, `price`, `supplier`, `date_bought`).
+2. Pick a data type for each column from the table above, and say why.
+3. Which column (or extra column) would you use as the primary key? Why would `name` be a risky choice?
+4. Challenge: your parts come from several suppliers who each have an address. Would you keep the address in the parts table? Think about what happens when a supplier moves. We'll answer this properly in the bonus lessons on normal forms.
+
+## Common Issues
+
+- **Problem**: Two rows look exactly the same, so you can't tell which one to change later.
+- **Solution**: Give every table a primary key, such as `id INTEGER PRIMARY KEY`.
+- **Why**: A primary key is guaranteed unique, so it always points at exactly one row.
+
+- **Problem**: You store a price as text (`"9.99"`) and can't add prices up or sort them properly.
+- **Solution**: Use a number type such as `REAL` or `INTEGER` for numbers.
+- **Why**: The column type tells SQLite how to compare and calculate with the value.
+
 ---
+
+## Check your understanding
 
 {% quiz %}
 ? What is a primary key?
@@ -255,6 +277,18 @@ Understanding these concepts is crucial for designing effective database schemas
 - [ ] It only runs in the cloud
 - [ ] It doesn't need any storage
 > There's no separate database server to install or run.
+
+? What is one row in a table also called?
+- [ ] A column
+- [x] A record
+- [ ] A schema
+> Rows are also called records (or tuples), and each one holds one complete entry, such as one book.
+
+? Which data type would you choose for a robot's name?
+- [ ] Integer
+- [x] Text
+- [ ] Blob
+> Text holds names and other strings. Integers are whole numbers and blobs are raw binary data like images.
 {% endquiz %}
 
 ---

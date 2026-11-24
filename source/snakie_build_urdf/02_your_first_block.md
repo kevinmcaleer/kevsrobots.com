@@ -4,12 +4,14 @@ description: Add a box to the robot in Snakie, then size, colour, name and place
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/02_your_first_block.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add a box to the robot, then size, colour, name and place it with the properties panel.
 
 ## Three shapes
 

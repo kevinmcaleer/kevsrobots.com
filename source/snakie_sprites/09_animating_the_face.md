@@ -4,12 +4,14 @@ description: Write an animation loop that makes the eyes blink and glance around
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/09_animating_the_face.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write an animation loop that makes the eyes blink and glance around at random.
 
 ## Animation is a loop
 

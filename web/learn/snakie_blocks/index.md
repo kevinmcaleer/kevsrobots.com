@@ -9,11 +9,24 @@ description: Program a Raspberry Pi Pico by snapping blocks together in Snakie, 
   buttons, servos and buzzers, then build a reaction timer game and read every line
   of its Python.
 level: beginner
-course_duration: 1h 1m
+course_duration: 1h 6m
 lesson_count: 13
 first_lesson: 00_intro.html
 quiz_total: 36
 video: HJYdGICcw0k
+outcomes:
+- Build working MicroPython programs for a Raspberry Pi Pico from blocks
+- Explain what each block writes in Python
+- Control LEDs, buttons, buzzers and servos from blocks
+- Make and reuse your own function blocks
+- Edit a program in either the blocks pane or the code pane
+- Build and read a complete reaction timer game
+prerequisites:
+- Getting Started with Snakie, if you have never opened Snakie before
+you_need:
+- Snakie, in your browser or the desktop app
+- For the button lesson and the project, a Raspberry Pi Pico, a breadboard, an LED
+  with a 330 ohm resistor, a push button, a piezo buzzer and jumper wires
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:

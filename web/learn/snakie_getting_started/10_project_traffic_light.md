@@ -11,8 +11,8 @@ description: Build a MicroPython traffic light in Snakie, first on the simulator
   then on a real Raspberry Pi Pico with three LEDs
 percent: 88
 duration: 6
-quiz_total: 20
-date_updated: 2026-11-20
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -54,6 +54,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build a traffic light that runs on the simulator and on a real Pico, and starts by itself at power-up.
 
 Let's put everything together and build something: a traffic light that runs the proper UK sequence. You'll write it on the simulator, watch the pins in the Board view, then wire three LEDs to a real Pico and make it run by itself.
 
@@ -200,6 +202,8 @@ The traffic light starts by itself. Unplug the Pico from your computer, plug it 
 
 ---
 
+> **Teachers**: Allow a full session. The first half runs on the simulator with no hardware, so learners without kit can still finish it. For the real build each learner or group needs a Pico, a breadboard, three LEDs, three 330 ohm resistors and four jumper wires. Remind learners to unplug the Pico while wiring.
+
 ## Try it Yourself
 
 1. Change the timings so the green light lasts five seconds.
@@ -208,17 +212,17 @@ The traffic light starts by itself. Unplug the Pico from your computer, plug it 
 
 ## Common Issues
 
-**Problem**: One LED never lights.
-**Solution**: Turn the LED round, and check its resistor reaches the ground rail.
-**Why**: LEDs only pass current one way.
+- **Problem**: One LED never lights.
+- **Solution**: Turn the LED round, and check its resistor reaches the ground rail.
+- **Why**: LEDs only pass current one way.
 
-**Problem**: The lights come on in the wrong order.
-**Solution**: Compare your wiring with the Board view. Red belongs on GP15, amber on GP14, green on GP13.
-**Why**: Two wires one row out is all it takes.
+- **Problem**: The lights come on in the wrong order.
+- **Solution**: Compare your wiring with the Board view. Red belongs on GP15, amber on GP14, green on GP13.
+- **Why**: Two wires one row out is all it takes.
 
-**Problem**: It works from Run but not from a power bank.
-**Solution**: Check `main.py` is on the board with **Refresh** in Device files.
-**Why**: Run doesn't save the program to the board.
+- **Problem**: It works from Run but not from a power bank.
+- **Solution**: Check `main.py` is on the board with **Refresh** in Device files.
+- **Why**: Run doesn't save the program to the board.
 
 ## Check your understanding
 

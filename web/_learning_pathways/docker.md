@@ -18,5 +18,6 @@ stages:
   - Mini-Rack 3D Design Tutorial
   further:
   - Running K3s on Raspberry Pi
+  - Homelab Automation with n8n
   - OpenClaw on Raspberry Pi
 ---

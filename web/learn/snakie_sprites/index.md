@@ -9,11 +9,24 @@ description: Give your robot a face. Draw 1-bit sprites and frame animations in 
   make a pair of eyes blink, glance around and react to light on a simulated OLED,
   before moving the same code to a real SSD1306 screen.
 level: beginner
-course_duration: 1h 11m
+course_duration: 1h 13m
 lesson_count: 14
 first_lesson: 00_intro.html
 quiz_total: 39
 video: QVe9meIHZtk
+outcomes:
+- Draw 1-bit sprites and frame animations in Snakie
+- Export a sprite as a MicroPython module and use it in a program
+- Explain how rows of pixels are packed into bytes
+- Use framebuf to draw shapes, text and sprites
+- Build an animation loop that makes a robot face feel alive
+- Run the same face on a real SSD1306 OLED
+prerequisites:
+- Learn MicroPython - The basics
+- Getting Started with Snakie
+you_need:
+- Snakie, in your browser at app.snakie.org or as the desktop app
+- 'Optional: a Raspberry Pi Pico and a 128x64 I2C SSD1306 OLED display'
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:

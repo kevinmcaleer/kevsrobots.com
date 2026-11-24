@@ -4,12 +4,14 @@ description: Package your Snakie parts as a library with versions, add a 3D mode
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/12_sharing_your_parts.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to share a part as a folder or a library, choose the right version number, and explain how the community registry works.
 
 A part you've made is useful to you. A part you've **shared** is useful to everyone with the same board. Because parts are just folders of text files, sharing them is refreshingly simple.
 
@@ -124,6 +126,8 @@ Snakie uses the model wherever the part is shown in 3-D, such as the **Build** w
 - The driver installs, and the help has a working example
 - You have the right to share the photo
 - The version number has gone up
+
+> **Teachers**: For a class, zipping the part folder is the simplest way to share, and keeps work inside the group. The community registry is public: adding a library means a pull request on GitHub, which needs a GitHub account and puts the learner's name and work on a public page, so decide with your school's rules in mind before anyone does it. Learners should only share photos and files they have the right to share.
 
 ---
 

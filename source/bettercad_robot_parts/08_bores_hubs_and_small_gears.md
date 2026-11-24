@@ -4,12 +4,14 @@ description: Fit a 3D printed gear to a motor shaft or servo horn in BetterCad, 
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/08_bores_hubs_and_small_gears.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose a bore for a motor shaft or servo horn, and fix a weak small gear with profile shift.
 
 A gear is no use until it's fixed to something that turns. This lesson covers the hole in the middle, the collar round it, and what goes wrong when a gear gets very small.
 
@@ -100,17 +102,17 @@ The simplest fix of all is to avoid the problem. If there's room, use 17 teeth o
 
 ## Common Issues
 
-**Problem**: The gear disappears and BetterCad says it rebuilt with a problem.
-**Solution**: Undo the last change, then make the hub wider or the bore smaller.
-**Why**: Some combinations can't be built. A 4 mm hub round a 3 mm D-flat bore is one: the wall between them is too thin.
+- **Problem**: The gear disappears and BetterCad says it rebuilt with a problem.
+- **Solution**: Undo the last change, then make the hub wider or the bore smaller.
+- **Why**: Some combinations can't be built. A 4 mm hub round a 3 mm D-flat bore is one: the wall between them is too thin.
 
-**Problem**: The D-flat gear is loose on the motor shaft.
-**Solution**: Reduce **Bore** by 0.1 mm at a time, or reduce **Flat from centre**.
-**Why**: A drive bore wants to be a push fit, tighter than a hole for a screw.
+- **Problem**: The D-flat gear is loose on the motor shaft.
+- **Solution**: Reduce **Bore** by 0.1 mm at a time, or reduce **Flat from centre**.
+- **Why**: A drive bore wants to be a push fit, tighter than a hole for a screw.
 
-**Problem**: My two printed gears bind at one point in each turn.
-**Solution**: Raise **Backlash** on both, and check the first layer isn't squashed outward.
-**Why**: A flared first layer, often called elephant's foot, makes the teeth fat at the bottom.
+- **Problem**: My two printed gears bind at one point in each turn.
+- **Solution**: Raise **Backlash** on both, and check the first layer isn't squashed outward.
+- **Why**: A flared first layer, often called elephant's foot, makes the teeth fat at the bottom.
 
 ## Check your understanding
 

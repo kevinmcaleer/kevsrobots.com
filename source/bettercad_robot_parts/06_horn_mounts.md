@@ -4,12 +4,14 @@ description: Bolt a servo horn to a 3D printed part with the BetterCad Horn moun
 layout: lesson
 type: page
 cover: /learn/bettercad_robot_parts/assets/banners/06_horn_mounts.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to bolt a servo horn to a printed part with a Horn mount, and measure your horn so the mount fits.
 
 A servo's output shaft has tiny splines, far too fine to print well. Try, and you get a part that grips for a week and then slips.
 
@@ -82,17 +84,17 @@ So the horn mount goes on the face that touches the horn. On a turntable that's 
 
 ## Common Issues
 
-**Problem**: The horn won't sit in the recess.
-**Solution**: Increase **Hub** by 0.2 to 0.4 mm.
-**Why**: Printed holes and recesses come out a little small.
+- **Problem**: The horn won't sit in the recess.
+- **Solution**: Increase **Hub** by 0.2 to 0.4 mm.
+- **Why**: Printed holes and recesses come out a little small.
 
-**Problem**: The arm screw holes don't line up with the horn.
-**Solution**: Measure from the horn's centre to the hole you want and set **Arm hole** to that.
-**Why**: The defaults suit a common micro servo horn. Yours may be longer.
+- **Problem**: The arm screw holes don't line up with the horn.
+- **Solution**: Measure from the horn's centre to the hole you want and set **Arm hole** to that.
+- **Why**: The defaults suit a common micro servo horn. Yours may be longer.
 
-**Problem**: I can't reach the horn's centre screw.
-**Solution**: Make **Screwdriver hole** wide enough for your screwdriver's shaft, not just its tip.
-**Why**: The hole goes right through so the screw can be done up after the part is on.
+- **Problem**: I can't reach the horn's centre screw.
+- **Solution**: Make **Screwdriver hole** wide enough for your screwdriver's shaft, not just its tip.
+- **Why**: The hole goes right through so the screw can be done up after the part is on.
 
 ## Check your understanding
 

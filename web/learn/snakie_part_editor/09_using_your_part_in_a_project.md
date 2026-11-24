@@ -12,7 +12,7 @@ description: Place your own Snakie part on the breadboard, wire it to a Pico, in
 percent: 70
 duration: 5
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to place and wire your own part in a project, install its driver, and find the blocks Snakie derives for it.
 
 This is the payoff. Your part leaves the editor and goes to work in a project, exactly like one of the standard parts.
 

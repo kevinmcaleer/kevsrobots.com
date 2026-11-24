@@ -12,7 +12,7 @@ description: Pick the right joint type in Snakie and set its axis and limits so 
 percent: 30
 duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to pick the right joint type for a moving part and set its axis and limits.
 
 ## Four ways to connect two parts
 

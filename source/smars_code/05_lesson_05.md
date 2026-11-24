@@ -2,12 +2,16 @@
 title: Lesson 05 - Bluetooth
 description: Learn how to connect a Bluetooth module to your Arduino and then use that to pair to an iOS or Android phone
 layout: lesson
+type: page
 cover: /learn/smars_code/assets/banners/05_lesson_05.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wire a Bluetooth module to SMARS and drive the robot, beep the buzzer and play a tune from the Dabble gamepad on your phone.
 
 ## Watch the livestream
 
@@ -45,7 +49,7 @@ Before you begin, you'll need to make sure you have a couple of things before yo
 
 You can download the code below from [GitHub](https://www.github.com/kevinmcaleer/lesson_05_bluetooth), but it's better to type it in yourself line by line, as you will get to understand what each line means.
 
-Make sure to download the `pitches.h` and `melody.h`, from the github link above, to the same folder where you create the code below.
+Make sure to download `pitches.h` from the github link above, and save it in the same folder as the sketch you create below. It defines the note names such as `F3` and `D3` used in the melody. (This sketch doesn't `#include` any other file, so you don't need `melody.h`.)
 
 ---
 
@@ -146,8 +150,50 @@ void loop() {
 ## Connect your phone
 
 1. Install the **Dabble** app and the **Dabble** library (**Tools > Manage Libraries**).
-2. Wire the Bluetooth module: VCC to 5V, GND to GND, module TX to Arduino pin 2, module RX to Arduino pin 3.
+2. Wire the Bluetooth module: VCC to 5V, GND to GND, module TX to Arduino pin 2, module RX to Arduino pin 3. The buzzer goes between pin 4 and GND.
 3. Upload the sketch, open Dabble, tap the connect icon and choose your module, then open the **Gamepad**.
+
+```mermaid
+flowchart LR
+    Phone[Phone with Dabble app] -- Bluetooth --> BT[Bluetooth module]
+    BT -- TX to pin 2, RX to pin 3 --> UNO[Arduino Uno]
+    UNO -- pins 12 and 13 direction, 10 and 11 speed --> Shield[Motor shield]
+    Shield --> Motors[SMARS motors]
+    UNO -- pin 4 --> Buzzer
+```
+
+Many Bluetooth modules, including the HM-10, use 3.3 volt signals. Check your module's data sheet: if the RX pin is 3.3 V only, put a simple voltage divider between Arduino pin 3 and the module's RX pin rather than connecting them directly.
+
+Unlike the Bluetooth sketch in the build course, this one uses pins 2 and 3 and not the USB serial pins, so you can leave the module plugged in while you upload.
+
+---
+
+## Try it Yourself
+
+1. Press each gamepad button and note what SMARS does. Which buttons do nothing yet?
+2. Change `wait_in_milliseconds` from `100` to `300`. Is SMARS easier or harder to steer?
+3. Change the `beep()` pitch from `1000` to `2000`, and its length from `200` to `500`.
+4. Challenge: add a new `if` line so the Circle button (`GamePad.isCirclePressed()`) plays your own short tune. Make a new `melody` array using notes from `pitches.h`.
+
+> **Teachers**: Bluetooth control brings phones into the room, so agree the rules first, and make sure learners are connecting to their own robot's module and not a neighbour's. Several robots in one room can look identical in the device list, so label each module with its own name or a sticker. School networks and device policies may block installing the Dabble app, so check before the lesson and have a spare phone or tablet available. Test the robot on the floor or in a tray with edges, because it is easy to drive off a table when you cannot see the robot's edge.
+
+## Common Issues
+
+- **Problem**: Verify fails with `Dabble.h: No such file or directory`, or `GamePad was not declared`.
+- **Solution**: Install the Dabble library from the Library Manager, and check `#define CUSTOM_SETTINGS` and `#define INCLUDE_GAMEPAD_MODULE` come before `#include <Dabble.h>`.
+- **Why**: The `#define` lines tell the library which parts to include, so the order matters.
+
+- **Problem**: Verify fails with `pitches.h: No such file or directory`.
+- **Solution**: Save `pitches.h` in the same folder as your sketch (the file must sit next to the `.ino` file).
+- **Why**: `#include "pitches.h"` with quote marks looks in the sketch folder first.
+
+- **Problem**: The phone cannot find or connect to the module.
+- **Solution**: Check the module has power (its LED will blink), use an HM-10 or HC-08 for an iPhone, and connect from inside the Dabble app and not the phone's Bluetooth settings.
+- **Why**: iPhones only talk to Bluetooth Low Energy modules, and Dabble does the pairing itself.
+
+- **Problem**: It connects but the buttons do nothing.
+- **Solution**: Swap the TX and RX wires, then check you opened the **Gamepad** screen in the app.
+- **Why**: Each side's TX must go to the other's RX. Matching names (TX to TX) is the most common mistake.
 
 ---
 
@@ -165,4 +211,10 @@ void loop() {
 - [x] HM-10 (Bluetooth Low Energy)
 - [ ] Any module works with iPhone
 > iPhones only talk to Bluetooth Low Energy modules like the HM-10 or HC-08.
+
+? Which Arduino pins does this sketch use to talk to the Bluetooth module?
+- [ ] 0 and 1
+- [x] 2 and 3
+- [ ] 12 and 13
+> The sketch uses pins 2 and 3, which keeps the USB serial port free for uploading and debugging.
 {% endquiz %}

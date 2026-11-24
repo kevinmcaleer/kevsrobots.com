@@ -8,10 +8,25 @@ description: Get parts that fit first time. Set up your printer in BetterCad, ca
   overhangs and thin walls before you print, calibrate holes and fits to your own
   machine, then design a box with a lid that closes just right.
 level: beginner
-course_duration: 1h 5m
+course_duration: 1h 9m
 lesson_count: 12
 first_lesson: 00_intro.html
 quiz_total: 36
+outcomes:
+- Tell before you print whether a part needs supports
+- Find walls that are too thin to print and fix them
+- Calibrate your hole offset with a test plate so an M3 screw slides in first time
+- Make two printed parts press together, slide or drop in, on purpose
+- Save your printer's settings once and reuse them in every model
+- Export the right file at the right resolution for your slicer
+prerequisites:
+- Learn BetterCad, or equivalent experience of finding your way round BetterCad and
+  making a simple part
+you_need:
+- A computer with a recent browser. BetterCad needs no install and no account
+- A 3D printer, slicer and some filament. PLA is ideal
+- A few M3 screws for the hole test. M2 to M6 all work
+- About 10 g of filament and under an hour of printing for the two calibration prints
 navigation:
 - name: Print It Right with BetterCad
 - content:

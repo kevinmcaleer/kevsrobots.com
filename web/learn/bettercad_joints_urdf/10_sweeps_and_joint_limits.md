@@ -11,8 +11,8 @@ description: Sweep every BetterCad joint through its range to find where parts c
   then set safe joint limits in one click
 percent: 77
 duration: 6
-quiz_total: 39
-date_updated: 2026-11-21
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -63,6 +63,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to sweep every joint through its range to find collisions, and set safe joint limits in one click.
+
 Checking one pose answers one question. A robot has endless poses, and the one that breaks it is never the one you thought to check.
 
 A **sweep** moves a joint from one end of its range to the other in small steps, checks for clashes at every step, and tells you the exact angles where things collide.
@@ -112,6 +114,16 @@ The bar says "Set the limits of Shoulder". Edit the joint and you'll find Lower 
 "Nothing hits from end to end."
 
 That sentence is the goal. When a sweep says it, no single joint can drive the arm into itself.
+
+```mermaid
+flowchart TD
+    H["Click Home"] --> S["Click Sweep"]
+    S --> R{"Anything listed?"}
+    R -->|"Yes"| W["Click Show to see why it hits"]
+    W --> L["Set the limits, or fix the design"]
+    L --> S
+    R -->|"No"| D["Nothing hits from end to end"]
+```
 
 ---
 

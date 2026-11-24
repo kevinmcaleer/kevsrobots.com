@@ -13,7 +13,7 @@ description: Write an HC-SR04 ultrasonic sensor driver in Snakie and take it thr
 percent: 84
 duration: 8
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -65,6 +65,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write, check, refactor and compile an ultrasonic sensor driver and keep it in Git, using the tools from the whole course.
 
 Time to use the whole toolbox on one job. You'll write a small **driver**, a module that hides the fiddly details of a piece of hardware behind a friendly function, and take it from first draft to something you'd be happy to share.
 
@@ -296,6 +298,8 @@ And a history of four commits that tells the story of how it got there.
 
 ---
 
+> **Teachers**: This project works with no hardware, because the lesson includes a stand-in sensor class for the simulator. It uses the desktop app features (Git), so plan for desktop installs. Learners with a Pico and an HC-SR04 can run the real driver at the end.
+
 ## Try it Yourself
 
 1. Add a `distance_cm()` method to the driver that uses `distance_mm()`. Recompile and check it appears under DEFINES.
@@ -304,17 +308,17 @@ And a history of four commits that tells the story of how it got there.
 
 ## Common Issues
 
-**Problem**: `distance_mm()` always returns -1 on real hardware.
-**Solution**: Check Trigger and Echo aren't swapped, and that the sensor has power and ground.
-**Why**: -1 means no echo pulse arrived before the timeout.
+- **Problem**: `distance_mm()` always returns -1 on real hardware.
+- **Solution**: Check Trigger and Echo aren't swapped, and that the sensor has power and ground.
+- **Why**: -1 means no echo pulse arrived before the timeout.
 
-**Problem**: `ImportError: no module named 'hcsr04'`.
-**Solution**: Upload `hcsr04.mpy` (or `hcsr04.py`) to the board, next to `main.py` or in `/lib`.
-**Why**: `main.py` imports the driver from the board's own file system.
+- **Problem**: `ImportError: no module named 'hcsr04'`.
+- **Solution**: Upload `hcsr04.mpy` (or `hcsr04.py`) to the board, next to `main.py` or in `/lib`.
+- **Why**: `main.py` imports the driver from the board's own file system.
 
-**Problem**: `ImportError: can't import name time_pulse_us` on the simulated device.
-**Solution**: Use the `FakeSensor` version on the simulator, and the real driver on a board.
-**Why**: The simulator doesn't have that hardware timing function.
+- **Problem**: `ImportError: can't import name time_pulse_us` on the simulated device.
+- **Solution**: Use the `FakeSensor` version on the simulator, and the real driver on a board.
+- **Why**: The simulator doesn't have that hardware timing function.
 
 ## Check your understanding
 

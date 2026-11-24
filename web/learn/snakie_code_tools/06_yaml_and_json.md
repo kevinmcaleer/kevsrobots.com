@@ -12,7 +12,7 @@ description: Catch mistakes in the YAML and JSON files your MicroPython project 
 percent: 42
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to catch punctuation mistakes in JSON and YAML files before they stop a program loading its settings.
 
 Not every file in a robot project is Python. Settings often live in **JSON**. Snakie's own project files, `robot.yml` and `parts.yml`, are **YAML**. Both are fussy about punctuation, and a single wrong character can stop a program loading its settings at all.
 
@@ -164,17 +166,17 @@ That loads without complaint, and the last one wins. If a setting seems to be ig
 
 ## Common Issues
 
-**Problem**: The error points at a line that looks fine.
-**Solution**: Check the end of the line before it for a missing comma, quote or bracket.
-**Why**: The parser reports where it got stuck, which is just after the real mistake.
+- **Problem**: The error points at a line that looks fine.
+- **Solution**: Check the end of the line before it for a missing comma, quote or bracket.
+- **Why**: The parser reports where it got stuck, which is just after the real mistake.
 
-**Problem**: My YAML looks right but Snakie says it's invalid.
-**Solution**: Delete the indentation on the flagged line and retype it with spaces.
-**Why**: A tab and four spaces look identical, and YAML only accepts spaces.
+- **Problem**: My YAML looks right but Snakie says it's invalid.
+- **Solution**: Delete the indentation on the flagged line and retype it with spaces.
+- **Why**: A tab and four spaces look identical, and YAML only accepts spaces.
 
-**Problem**: The file is valid but my program still fails to read a setting.
-**Solution**: Check the key's spelling and capitals in both the file and the code.
-**Why**: Validation checks the file's shape, not whether your code asks for a key that's there.
+- **Problem**: The file is valid but my program still fails to read a setting.
+- **Solution**: Check the key's spelling and capitals in both the file and the code.
+- **Why**: Validation checks the file's shape, not whether your code asks for a key that's there.
 
 ## Check your understanding
 

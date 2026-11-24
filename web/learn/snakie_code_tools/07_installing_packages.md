@@ -12,7 +12,7 @@ description: Find and install MicroPython libraries onto your board with mip fro
 percent: 48
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to install a package onto your board from the Packages panel and check what your program needs.
 
 Half of programming is not writing code that someone else has already written. MicroPython libraries are called **packages**, and the tool that installs them is **mip**. Snakie puts a friendly face on it.
 
@@ -139,6 +141,8 @@ Flash storage is small. A Pico has about 1.4 MB for files. Watch the **FLASH** m
 
 ---
 
+> **Teachers**: Installing a package copies files onto a connected board, so each learner or group needs one. A plain Pico has no Wi-Fi, so Snakie downloads the package on the computer and copies it over USB, which means the computer, not the board, needs internet access. Check that the school network allows it before the lesson.
+
 ## Try it Yourself
 
 1. Open Packages with the simulated device connected. What's already in `/lib`?
@@ -147,17 +151,17 @@ Flash storage is small. A Pico has about 1.4 MB for files. Watch the **FLASH** m
 
 ## Common Issues
 
-**Problem**: The INSTALL buttons are greyed out.
-**Solution**: Connect a board, or the simulated device.
-**Why**: Packages are installed onto a board's file system.
+- **Problem**: The INSTALL buttons are greyed out.
+- **Solution**: Connect a board, or the simulated device.
+- **Why**: Packages are installed onto a board's file system.
 
-**Problem**: The install fails part-way.
-**Solution**: Check your computer is online, and that the board has free space on the FLASH meter.
-**Why**: Snakie downloads the files first, then copies them over. Either step can fail.
+- **Problem**: The install fails part-way.
+- **Solution**: Check your computer is online, and that the board has free space on the FLASH meter.
+- **Why**: Snakie downloads the files first, then copies them over. Either step can fail.
 
-**Problem**: I installed a package but `import` still fails.
-**Solution**: Check the name you import matches the module's file name in `/lib`, and press **Reset** on the board.
-**Why**: The package name in the registry and the module name you import are sometimes different.
+- **Problem**: I installed a package but `import` still fails.
+- **Solution**: Check the name you import matches the module's file name in `/lib`, and press **Reset** on the board.
+- **Why**: The package name in the registry and the module name you import are sometimes different.
 
 ## Check your understanding
 

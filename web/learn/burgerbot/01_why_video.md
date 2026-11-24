@@ -10,7 +10,7 @@ next: 01_what_is_burger_bot.html
 description: Introduction to BurgerBot and why it was created.
 percent: 12
 duration: 55
-quiz_total: 11
+quiz_total: 33
 video_id: awQ97DOyOcM
 navigation:
 - name: Build your own BurgerBot

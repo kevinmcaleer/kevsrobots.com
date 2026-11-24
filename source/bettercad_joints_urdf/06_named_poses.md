@@ -4,12 +4,14 @@ description: Save the positions that matter in BetterCad as named poses, go back
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/06_named_poses.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to save the positions that matter as named poses, go back to them in a click, and update them later.
 
 Some positions matter more than others. Folded up for the shelf. Reaching out as far as it goes. Gripper over the pen pot. You'll come back to these again and again, to check clearances, to take a screenshot, to show someone how it works.
 
@@ -36,6 +38,13 @@ Now a second one:
 ![The Poses folder with Home, Reach and Folded](/learn/bettercad_joints_urdf/assets/poses.jpg){:class="img-fluid w-100"}
 
 ---
+
+```mermaid
+flowchart LR
+    H["Home: every joint at zero"] <-->|"Go to"| R["Reach: Shoulder 40, Elbow 60"]
+    R <-->|"Go to"| F["Folded: Shoulder -60, Elbow -90"]
+    F <-->|"Go to"| H
+```
 
 ## Go to a pose
 

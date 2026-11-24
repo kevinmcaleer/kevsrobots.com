@@ -11,7 +11,7 @@ description: Learn how to assemble a BurgerBot using a Raspberry Pi Pico and 3D 
   parts.
 percent: 30
 duration: 7
-quiz_total: 11
+quiz_total: 33
 video_id: 5G6psAuTYT4
 navigation:
 - name: Build your own BurgerBot

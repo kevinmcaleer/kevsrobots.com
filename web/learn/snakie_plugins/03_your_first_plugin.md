@@ -12,7 +12,7 @@ description: Create the ClubKit plugin folder, write a one-command Snakie plugin
 percent: 28
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create the ClubKit plugin folder, write a one-command plugin and load it into the Plugin Rack.
 
 ## Meet ClubKit
 

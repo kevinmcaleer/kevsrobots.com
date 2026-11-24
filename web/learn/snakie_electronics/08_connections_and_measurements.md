@@ -12,7 +12,7 @@ description: Read the Connections table in Snakie, understand nets, see the volt
 percent: 72
 duration: 5
 quiz_total: 33
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Wire It Up - Electronics in Snakie
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the Connections table, explain what a net is, and use node voltages and the on-screen multimeter to check a circuit.
 
 A picture of a circuit is nice. A *list* of its connections is what you check your work against. Snakie keeps one for you, and it can do some measuring on screen as well.
 

@@ -11,8 +11,8 @@ description: Use the Board view in Snakie to see which pins your MicroPython cod
   uses, live as you type
 percent: 48
 duration: 4
-quiz_total: 20
-date_updated: 2026-11-20
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -54,6 +54,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the Board view to find which pad each pin in your code is on.
 
 Code says `Pin(15)`. Your board has forty gold pads. Which one is pin 15? Snakie answers that for you by drawing the board and marking the pins your code uses.
 
@@ -112,7 +114,7 @@ The toolbar on the drawing zooms in and out, fits it to the panel, and toggles t
 
 ## The same pins in Electronics
 
-Click **Electronics** in the workspace switcher. The same board appears, large, with your named pins marked on it. This is where you'd add an LED and a resistor and draw the wires, which is what the Wire It Up course, coming next in this series, covers.
+Click **Electronics** in the workspace switcher. The same board appears, large, with your named pins marked on it. This is where you'd add an LED and a resistor and draw the wires, which is what the [Wire It Up](/learn/snakie_electronics/) course covers.
 
 ---
 
@@ -124,13 +126,13 @@ Click **Electronics** in the workspace switcher. The same board appears, large, 
 
 ## Common Issues
 
-**Problem**: The Board view says no pins are used.
-**Solution**: Make sure the file is saved as, or named, a `.py` file and contains a line such as `Pin(13, Pin.OUT)`.
-**Why**: Snakie only reads Python files, and it looks for pins being created.
+- **Problem**: The Board view says no pins are used.
+- **Solution**: Make sure the file is saved as, or named, a `.py` file and contains a line such as `Pin(13, Pin.OUT)`.
+- **Why**: Snakie only reads Python files, and it looks for pins being created.
 
-**Problem**: The pins are on the wrong pads.
-**Solution**: Check the board name at the top of the panel matches your board.
-**Why**: GP13 is in a different place on a Pico than on a Feather or a XIAO.
+- **Problem**: The pins are on the wrong pads.
+- **Solution**: Check the board name at the top of the panel matches your board.
+- **Why**: GP13 is in a different place on a Pico than on a Feather or a XIAO.
 
 ## Check your understanding
 

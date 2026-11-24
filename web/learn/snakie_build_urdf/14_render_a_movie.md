@@ -12,7 +12,7 @@ description: Turn your robot animation into a video or GIF with the Render movie
 percent: 90
 duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to turn your robot animation into a video or GIF with the Render movie tool.
 
 ## Show it off
 
@@ -131,6 +133,8 @@ Some good starting points:
 - **Start and end on the same pose.** Turn on **Loop** in the Timeline so the motion returns to the start. A looping GIF then plays without a jump
 - **Draft, then render.** Quality **Best** at 4K takes a while. Get everything right in a draft first
 - **Keep GIFs short and small.** GIF files grow quickly. A few seconds at 720p is plenty
+
+> **Teachers**: Rendering happens on the learner's own computer, and the settings show how long the movie will be and roughly how big the file will be. In a lesson, use **Quick draft** so a whole class is not waiting on high-quality renders, and save the larger sizes for a finished piece of work.
 
 ---
 

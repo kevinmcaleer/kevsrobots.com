@@ -4,12 +4,14 @@ description: Calibrate BetterCad's hole offset to your own 3D printer with a tes
 layout: lesson
 type: page
 cover: /learn/bettercad_printing/assets/banners/05_holes_that_fit.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to calibrate the hole offset to your printer with a test plate, so screw holes come out the right size.
 
 Draw a 3 mm hole, print it, and try an M3 screw. It won't go in. Printed holes come out small: the plastic is squeezed slightly wider than the path the nozzle follows, and a circle is drawn as a string of short straight lines that cut the corners.
 
@@ -106,6 +108,8 @@ Only **Clearance for printing** uses your offset. And it applies to holes made w
 
 ---
 
+> **Teachers**: this lesson needs a print before it works, so start the hole calibration plate early and have a few M3 screws ready, since M2 to M6 all work for the test. One plate per printer is enough. Learners can read the result from the same plate and set the offset on their own computers.
+
 ## Try it Yourself
 
 1. Print the hole calibration plate and find your offset for M3.
@@ -114,17 +118,17 @@ Only **Clearance for printing** uses your offset. And it applies to holes made w
 
 ## Common Issues
 
-**Problem**: The screw fits a different column on the M3 row than on the M5 row.
-**Solution**: Use the value for the size you use most, or split the difference.
-**Why**: Small circles are affected more by how the slicer draws curves.
+- **Problem**: The screw fits a different column on the M3 row than on the M5 row.
+- **Solution**: Use the value for the size you use most, or split the difference.
+- **Why**: Small circles are affected more by how the slicer draws curves.
 
-**Problem**: None of the holes fit, even at five notches.
-**Solution**: Check your slicer isn't shrinking holes or over-extruding. Calibrate flow first, then print the plate again.
-**Why**: An offset over 0.6 mm usually points to an extrusion problem, not a design one.
+- **Problem**: None of the holes fit, even at five notches.
+- **Solution**: Check your slicer isn't shrinking holes or over-extruding. Calibrate flow first, then print the plate again.
+- **Why**: An offset over 0.6 mm usually points to an extrusion problem, not a design one.
 
-**Problem**: My holes fitted in PLA but are tight in PETG.
-**Solution**: Print the plate again in PETG and save a second printer for it, such as "A1 Mini PETG".
-**Why**: Materials flow and shrink differently.
+- **Problem**: My holes fitted in PLA but are tight in PETG.
+- **Solution**: Print the plate again in PETG and save a second printer for it, such as "A1 Mini PETG".
+- **Why**: Materials flow and shrink differently.
 
 ## Check your understanding
 

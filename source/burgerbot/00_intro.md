@@ -5,7 +5,7 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/burgerbot/assets/banners/00_intro.jpg
-date_updated: 2024-07-29
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -77,6 +77,8 @@ M2 & M3 Nuts and bolts                                                          
                                                                                                          |                                     | **Total**     | **£48.81**
 {:class="table table-striped"}
 
+Prices are what the parts cost when the course was written and will have changed, so treat them as a rough guide and check the current price and quantity of each part before you order.
+
 **Additional Requirements:**
 - 3D printer access (or order pre-printed parts)
 - Raspberry Pi Pico (not included in price above)
@@ -107,6 +109,8 @@ This course combines hands-on hardware assembly with MicroPython programming. Yo
 6. **Upgrade** - Add advanced features like drawing and line following
 
 Each lesson builds on the previous one. The course uses the BurgerBot library to simplify robot control while teaching fundamental robotics concepts.
+
+> **Teachers**: BurgerBot suits ages 11 and up, working in pairs. Allow 30 to 45 minutes per lesson, plus the 3D printing: the parts take several hours to print in total, so print a week ahead and keep a spare set. Each pair needs one robot, one laptop with Thonny and one LiPo battery. LiPo batteries must never be punctured, crushed, shorted or left charging unattended, and the battery connector is polarity sensitive, so an adult should check the wiring before the first power-up. The SHIMs and the Pico headers need soldering, which needs an iron, ventilation and supervision; buy a Pico with headers fitted to cut the work down. Robots drive off desks, so test on the floor or in a tray with a lip. With no hardware, learners can still do the reading, the print planning and the code tracing in lessons 1 and 5 to 7, but the programs need a robot to run.
 
 > **Note:** All code is written in MicroPython for Raspberry Pi Pico. You can copy code directly from lessons or download complete files from the linked GitHub repositories.
 

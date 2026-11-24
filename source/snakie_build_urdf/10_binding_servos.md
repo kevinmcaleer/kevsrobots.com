@@ -4,12 +4,14 @@ description: Tell Snakie which servo pin drives which joint and how servo angles
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/10_binding_servos.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to tell Snakie which servo pin drives which joint and how servo angles map to joint angles.
 
 ## Joining the model to the electronics
 
@@ -103,6 +105,8 @@ They're in `robot.yml` too:
       servoMin: 0
       servoMax: 180
 ```
+
+> **Teachers**: No servos or boards are needed here. Bindings are saved in `robot.yml`, and the model can be driven from code on the simulated device, so a class without hardware loses nothing. Real servos are only worth bringing out once learners have a working simulated arm.
 
 ---
 

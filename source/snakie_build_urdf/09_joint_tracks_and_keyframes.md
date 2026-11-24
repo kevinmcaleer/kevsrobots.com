@@ -4,12 +4,14 @@ description: Take fine control of a robot motion in Snakie with joint tracks, ke
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/09_joint_tracks_and_keyframes.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use joint tracks, keyframes and easing for finer control of a motion.
 
 ## A second way to animate
 

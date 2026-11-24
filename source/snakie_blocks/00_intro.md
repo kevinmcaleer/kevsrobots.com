@@ -4,7 +4,7 @@ description: Learn to program a Raspberry Pi Pico with drag-and-drop blocks in S
 layout: lesson
 type: page
 cover: /learn/snakie_blocks/assets/banners/00_intro.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}

@@ -10,9 +10,9 @@ next: 12_summary.html
 description: Design a parametric phone stand in BetterCad from three shapes and five
   parameters, check it prints with no supports, and export it
 percent: 84
-duration: 7
+duration: 8
 quiz_total: 39
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Learn BetterCad
 - content:
@@ -60,6 +60,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to design a parametric phone stand from three shapes and five parameters, check that it prints without supports, and export it.
 
 Time to put it all together. You'll design a phone stand that prints flat with no supports, and because every size comes from a parameter, you can make it fit a phone, a tablet or a Raspberry Pi display by changing a number.
 
@@ -207,6 +209,8 @@ A few ways to take it further, all with tools you already know:
 
 ---
 
+> **Teachers**: the whole project, including the print checks and export, can be done on screen with no printer. If learners do print their stands, one printer makes one stand at a time, so have everyone export a 3MF and pass the overhang and thin wall checks first, then queue prints across a later session. Printers have hot nozzles and heated beds, so supervise them as you would any workshop tool.
+
 ## Try it Yourself
 
 1. Add a `lip` parameter for the lip thickness and replace every `4` that refers to it. How many places need changing?
@@ -215,17 +219,17 @@ A few ways to take it further, all with tools you already know:
 
 ## Common Issues
 
-**Problem**: The wedge slopes the wrong way.
-**Solution**: Set its Rotation Z to `180`.
-**Why**: A wedge has a high end and a low end. The high end goes at the back.
+- **Problem**: The wedge slopes the wrong way.
+- **Solution**: Set its Rotation Z to `180`.
+- **Why**: A wedge has a high end and a low end. The high end goes at the back.
 
-**Problem**: There's a gap between the wedge and the base.
-**Solution**: Check the wedge's Position Z is `base`, not a typed number.
-**Why**: If Z is a plain 4 and you change `base`, the wedge stays where it was.
+- **Problem**: There's a gap between the wedge and the base.
+- **Solution**: Check the wedge's Position Z is `base`, not a typed number.
+- **Why**: If Z is a plain 4 and you change `base`, the wedge stays where it was.
 
-**Problem**: After changing a parameter, one shape is left behind.
-**Solution**: Select it and look for a position or size that's a plain number where a name should be.
-**Why**: Only boxes containing a parameter name follow that parameter.
+- **Problem**: After changing a parameter, one shape is left behind.
+- **Solution**: Select it and look for a position or size that's a plain number where a name should be.
+- **Why**: Only boxes containing a parameter name follow that parameter.
 
 ## Check your understanding
 

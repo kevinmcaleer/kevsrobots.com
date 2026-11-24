@@ -12,7 +12,7 @@ description: Keep a history of your MicroPython project with Snakie's built-in S
 percent: 66
 duration: 6
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to put a project under Git in Snakie, make a commit and see what changed since.
 
 > **Desktop app**: Source Control is in the Snakie desktop app. You also need [Git](https://git-scm.com) installed on your computer.
 
@@ -159,6 +161,8 @@ Git tracks the folder on your **computer**. Files that only exist on the board a
 
 ---
 
+> **Teachers**: Source Control needs the Snakie desktop app and Git installed on the computer. Git needs your name and email set once, so on shared machines decide who sets them, because commits carry that identity. Publishing to GitHub needs a GitHub account, so check your school's rules on learner accounts first.
+
 ## Try it Yourself
 
 1. Initialise a repository in a project folder and make a first commit.
@@ -167,17 +171,17 @@ Git tracks the folder on your **computer**. Files that only exist on the board a
 
 ## Common Issues
 
-**Problem**: Source isn't in the activity bar.
-**Solution**: Use the Snakie desktop app.
-**Why**: Git needs access to your computer's files, which a browser tab doesn't have.
+- **Problem**: Source isn't in the activity bar.
+- **Solution**: Use the Snakie desktop app.
+- **Why**: Git needs access to your computer's files, which a browser tab doesn't have.
 
-**Problem**: The panel doesn't show a change I just made.
-**Solution**: Save the file, then click the **⟳** refresh button at the top of the panel.
-**Why**: Git compares files on disk. An unsaved edit hasn't reached the disk yet.
+- **Problem**: The panel doesn't show a change I just made.
+- **Solution**: Save the file, then click the **⟳** refresh button at the top of the panel.
+- **Why**: Git compares files on disk. An unsaved edit hasn't reached the disk yet.
 
-**Problem**: Commit fails asking who I am.
-**Solution**: Tell Git once, in a terminal: `git config --global user.name "Your Name"` and `git config --global user.email "you@example.com"`.
-**Why**: Every commit records its author.
+- **Problem**: Commit fails asking who I am.
+- **Solution**: Tell Git once, in a terminal: `git config --global user.name "Your Name"` and `git config --global user.email "you@example.com"`.
+- **Why**: Every commit records its author.
 
 ## Check your understanding
 

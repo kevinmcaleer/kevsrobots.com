@@ -4,13 +4,31 @@ title: Installing Pandas and NumPy
 type: page
 description: This lesson guides you through the installation process of Pandas and NumPy, setting the stage for data manipulation tasks in Python.
 cover: /learn/pandas_and_numpy/assets/pandas02.png
+date_updated: 2026-11-24
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}
 
+---
+
+By the end of this lesson you will be able to install Pandas, NumPy and Matplotlib and check that they import.
+
 ## Overview
 
 In this lesson, we will walk through the process of installing Pandas and NumPy. These libraries are essential tools in data manipulation and analysis. We'll ensure you have these tools set up correctly to start exploring the vast functionalities they offer.
+
+---
+
+```mermaid
+flowchart TD
+    A["Run: python --version"] --> B{"3.10 or later?"}
+    B -->|"No"| C["Install a newer Python"]
+    B -->|"Yes"| D["pip install pandas numpy matplotlib"]
+    D --> E{"error: externally-managed-environment?"}
+    E -->|"Yes"| F["Make a virtual environment, then install"]
+    E -->|"No"| G["python -c 'import pandas'"]
+    F --> G
+```
 
 ---
 
@@ -31,10 +49,10 @@ Pandas and NumPy can be easily installed using Python's package manager, pip. If
 Run the following commands in your terminal or command prompt to install Pandas and NumPy:
 
 ```shell
-pip install pandas numpy
+pip install pandas numpy matplotlib
 ```
 
-This downloads and installs the latest versions of Pandas and NumPy from the Python Package Index (PyPI).
+This downloads and installs the latest versions of Pandas, NumPy and Matplotlib (which we use for charts in the visualisation lesson) from the Python Package Index (PyPI).
 
 > ## On a Raspberry Pi or recent Linux
 >
@@ -58,7 +76,7 @@ import numpy as np
 print("Pandas version:", pd.__version__)
 print("NumPy version:", np.__version__)
 {% endcapture %}
-{% include snakie.html code=snakie_code name="installing.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="installing.py" engine="pyodide" packages="numpy,pandas" %}
 
 If the installation was successful, these commands should run without errors, and you will see the installed versions of Pandas and NumPy.
 
@@ -85,6 +103,56 @@ You may prefer to use a Jupyter Notebook, such as the free Google Colaboratory (
 ```
 
 To use Google Colab, you will need a Google account. You can access it here - <https://colab.research.google.com/>.
+
+---
+
+## Try it Yourself
+
+1. Run the version check and write down your Pandas and NumPy versions.
+2. Create a virtual environment called `data-env`, activate it, and install the three libraries inside it. Then use `pip list` to see them.
+3. Challenge: run `python -c "import pandas as pd; print(pd.DataFrame({'robot': ['SMARS']}))"` straight from the terminal, with no script file.
+
+---
+
+## Common Issues
+
+- **Problem**: `pip: command not found`, or pip installs into a different Python from the one you run.
+- **Solution**: Use `python -m pip install pandas numpy matplotlib` (or `python3 -m pip` on Linux and macOS) so pip and Python always match.
+- **Why**: Many computers have several Pythons, each with its own packages. `python -m pip` guarantees the install goes where `python` will look.
+
+- **Problem**: `ModuleNotFoundError: No module named 'pandas'` even though the install said it worked.
+- **Solution**: Check you activated the virtual environment in the terminal that runs your script, and that your editor is using that same interpreter.
+- **Why**: A virtual environment keeps its packages to itself. Outside it, Python cannot see them.
+
+- **Problem**: The install is refused on a school computer.
+- **Solution**: Ask your teacher or IT department, or use Google Colab or the code boxes in this course.
+- **Why**: Many schools block installing software on shared machines.
+
+> **Teachers**: installs are the biggest classroom catch in this course. School machines often lock down `pip` or have no internet access for it, and a virtual environment may be blocked too. Ask IT to preinstall Pandas, NumPy and Matplotlib, or plan the lessons around the browser code boxes or Google Colab (a Google account is needed). Test one machine before the lesson.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why use `python -m pip install` instead of plain `pip install`?
+- [ ] It downloads faster
+- [x] It installs into the same Python that you will run your scripts with
+- [ ] It skips the need for internet access
+> Your computer may have several Pythons. `python -m pip` makes sure pip and Python match.
+
+? What does `externally-managed-environment` tell you on a Raspberry Pi or recent Linux?
+- [ ] Pandas is already installed
+- [x] You should create a virtual environment and install there
+- [ ] Your internet is down
+> The system Python is protected, so installs go in a virtual environment, as shown in the lesson.
+
+? How can you check an installation worked?
+- [ ] Reboot the computer
+- [x] Import the libraries and print their `__version__`
+- [ ] Open the Pandas website
+> If the import runs without an error and the versions print, you are ready.
+{% endquiz %}
 
 ---
 

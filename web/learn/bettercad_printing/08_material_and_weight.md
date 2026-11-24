@@ -12,7 +12,7 @@ description: Choose a material and infill in BetterCad, read the weight estimate
 percent: 72
 duration: 6
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Print It Right with BetterCad
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose a material and infill, read the weight estimate, and explain how it is worked out.
 
 How much filament will this use? Is there enough left on the spool? What will it weigh on the end of a robot arm? BetterCad answers before you slice, with an estimate that's close enough to plan by.
 
@@ -149,17 +151,17 @@ Select a part before and after each change and watch the weight in Properties.
 
 ## Common Issues
 
-**Problem**: The weight shows a dash.
-**Solution**: The body is an imported mesh with gaps in its surface. Repair it, or import a STEP file.
-**Why**: A shape that isn't closed has no volume to measure.
+- **Problem**: The weight shows a dash.
+- **Solution**: The body is an imported mesh with gaps in its surface. Repair it, or import a STEP file.
+- **Why**: A shape that isn't closed has no volume to measure.
 
-**Problem**: My slicer says 30 g and BetterCad said 22 g.
-**Solution**: Check for supports, a brim or more walls in the slicer.
-**Why**: The estimate covers the part alone, with about three walls.
+- **Problem**: My slicer says 30 g and BetterCad said 22 g.
+- **Solution**: Check for supports, a brim or more walls in the slicer.
+- **Why**: The estimate covers the part alone, with about three walls.
 
-**Problem**: Changing infill doesn't change the weight.
-**Solution**: Nothing is wrong. The part is thin enough to be all skin.
-**Why**: Infill only fills what's left inside the walls.
+- **Problem**: Changing infill doesn't change the weight.
+- **Solution**: Nothing is wrong. The part is thin enough to be all skin.
+- **Why**: Infill only fills what's left inside the walls.
 
 ## Check your understanding
 

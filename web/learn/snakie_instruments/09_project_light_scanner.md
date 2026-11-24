@@ -11,9 +11,9 @@ description: Build a servo and light sensor scanner in Snakie that sweeps a half
   measures with three instruments at once, logs to CSV and points at the brightest
   spot
 percent: 90
-duration: 6
+duration: 7
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -53,6 +53,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build a light scanner that sweeps a servo, measures brightness at every angle and turns to face the brightest direction, using three instruments to check your work.
 
 Time to use everything at once. We'll build a scanner: a light sensor on a servo that sweeps half a circle, measures the brightness in every direction, and then turns to face the brightest one.
 
@@ -170,6 +172,8 @@ Break it on purpose and see which instrument tells you.
 | Read `ADC(27)` instead of `ADC(26)` | Multimeter: a reading that ignores the light |
 | Remove `log.close()` | Data View: missing rows |
 {:class="table table-single"}
+
+> **Teachers**: The whole project runs on the simulated device, so it works with no hardware. A real build needs one Pico, one SG90 servo, a photoresistor and a 10 kilohm resistor per group, and groups of two work well. Wire with the Pico unplugged, double-check the servo's power and ground leads before connecting USB, and keep to the voltages the lesson lists.
 
 ---
 

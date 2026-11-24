@@ -4,12 +4,14 @@ description: Add and place pins in the Snakie Part Editor and describe each one 
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/04_pins_types_and_capabilities.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add pins to a part and set each pin's name, type, capabilities and I2C signal so Snakie can wire and check them.
 
 Pins are the heart of a part. Draw them carefully and Snakie can colour the wires, check your circuit and even fill in your code. This lesson is the longest in the course, and the most important.
 

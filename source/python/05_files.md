@@ -1,108 +1,133 @@
 ---
 title: Working with Files in Python
-description: Learn how to read from and write to files in Python, handling both text and binary files.
+description: Read and write text and binary files, and keep a robot's log with the with statement.
 layout: lesson
+type: page
 cover: /learn/python/assets/banners/05_files.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Introduction
-
-Being able to interact with files is an important skill for any programmer. In this lesson, we'll learn how to read from and write to files in Python, including both text and binary files.
+By the end of this lesson you will be able to write and read text files, append to a log, work with binary data, and use `with` so files are always closed.
 
 ---
 
-## Learning Objectives
+Variables vanish when a program stops. Files are how a program remembers things: a robot's log, a list of settings, a high score. In this lesson we will build a tiny robot log file.
 
-- Understand how to open and close files.
-- Understand how to read from and write to text files.
-- Understand how to read from and write to binary files.
-
----
-
-### Opening and Closing Files
-
-You can open a file using the built-in `open()` function. This function returns a file object and is most commonly used with two arguments: `open(filename, mode)`. The `mode` argument is a string that contains multiple characters representing how you want to open the file.
-
-```python
-# Open a file for writing
-f = open("test.txt", "w")
-
-# Always remember to close files
-f.close()
+```mermaid
+flowchart LR
+    P["Your program"] -- "write / append" --> F[("robot_log.txt")]
+    F -- "read" --> P
 ```
 
-The most commonly used modes are:
+## Opening and closing files
 
-- `'r'`: read (default)
-- `'w'`: write (creates a new file or overwrite existing content)
-- `'a'`: append (adds new data to the end of the file)
-- `'b'`: binary mode
-- `'t'`: text mode (default)
-- `'+'`: read and write
+The built-in `open()` function takes a file name and a **mode** and returns a file object. The common modes are:
 
----
+| Mode | Meaning |
+| --- | --- |
+| `'r'` | read (the default) |
+| `'w'` | write: creates the file, or empties it if it exists |
+| `'a'` | append: adds to the end |
+| `'b'` | binary mode, combined with another, such as `'rb'` |
+| `'+'` | read and write |
+{:class="table table-single"}
 
-### Reading and Writing Text Files
+Always close a file when you are finished, so that your data is saved properly.
 
-You can read from a text file using the `read()`, `readline()`, or `readlines()` methods, and you can write using the `write()` or `writelines()` methods.
+## Reading and writing text
+
+Use `write()` to put text in a file and `read()`, `readline()` or `readlines()` to get it back. `write()` does not add a new line for you, so add `\n` yourself.
 
 {% capture snakie_code %}
-# Writing to a file
-f = open("test.txt", "w")
-f.write("Hello, World!")
+f = open("robot_log.txt", "w")
+f.write("Robot started\n")
+f.write("Battery 87 percent\n")
 f.close()
 
-# Reading from a file
-f = open("test.txt", "r")
+f = open("robot_log.txt", "r")
 content = f.read()
 f.close()
 
-print(content)  # Prints "Hello, World!"
+print(content)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="files_1.py" engine="pyodide" %}
 
----
-
-### Reading and Writing Binary Files
-
-You can read from and write to binary files just like text files, but you use the `'b'` mode.
+**Common mistake:** opening with `'w'` when you meant `'a'`. Write mode wipes the existing file first, so your old log is gone. Use `'a'` to add a line to the end:
 
 {% capture snakie_code %}
-# Writing binary data to a file
-data = bytes(range(5))
-f = open("test.bin", "wb")
-f.write(data)
-f.close()
+with open("robot_log.txt", "a") as f:
+    f.write("Obstacle at 12 cm\n")
 
-# Reading binary data from a file
-f = open("test.bin", "rb")
-data = f.read()
-f.close()
-
-print(list(data))  # Prints "[0, 1, 2, 3, 4]"
+with open("robot_log.txt") as f:
+    for line in f:
+        print(line.strip())
 {% endcapture %}
-{% include snakie.html code=snakie_code name="files_2.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="files_1b.py" engine="pyodide" %}
 
----
+Looping straight over the file gives you one line at a time, which also works for huge files. `strip()` removes the newline at the end of each line. Append mode creates the file if it is missing, so this works even on a first run.
 
-### The `with` Statement
+## The with statement
 
-Python provides the `with` statement to make working with files easier and cleaner. It automatically closes the file when you're done with it.
+Forgetting `close()` is easy, and an error halfway through would skip it. The `with` statement closes the file for you as soon as the indented block ends, even if something goes wrong. Use it by default.
 
 {% capture snakie_code %}
-with open("test.txt", "w") as f:
-    f.write("Hello, World!")
+with open("robot_log.txt", "w") as f:
+    f.write("Hello, World!\n")
 
-with open("test.txt", "r") as f:
-    print(f.read())  # Prints "Hello, World!"
+with open("robot_log.txt", "r") as f:
+    print(f.read())
 {% endcapture %}
 {% include snakie.html code=snakie_code name="files_3.py" engine="pyodide" %}
 
+## Binary files
+
+Not every file is text. Images, sound and sensor dumps are raw bytes. Add `'b'` to the mode to read and write bytes.
+
+{% capture snakie_code %}
+data = bytes(range(5))
+
+with open("test.bin", "wb") as f:
+    f.write(data)
+
+with open("test.bin", "rb") as f:
+    data = f.read()
+
+print(list(data))   # [0, 1, 2, 3, 4]
+{% endcapture %}
+{% include snakie.html code=snakie_code name="files_2.py" engine="pyodide" %}
+
+Files you create with a bare name such as `"robot_log.txt"` appear in the folder the program runs from. In the browser Run box they live in a temporary file system and disappear when you refresh.
+
+> **Teachers**: Files saved by browser Run boxes are temporary, so learners will not find them on the computer. To practise saving real files, have learners run the code in Thonny or a terminal, and agree where they save their work, particularly on shared or reset-on-logout machines.
+
 ---
+
+## Try it Yourself
+
+1. Write three lines of your own to a file called `notes.txt`, then read them back and print them.
+1. Run an append example twice, then read the file. Check both lines are there.
+1. Write a function `log(message)` that appends `message` plus a newline to `robot_log.txt`. Call it three times.
+1. Challenge: read `robot_log.txt` and print how many lines it contains.
+
+## Common Issues
+
+- **Problem**: `FileNotFoundError: [Errno 2] No such file or directory`.
+- **Solution**: Check the spelling, and that you are running Python from the folder that holds the file. Opening with `'w'` or `'a'` creates a missing file, `'r'` does not.
+- **Why**: Relative file names are looked up from the folder the program runs in.
+
+- **Problem**: My old data has gone after running the program again.
+- **Solution**: Use mode `'a'` to add to the file. Mode `'w'` starts with an empty file every time.
+- **Why**: Write mode truncates the file on open.
+
+- **Problem**: `TypeError: write() argument must be str, not int`.
+- **Solution**: Convert with `str(value)` or an f-string, such as `f.write(f"{value}\n")`.
+- **Why**: Text files hold strings, not numbers.
+
+## Check your understanding
 
 {% quiz %}
 ? Which mode adds to the end of an existing file without deleting what's there?
@@ -116,12 +141,16 @@ with open("test.txt", "r") as f:
 - [x] It closes the file automatically, even if an error happens
 - [ ] It's the only way to read binary files
 > The `with` statement guarantees the file gets closed when the block ends.
+
+? Which mode would you use to read an image file as raw bytes?
+- [ ] `'r'`
+- [ ] `'w'`
+- [x] `'rb'`
+> Adding `b` switches to binary mode, so you get bytes instead of text.
 {% endquiz %}
 
 ---
 
 ## Summary
 
-You've learned how to work with files in Python, including opening and closing files, reading from and writing to text and binary files, and using the `with` statement for better file handling.
-
----
+You can now save data to files and read it back, in text or binary, and `with` keeps it tidy. Next we will learn how to cope when things go wrong.

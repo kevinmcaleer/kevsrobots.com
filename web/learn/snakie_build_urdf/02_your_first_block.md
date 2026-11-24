@@ -12,7 +12,7 @@ description: Add a box to the robot in Snakie, then size, colour, name and place
 percent: 18
 duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add a box to the robot, then size, colour, name and place it with the properties panel.
 
 ## Three shapes
 

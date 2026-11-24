@@ -10,9 +10,9 @@ next: 04_making_decisions.html
 description: Use variable and maths blocks in Snakie to make a turtle spiral, and
   see how they become Python assignments
 percent: 28
-duration: 4
+duration: 5
 quiz_total: 36
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Blocks - From Blocks to Python
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to make a variable, change it inside a loop to draw a spiral, and read the Python assignment it writes.
 
 A square is the same every time round the loop. To draw something that *changes* as it goes, the program needs to remember a number. That's a variable.
 
@@ -141,13 +143,13 @@ Maths has the sums (`+`, `-`, `×`, `÷`), **random integer**, **round**, and mo
 
 ## Common Issues
 
-**Problem**: `NameError: name 'size' isn't defined`
-**Solution**: Put **set size to** above the loop, so the variable exists before it's used.
-**Why**: Python reads from the top. It can't look in a box that hasn't been made yet.
+- **Problem**: `NameError: name 'size' isn't defined`
+- **Solution**: Put **set size to** above the loop, so the variable exists before it's used.
+- **Why**: Python reads from the top. It can't look in a box that hasn't been made yet.
 
-**Problem**: The spiral is just a square.
-**Solution**: Check the last block in the loop sets `size` to `size + 10`, and that it's inside the repeat.
-**Why**: If `size` never changes, every side is the same length.
+- **Problem**: The spiral is just a square.
+- **Solution**: Check the last block in the loop sets `size` to `size + 10`, and that it's inside the repeat.
+- **Why**: If `size` never changes, every side is the same length.
 
 ## Check your understanding
 

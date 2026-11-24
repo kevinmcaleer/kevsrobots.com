@@ -5,15 +5,28 @@
   level: beginner
   layout: course
   cover: assets/pandas.png
+  outcomes:
+    - Create Pandas Series and DataFrames and select, filter and sort the rows and columns you need
+    - Read and write CSV, Excel and YAML files from Python
+    - Clean messy sensor data by finding gaps, filling or dropping them, and fixing types
+    - Summarise readings with describe, groupby, pivot tables and resampling
+    - Combine tables with concat, merge and join
+    - Chart your data with Pandas and Matplotlib
+  prerequisites:
+    - Python for beginners, or comfort with variables, lists, dictionaries and functions
+  you_need:
+    - A computer that can run Python 3.10 or later, or just a web browser to use the built-in code boxes
+    - Pandas, NumPy and Matplotlib (installed in lesson 2), or a free Google Colab account
+    - A text editor or an IDE such as Thonny or VS Code
   groups:
-    - pandas & numpy
+    - python
   description: >- 
     Learn how to manipulate data using Pandas and Numpy
   content:
   - section:
       name: Overview
       content:
-        - 01_overview.md
+        - 00_intro.md
   - section:
       name: Introduction to Pandas
       content:

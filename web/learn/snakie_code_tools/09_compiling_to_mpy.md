@@ -12,7 +12,7 @@ description: Compile a MicroPython module to a compact .mpy file in Snakie to sa
 percent: 60
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to compile a .py file to .mpy and explain when it is worth doing.
 
 Every time your board starts, MicroPython reads your `.py` files and compiles them to **bytecode** before it can run them. For a large library that takes time and, more importantly, memory. You can do that step once, on your computer, and give the board the result.
 
@@ -155,17 +157,17 @@ Don't compile:
 
 ## Common Issues
 
-**Problem**: The menu says **Compile to .mpy (unavailable)**.
-**Solution**: Open your project as a folder from the Files panel.
-**Why**: The compiler needs a real folder to write the new file into.
+- **Problem**: The menu says **Compile to .mpy (unavailable)**.
+- **Solution**: Open your project as a folder from the Files panel.
+- **Why**: The compiler needs a real folder to write the new file into.
 
-**Problem**: `ValueError: incompatible .mpy file` on the board.
-**Solution**: Update the board's firmware, or recompile after updating Snakie.
-**Why**: The file's bytecode version doesn't match what the firmware expects.
+- **Problem**: `ValueError: incompatible .mpy file` on the board.
+- **Solution**: Update the board's firmware, or recompile after updating Snakie.
+- **Why**: The file's bytecode version doesn't match what the firmware expects.
 
-**Problem**: My changes aren't taking effect.
-**Solution**: Recompile, and upload the new `.mpy`. Check there's no stale copy on the board.
-**Why**: The `.mpy` is a snapshot of the source at the moment you compiled it.
+- **Problem**: My changes aren't taking effect.
+- **Solution**: Recompile, and upload the new `.mpy`. Check there's no stale copy on the board.
+- **Why**: The `.mpy` is a snapshot of the source at the moment you compiled it.
 
 ## Check your understanding
 

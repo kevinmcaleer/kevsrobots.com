@@ -12,7 +12,7 @@ description: Place a hole exactly where you want it with dimensions and sums, th
 percent: 42
 duration: 5
 quiz_total: 39
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Learn BetterCad
 - content:
@@ -60,6 +60,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to place a hole exactly with dimensions, and resize a sketch by editing one number.
 
 A **dimension** is a constraint with a number in it. It's how you tell BetterCad "this hole is 25 mm from that edge" and have it stay true. In this lesson you'll put a screw hole in the 50 × 30 mm plate from the last lesson.
 
@@ -145,17 +147,17 @@ Press <kbd>Enter</kbd> to finish the sketch. If you'd like to keep the plate, ex
 
 ## Common Issues
 
-**Problem**: I clicked a line but BetterCad picked the axis.
-**Solution**: Click the line away from where it crosses an axis.
-**Why**: The axes count as lines you can dimension to, and where two overlap the axis wins.
+- **Problem**: I clicked a line but BetterCad picked the axis.
+- **Solution**: Click the line away from where it crosses an axis.
+- **Why**: The axes count as lines you can dimension to, and where two overlap the axis wins.
 
-**Problem**: I got a diagonal distance when I wanted the distance across.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, pick the two points again, and move the pointer straight below them before you click.
-**Why**: The pointer position chooses between across, up and straight-line.
+- **Problem**: I got a diagonal distance when I wanted the distance across.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, pick the two points again, and move the pointer straight below them before you click.
+- **Why**: The pointer position chooses between across, up and straight-line.
 
-**Problem**: The size box won't take my sum.
-**Solution**: Check for a missing bracket or a stray letter.
-**Why**: Sums can use numbers, `+ - * /`, brackets and parameter names, and nothing else.
+- **Problem**: The size box won't take my sum.
+- **Solution**: Check for a missing bracket or a stray letter.
+- **Why**: Sums can use numbers, `+ - * /`, brackets and parameter names, and nothing else.
 
 ## Check your understanding
 

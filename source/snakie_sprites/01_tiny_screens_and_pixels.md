@@ -4,12 +4,14 @@ description: How small OLED screens and LED matrices work, what a sprite is and 
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/01_tiny_screens_and_pixels.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how a small screen is a grid of pixels, what a sprite is and why one bit per pixel is enough.
 
 ## A screen is a grid of lights
 

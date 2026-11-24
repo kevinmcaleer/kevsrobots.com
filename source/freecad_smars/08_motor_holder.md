@@ -3,11 +3,15 @@ title: Motor Holder
 description: Create the final structural feature - motor mounting tabs and retention cutouts
 layout: lesson
 cover: /learn/freecad_smars/assets/banners/08_motor_holder.jpg
+type: page
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add floor pads and side retention cutouts that hold an N20 motor without screws.
 
 ## What We're Building
 
@@ -21,7 +25,7 @@ The motor holder is the final structural feature of the SMARS base. It consists 
 | Floor pads | Elevate motors to align shafts with wheel stubs |
 | Retention cutouts | Lock motor tabs without screws |
 | Symmetric design | Holds both motors identically |
-{: .table .table-single }
+{:class="table table-single"}
 
 ---
 
@@ -192,6 +196,8 @@ No screws, no glue - just clever geometry!
 
 ---
 
+> **Teachers**: This is the last modelling lesson before printing, so it is a good point for learners to save a named copy of their model and swap files with a partner for a design check against the dimensions in the lessons.
+
 ## Try It Yourself
 
 1. **Visualize assembly**: Imagine sliding an N20 motor into position. Does everything align?
@@ -203,20 +209,48 @@ No screws, no glue - just clever geometry!
 ## Common Issues
 
 ### "Clipping plane won't close"
-**Problem**: The clipping view stays active.
-**Solution**: Go to View → Clipping plane and toggle the active clipping axis. On Mac, the close button may be off-screen - double-click the title bar.
+- **Problem**: The clipping view stays active.
+- **Solution**: Go to View → Clipping plane and toggle the active clipping axis. On Mac, the close button may be off-screen - double-click the title bar.
+- **Why**: The clipping plane is just a view setting, so it stays on until you toggle it.
 
 ### "Pockets cut in wrong direction"
-**Problem**: Cutouts go outward instead of into the wall.
-**Solution**: Check the "Reversed" option in the Pocket dialog, or verify you selected the correct (interior) face.
+- **Problem**: Cutouts go outward instead of into the wall.
+- **Solution**: Check the "Reversed" option in the Pocket dialog, or verify you selected the correct (interior) face.
+- **Why**: The pocket direction depends on the face you chose.
 
 ### "Rectangles aren't aligned"
-**Problem**: Left and right cutouts are at different heights.
-**Solution**: Use the same dimensions for both sides. Consider using Mirror instead of creating separate sketches.
+- **Problem**: Left and right cutouts are at different heights.
+- **Solution**: Use the same dimensions for both sides. Consider using Mirror instead of creating separate sketches.
+- **Why**: Separate sketches can drift apart.
 
 ### "Floor pads don't appear"
-**Problem**: After padding, the floor looks unchanged.
-**Solution**: The pad might be very small. Verify your pad height is at least 1mm. Also check you selected the correct sketch.
+- **Problem**: After padding, the floor looks unchanged.
+- **Solution**: The pad might be very small. Verify your pad height is at least 1mm. Also check you selected the correct sketch.
+- **Why**: A very low pad has almost no visible height.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? How do the SMARS motors stay in place without screws?
+- [ ] Glue on the floor pads
+- [x] Friction fit: floor pads raise the motor and the side cutouts grip its tabs
+- [ ] The wheels hold them
+> Four side cutouts, two per wall, grip the motor tabs.
+
+? How deep are the retention cutout pockets?
+- [ ] 0.5mm
+- [x] 1.5mm
+- [ ] 10mm
+> Just enough to grip without weakening the walls.
+
+? A pocket cuts outwards instead of into the wall. What does the lesson suggest checking?
+- [ ] Only the Reversed option
+- [ ] Only that you selected the interior face
+- [x] The Reversed option in the Pocket dialog, and that you selected the interior face
+> Either can cause it.
+{% endquiz %}
 
 ---
 

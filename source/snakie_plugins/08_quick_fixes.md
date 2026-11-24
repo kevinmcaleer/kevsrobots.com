@@ -4,12 +4,14 @@ description: Attach a one-click quick fix to a Snakie linter warning so the ligh
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/08_quick_fixes.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to attach a one-click quick fix to a linter warning so the lightbulb can repair the code for you.
 
 ## Don't just complain
 

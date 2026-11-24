@@ -22,7 +22,7 @@
     Split a job between its Linux computer and its microcontroller, make Python and
     an Arduino sketch talk over the Bridge, and build the Q Board, a number display
     you drive from Python, a web page and a camera.
-  duration: 2h 16m
+  duration: 2h 21m
   groups:
   - arduino
   - electronics
@@ -39,7 +39,7 @@
   description: Design your own 3D printable parts in BetterCad, the free CAD tool
     that runs in your browser. Sketch, extrude, add screw holes that fit, hollow out
     an enclosure, drive a model with parameters, then build a phone stand from scratch.
-  duration: 1h 13m
+  duration: 1h 15m
   groups:
   - 3ddesign
   - 3dprinting
@@ -54,7 +54,7 @@
     and slider joints in BetterCad, pose them, drag an arm by its tip, check every
     pose for clashes, link joints through gears, and export the lot as URDF. The project
     is a two-joint desk arm.
-  duration: 1h 10m
+  duration: 1h 18m
   groups:
   - 3ddesign
   - robots
@@ -69,7 +69,7 @@
   description: Get parts that fit first time. Set up your printer in BetterCad, catch
     overhangs and thin walls before you print, calibrate holes and fits to your own
     machine, then design a box with a lid that closes just right.
-  duration: 1h 5m
+  duration: 1h 9m
   groups:
   - 3dprinting
   - 3ddesign
@@ -84,7 +84,7 @@
     uses. Drop parts in from BetterCad's robot catalogue, cut their pockets in one
     click, add standoffs and horn mounts, generate gears that mesh, and finish with
     a geared servo deck for a Raspberry Pi Pico.
-  duration: 1h 16m
+  duration: 1h 17m
   groups:
   - 3ddesign
   - 3dprinting
@@ -131,9 +131,10 @@
   date_published: 2023-04-27
   description: Build, program and upgrade BurgerBot, a simple 3D printed robot powered
     by a Raspberry Pi Pico and MicroPython
-  duration: 2h 26m
+  duration: 2h 49m
   groups:
-  - robotics
+  - robots
+  - 3dprinting
   - micropython
   - pico
   lessons: 15
@@ -141,6 +142,24 @@
   link: /learn/burgerbot/00_intro.html
   name: Build your own BurgerBot
   video: 5G6psAuTYT4
+- author: Kevin McAleer
+  cover: /learn/bus_servos/assets/cover.jpg
+  date_published: 2026-11-24
+  description: 'Learn to drive Feetech STS3215 bus servos from a Raspberry Pi Pico.
+    Start with one servo on a single data wire, chain two, record and replay poses
+    by hand, then build Buddy: a six-joint robot arm with calibration, smooth synchronised
+    moves, inverse kinematics and its own web control panel.'
+  duration: 1h 24m
+  groups:
+  - robots
+  - micropython
+  - pico
+  - robotarms
+  lessons: 16
+  level: intermediate
+  link: /learn/bus_servos/00_intro.html
+  name: Bus Servos and the Buddy Robot Arm
+  video: nzBZOTdEdtE
 - author: Kevin McAleer
   cover: /learn/c_pico/assets/cover.jpg
   date_published: 2025-06-16
@@ -176,11 +195,13 @@
 - author: Kevin McAleer
   cover: /learn/docker/assets/docker.jpg
   date_published: 2024-01-21
-  description: Learn how to use Docker to build and deploy applications in a containerised
-    environment.
-  duration: 0h 27m
+  description: Learn how to use Docker on a Raspberry Pi or Linux PC. Build a robot
+    status web app, package it in an image, then run it with Redis, a network and
+    a volume using Docker Compose.
+  duration: 0h 54m
   groups:
-  - docker
+  - raspberrypi
+  - python
   lessons: 11
   level: beginner
   link: /learn/docker/00_intro.html
@@ -283,11 +304,11 @@
     modeling techniques, and design-for-manufacturing principles while building the
     iconic SMARS robot base. Perfect for makers who want to design their own robot
     parts.
-  duration: 1h 6m
+  duration: 1h 20m
   groups:
-  - freecad
-  - 3d modeling
-  - robotics
+  - 3ddesign
+  - 3dprinting
+  - robots
   lessons: 11
   level: beginner
   link: /learn/freecad_smars/00_intro.html
@@ -327,14 +348,15 @@
 - author: Kevin McAleer
   cover: /learn/how_to_install_micropython/assets/cover.jpg
   date_published: 2024-08-10
-  description: Install MicroPython on your Raspberry Pi Pico.
-  duration: 0h 10m
+  description: Work out which Raspberry Pi Pico you have, download the right MicroPython
+    firmware, install it with Thonny or by drag and drop, and check it worked.
+  duration: 0h 29m
   groups:
   - micropython
   - pico
-  lessons: 4
+  lessons: 7
   level: beginner
-  link: /learn/how_to_install_micropython/01_intro.html
+  link: /learn/how_to_install_micropython/00_intro.html
   name: How to install MicroPython
 - author: Kevin McAleer
   cover: /learn/i2c_spi/assets/cover.jpg
@@ -342,11 +364,11 @@
   description: Master I2C and SPI communication protocols on Raspberry Pi Pico. Learn
     to connect sensors, scan for devices, read datasheets, and build real-world projects
     with practical hands-on examples using the BME280 sensor.
-  duration: 1h 56m
+  duration: 2h 29m
   groups:
   - micropython
   - electronics
-  - raspberry pi
+  - pico
   lessons: 14
   level: intermediate
   link: /learn/i2c_spi/00_intro.html
@@ -503,7 +525,7 @@
   date_published: 2022-12-04
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code
-  duration: 0h 48m
+  duration: 1h 27m
   groups:
   - micropython
   - python
@@ -529,6 +551,23 @@
   link: /learn/micropython_gpio/00_intro.html
   name: Raspberry Pi Pico with MicroPython - GPIO Mastery
   video: M-0P6ipVwNU
+- author: Kevin McAleer
+  cover: /learn/micropython_projects/assets/cover.jpg
+  date_published: 2026-11-24
+  description: Take your MicroPython beyond blinking LEDs. Build one desk gadget,
+    a status buddy, that senses a door with a reed switch, shows it on an OLED screen,
+    says it out loud with SAM speech, and reports to Arduino Cloud over Wi-Fi. Then
+    shrink it onto a tiny Seeed XIAO.
+  duration: 1h 18m
+  groups:
+  - micropython
+  - pico
+  - electronics
+  lessons: 17
+  level: beginner
+  link: /learn/micropython_projects/00_intro.html
+  name: MicroPython Projects - Make It Show, Talk and Connect
+  video: K0X4W09tiEA
 - author: Kevin McAleer
   cover: /learn/micropython_robotics/assets/cover.jpg
   date_published: 2025-05-20
@@ -594,6 +633,22 @@
   name: Motors and motor drivers
   projects:
   - /projects/burgerbot/index.html
+- author: Kevin McAleer
+  cover: /learn/n8n_homelab/assets/cover.jpg
+  date_published: 2026-11-24
+  description: Turn a Raspberry Pi into an automation hub with n8n and Docker. Build
+    a homelab robot butler that checks your services on a schedule, listens for readings
+    from a Pico W, tidies the data with a little JavaScript, and tells you when something
+    is wrong.
+  duration: 0h 51m
+  groups:
+  - raspberrypi
+  - productivity
+  lessons: 14
+  level: beginner
+  link: /learn/n8n_homelab/00_intro.html
+  name: Homelab Automation with n8n
+  video: Yds3_vQR5xM
 - author: Kevin McAleer
   cover: /learn/object_model/assets/cover.jpg
   date_published: 2025-12-04
@@ -675,12 +730,12 @@
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
   description: Learn how to manipulate data using Pandas and Numpy
-  duration: 0h 37m
+  duration: 0h 59m
   groups:
-  - pandas & numpy
+  - python
   lessons: 12
   level: beginner
-  link: /learn/pandas_and_numpy/01_overview.html
+  link: /learn/pandas_and_numpy/00_intro.html
   name: Data Manipulation with Pandas and Numpy
   video: kD5r-dph7Lg
 - author: Kevin McAleer
@@ -754,14 +809,17 @@
 - author: Kevin McAleer
   cover: /learn/python/assets/python.png
   date_published: 2023-07-20
-  description: Get started with Python programming, learn why you should  learn Python
-    and how to setup your Python environment.
-  duration: 0h 54m
+  description: 'Get started with Python programming. Install Python, learn the core
+    language (variables, data structures, loops, functions, files, errors, modules
+    and classes), then take a guided tour of what Python does in the real world: web
+    scraping, charts, machine learning, automation and databases. You finish by building
+    a small quiz application.'
+  duration: 1h 44m
   groups:
   - python
   lessons: 18
   level: beginner
-  link: /learn/python/01_intro.html
+  link: /learn/python/00_intro.html
   name: Python for beginners
   video: uRNsqHZEzUM
 - author: Kevin McAleer
@@ -847,11 +905,11 @@
   date_published: 2023-02-19
   description: Learn how to 3D print, assemble, wire up and program the original SMARS
     robot, a small tracked robot powered by an Arduino Uno and a motor shield.
-  duration: 0h 22m
+  duration: 0h 57m
   groups:
-  - smars
-  - robotics
+  - robots
   - arduino
+  - 3dprinting
   lessons: 15
   level: beginner
   link: /learn/smars/00_intro.html
@@ -863,10 +921,9 @@
   description: 'Program your SMARS robot in Arduino C++: drive it around, avoid obstacles
     with an ultrasonic sensor, sense its position, control it over Bluetooth, move
     servos and follow a line.'
-  duration: 0h 42m
+  duration: 1h 4m
   groups:
-  - smars
-  - robotics
+  - robots
   - arduino
   lessons: 8
   level: beginner
@@ -929,7 +986,7 @@
     and watch the real MicroPython appear beside them. Draw with the turtle, drive
     LEDs, buttons, servos and buzzers, then build a reaction timer game and read every
     line of its Python.
-  duration: 1h 1m
+  duration: 1h 6m
   groups:
   - micropython
   - pico
@@ -944,7 +1001,7 @@
   description: Build a robot in 3-D inside Snakie, then make it move. Stack blocks
     into a three-joint desk arm, add hinges, save poses, build an animation, bind
     servos and drive the model from MicroPython on the simulator.
-  duration: 1h 14m
+  duration: 1h 17m
   groups:
   - robots
   - robotarms
@@ -961,7 +1018,7 @@
     hover help, linting and one-click refactors, install packages, compile to .mpy
     and keep your project under Git, then put it all to work on an ultrasonic sensor
     driver.
-  duration: 1h 15m
+  duration: 1h 18m
   groups:
   - micropython
   - pico
@@ -978,7 +1035,7 @@
     workspace to pick parts, wire them to a Raspberry Pi Pico, check the wiring for
     mistakes and print a build guide, then wire and code a two-wheeled obstacle-avoiding
     robot.
-  duration: 1h 2m
+  duration: 1h 7m
   groups:
   - micropython
   - pico
@@ -995,7 +1052,7 @@
   description: Meet Snakie, the robotics-first MicroPython editor. Write and run your
     first programs on the built-in simulator, then find your board, flash MicroPython,
     and build a traffic light on a real Raspberry Pi Pico.
-  duration: 0h 47m
+  duration: 0h 51m
   groups:
   - micropython
   - pico
@@ -1011,7 +1068,7 @@
     plotter, multimeter, oscilloscope and data logger to watch sensors and signals
     live, then scan a room for its brightest spot with a servo and a light sensor
     and log the results to a file.
-  duration: 0h 48m
+  duration: 0h 54m
   groups:
   - micropython
   - pico
@@ -1027,7 +1084,7 @@
   description: Add any sensor, breakout or microcontroller board to Snakie with the
     Part Editor. Draw the board, place its pins, trace a photo, attach a driver and
     give it its own blocks, by building a VL53L0X distance sensor part from scratch.
-  duration: 1h 7m
+  duration: 1h 14m
   groups:
   - electronics
   - micropython
@@ -1044,7 +1101,7 @@
     for a robot club, with commands that read and change code, a linter with one-click
     fixes that catches MicroPython mistakes as you type, and custom blocks for your
     own robot.
-  duration: 1h 9m
+  duration: 1h 10m
   groups:
   - micropython
   - python
@@ -1061,7 +1118,7 @@
     Snakie's Sprite editor, learn how pixels become bytes, then use MicroPython's
     framebuf to make a pair of eyes blink, glance around and react to light on a simulated
     OLED, before moving the same code to a real SSD1306 screen.
-  duration: 1h 11m
+  duration: 1h 13m
   groups:
   - micropython
   - robots
@@ -1087,11 +1144,9 @@
   cover: /learn/sqlite3/assets/database.png
   date_published: 2023-07-15
   description: Learn how to create databases in Python with sqlite3
-  duration: 1h 8m
+  duration: 1h 43m
   groups:
   - python
-  - sqlite3
-  - databases
   lessons: 18
   level: beginner
   link: /learn/sqlite3/00_intro.html

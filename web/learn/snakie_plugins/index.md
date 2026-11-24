@@ -9,11 +9,25 @@ description: Write your own Snakie plugins in plain Python. Build ClubKit, a too
   fixes that catches MicroPython mistakes as you type, and custom blocks for your
   own robot.
 level: intermediate
-course_duration: 1h 9m
+course_duration: 1h 10m
 lesson_count: 13
 first_lesson: 00_intro.html
 quiz_total: 36
 video: QVe9meIHZtk
+outcomes:
+- Create a Snakie plugin and load it into the Plugin Rack
+- Write commands that show messages, update the status bar and edit the open file
+- Write a linter with a one-click quick fix
+- Add your own blocks that generate MicroPython
+- Package a plugin for a club and judge whether a plugin is safe to install
+prerequisites:
+- Getting Started with Snakie
+- Coding Faster in Snakie
+- 'Some Python: functions, loops, strings and import'
+you_need:
+- The Snakie desktop app for Windows, macOS or Linux
+- Python 3 installed on your computer
+- No robot or microcontroller needed
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:

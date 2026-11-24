@@ -4,12 +4,14 @@ description: Switch on the advanced blocks in Snakie for lists and more, and use
 layout: lesson
 type: page
 cover: /learn/snakie_blocks/assets/banners/10_simple_and_advanced_blocks.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to switch on advanced blocks, use lists, and put your own code in a grey Python block.
 
 Snakie starts you with a small set of blocks so the toolbox isn't overwhelming. When you're ready, there's a lot more behind one switch.
 
@@ -119,17 +121,17 @@ Run it in the box and the readings scroll past in the console as `SNK PLOT` line
 
 ## Common Issues
 
-**Problem**: The Python drawer has no blocks in it.
-**Solution**: Turn on **Show advanced blocks**.
-**Why**: The grey blocks are part of the advanced set.
+- **Problem**: The Python drawer has no blocks in it.
+- **Solution**: Turn on **Show advanced blocks**.
+- **Why**: The grey blocks are part of the advanced set.
 
-**Problem**: A grey block has a warning on it.
-**Solution**: Read the sentence. It usually names the missing bracket or quote.
-**Why**: Snakie checks the line as you type.
+- **Problem**: A grey block has a warning on it.
+- **Solution**: Read the sentence. It usually names the missing bracket or quote.
+- **Why**: Snakie checks the line as you type.
 
-**Problem**: `IndentationError` after adding a grey block.
-**Solution**: Put one line in each block, and put lines that belong to a loop inside the loop block.
-**Why**: The blocks do the indenting. Typed spaces at the start of a line confuse it.
+- **Problem**: `IndentationError` after adding a grey block.
+- **Solution**: Put one line in each block, and put lines that belong to a loop inside the loop block.
+- **Why**: The blocks do the indenting. Typed spaces at the start of a line confuse it.
 
 ## Check your understanding
 

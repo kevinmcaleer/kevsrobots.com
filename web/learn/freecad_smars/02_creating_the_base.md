@@ -10,7 +10,9 @@ next: 03_shell_and_fillet.html
 description: Build the foundation of your SMARS robot - a parametric 3D sketch extruded
   into a solid
 percent: 27
-duration: 6
+duration: 8
+quiz_total: 30
+date_updated: 2026-11-24
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
@@ -51,6 +53,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to draw a constrained, centred rectangle in a sketch and pad it into a solid 70mm x 58mm x 32mm block.
+
 ## What We're Building
 
 The SMARS base is a **70mm × 58mm × 32mm** solid block. These aren't random numbers:
@@ -60,7 +64,7 @@ The SMARS base is a **70mm × 58mm × 32mm** solid block. These aren't random nu
 | Length | 70mm | Fits two N20 motors side by side with clearance |
 | Width | 58mm | Matches standard SMARS wheel track width |
 | Height | 32mm | Tall enough for Arduino Nano + batteries |
-{: .table .table-single }
+{:class="table table-single"}
 
 This block becomes the foundation for everything else - we'll hollow it out, add holes, and create mounting features in later lessons.
 
@@ -208,30 +212,63 @@ Your SMARS base is now a solid 70mm × 58mm × 32mm block, perfectly centered on
 
 ---
 
+> **Teachers**: Decide where learners save their `.FCStd` files before you start. Network drives and cloud folders can sync slowly, so a local folder plus a copy on the shared drive at the end of the lesson works well. To share a model, send the `.FCStd` file itself. Allow about 30 to 40 minutes for this lesson.
+
 ## Try It Yourself
 
 1. **Change a dimension**: Double-click the sketch in the Model tree, change 70mm to 80mm. Watch everything adjust!
 2. **Examine the constraints**: In sketch edit mode, notice the green color - that means "fully constrained." Orange or white means under-constrained.
+3. **Challenge**: Change the length back to 70mm and check that the sketch is still centred on the origin and still green.
+
+> **Note**: Button and menu names can differ slightly between FreeCAD versions. If one is labelled differently on your screen, compare it with the screenshot.
 
 ---
 
 ## Common Issues
 
 ### "My sketch is orange/white, not green"
-**Problem**: The sketch isn't fully constrained.
-**Solution**: Add more constraints. Common missing ones: fixing one corner position, or constraining the center to origin.
+- **Problem**: The sketch isn't fully constrained.
+- **Solution**: Add more constraints. Common missing ones: fixing one corner position, or constraining the center to origin.
+- **Why**: Green appears only when every part of the sketch is fixed, so something is still free to move.
 
 ### "The Pad button is grayed out"
-**Problem**: Nothing is selected, or you're not in Part Design workbench.
-**Solution**: Click on your sketch in the Model tree, ensure you're in Part Design workbench.
+- **Problem**: Nothing is selected, or you're not in Part Design workbench.
+- **Solution**: Click on your sketch in the Model tree, ensure you're in Part Design workbench.
+- **Why**: Pad needs a sketch to work on, and the toolbar belongs to the Part Design workbench.
 
 ### "My rectangle isn't the size I specified"
-**Problem**: Dimensions didn't apply correctly.
-**Solution**: Double-click the sketch to edit it, use the Dimension tool to set/verify each dimension.
+- **Problem**: Dimensions didn't apply correctly.
+- **Solution**: Double-click the sketch to edit it, use the Dimension tool to set/verify each dimension.
+- **Why**: Dimensions typed while drawing can be replaced or missed by later constraints.
 
 ### "I can't select the origin point"
-**Problem**: The origin is hard to see or click.
-**Solution**: Zoom in on where the axes cross. The origin appears as a small point where the green and red lines meet.
+- **Problem**: The origin is hard to see or click.
+- **Solution**: Zoom in on where the axes cross. The origin appears as a small point where the green and red lines meet.
+- **Why**: The origin is tiny at the default zoom.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does a fully constrained sketch look like in FreeCAD?
+- [ ] Orange
+- [ ] White
+- [x] Green
+> Green means every part of the sketch is fixed. Orange or white means it is under-constrained.
+
+? Why do we draw both diagonals and make them construction geometry?
+- [ ] They become the walls of the base
+- [x] Their crossing point is the exact centre of the rectangle, and construction lines guide us without becoming part of the shape
+- [ ] They make the Pad button work
+> The diagonals cross at the centre, which we then lock to the origin.
+
+? What does the Pad operation do?
+- [ ] Cuts a hole into a solid
+- [x] Pushes a 2D sketch out into a 3D solid
+- [ ] Rounds the edges of a solid
+> We padded the sketch by 32mm to make the block.
+{% endquiz %}
 
 ---
 

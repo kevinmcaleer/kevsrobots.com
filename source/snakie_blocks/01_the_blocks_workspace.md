@@ -4,12 +4,14 @@ description: Find your way around the Snakie Blocks workspace, the toolbox and t
 layout: lesson
 type: page
 cover: /learn/snakie_blocks/assets/banners/01_the_blocks_workspace.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find your way around the Blocks workspace and switch to the split view to see blocks and Python together.
 
 Before we build anything, let's look at where everything lives.
 
@@ -93,13 +95,13 @@ At the bottom left of the canvas is a box that says **What block is this? Drop o
 
 ## Common Issues
 
-**Problem**: I can't see the Python.
-**Solution**: Click the dot between **Blocks** and **Code** at the top of the window.
-**Why**: Blocks on its own hides the code pane. The dot is the halfway stop that shows both.
+- **Problem**: I can't see the Python.
+- **Solution**: Click the dot between **Blocks** and **Code** at the top of the window.
+- **Why**: Blocks on its own hides the code pane. The dot is the halfway stop that shows both.
 
-**Problem**: A drawer is missing blocks I've seen in a screenshot.
-**Solution**: Turn on **Show advanced blocks** under the toolbox.
-**Why**: Snakie starts with the simple set. We'll meet the advanced ones in a later lesson.
+- **Problem**: A drawer is missing blocks I've seen in a screenshot.
+- **Solution**: Turn on **Show advanced blocks** under the toolbox.
+- **Why**: Snakie starts with the simple set. We'll meet the advanced ones in a later lesson.
 
 ## Check your understanding
 

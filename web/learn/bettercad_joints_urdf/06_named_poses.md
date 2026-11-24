@@ -10,9 +10,9 @@ next: 07_drag_the_arm_by_its_tip.html
 description: Save the positions that matter in BetterCad as named poses, go back to
   them in a click and update them later
 percent: 49
-duration: 4
-quiz_total: 39
-date_updated: 2026-11-21
+duration: 5
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -63,6 +63,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to save the positions that matter as named poses, go back to them in a click, and update them later.
+
 Some positions matter more than others. Folded up for the shelf. Reaching out as far as it goes. Gripper over the pen pot. You'll come back to these again and again, to check clearances, to take a screenshot, to show someone how it works.
 
 A **named pose** saves every joint's angle under a name.
@@ -88,6 +90,13 @@ Now a second one:
 ![The Poses folder with Home, Reach and Folded](/learn/bettercad_joints_urdf/assets/poses.jpg){:class="img-fluid w-100"}
 
 ---
+
+```mermaid
+flowchart LR
+    H["Home: every joint at zero"] <-->|"Go to"| R["Reach: Shoulder 40, Elbow 60"]
+    R <-->|"Go to"| F["Folded: Shoulder -60, Elbow -90"]
+    F <-->|"Go to"| H
+```
 
 ## Go to a pose
 

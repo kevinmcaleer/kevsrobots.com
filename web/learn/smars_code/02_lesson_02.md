@@ -9,8 +9,9 @@ previous: 01_lesson_01.html
 next: 03_lesson_03.html
 description: Learn how to make your robot turn left and right
 percent: 36
-duration: 5
-quiz_total: 17
+duration: 9
+quiz_total: 21
+date_updated: 2026-11-24
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:
@@ -44,6 +45,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to make SMARS go backwards and turn on the spot, and drive it from your keyboard using the Serial Monitor and a `switch` statement.
 
 ## What you'll learn
 
@@ -214,7 +217,7 @@ while (Serial.available()) {
   delay(2000);
 ```
 
-We can now open the Serial monitor from the Tools menu, and begin typing any of the four direction commands 'w','s','a','d' and return to move the SMARS in any of the four directions.
+We can now open the Serial monitor from the Tools menu, set the speed box at the bottom to `9600 baud` so it matches `Serial.begin(9600)`, and begin typing any of the four direction commands 'w','s','a','d' and return to move the SMARS in any of the four directions.
 
 ![Serial Monitor Menu Screenshot](assets/serial_monitor_menu.png){:class="img-fluid w-50"}
 
@@ -223,6 +226,74 @@ We can now open the Serial monitor from the Tools menu, and begin typing any of 
 ### The Serial Monitor
 
 ![Serial Monitor Screenshot](assets/serial_monitor.png){:class="img-fluid w-50"}
+
+---
+
+### The complete sketch
+
+Here is everything together, so you can check your own sketch against it. It is lesson 01's code with the three new functions added, `Serial.begin(9600);` in `setup()`, and the new `loop()`.
+
+```arduino
+// Lesson 02 Turning
+// SMARS keyboard control over the Serial Monitor
+
+int motor_A = 12;
+int motor_B = 13;
+int motor_A_speed = 10;
+int motor_B_speed = 11;
+
+int wait_in_milliseconds = 1000;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(motor_A, OUTPUT);
+  pinMode(motor_B, OUTPUT);
+}
+
+// set both motor directions, run for a while, then stop
+void drive(int dirA, int dirB) {
+  digitalWrite(motor_A, dirA);
+  digitalWrite(motor_B, dirB);
+  analogWrite(motor_A_speed, 255);
+  analogWrite(motor_B_speed, 255);
+  delay(wait_in_milliseconds);
+  analogWrite(motor_A_speed, 0);
+  analogWrite(motor_B_speed, 0);
+}
+
+void forward()   { drive(LOW, HIGH); }
+void backward()  { drive(HIGH, LOW); }
+void turnLeft()  { drive(LOW, LOW); }
+void turnRight() { drive(HIGH, HIGH); }
+
+void loop() {
+  while (Serial.available()) {
+    char c = Serial.read();
+    switch (c) {
+      case 'w':
+        Serial.println("Moving Forward");
+        forward();
+        break;
+      case 's':
+        Serial.println("Moving Backward");
+        backward();
+        break;
+      case 'a':
+        Serial.println("Turning Left");
+        turnLeft();
+        break;
+      case 'd':
+        Serial.println("Turning Right");
+        turnRight();
+        break;
+    }
+  }
+  // wait 2 seconds
+  delay(2000);
+}
+```
+
+This version folds the four near-identical functions into one helper called `drive()` that takes the two directions as parameters. The behaviour is identical to the longer functions above, just shorter to type. You will see the same trick again in the Bluetooth lesson.
 
 ---
 
@@ -250,11 +321,31 @@ The last line `break;` means stop running through the `case` statements.
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
 1. Change `wait_in_milliseconds` to `250` so each key press moves the robot a shorter distance.
-2. Add a new key, `x`, that stops the robot.
-3. Challenge: add `q` and `e` keys that turn the robot by a smaller amount.
+2. Add a new key, `x`, that stops the robot (hint: you do not need to drive at all, just print a message).
+3. Challenge: add `q` and `e` keys that turn the robot by a smaller amount. You could make a short turn by calling `turnLeft()` with a shorter wait.
+
+> **Teachers**: The Serial Monitor needs one computer per robot, so pairs work best. Learners often type several letters at once and are surprised when SMARS keeps going for several seconds, because each key press runs for a full second and the `delay(2000)` at the end of `loop()` adds more. Ask them to press one key at a time and wait. Keep the robot on the floor or a tray with edges, and keep the USB cable slack so it does not drag the robot.
+
+## Common Issues
+
+- **Problem**: Typing `w` in the Serial Monitor does nothing.
+- **Solution**: Check the baud rate box in the Serial Monitor says `9600`, that `Serial.begin(9600);` is in `setup()`, and that you pressed Enter or the Send button.
+- **Why**: The Serial Monitor and the sketch must agree on the speed, and the letters are only sent when you send the line.
+
+- **Problem**: SMARS turns the wrong way when you press `a` or `d`.
+- **Solution**: Swap the two `drive()` calls in `turnLeft()` and `turnRight()`, or swap the motor wires.
+- **Why**: Left and right depend on which motor is called A and which way the chassis faces.
+
+- **Problem**: The robot keeps moving after you stop typing.
+- **Solution**: Wait for it to finish. Each character you sent is queued up and runs one after another.
+- **Why**: The Serial Monitor sends every letter into a queue, and `while (Serial.available())` works through them in order.
+
+- **Problem**: Verify says `'forward' was not declared in this scope`.
+- **Solution**: Make sure the movement functions are in your sketch above the `loop()` that calls them.
+- **Why**: The functions in the sketch must exist before they are used, or be added to the same file.
 
 ## Check your understanding
 
@@ -270,4 +361,10 @@ The last line `break;` means stop running through the `case` statements.
 - [ ] Stops the robot
 - [ ] Restarts the Arduino
 > Without `break;` the code would carry on into the next `case` as well.
+
+? Which line must be in `setup()` for the Serial Monitor to receive anything from SMARS or send it keys?
+- [ ] `pinMode(motor_A, OUTPUT);`
+- [x] `Serial.begin(9600);`
+- [ ] `Serial.read();`
+> `Serial.begin(9600);` starts the serial port. The Serial Monitor must be set to the same 9600 baud.
 {% endquiz %}

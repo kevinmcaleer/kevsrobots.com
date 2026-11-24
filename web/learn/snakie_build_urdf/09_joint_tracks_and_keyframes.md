@@ -12,7 +12,7 @@ description: Take fine control of a robot motion in Snakie with joint tracks, ke
 percent: 60
 duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use joint tracks, keyframes and easing for finer control of a motion.
 
 ## A second way to animate
 

@@ -10,6 +10,19 @@
       - pico
   description: >-
     Meet Snakie, the robotics-first MicroPython editor. Write and run your first programs on the built-in simulator, then find your board, flash MicroPython, and build a traffic light on a real Raspberry Pi Pico.
+  outcomes:
+    - Open Snakie in a browser or install the desktop app
+    - Write, run and stop a MicroPython program on the simulator
+    - Use the REPL to try out one line at a time
+    - Find your board and put MicroPython onto it
+    - Connect a real board and save a program to it as main.py so it runs at power-up
+    - Build a traffic light on a Raspberry Pi Pico
+  prerequisites:
+    - None. No coding experience needed
+  you_need:
+    - A computer with a browser (Chrome or Edge to use a real board)
+    - For the hardware lessons, a Raspberry Pi Pico and a USB data cable
+    - For the project, a breadboard, three LEDs, three 330 ohm resistors and four jumper wires
   content:
   - section:
       name: Overview

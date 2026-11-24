@@ -12,7 +12,7 @@ description: Search a MicroPython file and change many places at once with Snaki
 percent: 24
 duration: 4
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find and replace names across a file safely, one at a time or all at once.
 
 Sooner or later you'll want to change the same thing in six places. Doing it by hand means missing one. This is what Find and Replace is for.
 
@@ -131,17 +133,17 @@ Search isn't only for changing things. <kbd>Ctrl</kbd>+<kbd>F</kbd>, type `sleep
 
 ## Common Issues
 
-**Problem**: Replace all changed things I didn't mean to change.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, then switch on **Aa** and **\|ab\|** and try again.
-**Why**: Without them, a short search term matches inside longer names.
+- **Problem**: Replace all changed things I didn't mean to change.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, then switch on **Aa** and **\|ab\|** and try again.
+- **Why**: Without them, a short search term matches inside longer names.
 
-**Problem**: It says no matches, but I can see the word.
-**Solution**: Check **Aa** isn't on when the capitals differ, and that there's no stray space in the Find box.
-**Why**: With match case on, `Pin` and `pin` are different words.
+- **Problem**: It says no matches, but I can see the word.
+- **Solution**: Check **Aa** isn't on when the capitals differ, and that there's no stray space in the Find box.
+- **Why**: With match case on, `Pin` and `pin` are different words.
 
-**Problem**: I lost the Find window.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>F</kbd> again.
-**Why**: On the desktop it's a separate window, and it can slip behind the main one.
+- **Problem**: I lost the Find window.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>F</kbd> again.
+- **Why**: On the desktop it's a separate window, and it can slip behind the main one.
 
 ## Check your understanding
 

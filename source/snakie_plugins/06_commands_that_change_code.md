@@ -4,12 +4,14 @@ description: Use the edit action in a Snakie plugin to rewrite the open file, an
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/06_commands_that_change_code.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use the edit action to rewrite the open file, and follow the rules for commands that change code safely.
 
 ## From reading to writing
 

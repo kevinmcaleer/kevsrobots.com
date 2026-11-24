@@ -11,7 +11,7 @@ description: Design 3D printed robot parts around real servos, boards and gears 
 percent: 7
 duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Design Robot Parts with BetterCad
 - content:
@@ -121,6 +121,8 @@ The course's two files are here if you want them:
 BetterCad is in alpha and changes quickly. If a button has moved since these screenshots were taken, press <kbd>Ctrl</kbd>+<kbd>K</kbd> and type its name.
 
 ---
+
+> **Teachers**: this course suits learners who have finished Learn BetterCad, and ideally Print It Right, because the pockets and holes rely on a calibrated printer. Each lesson covers one tool, and the project is the longest, so give it a session of its own. Every lesson can be done on screen with just a computer, a recent browser and a mouse, with no install or account. To build the project for real, each group needs one SG90 micro servo with its horns and screws, one Raspberry Pi Pico, a few M2 screws, one M3 screw about 20 mm long and a pair of callipers, plus printer time. Sharing one set of kit per group keeps the cost down. BetterCad is in alpha, so check a lesson before class in case a button has moved.
 
 ## Try it Yourself
 

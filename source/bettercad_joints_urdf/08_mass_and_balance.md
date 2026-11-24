@@ -4,12 +4,14 @@ description: Read the mass and centre of mass of each moving part in BetterCad a
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/08_mass_and_balance.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the mass and centre of mass of each moving part, and enter datasheet masses for bought parts.
 
 A servo doesn't care how nice your arm looks. It cares how heavy the arm is and how far that weight sits from the shaft. Get it wrong and the shoulder servo buzzes, gets hot, and drops the arm when you switch it on.
 

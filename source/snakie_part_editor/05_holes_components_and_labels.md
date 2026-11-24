@@ -4,12 +4,14 @@ description: Add mounting holes, component shapes and text labels to a part in t
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/05_holes_components_and_labels.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add mounting holes, a component body and text labels to a part, and control the order they are drawn in.
 
 Your part works already: it has a size and six pins. This lesson makes it *look* like the real thing, which matters more than you'd think. On a busy breadboard you find a part by its shape.
 
