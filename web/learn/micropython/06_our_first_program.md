@@ -7,9 +7,11 @@ cover: /learn/micropython/assets/micropython.jpg
 date: 2022-12-04
 previous: 05_ides.html
 next: 07_hello_world.html
-description: "\u2018Hello World\u2019 - its a tradition"
+description: Hello World, it's a tradition
 percent: 40
-duration: 3
+duration: 4
+quiz_total: 57
+date_updated: 2026-11-24
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -70,75 +72,112 @@ navigation:
 
 ![Cover photo of a duckling running on grass](assets/hello_world.jpg){:class="cover"}
 
-Lets create a simple program that will display the message ‘Hello World’[^1].
+---
 
-First, here is the code, type this into your MicroPython editor:
+By the end of this lesson you will be able to write and run a program that prints a message, and explain what `print`, brackets and quotes do.
+
+Let's create a simple program that will display the message 'Hello World'[^1].
+
+First, here is the code. Type this into your MicroPython editor:
 
 {% capture snakie_code %}
-print ("Hello World!")
+print("Hello World!")
 {% endcapture %}
 {% include snakie.html code=snakie_code name="our_first_program.py" %}
 
-When we run this, we will see the following printed to our screen (also refered to as the console):
+When we run this, we will see the following printed to the screen (also referred to as the console or shell):
 
 ``` bash
 Hello World!
 ```
 
-To run this in Thonny, click the green `run` button:
+To run it in Thonny, click the green `run` button. In Snakie, click `Run`.
 
 ![picture of run button](assets/run.png){:class="img-fluid w-100 shadow-lg"}
 
-As you can see this is a very simple piece of code. The word `print` is a special word that Python understands. Python expects a line of text between the brackets, inside of the speech marks.
+Congratulations, you're now a MicroPython programmer!
 
-Notice that the `print` command is in lowercase; typing `Print` or `PRINT` will result in an error message.
+## Anatomy of the line
 
-We call this case sensitive; we need to ensure that the commands we type are in the correct case for Python to work properly.
+```mermaid
+flowchart LR
+    A["print"] --> B["( )"] --> C["quotes"] --> D["Hello World!"]
+```
 
-Congratulations, you’re now a MicroPython programmer!
+* `print` is a **function**, a named block of code that is built in to MicroPython, so it already knows how to show things
+* The brackets `( )` tell MicroPython to run the function now. What goes inside is what the function should work on
+* The speech marks (quotes) mark where the text `starts` and `ends`. Text in a program is called a `string`
 
----
+You can use single quotes `' '` or double quotes `" "`, as long as you open and close with the same kind. Double quotes are a good habit, because they let you write an apostrophe inside your message: `print("It's alive!")`.
 
-> ## Note
->
-> The pound (or hash) symbol `#` means the reset of the line is a comment
-> MicroPython ignores comments, so you can type useful reminders or notes to others here:
->
-> ```python
-> # a single line comment
->```
->
-> For comments that span multiple lines, you can use 3 double quotations:
->
-> ```python
-> """ This is a multi -
-> line comment """
-> ```
-{:class="blockquote bg-blue"}
+## Case sensitive
 
----
+Notice that `print` is lowercase. Typing `Print` or `PRINT` gives an error message. We say MicroPython is `case sensitive`, so `print`, `Print` and `PRINT` are three different names, and only the first one exists.
 
-## Why Print?
+## Why print?
 
-But why do we use the word `print`? It doesn’t come out of my printer?
+It doesn't come out of my printer? Back in the early days of computing there were no screens, just an electronic typewriter called a `teleprinter` or `teletype` machine, which would `print` out the results of programs. That is also why serial devices in Unix have names starting with `TTY`. The name stuck, even though it now prints to the screen.
 
-Back in the early days of computing there were no screens, just a form of electronic typewriter that would `print` out the results of programs running on the attached computer. These terminals were called `teleprinters` or `teletype` machines which is why serial devices in Unix have the prefix `TTY`. A lot of computing stems from these early days and still remains in some form.
+## Comments
 
-We put the `hello world` message in speech marks so that the computer knows where our message `starts` and `ends`. The speech marks can be either `' ' single` or `" " double` quotes.
+The hash symbol `#` means the rest of the line is a comment. MicroPython ignores comments, so you can leave reminders for yourself and others:
 
-> ## Quotes
->
-> In MicroPython you can use double `" "` or single quotes `' '` when working with text strings,
-> the preferred method is to use double quotes: read the [Black](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#strings) style guide for more background on this. Double quotes anticipate the need for apostrophies within text so it makes sense to use them by default.
+```python
+# this is a single line comment
+print("Robot online")  # a comment can follow code, too
+```
 
-We use the brackets `( )` to tell the computer that we want to run a `function` (a named block of code), the function named `print`.
+For longer notes you can wrap text in triple quotes:
 
-Also notice that the commands are in `lowercase` - no capital letters, this is because MicroPython (and Python) are `case sensitive` meaning the words `print`, `Print` and `PRINT` are not all the same.
+```python
+"""This note
+spans several lines"""
+print("Ready")
+```
 
-The `print` function is built-in to MicroPython, it already knows how to print things, so we don’t have to include any extra commands to make that work
+## Try it Yourself
+
+1. Change the message so your program prints the name of your robot.
+2. Add a second `print` line underneath. In which order do the messages appear?
+3. Print a message that has an apostrophe in it, such as `It's alive!`, in two different ways. Hint: use different quotes.
+4. Challenge: print three lines that draw a tiny robot face using symbols such as `[ o_o ]`.
+
+## Common Issues
+
+- **Problem**: `NameError: name 'Print' isn't defined`.
+- **Solution**: Change `Print` to lowercase `print`.
+- **Why**: MicroPython is case sensitive, so the capital letter makes it a different, unknown name.
+
+- **Problem**: `SyntaxError: invalid syntax` pointing at the end of the line.
+- **Solution**: Check every opening quote and bracket has a matching closing one.
+- **Why**: MicroPython can't tell where your text or function call ends.
+
+- **Problem**: Nothing is printed.
+- **Solution**: Look in the shell or console panel, and check you pressed `Run`.
+- **Why**: Output appears in the console, not in the editor window.
+
+## Check your understanding
+
+{% quiz %}
+? What does `print("Hello")` do?
+- [ ] Sends the word Hello to a paper printer
+- [x] Shows the word Hello in the console
+- [ ] Saves the word Hello in a file
+> `print` displays its input on the screen (the console).
+
+? Why does `Print("Hi")` give an error?
+- [ ] Brackets are not allowed
+- [x] MicroPython is case sensitive, and only lowercase `print` exists
+- [ ] Hi is too short
+> `print`, `Print` and `PRINT` are all different names.
+
+? What does the `#` symbol do in a program?
+- [ ] It prints a hash
+- [x] It starts a comment that MicroPython ignores
+- [ ] It stops the program
+> Everything after `#` on the line is a note for people.
+{% endquiz %}
 
 ---
 
 [^1]: This is a tradition that many programming language tutorials use to help you understand how to write a simple program.
-
----
