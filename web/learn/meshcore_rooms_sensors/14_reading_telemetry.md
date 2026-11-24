@@ -10,7 +10,9 @@ next: 15_troubleshooting.html
 description: Request telemetry from your phone, understand the permissions, and interpret
   what comes back
 percent: 75
-duration: 6
+duration: 8
+quiz_total: 53
+date_updated: 2026-11-24
 navigation:
 - name: MeshCore Room Servers and Sensors
 - content:
@@ -63,6 +65,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to request telemetry from a sensor over the mesh, and explain why some readings come back and others do not.
+
 The sensor is built and wired. Now let's ask it something from the other end of the mesh.
 
 ---
@@ -78,11 +82,7 @@ The request travels across the mesh to the sensor. The sensor wakes, reads its s
 
 **How long should it take?** Seconds, not milliseconds. A direct link answers quickly; two hops through repeaters take longer. If nothing comes back at all, work through the Common Issues below.
 
-From `meshcore-cli`, the equivalent command is:
-
-```text
-req_telemetry
-```
+From `meshcore-cli`, a command-line tool for companion nodes, there is a telemetry request command (`req_telemetry`). Check `meshcore-cli`'s own help for its exact arguments in your version.
 
 ---
 
@@ -92,33 +92,33 @@ Depending on what is wired and what permission you have:
 
 | Reading | Source | Typical permission |
 |---|---|---|
-| Battery voltage | Onboard ADC | Base tier |
+| Battery voltage | Onboard ADC | Always included |
 | Uptime | Firmware status frame | Base tier |
-| Temperature | BME280 or similar | Guest or admin |
-| Humidity | BME280 | Guest or admin |
-| Pressure | BME280 | Guest or admin |
-| Bus voltage and current | INA219 / INA3221 | Guest or admin |
-| Distance | VL53L0X | Guest or admin |
-| Position | GPS module | Admin |
+| Temperature | BME280 or similar | May need permission |
+| Humidity | BME280 | May need permission |
+| Pressure | BME280 | May need permission |
+| Bus voltage and current | INA219 / INA3221 | May need permission |
+| Distance | VL53L0X | May need permission |
+| Position | GPS module | Usually restricted |
 {:class="table table-single"}
 
-**The split is deliberate.** Basic health - is this node alive, is its battery holding up - is available to anyone, because that information helps the whole mesh. Actual measurements, and location in particular, are gated behind permissions.
+**The split is deliberate.** In the sensor source, battery voltage is always added to the reply, and the other readings can be filtered by permission flags. Exactly which reading needs which level depends on your build, so test with a second node rather than trusting the table above as law.
 
 ---
 
 ## Permissions in practice
 
-The sensor checks your permission level before it puts each reading into the response. Same three-tier model as the room server, so if you set up permissions in lesson 7 there is nothing new to learn.
+A sensor can filter readings by permission before it puts them in the response, using the same access-list idea as the room server, so lesson 7 applies.
 
-**To grant someone access to your sensor's readings:**
+**To grant a node a permission level over USB or as an admin:**
 
 ```text
-setperm <their-public-key> 2
+setperm <their-public-key> <level>
 ```
 
-Level 2 is read-write. For a sensor node that effectively means "can see the telemetry".
+The levels are 0 guest, 1 read-only, 2 read-write and 3 admin, as in the CLI reference. Start with the lowest level that shows what you want, and test what the second node can see.
 
-**To keep GPS position private** while still letting people check the node is alive, simply do not grant them a higher level. Battery and uptime remain visible; position does not.
+**To keep a GPS position private,** do not fit a GPS to a node that you cannot trust everyone with, or do not grant higher levels freely. Check what your build exposes before relying on it.
 
 ---
 
@@ -138,13 +138,13 @@ Level 2 is read-write. For a sensor node that effectively means "can see the tel
 
 ## Logging intervals and history
 
-Sensor builds keep a **rolling time-series buffer**, which supports min, max and average queries over a window. That is what lets you ask "what was the lowest temperature overnight?" rather than only "what is it right now?". From `meshcore-cli` the command is `req_mma`.
+Sensor builds keep a **rolling time-series buffer**, which supports min, max and average queries over a window. That is what lets you ask "what was the lowest temperature overnight?" rather than only "what is it right now?". In `meshcore-cli` a min/max/average request command exists (`req_mma`); check its help for arguments.
 
 **Reading is local and cheap.** The node samples its sensors roughly every minute into that buffer, and the shipped example keeps about a day of battery history in five-minute slots. None of that costs airtime - it is all happening on the board.
 
 **Transmitting is what costs.** Which is exactly why the model is pull-based: sample often, transmit only when asked.
 
-**The read interval is compile-time**, not a CLI setting. If you need it different, you are building your own firmware image.
+**The read interval is compile-time**, not a CLI setting (the sensor source defines `SENSOR_READ_INTERVAL_SECS` as 60). If you need it different, you are building your own firmware image.
 
 **The rolling buffer is not an archive.** If you want months of history, log it at the receiving end - see the next lesson.
 
@@ -156,7 +156,7 @@ Sensor builds support **threshold-triggered alerts**: when a reading crosses a l
 
 This is the exception to the pull-based model, and it is the right exception. "Tell me if the greenhouse drops below 2°C" is exactly the sort of thing you want pushed rather than polled.
 
-**The catch:** thresholds live in the firmware source, not in a CLI setting - the shipped examples call something like `alertIf(batt_voltage < 3.4f, ...)` in C++. Changing the limit means building your own image, which puts this in the same territory as lesson 13's route 3.
+**The catch:** thresholds live in the firmware source, not in a CLI setting - the shipped example calls `alertIf(batt_voltage < 3.4f, ...)` and `alertIf(batt_voltage < 3.6f, ...)` in C++. Changing the limit means building your own image, which puts this in the same territory as lesson 13's route 3.
 
 **Use it sparingly when you do get there.** Each alert is an unsolicited transmission. A threshold sitting inside the reading's normal wobble will chatter every time it crosses, which is annoying and expensive in airtime.
 
@@ -175,6 +175,27 @@ The nodes that stay useful are the ones people actually check:
 
 ---
 
+## What a telemetry request looks like
+
+```mermaid
+sequenceDiagram
+  participant P as Phone app
+  participant C as Your companion
+  participant R as Repeater (optional)
+  participant S as Sensor node
+  P->>C: Request telemetry from Greenhouse-Sensor
+  C->>R: Request
+  R->>S: Request
+  S->>S: Read sensors, pack as CayenneLPP
+  S-->>R: Reply
+  R-->>C: Reply
+  C-->>P: Show readings
+```
+
+> **Teachers**: Threshold alerts are a notification, not a safety system: do not rely on them for frost protection, fire, flooding or anything that matters to people or animals. In a school, decide who may request telemetry from shared sensor nodes, and keep any GPS-equipped node's location private.
+
+---
+
 ## Try it Yourself
 
 1. Request telemetry from your sensor and note every value that comes back.
@@ -186,28 +207,43 @@ The nodes that stay useful are the ones people actually check:
 
 ## Common Issues
 
-**Problem**: The telemetry request times out.
+- **Problem**: The telemetry request times out.
+- **Solution**: Confirm you can message the sensor normally first, then check it is powered and in range.
+- **Why**: Telemetry rides on ordinary mesh messaging. If messaging does not work, telemetry cannot.
 
-**Solution**: Confirm you can message the sensor normally first, then check it is powered and in range.
+- **Problem**: I only get battery and uptime.
+- **Solution**: Check your permission level on that node, and confirm `sensor list` on the node itself shows the sensor.
+- **Why**: Either the sensor is not detected, or you are not authorised for gated readings. Checking `sensor list` locally distinguishes the two immediately.
 
-**Why**: Telemetry rides on ordinary mesh messaging. If messaging does not work, telemetry cannot.
+- **Problem**: The historic min/max figures do not match what I just read live.
+- **Solution**: Both are correct - they answer different questions.
+- **Why**: A live telemetry request samples now. A min/max/average query summarises the rolling buffer over a window. If the window includes last night, its minimum will be lower than this afternoon's reading.
 
-**Problem**: I only get battery and uptime.
-
-**Solution**: Check your permission level on that node, and confirm `sensor list` on the node itself shows the sensor.
-
-**Why**: Either the sensor is not detected, or you are not authorised for gated readings. Checking `sensor list` locally distinguishes the two immediately.
-
-**Problem**: The historic min/max figures do not match what I just read live.
-
-**Solution**: Both are correct - they answer different questions.
-
-**Why**: A live telemetry request samples now. A min/max/average query summarises the rolling buffer over a window. If the window includes last night, its minimum will be lower than this afternoon's reading.
-
-**Problem**: My alerts fire constantly.
-
-**Solution**: Move the threshold further from the normal operating range.
-
-**Why**: A threshold sitting inside the reading's normal wobble triggers every time it crosses, which on a noisy measurement is very often.
+- **Problem**: My alerts fire constantly.
+- **Solution**: Move the threshold further from the normal operating range.
+- **Why**: A threshold sitting inside the reading's normal wobble triggers every time it crosses, which on a noisy measurement is very often.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why does reading sensors locally cost far less than transmitting?
+- [x] Local reads use no airtime and little power, while transmitting is the costly part
+- [ ] Local reads use the radio
+- [ ] They do not
+> That is why sensors sample about every minute but only transmit on request.
+
+? You only get battery and uptime back. What are the two likely causes?
+- [x] The sensor is not detected, or you lack permission for the other readings
+- [ ] The antenna is too long
+- [ ] The room server is full
+> `sensor list` on the node tells you which.
+
+? Where does the threshold for an alert live?
+- [x] In the firmware source, so changing it means building firmware
+- [ ] In a CLI setting
+- [ ] In the phone app
+> The shipped example hardcodes 3.4V and 3.6V.
+
+{% endquiz %}

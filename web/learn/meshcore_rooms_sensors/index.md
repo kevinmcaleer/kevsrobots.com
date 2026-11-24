@@ -8,9 +8,26 @@ description: Part 2 of the MeshCore series. Build the other two node types - a r
   server that stores messages for people who were out of range, and a sensor node
   that reports temperature, battery and tank levels across kilometres.
 level: intermediate
-course_duration: 1h 37m
+course_duration: 2h 11m
 lesson_count: 17
 first_lesson: 00_intro.html
+quiz_total: 53
+outcomes:
+- Flash, name, password and configure a MeshCore room server
+- Join a room from the app and catch up on posts you missed
+- Apply guest, read-only and admin permissions to a shared room
+- Flash a sensor node and wire a BME280 to its sensor bus
+- Read battery and environment telemetry from across the mesh
+- Choose between supported I2C sensors and custom firmware for level and contact sensing
+prerequisites:
+- Off-Grid Messaging with MeshCore (part one)
+you_need:
+- One or two Heltec WiFi LoRa 32 V3 boards in the right frequency version for your
+  country, with antennas
+- A BME280 I2C breakout and four Dupont jumper wires
+- A USB-C data cable and a computer with Chrome or Edge
+- The MeshCore app on a phone, and a working repeater and companion from part one
+- Optional - an INA219, a VL53L0X and a protected single-cell LiPo
 navigation:
 - name: MeshCore Room Servers and Sensors
 - content:

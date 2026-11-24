@@ -4,11 +4,14 @@ description: What room servers and sensor nodes add to a mesh, and when each is 
 type: page
 layout: lesson
 cover: /learn/meshcore_rooms_sensors/assets/banners/01_beyond_repeaters.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain what a room server and a sensor node add to a plain MeshCore mesh, and decide which one solves a real problem for you.
 
 A repeater and a client give you a working network. So why add anything else? Because a plain mesh has two blind spots, and each of these roles fixes one of them.
 
@@ -90,9 +93,9 @@ That is a real limitation the moment you care about something unattended. Is the
 
 Two things in that table are worth pausing on.
 
-**A room server can also repeat**, using `set repeat on`. The MeshCore community broadly advises against it - you lose admin features and you tie two jobs to one board. Lesson 8 covers why, and what to do instead.
+**A room server can also repeat** on some firmware versions, using `set repeat on`. The official FAQ says this is not recommended or encouraged, and recent builds may reject the command altogether. Lesson 8 covers why, and what to do instead.
 
-**A sensor is a leaf by default.** Sensor firmware ships with forwarding disabled, because sensors are usually the most power-constrained thing on the mesh and forwarding other people's traffic is the fastest way to flatten a battery. You *can* turn it on with `set repeat on` - you almost certainly should not.
+**A sensor is a leaf by default.** Sensor firmware ships with forwarding disabled, because sensors are usually the most power-constrained thing on the mesh and forwarding other people's traffic is the fastest way to flatten a battery. The CLI has a `set repeat` setting, but you almost certainly should not turn it on for a battery node.
 
 ---
 
@@ -102,9 +105,21 @@ Over the rest of this course:
 
 **Lessons 3 to 8** build a room server - flashed, named, passworded, joined from a phone, with permissions set up so your group can post but strangers cannot reconfigure it.
 
+```mermaid
+flowchart LR
+  A[Room server<br/>lessons 3-8] --> C[Capstone<br/>lesson 16]
+  B[Sensor node<br/>lessons 9-14] --> C
+  P[Part 1<br/>repeater + client] --> A
+  P --> B
+```
+
 **Lessons 9 to 14** build a sensor node - flashed, wired to a BME280, reporting temperature, humidity, pressure and battery voltage back to your phone on request.
 
 You can do either half on its own. If you only have one spare board, read both and pick the one that solves a problem you actually have.
+
+---
+
+> **Teachers**: Before anyone transmits, agree the local rules. LoRa uses licence-free bands, but the legal frequency, transmit power and duty cycle differ by country: 868MHz in the UK and EU, 915MHz in the US. Decide as a class who owns the radios and who holds the admin passwords, because a room server is shared infrastructure that outlives the lesson.
 
 ---
 
@@ -118,16 +133,35 @@ You can do either half on its own. If you only have one spare board, read both a
 
 ## Common Issues
 
-**Problem**: I built a room server and nobody uses it.
+- **Problem**: I built a room server and nobody uses it.
+- **Solution**: Check that people actually know the guest password and how to join, and that the room appears in their contact list.
+- **Why**: A room server is invisible until someone logs in. It is not like a channel that just appears - joining is a deliberate step, covered in lesson 6.
 
-**Solution**: Check that people actually know the guest password and how to join, and that the room appears in their contact list.
-
-**Why**: A room server is invisible until someone logs in. It is not like a channel that just appears - joining is a deliberate step, covered in lesson 6.
-
-**Problem**: My sensor never sends me anything.
-
-**Solution**: That is normal. MeshCore telemetry is pull-based - you have to ask.
-
-**Why**: The node reads its sensors locally on a timer, but it only transmits when a client requests telemetry. Silence is the correct, power-saving state. See lesson 9.
+- **Problem**: My sensor never sends me anything.
+- **Solution**: That is normal. MeshCore telemetry is pull-based - you have to ask.
+- **Why**: The node reads its sensors locally on a timer, but it only transmits when a client requests telemetry. Silence is the correct, power-saving state. See lesson 9.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? What is the main gap a room server fills?
+- [x] A plain mesh has no memory, so out-of-range people miss messages
+- [ ] A plain mesh cannot send direct messages
+- [ ] A plain mesh needs the internet
+> Nodes only hear what is on air at the moment, so nothing holds a message for someone who was away.
+
+? When should you choose WiFi over a LoRa sensor?
+- [x] When the spot already has WiFi
+- [ ] When you need readings every few seconds over kilometres
+- [ ] When the sensor has no power
+> WiFi is simpler and faster where it reaches; LoRa is for the places it does not.
+
+? Which role is a leaf node by default, with forwarding off?
+- [x] Sensor
+- [ ] Companion with a phone
+- [ ] Repeater
+> Sensor firmware ships with forwarding disabled to protect the battery.
+
+{% endquiz %}

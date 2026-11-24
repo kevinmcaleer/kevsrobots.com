@@ -4,11 +4,14 @@ description: The three permission tiers, access control lists, and running a roo
 type: page
 layout: lesson
 cover: /learn/meshcore_rooms_sensors/assets/banners/07_permissions.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain the permission levels, grant one node a specific level with the access list, and rotate the guest password.
 
 The moment more than two people use your room, you are running shared infrastructure. This lesson is about the controls MeshCore gives you, and the fact that some of the problem is social rather than technical.
 
@@ -50,7 +53,7 @@ To see the current list:
 get acl
 ```
 
-`get acl` is serial-only on most builds, so you will need USB access to read it back.
+The official CLI reference marks `get acl` as serial only, so you will need USB access to read it back.
 
 **When the ACL is worth the effort:**
 
@@ -67,8 +70,7 @@ get acl
 To set a permission you need the node's public key. The easiest routes:
 
 - Ask them to share their contact from the app - the key travels with it
-- Look at the room's own view of who has logged in
-- Have them run `get public.key` on their own node's console if it has one
+- Have them run `get public.key` on their own node's console over USB serial
 
 **Why keys and not names:** names are just labels and anyone can set any name. The public key is the actual cryptographic identity of the node. Permissions attach to the thing that cannot be faked.
 
@@ -126,7 +128,7 @@ For a typical group room:
 password <a-long-admin-password-only-you-know>
 set guest.password <a-speakable-group-password>
 set allow.read.only off
-set owner.info Kev - kevsrobots.com
+set owner.info <your name or club> - <contact>
 ```
 
 For a public noticeboard:
@@ -135,10 +137,14 @@ For a public noticeboard:
 password <a-long-admin-password-only-you-know>
 set guest.password <a-speakable-group-password>
 set allow.read.only on
-set owner.info Kev - kevsrobots.com
+set owner.info <your name or club> - <contact>
 ```
 
 The only difference is who can read without asking.
+
+---
+
+> **Teachers**: A shared room needs a moderator. Decide who that is, write down what the room is for, and keep the admin key with an adult. Do not let a school room run as an open, read-only noticeboard to the public unless a teacher has agreed what may be posted. Because posts cannot be deleted one by one, the only quick fix for an unsuitable post is a reboot, which clears everything.
 
 ---
 
@@ -152,22 +158,39 @@ The only difference is who can read without asking.
 
 ## Common Issues
 
-**Problem**: `get acl` returns nothing over the air.
+- **Problem**: `get acl` returns nothing over the air.
+- **Solution**: Connect over USB serial.
+- **Why**: The CLI reference lists `get acl` as serial only, and it is a list of who can do what, which is not something to hand out over the radio.
 
-**Solution**: Connect over USB serial.
+- **Problem**: I set someone to admin and now cannot demote them.
+- **Solution**: Connect over USB and use `setperm` with a lower level, or `erase` (serial only, and it wipes everything) and reconfigure from scratch.
+- **Why**: An admin can change permissions, including yours. Grant level 3 sparingly and only to people you would hand the board to.
 
-**Why**: ACL reading is serial-only on most builds, deliberately - it is a list of who can do what, and that is not something to hand out over the radio.
-
-**Problem**: I set someone to admin and now cannot demote them.
-
-**Solution**: Connect over USB and use `setperm` with a lower level, or `erase` and reconfigure from scratch.
-
-**Why**: An admin can change permissions, including yours. Grant level 3 sparingly and only to people you would hand the board to.
-
-**Problem**: Someone is posting nonsense and I want it gone now.
-
-**Solution**: Reboot the room server.
-
-**Why**: Posts live in RAM. A reboot clears the buffer completely - which also clears everything else, so it is a genuinely blunt instrument. Warn the group first if you can.
+- **Problem**: Someone is posting nonsense and I want it gone now.
+- **Solution**: Reboot the room server.
+- **Why**: Posts live in RAM. A reboot clears the buffer completely - which also clears everything else, so it is a genuinely blunt instrument. Warn the group first if you can.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Which permission level number does the guest password grant?
+- [x] 2, read-write
+- [ ] 0, guest
+- [ ] 3, admin
+> Level 0 is the passwordless guest; the guest password gives read-write.
+
+? Why do ACL entries use a public key rather than a node name?
+- [x] Anyone can set any name, but the key is the node's identity
+- [ ] Keys are shorter
+- [ ] Names are encrypted
+> Permissions attach to the thing that cannot be faked.
+
+? What is the quickest way to remove an unsuitable post?
+- [x] Reboot the room server, accepting that all posts are lost
+- [ ] Delete it from the app
+- [ ] Use `setperm`
+> You cannot delete a single post remotely; the buffer is in RAM.
+
+{% endquiz %}

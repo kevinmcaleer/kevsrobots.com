@@ -10,7 +10,9 @@ next: 13_contact_and_level.html
 description: Report cell voltage and charge state from a remote node, and calibrate
   the ADC
 percent: 65
-duration: 7
+duration: 9
+quiz_total: 53
+date_updated: 2026-11-24
 navigation:
 - name: MeshCore Room Servers and Sensors
 - content:
@@ -63,6 +65,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to read a node's battery voltage, calibrate it against a multimeter, and monitor solar current with an INA219.
+
 The most useful sensor on a remote node is not a thermometer. It is the battery gauge. A node that tells you it is at 3.4V and falling gives you a week's warning; a node that just goes quiet gives you a mystery and a walk up a hill.
 
 ---
@@ -71,15 +75,15 @@ The most useful sensor on a remote node is not a thermometer. It is the battery 
 
 Battery voltage needs **no extra hardware**. Every MeshCore node reads its own supply through an onboard ADC, and reports it as basic device telemetry.
 
-On the Heltec V3 the battery voltage arrives on **GPIO1** through an onboard divider.
+On the Heltec V3 the battery voltage is read on **GPIO1** through an onboard divider.
 
-Check it from the console:
+Check it from the USB serial console (the CLI reference lists `stats-core` as serial only):
 
 ```text
 stats-core
 ```
 
-Battery voltage and uptime both appear here. And because battery is treated as basic health data rather than gated telemetry, it is available at a lower permission level than environmental readings - which is exactly right. Anyone should be able to see whether infrastructure is alive.
+It reports battery, uptime, queue length and debug flags. And because battery is treated as basic health data rather than gated telemetry, it is available at a lower permission level than environmental readings - which is exactly right. Anyone should be able to see whether infrastructure is alive.
 
 ---
 
@@ -92,7 +96,7 @@ get adc.multiplier
 set adc.multiplier <value>
 ```
 
-Valid values run from 0.0 to 10.0. The Heltec V3's built-in default is around **5.42**, reflecting the divider fitted to that board.
+Valid values run from 0.0 to 10.0, and 0.0 means "use the board's own value". The Heltec V3 board code defaults to **5.42**, reflecting the divider fitted to that board. The command returns an error on boards that do not support it.
 
 **How to calibrate properly:**
 
@@ -117,7 +121,7 @@ A single-cell LiPo tells you a lot if you know the shape of its discharge curve:
 | 3.7V | Nominal - the long flat middle |
 | 3.6V | ~20%, start paying attention |
 | 3.4V | ~10%, act now |
-| 2.5-3.0V | Protection circuit cuts off, depending on the cell's protection IC |
+| Below about 3.0V | Never run a cell this low: the protection circuit may cut off, and deep discharge damages it |
 {:class="table table-single"}
 
 **The awkward truth about that curve:** LiPo cells spend most of their life between 3.9V and 3.7V. Voltage is a poor guide to remaining capacity in the middle and an excellent one at the ends. Treat 3.6V as your alarm threshold rather than trying to read a percentage.
@@ -130,7 +134,7 @@ A single-cell LiPo tells you a lot if you know the shape of its discharge curve:
 
 The onboard ADC gives you voltage. If you want to know what your solar panel is actually *doing*, you need current as well - and that means an INA-series sensor.
 
-MeshCore supports **INA219, INA226, INA260 and INA3221**.
+MeshCore's sensor driver code supports **INA219, INA226, INA260 and INA3221**, when the matching build flag is enabled. Their default addresses in that code are 0x40 (INA219), 0x44 (INA226), 0x41 (INA260) and 0x42 (INA3221).
 
 | Part | Channels | Good for |
 |---|---|---|
@@ -156,7 +160,7 @@ I2C, exactly like the BME280:
 | VIN- | Load side |
 {:class="table table-single"}
 
-The last two are the difference from a BME280. **The INA measures current by sitting in series with the load**, across an internal shunt resistor. VIN+ goes to the source, VIN- to the thing being powered. Get these the wrong way round and you get negative current readings - which is actually useful for telling charge from discharge.
+The INA219 chip itself runs from 3 to 5.5V (datasheet), but the voltage it measures on VIN+ and VIN- can be up to 26V, so keep your battery and panel within that. The last two pins are the difference from a BME280. **The INA measures current by sitting in series with the load**, across an internal shunt resistor. VIN+ goes to the source, VIN- to the thing being powered. Get these the wrong way round and you get negative current readings - which is actually useful for telling charge from discharge.
 
 Then, as always:
 
@@ -191,9 +195,24 @@ set advert.interval 240
 set flood.advert.interval 168
 ```
 
-Lower transmit power, and advertise as rarely as the ranges allow. Each of these directly reduces transmit time, which is where nearly all the energy goes.
+Lower transmit power (within your legal limits), and advertise as rarely as the ranges allow. Each of these directly reduces transmit time, which is where nearly all the energy goes.
 
-Beyond that, the honest answer is hardware: a **Heltec T114** on nRF52840 idles at a fraction of an ESP32-S3's current draw and is the standard community choice for solar nodes.
+Beyond that, the honest answer is hardware: the nRF52840-based **Heltec T114** is designed for much lower idle current than the ESP32-S3 and is a popular choice for solar nodes. Check its datasheet for numbers.
+
+---
+
+## The power chain on a solar node
+
+```mermaid
+flowchart LR
+  P[Solar panel] --> C[Charge controller<br/>for LiPo]
+  C --> B[Protected LiPo cell]
+  B --> I[INA219<br/>VIN+ to VIN-]
+  I --> H[Heltec V3]
+  H -. "GPIO33/34<br/>I2C" .- I
+```
+
+> **Teachers**: LiPo cells need care. Use only protected single cells, charge them with a charger designed for LiPo (never directly from a bare solar panel), check polarity before connecting, and never charge unattended. Do not short the cell's terminals, and bin any swollen cell safely through a battery recycling point. Measuring with a multimeter is safe at these voltages, but take care not to touch the probes across the terminals.
 
 ---
 
@@ -202,34 +221,59 @@ Beyond that, the honest answer is hardware: a **Heltec T114** on nRF52840 idles 
 1. Run `stats-core` and note the battery voltage. Check it against a multimeter at the terminals. How close is it?
 2. Calibrate `adc.multiplier` if the two disagree by more than a couple of percent.
 3. Unplug USB, let the node run on battery for a day, and check the voltage morning and evening.
-4. Challenge: wire an INA219 in series with a small solar panel and log panel current across a full day. When does your panel actually start producing?
+4. Challenge: wire an INA219 in series with a small solar panel behind a proper charge controller and log panel current across a full day. When does your panel actually start producing? Never connect a bare panel straight to a LiPo.
 
 ---
 
 ## Common Issues
 
-**Problem**: Battery voltage reads zero or wildly wrong.
+- **Problem**: Battery voltage reads zero or wildly wrong.
+- **Solution**: Check `get adc.multiplier` and calibrate against a multimeter.
+- **Why**: The multiplier compensates for a board-specific voltage divider. A wrong value gives a plausible-looking but wrong number.
 
-**Solution**: Check `get adc.multiplier` and calibrate against a multimeter.
+- **Problem**: Voltage reads high on USB and low on battery.
+- **Solution**: That is expected.
+- **Why**: On USB the board is running from the 5V rail through its regulator and the cell is charging. The reading only reflects true battery state when it is actually running from the battery.
 
-**Why**: The multiplier compensates for a board-specific voltage divider. A wrong value gives a plausible-looking but wrong number.
+- **Problem**: My INA219 shows negative current.
+- **Solution**: Swap VIN+ and VIN-, or leave it and remember the sign.
+- **Why**: The INA measures the direction of flow across its shunt. Negative simply means current is flowing the other way - which on a battery channel is exactly how you tell charging from discharging.
 
-**Problem**: Voltage reads high on USB and low on battery.
+- **Problem**: My LiPo is hot, swollen or smells strange.
+- **Solution**: Disconnect it, move it somewhere non-flammable, and do not charge or reuse it.
+- **Why**: Damage, overcharging or a reversed connection can make a LiPo overheat, so treat any swelling as a stop sign.
 
-**Solution**: That is expected.
-
-**Why**: On USB the board is running from the 5V rail through its regulator and the cell is charging. The reading only reflects true battery state when it is actually running from the battery.
-
-**Problem**: My INA219 shows negative current.
-
-**Solution**: Swap VIN+ and VIN-, or leave it and remember the sign.
-
-**Why**: The INA measures the direction of flow across its shunt. Negative simply means current is flowing the other way - which on a battery channel is exactly how you tell charging from discharging.
-
-**Problem**: The node dies overnight even though voltage looked fine at dusk.
-
-**Solution**: Check the reading under load rather than idle, and suspect the cell's capacity rather than its voltage.
-
-**Why**: An aged LiPo holds voltage but not charge. It reads 4.0V, then collapses the moment it is asked for real current.
+- **Problem**: The node dies overnight even though voltage looked fine at dusk.
+- **Solution**: Check the reading under load rather than idle, and suspect the cell's capacity rather than its voltage.
+- **Why**: An aged LiPo holds voltage but not charge. It reads 4.0V, then collapses the moment it is asked for real current.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? The reported voltage is wrong. Which setting do you adjust?
+- [x] adc.multiplier
+- [ ] set tx
+- [ ] advert.interval
+> The multiplier compensates for the board's voltage divider; new = current x (measured / reported).
+
+? An INA219 measures current by sitting...
+- [x] in series with the load, across a shunt resistor
+- [ ] in parallel across the battery
+- [ ] next to the antenna
+> VIN+ goes to the source and VIN- to the load.
+
+? Which tool do you use to compare the node's reading with the true cell voltage?
+- [x] A multimeter at the battery terminals
+- [ ] The OLED brightness
+- [ ] The advert counter
+> Measure the actual cell voltage, then scale the multiplier by measured divided by reported.
+
+? Why should you not connect a bare solar panel directly to a LiPo?
+- [x] It can overcharge the cell, so use a charge controller
+- [ ] It makes the radio quieter
+- [ ] Panels are always 3.3V
+> Cells need controlled charging.
+
+{% endquiz %}

@@ -4,11 +4,14 @@ description: Find the room from your phone, log in, post, and catch up on what y
 type: page
 layout: lesson
 cover: /learn/meshcore_rooms_sensors/assets/banners/06_joining_a_room.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find a room server in the app, log in with the right password, post, and catch up on posts you missed.
 
 The server is configured. Now let's use it - from the companion client you built in part one.
 
@@ -17,7 +20,7 @@ The server is configured. Now let's use it - from the companion client you built
 ## Finding the room
 
 1. Power up the room server and your client node, both with antennas fitted
-2. Open the MeshCore app and connect to your client over Bluetooth
+2. Open the MeshCore app (the official app is called MeshCore on iOS and Android) and connect to your client over Bluetooth; screen names can differ between app versions
 3. Wait for the room server to advert - or hurry it along by running `advert` on the server's console
 4. The room appears in your **contacts list** by name
 
@@ -52,7 +55,7 @@ When you log in, the server compares your **sync point** against its buffer of r
 
 **What that looks like in practice:** you walk back into range after a day away, open the app, tap the room, and a day's worth of posts arrives. No action needed beyond logging in.
 
-**What it does not do:** it will not give you posts older than the buffer. The server holds a fixed number of recent posts - 32 by default - and overwrites the oldest as new ones come in. Two weeks away on a busy room and you will have missed some of it permanently.
+**What it does not do:** it will not give you posts older than the buffer. The server holds a fixed number of recent posts (the FAQ says a login receives the previous 32 unseen messages) and overwrites the oldest as new ones come in. Two weeks away on a busy room and you will have missed some of it permanently.
 
 ---
 
@@ -82,7 +85,25 @@ Nothing stops you running more than one room server, and nothing stops a client 
 
 Each room is a separate node, with its own name, its own passwords, and its own buffer. There is no linking between them - a post to one does not appear in the other.
 
-**The cost of a second room is £15 and a wall socket.** That is often cheaper than trying to make one room serve two purposes.
+**The cost of a second room is another board and a wall socket.** That is often simpler than trying to make one room serve two purposes.
+
+---
+
+## What happens when you log in
+
+```mermaid
+sequenceDiagram
+  participant P as Phone app
+  participant C as Companion node
+  participant R as Room server
+  P->>C: Tap room, enter guest password
+  C->>R: Login with timestamp, sync point, password
+  R-->>C: Reply with permissions and server time
+  R-->>C: Posts newer than your sync point
+  C-->>P: Show missed posts
+```
+
+> **Teachers**: Joining needs a phone with Bluetooth and the MeshCore app installed. Check your school's device and app policy first, because many schools restrict app installs. If phones are not allowed, a teacher-held phone can act as the class client, or learners can read the lesson and walk through the diagram instead. Agree the room's purpose and etiquette before sharing the guest password.
 
 ---
 
@@ -96,28 +117,43 @@ Each room is a separate node, with its own name, its own passwords, and its own 
 
 ## Common Issues
 
-**Problem**: The room never appears in my contacts.
+- **Problem**: The room never appears in my contacts.
+- **Solution**: Compare `get radio` on the server against the client's radio settings, then run `advert` on the server.
+- **Why**: Mismatched frequency, bandwidth or spreading factor is the cause the overwhelming majority of the time. Everything else is a distant second.
 
-**Solution**: Compare `get radio` on the server against the client's radio settings, then run `advert` on the server.
+- **Problem**: I log in and get no history at all.
+- **Solution**: Check the server's clock with `clock`, and sync it if it is wrong.
+- **Why**: Catch-up is driven by timestamps. A server with a wildly wrong clock cannot work out which posts you have already seen.
 
-**Why**: Mismatched frequency, bandwidth or spreading factor is the cause the overwhelming majority of the time. Everything else is a distant second.
+- **Problem**: My login is rejected even with the right password.
+- **Solution**: Check your client's clock, and try again in a minute.
+- **Why**: The server rejects logins whose timestamp is not newer than the last one it recorded from your node. A client clock that has jumped backwards will be refused until it catches up.
 
-**Problem**: I log in and get no history at all.
-
-**Solution**: Check the server's clock with `clock`, and sync it if it is wrong.
-
-**Why**: Catch-up is driven by timestamps. A server with a wildly wrong clock cannot work out which posts you have already seen.
-
-**Problem**: My login is rejected even with the right password.
-
-**Solution**: Check your client's clock, and try again in a minute.
-
-**Why**: The server rejects logins whose timestamp is not newer than the last one it recorded from your node. A client clock that has jumped backwards will be refused until it catches up.
-
-**Problem**: I can read but every post I send fails.
-
-**Solution**: Log out and log back in with the guest password.
-
-**Why**: You joined as a read-only guest. Read-only access looks like a successful join until the first time you try to write.
+- **Problem**: I can read but every post I send fails.
+- **Solution**: Log out and log back in with the guest password.
+- **Why**: You joined as a read-only guest. Read-only access looks like a successful join until the first time you try to write.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? What does the room server compare to decide which posts to send you?
+- [x] Your sync point against its buffer of recent posts
+- [ ] Your phone's battery level
+- [ ] The signal strength
+> On login it sends posts newer than your last sync point, skipping your own.
+
+? You can read the room but every post fails. Why?
+- [x] You joined with no password, as a read-only guest
+- [ ] The antenna is too long
+- [ ] The room is full
+> Read-only access looks like a join until you try to write.
+
+? Why might a login be refused even with the right password?
+- [x] Your clock is behind the last timestamp the server recorded for you
+- [ ] The room has too many posts
+- [ ] The guest password expired
+> The server rejects logins whose timestamp is not newer, a replay protection measure.
+
+{% endquiz %}

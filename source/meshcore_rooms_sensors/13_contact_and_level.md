@@ -4,11 +4,14 @@ description: Doors, water tanks and switches - what works out of the box and wha
 type: page
 layout: lesson
 cover: /learn/meshcore_rooms_sensors/assets/banners/13_contact_and_level.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose between a supported I2C sensor, a GPIO expander and custom firmware for door, level and switch sensing.
 
 "Is the shed door open?" and "how full is the water tank?" are two of the most requested things people want from a remote sensor. This lesson is an honest account of how to get them, because the obvious approach is not the supported one.
 
@@ -30,7 +33,7 @@ The most reliable approach is to reframe the question so a supported I2C part ca
 
 ### Water tank level - VL53L0X
 
-A **VL53L0X** is a time-of-flight distance sensor: it measures how far away a surface is, up to around two metres.
+A **VL53L0X** is a time-of-flight distance sensor: it measures how far away a surface is, up to around two metres according to ST. It sits at I2C address 0x29 and its chip runs from about 2.6 to 3.5V, so feed the breakout from 3V3. It uses an invisible infrared laser (a Class 1 device, safe in normal use), so do not stare into it from close range with magnifying optics.
 
 Mount it in the top of a tank looking down at the water. Distance to the surface *is* the level, inverted. A full tank reads a short distance; an empty one reads the tank's depth.
 
@@ -60,11 +63,9 @@ If the question is really about a growing thing rather than a tank, the **RAK120
 
 ## Route 2: an I2C GPIO expander
 
-If you genuinely need contact closures - several of them, or a specific switch you already have - an I2C GPIO expander like a PCF8574 or MCP23017 puts digital inputs on the bus.
+If you genuinely need contact closures - several of them, or a specific switch you already have - an I2C GPIO expander puts digital inputs on the bus.
 
-**The honest caveat:** the expander must be supported by the firmware build for its pins to show up in `sensor list`. Support for expanders varies between builds and releases. Check `sensor list` with the expander wired before you plan a whole installation around it.
-
-If it is not supported, you are into route 3 - but the hardware you have bought is still the right hardware, which softens the blow.
+**The honest caveat:** the MeshCore driver list we checked (BME280, INA219 and so on) does not include a GPIO expander, so an expander will not show up in `sensor list`. Treat it as part of route 3, where you write the driver yourself. It is still the right hardware for that job.
 
 ---
 
@@ -77,7 +78,7 @@ MeshCore's sensor support is built around a **`SensorManager`** base class. Indi
 1. Clone [the MeshCore repository](https://github.com/meshcore-dev/MeshCore)
 2. Install PlatformIO - the VS Code extension is the easy path
 3. Find the sensor manager for your board
-4. Implement `querySensors()` for your input, respecting the permission flags
+4. Implement `querySensors()` for your input, respecting the permission flags (read how an existing driver does it, and the repository's own docs, rather than copying from this lesson)
 5. Add your build flag and compile for your board
 6. Flash the result
 
@@ -94,7 +95,7 @@ Both are extremely common, and neither is I2C.
 - **DS18B20** is one-wire
 - **DHT22 / AM2302** uses its own proprietary single-wire protocol
 
-Neither is auto-detected. For temperature, a **BME280 costs about the same and works today**, which makes it the sensible choice for this course. Keep the DS18B20 for a project where you are already building firmware - it is a genuinely excellent waterproof probe.
+Neither is auto-detected. For temperature, a **BME280 works today without custom firmware**, which makes it the sensible choice for this course. Keep the DS18B20 for a project where you are already building firmware - it is a genuinely excellent waterproof probe.
 
 ---
 
@@ -106,7 +107,7 @@ Neither is auto-detected. For temperature, a **BME280 costs about the same and w
 | Door open or shut | VL53L0X, route 1 |
 | Soil moisture | RAK12035, route 1 |
 | Temperature outdoors | BME280, route 1 |
-| Several contact switches | GPIO expander, route 2 |
+| Several contact switches | GPIO expander plus custom firmware, routes 2 and 3 |
 | A specific existing switch | Custom firmware, route 3 |
 | Waterproof probe temperature | DS18B20 + custom firmware, route 3 |
 {:class="table table-single"}
@@ -132,7 +133,22 @@ reboot
 sensor list
 ```
 
-You can run the VL53L0X and a BME280 on the same bus at the same time - different addresses, no conflict. A tank monitor that also reports the temperature of the water shed is a nice build.
+This assumes your firmware build has the VL53L0X driver switched on (`ENV_INCLUDE_VL53L0X`). You can run the VL53L0X (0x29) and a BME280 (0x76 or 0x77) on the same bus at the same time - different addresses, no conflict. A tank monitor that also reports the temperature of the water shed is a nice build.
+
+---
+
+## Which route for which sensor?
+
+```mermaid
+flowchart TD
+  Q[What do you need to sense?] --> A{Is it on the supported I2C list?}
+  A -- yes --> R1[Route 1: wire it and reboot]
+  A -- no --> B{Can a supported part answer the question?}
+  B -- yes --> R1b[Reframe it: VL53L0X for level or door]
+  B -- no --> R3[Route 3: write firmware, enable your build flag]
+```
+
+> **Teachers**: Water and electricity do not mix, so keep the electronics well above any water tank, sealed from splash, and powered from USB or a protected LiPo only, never mains. Custom firmware needs a computer with PlatformIO and a free afternoon, so treat route 3 as an extension activity, not a core task.
 
 ---
 
@@ -146,22 +162,39 @@ You can run the VL53L0X and a BME280 on the same bus at the same time - differen
 
 ## Common Issues
 
-**Problem**: My reed switch on a GPIO pin does not appear anywhere.
+- **Problem**: My reed switch on a GPIO pin does not appear anywhere.
+- **Solution**: It will not. Use a supported I2C part, or build custom firmware.
+- **Why**: The stock sensor firmware detects I2C devices from a known list. Arbitrary GPIO pins are not part of that model.
 
-**Solution**: It will not. Use a supported I2C part, or build custom firmware.
+- **Problem**: My VL53L0X readings jump around.
+- **Solution**: Check the lens is clean and dry, and that the target surface is not shiny or angled.
+- **Why**: Time-of-flight sensors need a reflection coming back. Water surfaces, glass and steep angles all scatter the beam.
 
-**Why**: The stock sensor firmware detects I2C devices from a known list. Arbitrary GPIO pins are not part of that model.
-
-**Problem**: My VL53L0X readings jump around.
-
-**Solution**: Check the lens is clean and dry, and that the target surface is not shiny or angled.
-
-**Why**: Time-of-flight sensors need a reflection coming back. Water surfaces, glass and steep angles all scatter the beam.
-
-**Problem**: Two I2C sensors, only one detected.
-
-**Solution**: Check for an address clash, and use the address-select jumper on one breakout.
-
-**Why**: Two devices at the same address on one bus is a genuine collision. Most breakouts have a jumper or a pin to move one of them.
+- **Problem**: Two I2C sensors, only one detected.
+- **Solution**: Check for an address clash, and use the address-select jumper on one breakout.
+- **Why**: Two devices at the same address on one bus is a genuine collision. Most breakouts have a jumper or a pin to move one of them.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Does a reed switch on a spare GPIO pin show up in `sensor list` on the stock firmware?
+- [x] No, the stock firmware only detects I2C parts from a known list
+- [ ] Yes, any pin is scanned
+- [ ] Only if it is on 5V
+> A GPIO input needs custom firmware.
+
+? How can a VL53L0X measure a water tank's level?
+- [x] Mounted at the top looking down, the distance to the surface gives the level
+- [ ] By touching the water
+- [ ] By measuring its temperature
+> A full tank reads a short distance and an empty one reads the depth.
+
+? What is the VL53L0X's I2C address?
+- [x] 0x29
+- [ ] 0x76
+- [ ] 0x40
+> That differs from the BME280 so both can share the bus.
+
+{% endquiz %}
