@@ -7,10 +7,12 @@ cover: /learn/docker_swarm/assets/banners/09_managing-and-scaling-services.jpg
 date: 2024-02-03
 previous: 08_deploying-a-stack.html
 next: 09_rebalancing.html
-description: This lesson covers the essentials of managing and dynamically scaling
-  services within your Docker Swarm cluster to meet demand and ensure high availability.
+description: Scale services up and down, roll out an update and roll it back, and
+  drain a Raspberry Pi node safely for maintenance.
 percent: 60
-duration: 4
+duration: 6
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -54,8 +56,8 @@ navigation:
     content:
     - name: Project Ideas
       link: 13_project-ideas.html
-    - name: Further Resources
-      link: 14_further-resources.html
+    - name: Summary and Next Steps
+      link: 14_summary-and-next-steps.html
 ---
 
 
@@ -63,107 +65,157 @@ navigation:
 
 ---
 
-## Effective Service Management in Docker Swarm
-
-Once you've deployed your application as a stack in Docker Swarm, managing and scaling your services becomes crucial for maintaining performance and availability. Docker Swarm offers built-in tools to help you adjust your services in response to your application's needs. This lesson will guide you through the processes of managing and scaling services within your Docker Swarm cluster.
+By the end of this lesson you will be able to scale a service, roll out and roll back an update, and drain a node so it can be worked on safely.
 
 ---
 
-### Overview of Service Management
+## Scaling a service
 
-Service management in Docker Swarm involves monitoring the state of your services, adjusting configurations, updating images, and scaling services to meet demand. Docker Swarm simplifies these tasks with its declarative model, allowing you to specify desired states for your services which Swarm then maintains.
+Imagine your robot's web dashboard suddenly gets popular. You can add replicas in one command (using the service name, `<stack>_<service>`):
 
----
+```bash
+docker service scale robot_web=6
+```
 
-### Scaling Services
+Swarm starts three more tasks and spreads them across your nodes. Scale back down just as easily:
 
-Scaling services in Docker Swarm can be done manually or automatically (with third-party tools). To manually scale a service:
+```bash
+docker service scale robot_web=3
+```
 
-1. **Identify the Service**: Determine the name or ID of the service you wish to scale. You can list all services in your stack with:
+You can also change `replicas:` in `stack.yml` and run `docker stack deploy` again. Pick one habit and stick with it: if you scale by hand, a later `docker stack deploy` will put the number back to whatever the file says.
 
-   ```sh
-   docker stack services <STACK_NAME>
-   ```
+Swarm does not have built-in auto-scaling. Other tools, or a script that watches a metric and calls `docker service scale`, can do it, but on a small Pi cluster you will usually scale by hand.
 
-1. **Scale the Service**: Adjust the number of replicas (instances) of your service with the `docker service scale` command:
-
-   ```sh
-   docker service scale <SERVICE_NAME>=<NUM_REPLICAS>
-   ```
-
-   Replace `<SERVICE_NAME>` with your service's name and `<NUM_REPLICAS>` with the desired number of replicas.
+Replicas cost memory. Six copies of a heavy app on a 4 GB Pi can run it out of RAM, which is why the `resources: limits:` from lesson 7 matter.
 
 ---
 
-### Updating Services
+## Rolling updates
 
-To update a service, such as changing its image or configuration, you can edit your Docker Compose file and redeploy your stack. Docker Swarm will perform a rolling update, minimizing downtime:
+Say there is a new version of your app. Update the image:
 
-1. **Edit Docker Compose File**: Make the necessary changes to your service's configuration in the Docker Compose file.
-1. **Redeploy the Stack**: Use the `docker stack deploy` command again with the updated Compose file:
+```bash
+docker service update --image nginx:1.27-alpine robot_web
+```
 
-   ```sh
-   docker stack deploy -c docker-compose.yml <STACK_NAME>
-   ```
+Because we set `update_config` in the stack file, Swarm replaces one task at a time (`parallelism: 1`), waits between them and starts each new task before stopping the old one. Visitors never see a gap. Watch it happen with:
 
-   Swarm updates the services based on the changes in the Compose file.
+```bash
+docker service ps robot_web
+```
 
----
+You'll see old tasks marked `Shutdown` and new ones `Running`.
 
-### Draining and Removing Services
+```mermaid
+stateDiagram-v2
+    [*] --> Updating
+    Updating --> Converged: all tasks healthy
+    Updating --> RollbackStarted: new tasks fail
+    RollbackStarted --> RolledBack: old version restored
+    Converged --> [*]
+    RolledBack --> [*]
+```
 
-When you need to remove a service from your stack, you can use the `docker service rm` command. Before removing a service, you may want to drain it to prevent new tasks from being scheduled on it:
+### Rolling back
 
-- **Drain a Service**: Prevent new tasks from being scheduled on a service with:
+Did the new version misbehave? Swarm remembers the previous definition of a service:
 
-  ```sh
-  docker service update --replicas=0 <SERVICE_NAME>
-  ```
+```bash
+docker service rollback robot_web
+```
 
-- **Remove a Service**: Once the service is drained, remove it from your stack with:
-
-  ```sh
-   docker service rm <SERVICE_NAME>
-   ```
-
-- **Drain a node**: To bring a node down safely, you can drain it to prevent new tasks from being scheduled on it, then remove it from the cluster.
-
-   ```bash
-   docker node update --availability drain <NODE_NAME>
-   ```
-
----
-
-### Monitoring Service Health
-
-Monitoring is key to managing services effectively. Docker Swarm offers basic monitoring capabilities through service logs and status commands:
-
-- **View Service Logs**: To troubleshoot issues or monitor activity, view a service's logs with:
-
-  ```sh
-  docker service logs <SERVICE_NAME>
-  ```
-
-- **Check Service Status**: Use `docker service ps <SERVICE_NAME>` to check the status of a service's replicas, including any errors or failures.
+The service returns to the earlier image and settings. With `failure_action: rollback` in the file, Swarm does this for you when new tasks fail their health check.
 
 ---
 
-### Implementing Auto-scaling
+## Draining a node
 
-While Docker Swarm does not natively support auto-scaling, you can integrate third-party tools like Prometheus and Portainer, or use custom scripts that monitor your services and scale them based on metrics like CPU usage, memory consumption, or request load.
+Before you reboot a Pi, change its SD card or fit a fan, move its work elsewhere. This is called **draining**:
+
+```bash
+docker node update --availability drain pi-node3
+```
+
+Swarm stops the tasks on that node and starts replacements on the others. The node stays in the swarm but gets no new tasks. When you are finished:
+
+```bash
+docker node update --availability active pi-node3
+```
+
+Notice that bringing a node back to `active` does **not** move tasks back onto it. That surprise is what the next lesson fixes.
+
+A word of warning from testing this on a single node: if you drain the only node that can run a task (for example a service pinned to it by a placement constraint), the task has nowhere to go and sits in `Pending` until the node is active again. Drain only when other nodes can take over.
 
 ---
 
-### Best Practices for Service Management
+## Removing a service
 
-- **Regularly Update Images**: Keep your service images up-to-date for security and performance improvements.
-- **Monitor Resource Usage**: Ensure your services have enough resources (CPU, memory) and adjust allocations as necessary.
-- **Plan for High Availability**: Deploy critical services with multiple replicas across different nodes to ensure redundancy and high availability.
+```bash
+docker service rm robot_web
+```
+
+Use `docker stack rm` for a whole stack. Setting `--replicas 0` is not draining: it just stops all copies of that service but leaves the service defined.
+
+---
+
+## A short scaling checklist
+
+| You want to | Command |
+| --- | --- |
+| Change the number of copies | `docker service scale robot_web=N` |
+| Update the image | `docker service update --image <image> robot_web` |
+| Undo the last update | `docker service rollback robot_web` |
+| Empty a node for maintenance | `docker node update --availability drain <node>` |
+{:class="table table-single"}
+
+> **Teachers**: Scaling and rolling updates are great to demonstrate live: ask a learner to refresh a page while you update the service. If your classroom Pis are shared, remember that draining a node will interrupt other groups' work on it.
 
 ---
 
-### Summary
+## Try it Yourself
 
-Managing and scaling services are critical aspects of running a successful Docker Swarm cluster. By effectively leveraging Docker Swarm's service management features, you can ensure your applications remain responsive, available, and up-to-date. As your application's needs evolve, continue to adjust your service configurations and scaling strategies to maintain optimal performance and reliability.
+1. Scale `robot_web` to 6, run `docker service ps robot_web` and count tasks per node, then scale back to 3.
+2. Update the image to another nginx tag with `docker service update --image`, and watch the old and new tasks in `docker service ps`.
+3. Run `docker service rollback robot_web` and confirm the image goes back.
+4. Challenge: drain one worker, then count the tasks on the remaining nodes. Then make the node active again. Do the tasks return?
 
 ---
+
+## Common Issues
+
+- **Problem**: After `docker service scale`, the stack goes back to the old replica count on the next deploy.
+- **Solution**: Change `replicas:` in `stack.yml` so the file matches what you want.
+- **Why**: A stack deploy applies the file as the source of truth.
+
+- **Problem**: A drained node's tasks stay `Pending`.
+- **Solution**: Check `docker service ps --no-trunc <service>`. Make sure another node meets the constraints and has memory.
+- **Why**: The scheduler can only place a task where it fits.
+
+- **Problem**: An update hangs on one task.
+- **Solution**: Read `docker service ps` for the error. Fix it, or run `docker service rollback`.
+- **Why**: With `parallelism: 1`, a failing task blocks the whole update by design.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does draining a node do?
+- [ ] Deletes the node from the swarm
+- [x] Moves its tasks to other nodes and stops new ones being placed on it
+- [ ] Reboots the node
+> A drained node stays in the swarm but runs no tasks until it is made active again.
+
+? How do you undo a bad update?
+- [x] `docker service rollback <service>`
+- [ ] `docker service undo`
+- [ ] Re-flash the Pi
+> Swarm remembers the previous service definition and `rollback` restores it.
+
+? Why might a manual `docker service scale` seem to be forgotten?
+- [ ] Swarm ignores scale commands
+- [x] A later `docker stack deploy` restores the replica count from the file
+- [ ] Scaling only lasts one minute
+> The stack file is the source of truth for a stack-deployed service.
+{% endquiz %}

@@ -7,10 +7,12 @@ cover: /learn/docker_swarm/assets/banners/11_cluster-maintenance.jpg
 date: 2024-02-03
 previous: 10_monitoring-tools.html
 next: 12_backup-and-recovery.html
-description: Master the key strategies and practices for maintaining a healthy and
-  efficient Docker Swarm cluster, ensuring long-term stability and performance.
+description: Keep a Raspberry Pi swarm healthy with a safe rolling OS update routine,
+  careful clean-up, log limits, security basics and a node-replacement drill.
 percent: 78
-duration: 3
+duration: 6
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -54,8 +56,8 @@ navigation:
     content:
     - name: Project Ideas
       link: 13_project-ideas.html
-    - name: Further Resources
-      link: 14_further-resources.html
+    - name: Summary and Next Steps
+      link: 14_summary-and-next-steps.html
 ---
 
 
@@ -63,79 +65,157 @@ navigation:
 
 ---
 
-## Best Practices for Docker Swarm Maintenance
-
-Maintaining your Docker Swarm cluster is crucial for ensuring its long-term stability and performance. This lesson outlines essential maintenance tasks, strategies for updating and troubleshooting, and tips for keeping your cluster in top condition.
+By the end of this lesson you will be able to update the OS on each node without taking your services offline, clean up disk space safely, and replace a failed node.
 
 ---
 
-### Regular Software Updates
+## The golden rule: one node at a time
 
-Keeping your Docker engine, Swarm services, and operating system up to date is vital for security, performance, and stability.
+The whole point of a cluster is that it can lose a node and carry on. So update, reboot or repair **one node at a time**, and wait until the cluster is healthy before touching the next.
 
-- **Docker Engine**: Regularly update to the latest version to benefit from security patches, bug fixes, and new features.
-- **Operating System**: Apply security patches and updates to the host OS to protect against vulnerabilities.
+### A rolling OS update
 
----
+For each node in turn, starting with workers:
 
-### Managing Docker Resources
+```mermaid
+flowchart LR
+    A["Drain the node"] --> B["apt update and upgrade"]
+    B --> C["Reboot"]
+    C --> D["Wait: node Ready"]
+    D --> E["Set node active"]
+    E --> F["Check services 3/3"]
+    F --> G["Next node"]
+```
 
-Over time, Docker can accumulate unused images, containers, volumes, and networks, consuming valuable disk space.
+From a manager, drain the node:
 
-- **Prune Unused Docker Objects**: Use Docker's prune commands to remove unused objects:
-  - `docker system prune` to remove unused containers, networks, and images.
-  - `docker volume prune` to remove unused volumes.
+```bash
+docker node update --availability drain pi-node4
+```
 
----
+Then on that Pi itself:
 
-### Monitoring and Logging
+```bash
+sudo apt update
+sudo apt full-upgrade -y
+sudo reboot
+```
 
-Implementing a robust monitoring and logging system helps in identifying and troubleshooting issues promptly.
+Back on the manager, once `docker node ls` shows the node `Ready`:
 
-- **Monitoring**: Use tools like Prometheus and Grafana to monitor resource usage and performance metrics.
-- **Logging**: Aggregate logs using the ELK Stack or similar tools to simplify analysis and troubleshooting.
+```bash
+docker node update --availability active pi-node4
+docker service ls
+```
 
----
+Wait for every service to show its full replica count before doing the next node. Do managers last, and never reboot two managers at once in a three-manager swarm, or you lose quorum.
 
-### Backup and Disaster Recovery
-
-Regular backups of important data, including Docker volumes and configuration files, are essential for disaster recovery.
-
-- **Volume Backups**: Use tools like `rsync` or Docker volume backup solutions to backup data volumes to external storage.
-- **Configuration Backups**: Backup Docker Swarm configurations, including service definitions and Compose files.
-
----
-
-### Node Health and Recovery
-
-Regularly check the health of Docker Swarm nodes and replace failed nodes to ensure the cluster's resilience.
-
-- **Node Health Checks**: Use monitoring tools to track node health and resource usage.
-- **Replacing Failed Nodes**: Automate the process of adding new nodes and decommissioning failed ones to maintain the cluster's capacity and performance.
-
----
-
-### Security Best Practices
-
-Implement security measures to protect your cluster from unauthorized access and vulnerabilities.
-
-- **Secure Docker Daemon**: Use TLS to secure the Docker daemon socket.
-- **Network Security**: Implement firewall rules to restrict incoming traffic to the cluster.
-- **Regular Security Audits**: Use tools like Docker Bench for Security to audit your Docker setup against best practices.
+Docker Engine updates arrive through the same `apt` repository the install script set up, so a full upgrade keeps Docker current too. Try to keep all nodes on the same Docker version.
 
 ---
 
-### Updating Services and Stacks
+## Clean up, carefully
 
-Plan and execute updates to services and stacks carefully to minimize downtime.
+Docker slowly fills the SD card with old images and stopped containers. Look first, then clean:
 
-- **Rolling Updates**: Use Docker Swarm's rolling updates feature to update services without downtime.
-- **Testing in Staging**: Test updates in a staging environment before applying them to production.
+```bash
+docker system df
+docker image prune
+```
+
+`docker image prune` removes dangling (untagged) images. `docker system prune` removes more: stopped containers, unused networks and dangling images, and adding `-a` also removes every image not used by a running container, which means the nodes must pull them again. These commands only act on the node where you run them, so run them on each Pi in turn. Never add `--volumes` unless you are sure: volumes hold your data.
+
+---
+
+## Stop the logs filling the disk
+
+By default each container's log can grow without limit. Cap it on every node by creating `/etc/docker/daemon.json` (with `sudo`):
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+```
+
+Then run `sudo systemctl restart docker`. This keeps at most three 10 MB files per container. It applies to containers created afterwards, so redeploy your services. If you already have an `insecure-registries` entry in that file, merge the two rather than replacing the file.
 
 ---
 
-### Summary
+## Security basics
 
-Effective cluster maintenance involves regular updates, resource management, monitoring, backups, and security measures. By establishing a routine maintenance schedule and utilizing Docker Swarm's built-in features for updates and scaling, you can ensure your cluster remains healthy, secure, and performant over time. Keeping abreast of Docker and industry best practices will further enhance your cluster's stability and efficiency.
+- **Never expose the Docker socket over the network** (port 2375) without TLS. Anyone who can reach it controls the machine.
+- **Limit who can reach the cluster ports** (2377, 7946, 4789) to your cluster's own network.
+- **Rotate join tokens** with `docker swarm join-token --rotate worker` if one leaks.
+- **Autolock the managers**, so the swarm's encryption keys are not readable from a stolen SD card:
+
+```bash
+docker swarm update --autolock=true
+```
+
+Docker prints an **unlock key**. Store it somewhere safe away from the Pis (a password manager). After a manager restarts it stays locked until you run `docker swarm unlock` and enter that key. Lose the key and that manager cannot rejoin.
+
+> **Teachers**: Autolock is a good talking point but makes a classroom cluster fiddly, because every reboot needs a key. Use it as a demonstration on one group's cluster, not by default. Also agree rules for who may power off a shared Pi.
 
 ---
+
+## Replacing a failed node
+
+A node dies. Don't panic: its tasks have already moved. To replace it:
+
+1. On a manager, `docker node ls` shows it `Down`.
+2. Remove it: `docker node rm --force pi-node4` (a down node needs `--force`, or first `docker node demote` if it was a manager).
+3. Flash a new card with the same hostname, install Docker, and join with the right token. This is why the preparation lesson matters.
+4. Run `docker service update --force` on busy services to rebalance onto the new node.
+
+---
+
+## Try it Yourself
+
+1. Write down your own maintenance routine as a checklist: what you check weekly, and what monthly.
+2. Run `docker system df` on every node and find which has the most reclaimable space.
+3. Add the log limits above to one node, restart Docker, redeploy a service on it and confirm with `docker inspect` on a container that the log options are set.
+4. Challenge: do a full rolling update of your cluster, timing how long the services were below their replica count.
+
+---
+
+## Common Issues
+
+- **Problem**: After a reboot, a manager shows `Unreachable`.
+- **Solution**: Wait a minute for Docker to start. If autolock is on, run `docker swarm unlock` on that node.
+- **Why**: A locked manager cannot read its keys until it is unlocked.
+
+- **Problem**: The disk is full and containers stop starting.
+- **Solution**: Run `docker system df`, then `docker image prune`, and cap logs as shown above.
+- **Why**: Unbounded logs and old images are the usual culprits on small SD cards.
+
+- **Problem**: The daemon will not start after editing `daemon.json`.
+- **Solution**: Check the file is valid JSON (`python3 -m json.tool /etc/docker/daemon.json`) and read `journalctl -u docker`.
+- **Why**: One misplaced comma stops the Docker daemon from reading its settings.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why drain a node before updating it?
+- [ ] Draining speeds up `apt`
+- [x] Its tasks move elsewhere first, so your services stay available
+- [ ] A node cannot update while it is active
+> Draining moves work off the node so a reboot does not interrupt your services.
+
+? What does adding `--volumes` to a prune command risk?
+- [ ] Nothing
+- [x] Deleting unused volumes, which may hold your data
+- [ ] Removing the swarm
+> Volumes hold persistent data, so only delete those you are sure you don't need.
+
+? What does autolock protect against?
+- [x] Someone reading the swarm's secrets from a stolen manager's disk
+- [ ] A worker failing
+- [ ] Slow networks
+> Autolock encrypts the keys at rest, and the unlock key is needed after a restart.
+{% endquiz %}

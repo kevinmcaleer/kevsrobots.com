@@ -7,10 +7,12 @@ cover: /learn/docker_swarm/assets/banners/04_adding-worker-nodes.jpg
 date: 2024-02-03
 previous: 03_initializing-docker-swarm.html
 next: 05_verifying-cluster-setup.html
-description: This lesson explains how to expand your Docker Swarm by adding more worker
-  nodes to your Raspberry Pi cluster, increasing its capacity and fault tolerance.
+description: Join more Raspberry Pis to your swarm as workers and managers, promote
+  and demote nodes, and remove nodes cleanly.
 percent: 30
-duration: 3
+duration: 4
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -54,8 +56,8 @@ navigation:
     content:
     - name: Project Ideas
       link: 13_project-ideas.html
-    - name: Further Resources
-      link: 14_further-resources.html
+    - name: Summary and Next Steps
+      link: 14_summary-and-next-steps.html
 ---
 
 
@@ -63,87 +65,124 @@ navigation:
 
 ---
 
-## Expanding Your Docker Swarm Cluster
-
-After initializing Docker Swarm on your Raspberry Pi cluster, adding worker nodes is the next step to increase its processing capacity and reliability. This lesson will guide you through the process of adding new Raspberry Pis as worker nodes to your existing Swarm.
+By the end of this lesson you will be able to join Raspberry Pis to a swarm, change a node's role between worker and manager, and remove a node safely.
 
 ---
 
-### Preparing New Nodes
+## Joining a worker
 
-Before adding new Raspberry Pis to your Swarm, ensure they are:
+We have one manager, `pi-node1`. Let's give it company. First, on the manager, print the worker join command:
 
-- Properly set up with the Raspberry Pi OS and have Docker installed (refer to previous lessons for setup instructions).
-- Connected to the same network as your Swarm and have internet access.
-- Configured with static IP addresses (recommended) to ensure consistent communication within the Swarm.
+```bash
+docker swarm join-token worker
+```
 
----
+It prints a ready-made command. Copy it, SSH into your second Pi, and paste it:
 
-### Using the Swarm Join Token
+```bash
+docker swarm join --token SWMTKN-1-<token_string> 192.168.50.11:2377
+```
 
-1. **Retrieve the Join Token**: If you haven't already noted the join token when you initialized the Swarm, you can retrieve it on the manager node by running:
-
-   ```sh
-   docker swarm join-token worker
-   ```
-
-   This command will output the complete command to join the Swarm as a worker, including the token.
+You should see `This node joined a swarm as a worker.` Repeat on each Pi you want to add. The screenshot shows what the token command looks like on a real manager.
 
 ![Docker Swarm Join Token](/learn/docker_swarm/assets/join.png){:class="img-fluid w-100 shadow-lg rounded"}
 
-1. **Join the Swarm**: On each new Raspberry Pi you wish to add as a worker, execute the join command provided by the manager node:
+---
 
-   ```sh
-   docker swarm join --token SWMTKN-1-<token_string> <MANAGER_IP>:2377
-   ```
+## Checking who has joined
 
-   Replace `<token_string>` and `<MANAGER_IP>` with the actual token and IP address of your manager node.
+Worker nodes cannot run swarm commands, only managers can. Back on the manager:
+
+```bash
+docker node ls
+```
+
+Each node shows its hostname, STATUS (`Ready` is good, `Down` is not), AVAILABILITY (`Active`) and MANAGER STATUS. Workers have a blank manager status; the leader shows `Leader`.
 
 ---
 
-### Verifying Worker Nodes
+## Making a three-manager cluster
 
-After adding the new worker nodes, you can verify they've successfully joined the Swarm:
+Remember lesson 1: three managers survive one failure. To make a node a manager, you have two choices.
 
-- **List Nodes**: On the manager node, run:
+**Join as a manager from the start.** On a manager, get the manager token and join with that:
 
-  ```sh
-  docker node ls
-  ```
+```bash
+docker swarm join-token manager
+```
 
-  This command lists all nodes in the Swarm, including the newly added workers, and shows their status, availability, and role.
+**Or promote an existing worker.** On a manager:
 
----
+```bash
+docker node promote pi-node2
+docker node promote pi-node3
+```
 
-### Managing Node Roles
+Run `docker node ls` again. The promoted nodes now show `Reachable` under MANAGER STATUS, and `pi-node1` is still the `Leader`. If you later need to reduce the number of managers, `docker node demote pi-node3` turns a manager back into a worker.
 
-Docker Swarm nodes can have either the `manager` or `worker` role:
-
-- **Workers** are responsible for running containers and services but don't participate in Swarm management.
-- **Managers** handle orchestration and cluster management tasks but can also run services.
-
-You can dynamically change the role of a node:
-
-- **Promote a Worker to Manager**:
-
-  ```sh
-  docker node promote <NODE_ID>
-  ```
-
-  This is useful for adding redundancy to your Swarm's management layer.
-
-- **Demote a Manager to Worker**:
-
-  ```sh
-  docker node demote <NODE_ID>
-  ```
-
-  Use this if you need to reduce the number of manager nodes or to repurpose a node as a worker.
+```mermaid
+flowchart LR
+    W["Worker"] -- "docker node promote" --> M["Manager (reachable)"]
+    M -- "docker node demote" --> W
+```
 
 ---
 
-### Summary
+## Leaving and removing nodes
 
-Adding worker nodes to your Docker Swarm expands the cluster's capacity and fault tolerance, enabling you to run more or larger services. It's a straightforward process that involves using a join token and can be done as your cluster's needs grow. With your Swarm now expanded, you're ready to deploy applications across your Raspberry Pi cluster, leveraging the combined resources of your nodes.
+To take a node out cleanly:
+
+1. On the node itself, run `docker swarm leave`. Its status on the manager becomes `Down`.
+2. On a manager, run `docker node rm pi-node4` to delete the entry.
+
+A manager must be demoted before it can leave, or you must add `--force`, which risks losing quorum. Demote first.
+
+Joining and leaving are cheap, so do not be afraid of experimenting. A node that left can always rejoin with the token.
 
 ---
+
+## Try it Yourself
+
+1. Join your second Pi as a worker, then run `docker node ls` and confirm it says `Ready` and `Active`.
+2. Promote it to a manager, then demote it again. Watch the MANAGER STATUS column change.
+3. Challenge: run `docker node ls` on a *worker*. What error do you get, and why?
+
+---
+
+## Common Issues
+
+- **Problem**: The join command hangs or says `connection refused` or `timeout`.
+- **Solution**: Check the manager's address, and that port 2377/tcp is reachable from the worker, for example with `nc -zv 192.168.50.11 2377`.
+- **Why**: Joining needs a direct network path to the manager's management port.
+
+- **Problem**: `Error response from daemon: This node is not a swarm manager`.
+- **Solution**: Run swarm commands such as `docker node ls` on a manager, not a worker.
+- **Why**: Only managers hold the cluster state and can change it.
+
+- **Problem**: The node joins but shows as `Down` soon afterwards.
+- **Solution**: Open ports 7946 (tcp and udp) and 4789/udp between nodes, and check the node's time with `timedatectl`.
+- **Why**: Nodes need gossip and overlay traffic, and certificates are checked against the clock.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Where do you run `docker node ls`?
+- [ ] On any node in the swarm
+- [x] On a manager node only
+- [ ] On your own computer without Docker
+> Worker nodes do not hold the cluster state, so swarm management commands only work on managers.
+
+? How do you turn an existing worker into a manager?
+- [x] `docker node promote <node>`, run on a manager
+- [ ] Re-flash its card
+- [ ] `docker swarm init` on the worker
+> `docker node promote` changes a worker's role without moving anything.
+
+? What should you do before a manager leaves the swarm?
+- [ ] Nothing, it can just leave
+- [x] Demote it to a worker first
+- [ ] Delete `/var/lib/docker`
+> Demoting first keeps the managers in agreement. Forcing a manager out risks losing quorum.
+{% endquiz %}

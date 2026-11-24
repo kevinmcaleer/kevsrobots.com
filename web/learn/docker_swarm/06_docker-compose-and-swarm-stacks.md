@@ -7,10 +7,12 @@ cover: /learn/docker_swarm/assets/banners/06_docker-compose-and-swarm-stacks.jpg
 date: 2024-02-03
 previous: 05_verifying-cluster-setup.html
 next: 07_writing-a-docker-compose-file.html
-description: Learn the difference between Docker Compose and Swarm Stacks, and how
-  to utilize them for deploying applications on your Docker Swarm cluster.
+description: Learn how Docker Compose and Swarm stacks differ, what a stack ignores,
+  and why a swarm needs a registry for your own images.
 percent: 42
-duration: 5
+duration: 6
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -54,8 +56,8 @@ navigation:
     content:
     - name: Project Ideas
       link: 13_project-ideas.html
-    - name: Further Resources
-      link: 14_further-resources.html
+    - name: Summary and Next Steps
+      link: 14_summary-and-next-steps.html
 ---
 
 
@@ -63,124 +65,125 @@ navigation:
 
 ---
 
-## Introduction to Deployment Tools
-
-Deploying applications on a Docker Swarm cluster requires understanding the tools available for managing service configurations and orchestrations. This lesson introduces Docker Compose and Swarm Stacks, explaining their purposes, differences, and how to use them effectively in a Swarm environment.
+By the end of this lesson you will be able to explain how `docker compose` and `docker stack deploy` differ, and why a multi-node swarm needs a registry for images you build yourself.
 
 ---
 
-### Understanding Docker Compose
+## One file, two commands
 
-Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services, networks, and volumes. Then, with a single command, you create and start all the services defined in your configuration.
+In the Docker course you wrote Compose files and ran `docker compose up`. Swarm uses the *same file format*, but a different command to launch it:
 
-- **Primary Use**: Ideal for development, testing, and staging environments, as well as single-host production deployments.
-- **Key Features**:
-  - Simple, declarative YAML configuration for services.
-  - Manages the entire application lifecycle with simple commands.
-  - Supports variables and extension fields for flexible configurations.
+| | `docker compose up` | `docker stack deploy` |
+| --- | --- | --- |
+| Runs on | One machine | The whole swarm |
+| Creates | Containers | Services made of tasks, spread over nodes |
+| Reads | The `services:` keys | The same, plus the `deploy:` key |
+| Builds images | Yes, with `build:` | No, it only pulls ready-made images |
+{:class="table table-single"}
 
----
+A **stack** is simply a group of services deployed together from one file, much as a Compose project is a group of containers. It is the right tool for the cluster you just built.
 
-### Introduction to Docker Swarm Stacks
-
-Swarm Stacks are similar to Docker Compose but are specifically designed for managing applications across a Docker Swarm cluster. Stacks allow you to deploy, update, and scale services across multiple Docker hosts within the Swarm.
-
-- **Primary Use**: Best suited for production environments and multi-host deployments in a Docker Swarm.
-- **Key Features**:
-  - Utilizes Docker Compose files (version 3 and above) for service definitions.
-  - Seamlessly integrates with Docker Swarm for native clustering support.
-  - Enables service replication across nodes, load balancing, and secure service-to-service communication.
-
----
-
-### Differences Between Docker Compose and Swarm Stacks
-
-| Feature | Docker Compose | Swarm Stacks |
-|---------|----------------|--------------|
-| Scope   | Single host    | Multi-host (Swarm) |
-| Use Case| Development, testing, and small-scale production | Large-scale production deployments in Swarm |
-| Command | `docker-compose up` | `docker stack deploy` |
-| File Format | Docker Compose YAML (supports version 2 and 3) | Docker Compose version 3 YAML, with Swarm-specific options |
-{:class="table table-striped"}
+```mermaid
+flowchart LR
+    F["stack.yml"] --> M["docker stack deploy (on a manager)"]
+    M --> S1["Service: web"]
+    M --> S2["Service: cache"]
+    S1 --> T1["Tasks on several nodes"]
+    S2 --> T2["Tasks on a node"]
+```
 
 ---
 
-### Deploying a Stack to Docker Swarm
+## What a stack ignores
 
-1. **Create a Docker Compose File**: Define your application stack in a `docker-compose.yml` file, using version 3 syntax to ensure compatibility with Docker Swarm.
-1. **Deploy the Stack**:
+Because a stack runs across several machines, some Compose keys no longer make sense. The ones to remember:
 
-   - Run the following command on a manager node to deploy the stack:
+- **`build:` is ignored.** A stack cannot build on one node and ship the result to the others. Build your image first, push it to a registry, and refer to it with `image:`.
+- **`depends_on:` is ignored.** Swarm starts all services at once, so your app must cope with a dependency that is not ready yet (retry the connection, or use a health check).
+- **`container_name:` and some others are ignored** too. Swarm names tasks itself.
 
-     ```sh
-     docker stack deploy -c docker-compose.yml <STACK_NAME>
-     ```
+The `docker stack config` command previews how your file is read, which is handy for catching mistakes before you deploy.
 
-   - Replace `<STACK_NAME>` with a name for your stack.
-1. **Verify Deployment**:
-   - Check the status of your stack with:
-
-     ```sh
-     docker stack services <STACK_NAME>
-     ```
-
-   - This command lists the services in your stack, along with their replicas and status.
+Modern Compose files do not need a `version:` line at the top, so we leave it out.
 
 ---
 
-## How to update a docker service to the latest version
+## Why you need a registry for your own images
 
-You may often need to update docker services with the latest version of a container. One of quirks of docker is that it does not automatically update the containers to the latest version, when you do `docker service update <SERVICENAME>`. You need to follow the process below, in this example a service called `kevsrobots` is updated to the latest version.
+When you deploy `nginx:alpine`, every node pulls it from Docker Hub. But an image you built on `pi-node1` exists only on `pi-node1`. A task scheduled on `pi-node2` would fail with an image error.
 
-1. Build (or Rebuild) and tag the image
+The fix is a **registry**, a server every node can reach. You can use Docker Hub, GitHub's registry, or run your own small one on the cluster. Also, the image must be built for the Pi's CPU: build on a Pi, or use `docker buildx build --platform linux/arm64` on another computer.
 
-   ```bash
-   docker build -t 192.168.2.1:5000/kevsrobots:latest .
-   ```
+```bash
+docker build -t 192.168.50.11:5000/robot-web:1.0 .
+docker push 192.168.50.11:5000/robot-web:1.0
+```
 
-1. Push the image
-   After rebuilding your image, tag it (even if you're reusing the latest tag) and push it to the registry. 
-
-    ```bash
-   
-    docker push 192.168.2.1:5000/kevsrobots:latest
-    ```
-
-1. Update the Service
-   To update the service and force all nodes to pull the latest image, use the --image flag with the docker service update command, specifying the full image name, including the tag:
-
-    ```bash
-    docker service update --image 192.168.2.1:5000/kevsrobots:latest kevsrobots
-    ```
+Here `192.168.50.11:5000` is an example private registry on your own network. A plain HTTP registry like this has to be listed as an `insecure-registries` entry in `/etc/docker/daemon.json` on every node that pulls from it. It is fine on a home network and wrong on the internet.
 
 ---
 
-## Additional Tips
+## Updating a service to a newer image
 
-- **Force Pull**: If you want to explicitly ensure that Docker Swarm pulls the image on each node, you can use the --with-registry-auth flag to pass registry authentication credentials to the Swarm nodes. This is particularly useful if your image is stored in a private registry that requires authentication.
+A common stumbling block: you rebuild your image with the same tag, but the cluster keeps running the old one. The reliable way to roll out the new image is to tell the service explicitly:
 
-  ```bash
-  docker service update --image 192.168.2.1:5000/kevsrobots:latest --with-registry-auth kevsrobots
-  ```
+```bash
+docker service update --image 192.168.50.11:5000/robot-web:1.0 robot-web
+```
 
-- **No Downtime**: Ensure you have configured the service with an appropriate update policy to achieve zero downtime deployments. You can set parameters like --update-parallelism and --update-delay to control the rollout of the update across the service's tasks.
+Swarm resolves the tag to the image's exact content at the moment you run this, so if you pushed new content under the same tag, it notices the difference and replaces the tasks. Better still, use a **new version tag** for every release (`1.1`, `1.2`), so you always know what is running and can roll back to a known version.
 
-  ```bash
-  docker service update --image 192.168.2.1:5000/kevsrobots:latest --update-parallelism 1 --update-delay 10s kevsrobots
-  ```
+Two options worth knowing:
 
-- **Rollback Strategy**: It's also a good practice to configure a rollback strategy in case the new version of the image introduces issues.
+- `--with-registry-auth` passes your registry login to the nodes, needed for private registries that require a password.
+- `--update-parallelism 1 --update-delay 10s` replaces one task at a time, waiting ten seconds between each, so the service never goes fully offline.
 
-  ```bash
-  docker service update --image 192.168.2.1:5000/kevsrobots:latest --rollback-parallelism 1 --rollback-delay 10s kevsrobots
-  ```
-
-By following these steps, you can ensure that all nodes in your Docker Swarm pull and use the latest version of your image, maintaining the consistency of your deployment.
+> **Teachers**: A shared Docker Hub account or registry login should never be pasted into a classroom Pi. Use a local registry on the cluster, or public images only, and keep passwords out of lesson files.
 
 ---
 
-### Summary
+## Try it Yourself
 
-Docker Compose and Swarm Stacks provide powerful and flexible tools for deploying and managing containerized applications. Understanding when and how to use each tool is crucial for effectively managing your Docker Swarm cluster. By leveraging Docker Stacks, you can take full advantage of Docker Swarm's capabilities for deploying scalable and resilient applications across multiple nodes in your cluster.
+1. Write a tiny stack file with one service using `image: nginx:alpine` and a `deploy:` block with `replicas: 2`. Run `docker stack config -c <file>` and read the output.
+2. Take a Compose file from the Docker course and list which of its keys a stack would ignore or need changing (look for `build`, `depends_on` and `container_name`).
+3. Challenge: decide where you would host a private registry in your cluster, and which Pi must be reachable by all the others.
 
 ---
+
+## Common Issues
+
+- **Problem**: `No such image` or a task stuck in `Preparing`, then `Rejected`, on one node only.
+- **Solution**: Push the image to a registry that every node can reach, then use that full name in `image:`.
+- **Why**: Stacks do not copy images between nodes. Each node pulls for itself.
+
+- **Problem**: `http: server gave HTTP response to HTTPS client` when pulling from your own registry.
+- **Solution**: Add the registry to `insecure-registries` in `/etc/docker/daemon.json` on each node, then restart Docker.
+- **Why**: Docker expects HTTPS from registries unless told otherwise.
+
+- **Problem**: The image runs on your laptop but crashes with `exec format error` on the Pi.
+- **Solution**: Rebuild for `linux/arm64`, or build directly on a Pi.
+- **Why**: An image built for an Intel or AMD CPU cannot run on the Pi's ARM CPU.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which Compose key does `docker stack deploy` ignore?
+- [ ] `image`
+- [ ] `ports`
+- [x] `build`
+> Stacks only pull ready-made images, so build and push your image first.
+
+? Why must your own images go to a registry before a stack deploy?
+- [ ] Registries make images smaller
+- [x] Every node pulls its own copy, and an image built on one Pi exists only there
+- [ ] Swarm refuses local images for security
+> The scheduler can place a task on any node, so every node must be able to fetch the image.
+
+? What is a good habit for rolling out new versions?
+- [ ] Always reuse the `latest` tag
+- [x] Use a new version tag for every release
+- [ ] Delete the old image first
+> Version tags make it clear what is running and let you roll back to a known version.
+{% endquiz %}

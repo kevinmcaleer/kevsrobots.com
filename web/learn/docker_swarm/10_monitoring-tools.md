@@ -7,10 +7,12 @@ cover: /learn/docker_swarm/assets/banners/10_monitoring-tools.jpg
 date: 2024-02-03
 previous: 09_rebalancing.html
 next: 11_cluster-maintenance.html
-description: Explore various tools and strategies for monitoring your Docker Swarm
-  cluster, ensuring the health, performance, and efficiency of your services.
+description: Keep an eye on your Raspberry Pi cluster using built-in Docker commands,
+  a simple status loop, and lightweight tools such as Portainer and Prometheus.
 percent: 72
-duration: 3
+duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -54,8 +56,8 @@ navigation:
     content:
     - name: Project Ideas
       link: 13_project-ideas.html
-    - name: Further Resources
-      link: 14_further-resources.html
+    - name: Summary and Next Steps
+      link: 14_summary-and-next-steps.html
 ---
 
 
@@ -63,86 +65,124 @@ navigation:
 
 ---
 
-## Effective Monitoring in Docker Swarm
-
-Monitoring is crucial for maintaining the health and performance of your Docker Swarm cluster. It enables you to detect issues early, understand your cluster's workload, and optimize resource usage. This lesson introduces several tools and strategies for effective monitoring of your Docker Swarm environment.
+By the end of this lesson you will be able to check the health of a swarm using built-in commands, build a simple live status view, and choose a monitoring tool that suits a Raspberry Pi cluster.
 
 ---
 
-### Why Monitor Docker Swarm?
+## Three questions to ask your cluster
 
-Monitoring provides insights into:
+Monitoring answers three questions:
 
-- **Service Health**: Ensures services are running as expected and helps in troubleshooting issues.
-- **Resource Utilization**: Tracks CPU, memory, and network usage to prevent bottlenecks.
-- **Scaling Needs**: Identifies when to scale services up or down based on demand.
+1. **Are my nodes up?** (`docker node ls`)
+2. **Are my services running as many copies as I asked for?** (`docker service ls`)
+3. **Is anything running out of CPU, memory, disk or heat?** (needs a little more)
 
----
-
-### Built-in Docker Swarm Monitoring Tools
-
-Docker Swarm offers basic monitoring functionalities through Docker CLI commands:
-
-- **`docker stats`**: Shows real-time resource usage for containers.
-- **`docker service ls`**: Lists services and their status in the Swarm.
-- **`docker service ps <service>`**: Displays the state of tasks in a service.
-
-While these commands provide immediate insights, for more comprehensive monitoring, third-party tools are recommended.
+You can answer the first two with built-in commands, which is where we start.
 
 ---
 
-### Prometheus and Grafana
+## Built-in commands
 
-**Prometheus** is an open-source monitoring solution that collects metrics from configured targets at specified intervals. It's highly scalable and integrates well with Docker Swarm. **Grafana** is an analytics and monitoring platform that can visualize data from Prometheus.
+```bash
+docker node ls
+docker service ls
+docker service ps robot_web
+docker service logs --tail 20 robot_web
+```
 
-- **Integration**: Deploy Prometheus and Grafana as services within your Docker Swarm.
-- **Usage**: Configure Prometheus to scrape metrics from your Docker nodes and services. Use Grafana to create dashboards visualizing this data.
+- `docker service ls` shows `REPLICAS` such as `3/3`. If it says `2/3`, something is wrong.
+- `docker service ps` shows each task's node and state, and the error if it failed.
+- `docker service logs` gathers log lines from every task of a service.
 
----
+`docker stats` is also useful, but remember it is **per node**: it only shows containers running on the machine where you type it. Swarm has no single command for cluster-wide CPU and memory.
 
-### ELK Stack
+Hardware checks on each Pi:
 
-The **Elasticsearch, Logstash, and Kibana (ELK) Stack** is a powerful platform for logging and visualizing data from Docker Swarm.
+```bash
+vcgencmd measure_temp
+vcgencmd get_throttled
+df -h /
+free -h
+```
 
-- **Elasticsearch** stores and indexes logs.
-- **Logstash** processes and forwards logs to Elasticsearch.
-- **Kibana** provides web-based log visualization.
-
-Deploying the ELK stack in Docker Swarm allows you to aggregate logs from all nodes and services, making it easier to search and analyze log data.
-
----
-
-### Portainer
-
-**Portainer** is a lightweight management UI that provides a visual interface for managing your Docker Swarm. It offers:
-
-- Easy deployment, scaling, and management of containers.
-- Real-time monitoring of resource usage.
-- Logs viewer for troubleshooting.
+`vcgencmd measure_temp` shows the CPU temperature, and `vcgencmd get_throttled` returns `throttled=0x0` when the Pi is healthy. Any other value means the Pi has hit under-voltage or thermal limits, so check the power supply and cooling.
 
 ---
 
-### cAdvisor and Node Exporter
+## A live status view in two lines
 
-- **cAdvisor** (Container Advisor) provides container users an understanding of the resource usage and performance characteristics of their running containers.
-- **Node Exporter** is a Prometheus exporter that collects hardware and OS metrics exposed by *NIX kernels, with pluggable metric collectors.
+You do not need any extra software for a handy dashboard. On a manager, run:
 
-These tools can be deployed as services within your Docker Swarm to provide detailed insights into container and system performance.
+```bash
+watch -n 5 'docker node ls; echo; docker service ls'
+```
 
----
-
-### Implementing a Monitoring Solution
-
-When implementing a monitoring solution for Docker Swarm:
-
-1. **Assess Your Needs**: Determine what aspects of your cluster you need to monitor (e.g., performance, logs, health).
-2. **Choose Your Tools**: Select tools that best fit your requirements. You might combine several tools (e.g., Prometheus for metrics and ELK for logs).
-3. **Deploy as Swarm Services**: Where possible, deploy your monitoring tools as Docker services to ensure they are managed by Swarm and benefit from its orchestration features.
+Leave it open on a spare monitor or terminal. Within five seconds of switching a Pi off, you will see the node flip to `Down` and a service's replicas drop and recover.
 
 ---
 
-### Summary
+## Tools you can add
 
-Effective monitoring is essential for maintaining a healthy Docker Swarm cluster. By leveraging tools like Prometheus, Grafana, the ELK Stack, Portainer, cAdvisor, and Node Exporter, you can gain comprehensive insights into your cluster's operation. This enables proactive management, troubleshooting, and optimization of your Docker Swarm environment.
+```mermaid
+flowchart LR
+    N["Each Pi: node-exporter and cAdvisor"] --> P["Prometheus collects metrics"]
+    P --> G["Grafana shows dashboards"]
+    N2["Docker Swarm API"] --> PT["Portainer: a web UI"]
+```
+
+- **Portainer** is a web interface for managing containers, services and stacks. It is the easiest first step and gives you a visual cluster overview. Follow Portainer's own Swarm installation guide for the current stack file.
+- **Prometheus and Grafana** are the standard pair for metrics: Prometheus collects numbers over time and Grafana draws graphs. They have arm64 builds, run happily on a Pi, and need you to run an exporter on each node to see its CPU and memory (Node Exporter for the host, cAdvisor for containers). Run the exporters as a *global* service, which means one task per node.
+- **ELK (Elasticsearch, Logstash, Kibana)** is a logging stack that is generally heavy on memory. On a small Pi cluster, a lighter log tool such as Loki is a gentler choice, or simply use `docker service logs`.
+
+Whatever you choose, deploy it as a stack on the swarm itself, and give it resource limits so it does not starve your real services. Monitoring that crashes the cluster is worse than none.
 
 ---
+
+## Try it Yourself
+
+1. Run `watch -n 5 'docker node ls; echo; docker service ls'` and leave it running.
+2. Run `vcgencmd measure_temp` on each Pi, first idle, then while a service is busy. How much does it change?
+3. Switch one worker off (or `sudo reboot` it) and watch the view. How long until the node shows `Down`? How long until the tasks reappear elsewhere?
+4. Challenge: read about the `mode: global` setting for a service and sketch how you would run a metrics exporter on every Pi.
+
+---
+
+## Common Issues
+
+- **Problem**: `docker stats` on the manager shows nothing for a service.
+- **Solution**: Run `docker stats` on the node where the task is running (see `docker service ps`).
+- **Why**: Docker stats reads the local Docker Engine only.
+
+- **Problem**: `vcgencmd get_throttled` returns something other than `0x0`.
+- **Solution**: Use the official power supply and cable, and improve cooling.
+- **Why**: Non-zero flags record under-voltage or overheating, which cause random cluster glitches.
+
+- **Problem**: The monitoring stack makes the Pis slow or crash.
+- **Solution**: Put memory limits on it, and drop heavy components such as Elasticsearch.
+- **Why**: A Pi has limited RAM, and monitoring tools compete with your services for it.
+
+> **Teachers**: Prometheus and Grafana are free, but Grafana's setup involves default admin logins. Change the admin password and keep the dashboard on the classroom network only, not on the internet.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why does `docker stats` not give a whole-cluster view?
+- [ ] It only works on managers
+- [x] It reads the Docker Engine on the machine you run it on
+- [ ] It needs Grafana installed
+> `docker stats` is local to the node, so cluster-wide metrics need a tool such as Prometheus.
+
+? What does `docker service ls` show you for each service?
+- [ ] The CPU temperature
+- [x] The number of running replicas against the number wanted
+- [ ] The Raft leader
+> The REPLICAS column such as `3/3` quickly shows whether the service is healthy.
+
+? Why run node exporters as a global service?
+- [x] So that one runs on every node
+- [ ] So that they run only on the leader
+- [ ] So that they use less memory
+> Global mode puts one task on each node, which is what a per-node exporter needs.
+{% endquiz %}
