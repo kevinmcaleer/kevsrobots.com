@@ -2813,6 +2813,106 @@
     ]
   },
   {
+    "slug": "micropython_projects",
+    "name": "MicroPython Projects - Make It Show, Talk and Connect",
+    "description": "Take your MicroPython beyond blinking LEDs. Build one desk gadget, a status buddy, that senses a door with a reed switch, shows it on an OLED screen, says it out loud with SAM speech, and reports to Arduino Cloud over Wi-Fi. Then shrink it onto a tiny Seeed XIAO.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "micropython",
+      "pico",
+      "electronics"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Getting started",
+        "url": "/learn/micropython_projects/00_intro.html"
+      },
+      {
+        "file": "01_meet_the_status_buddy.md",
+        "section": "Getting started",
+        "url": "/learn/micropython_projects/01_meet_the_status_buddy.html"
+      },
+      {
+        "file": "02_parts_and_pin_plan.md",
+        "section": "Getting started",
+        "url": "/learn/micropython_projects/02_parts_and_pin_plan.html"
+      },
+      {
+        "file": "03_reed_switches_and_magnets.md",
+        "section": "Sense",
+        "url": "/learn/micropython_projects/03_reed_switches_and_magnets.html"
+      },
+      {
+        "file": "04_reading_the_door.md",
+        "section": "Sense",
+        "url": "/learn/micropython_projects/04_reading_the_door.html"
+      },
+      {
+        "file": "05_interrupts_and_debounce.md",
+        "section": "Sense",
+        "url": "/learn/micropython_projects/05_interrupts_and_debounce.html"
+      },
+      {
+        "file": "06_oled_wiring_and_first_text.md",
+        "section": "Show",
+        "url": "/learn/micropython_projects/06_oled_wiring_and_first_text.html"
+      },
+      {
+        "file": "07_drawing_shapes_and_icons.md",
+        "section": "Show",
+        "url": "/learn/micropython_projects/07_drawing_shapes_and_icons.html"
+      },
+      {
+        "file": "08_the_status_screen.md",
+        "section": "Show",
+        "url": "/learn/micropython_projects/08_the_status_screen.html"
+      },
+      {
+        "file": "09_meet_sam.md",
+        "section": "Talk",
+        "url": "/learn/micropython_projects/09_meet_sam.html"
+      },
+      {
+        "file": "10_giving_the_buddy_a_voice.md",
+        "section": "Talk",
+        "url": "/learn/micropython_projects/10_giving_the_buddy_a_voice.html"
+      },
+      {
+        "file": "11_pico_w_and_wifi.md",
+        "section": "Connect",
+        "url": "/learn/micropython_projects/11_pico_w_and_wifi.html"
+      },
+      {
+        "file": "12_arduino_cloud.md",
+        "section": "Connect",
+        "url": "/learn/micropython_projects/12_arduino_cloud.html"
+      },
+      {
+        "file": "13_porting_to_a_xiao.md",
+        "section": "Shrink it",
+        "url": "/learn/micropython_projects/13_porting_to_a_xiao.html"
+      },
+      {
+        "file": "14_the_full_gadget.md",
+        "section": "Putting it together",
+        "url": "/learn/micropython_projects/14_the_full_gadget.html"
+      },
+      {
+        "file": "15_troubleshooting.md",
+        "section": "Putting it together",
+        "url": "/learn/micropython_projects/15_troubleshooting.html"
+      },
+      {
+        "file": "16_summary.md",
+        "section": "Putting it together",
+        "url": "/learn/micropython_projects/16_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "micropython_robotics",
     "name": "MicroPython Robotics Projects with the Raspberry Pi Pico",
     "description": "Learn how to build simple yet powerful robots using the Raspberry Pi Pico and MicroPython.  This hands-on course guides you through controlling motors, reading sensors, and combining hardware to create autonomous and remotely controlled robots.  Perfect for makers ready to go beyond GPIO and start building real-world robotics projects.",

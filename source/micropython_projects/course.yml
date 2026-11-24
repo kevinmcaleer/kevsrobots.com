@@ -1,0 +1,74 @@
+- name: MicroPython Projects - Make It Show, Talk and Connect
+  author: Kevin McAleer
+  date_created: 2026-11-24
+  date_published: 2026-11-24
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  video: K0X4W09tiEA
+  groups:
+      - micropython
+      - pico
+      - electronics
+  description: >-
+    Take your MicroPython beyond blinking LEDs. Build one desk gadget, a status buddy, that senses a door
+    with a reed switch, shows it on an OLED screen, says it out loud with SAM speech, and reports to Arduino
+    Cloud over Wi-Fi. Then shrink it onto a tiny Seeed XIAO.
+  outcomes:
+    - Wire a reed switch and read it reliably with a pull-up, an interrupt and debouncing
+    - Connect an SSD1306 OLED over I2C and draw text, shapes and a live status screen
+    - Make a Pico talk with SAM, and change its voice
+    - Connect a Pico W to Wi-Fi and push a value to Arduino Cloud
+    - Keep every pin number in one config file so a project moves between boards easily
+    - Port the whole gadget to a Seeed XIAO
+  prerequisites:
+    - Learn MicroPython - The basics
+    - Raspberry Pi Pico with MicroPython - GPIO Mastery
+  you_need:
+    - A Raspberry Pi Pico W (a plain Pico works for everything except the Wi-Fi lessons)
+    - A reed switch (normally open) and a neodymium magnet
+    - A 0.96 inch SSD1306 I2C OLED display (128x64)
+    - A small speaker or piezo buzzer, and an optional 1K resistor
+    - Jumper wires and a breadboard
+    - Thonny, or mpremote, on your computer
+    - A free Arduino Cloud account (lesson 12)
+    - Optional, a Seeed XIAO RP2040, RP2350 or ESP32-S3 (lesson 13)
+  content:
+    - section:
+        name: Getting started
+        content:
+          - 00_intro.md
+          - 01_meet_the_status_buddy.md
+          - 02_parts_and_pin_plan.md
+    - section:
+        name: Sense
+        content:
+          - 03_reed_switches_and_magnets.md
+          - 04_reading_the_door.md
+          - 05_interrupts_and_debounce.md
+    - section:
+        name: Show
+        content:
+          - 06_oled_wiring_and_first_text.md
+          - 07_drawing_shapes_and_icons.md
+          - 08_the_status_screen.md
+    - section:
+        name: Talk
+        content:
+          - 09_meet_sam.md
+          - 10_giving_the_buddy_a_voice.md
+    - section:
+        name: Connect
+        content:
+          - 11_pico_w_and_wifi.md
+          - 12_arduino_cloud.md
+    - section:
+        name: Shrink it
+        content:
+          - 13_porting_to_a_xiao.md
+    - section:
+        name: Putting it together
+        content:
+          - 14_the_full_gadget.md
+          - 15_troubleshooting.md
+          - 16_summary.md
