@@ -3,14 +3,14 @@ layout: lesson
 title: Docker Swarm on Raspberry Pi 5
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/00_intro.jpg
 date: 2024-02-03
 next: 01_planning-the-cluster.html
 description: Kickstart your journey into container orchestration with Docker Swarm
   on the powerful Raspberry Pi 5, mastering the essentials of deploying and managing
   a robust, scalable microservices architecture.
 percent: 6
-duration: 3
+duration: 2
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -59,7 +59,9 @@ navigation:
 ---
 
 
-![Docker Swarm on Raspberry Pi 5]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Welcome to Docker Swarm on Raspberry Pi 5
 

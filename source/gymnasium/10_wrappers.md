@@ -3,11 +3,11 @@ title: Gymnasium Wrappers
 description: Learn how to use TimeLimit, RecordEpisodeStatistics, and custom wrappers to modify an environment's behaviour without editing its source code.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/10_wrappers.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

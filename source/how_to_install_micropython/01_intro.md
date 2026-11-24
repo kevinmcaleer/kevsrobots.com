@@ -3,6 +3,11 @@ title: Introduction
 description:
 layout: lesson
 type: pages
+cover: /learn/how_to_install_micropython/assets/banners/01_intro.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## About this course

@@ -3,6 +3,11 @@ title: "Project: Containerize a Simple Application"
 description: Practical project to containerize a simple web application using Docker.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/09_dockerise.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Project Overview

@@ -3,6 +3,11 @@ title: Creating the Lower Eyelid
 description: Let's create the lower eyelid, similar to the upper eyelid
 layout: lesson
 type: page
+cover: /learn/eye_mechanism/assets/banners/07_create_lower_sketch.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Picking up the pace

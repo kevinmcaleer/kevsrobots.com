@@ -3,11 +3,11 @@ title: Your First Gymnasium Environment
 description: Install Gymnasium in a virtual environment, run CartPole-v1 with a random agent, and learn how render_mode works.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/02_first_environment.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

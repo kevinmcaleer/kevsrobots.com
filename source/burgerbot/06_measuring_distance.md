@@ -3,6 +3,11 @@ title: Measuring Distance
 description: Learn how to measure distance using the range finder on BurgerBot.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/06_measuring_distance.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Ultrasonic Range Finder

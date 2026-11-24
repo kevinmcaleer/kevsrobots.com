@@ -3,7 +3,7 @@ layout: lesson
 title: Seeding and the Episode Lifecycle
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/06_seeding_and_lifecycle.jpg
 date: 2026-06-14
 previous: 05_qlearning_on_gymnasium.html
 next: 07_anatomy_of_custom_env.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

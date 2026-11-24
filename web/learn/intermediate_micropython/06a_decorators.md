@@ -3,7 +3,7 @@ layout: lesson
 title: Decorators
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/06a_decorators.jpg
 date: 2024-07-07
 previous: 06_polymorphism.html
 next: 07_modules.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Decorators
 

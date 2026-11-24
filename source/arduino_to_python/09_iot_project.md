@@ -3,7 +3,11 @@ title: IoT Project - WiFi Temperature Monitor
 description: Build a complete IoT project that connects to WiFi, reads sensor data, and serves a web page showing real-time temperature readings
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/09_iot_project.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Building Your First IoT Project

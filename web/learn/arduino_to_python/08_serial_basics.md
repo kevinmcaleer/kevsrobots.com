@@ -3,7 +3,7 @@ layout: lesson
 title: Serial Communication and REPL - No More Serial.begin!
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/08_serial_basics.jpg
 date: 2025-11-20
 previous: 07_timing.html
 next: 09_iot_project.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Serial Communication: Simpler in Python
 

@@ -3,7 +3,11 @@ title: DocStrings
 description: Learn about DocStrings in MicroPython and how they help document your code.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/10_docstrings.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## DocStrings

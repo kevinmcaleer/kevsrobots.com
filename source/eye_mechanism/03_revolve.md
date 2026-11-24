@@ -3,6 +3,11 @@ title: Revolve
 description: Revolve to create the eyelid
 type: page
 layout: lesson
+cover: /learn/eye_mechanism/assets/banners/03_revolve.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 * **Select the profile** - Click within the newly created profile to select it

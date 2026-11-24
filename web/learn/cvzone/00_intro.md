@@ -3,7 +3,7 @@ layout: lesson
 title: Computer Vision with CVZone
 author: Kevin McAleer
 type: page
-cover: /learn/cvzone/assets/computer_vision.jpg
+cover: /learn/cvzone/assets/banners/00_intro.jpg
 date: 2023-10-07
 next: 01_install.html
 description: Detect faces, hands and body poses in real time on a Raspberry Pi with
@@ -38,7 +38,9 @@ navigation:
 ---
 
 
-![Cover Image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

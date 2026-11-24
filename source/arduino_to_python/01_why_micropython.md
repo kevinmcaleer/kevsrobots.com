@@ -3,7 +3,11 @@ title: Why MicroPython?
 description: Understand when to use MicroPython vs C++ for your microcontroller projects and make the right choice for your needs
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/01_why_micropython.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Why Learn MicroPython?

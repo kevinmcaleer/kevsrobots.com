@@ -3,6 +3,10 @@ title: Adding Worker Nodes to the Swarm
 description: This lesson explains how to expand your Docker Swarm by adding more worker nodes to your Raspberry Pi cluster, increasing its capacity and fault tolerance.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/04_adding-worker-nodes.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

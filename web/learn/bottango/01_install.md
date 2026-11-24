@@ -3,7 +3,7 @@ layout: lesson
 title: Installing Bottango
 author: Kevin McAleer
 type: page
-cover: assets/bottango_install.png
+cover: /learn/bottango/assets/banners/01_install.jpg
 date: 2025-05-10
 previous: 00_intro.html
 next: 02_setup_board.html
@@ -52,7 +52,7 @@ navigation:
 ---
 
 
-![Cover](assets/intro.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/00_intro.jpg
 date: 2023-04-27
 next: 01_why_video.html
 description: Learn how to build and program Burgerbot, a robot that can move around
@@ -59,6 +59,8 @@ navigation:
 
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

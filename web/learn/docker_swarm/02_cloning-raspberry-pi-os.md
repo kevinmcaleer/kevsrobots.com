@@ -3,7 +3,7 @@ layout: lesson
 title: Cloning Raspberry Pi OS
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/02_cloning-raspberry-pi-os.jpg
 date: 2024-02-03
 previous: 01_planning-the-cluster.html
 next: 03_initializing-docker-swarm.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Streamlining Cluster Setup
 

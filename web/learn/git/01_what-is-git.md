@@ -3,7 +3,7 @@ layout: lesson
 title: What is Git?
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/01_what-is-git.jpg
 date: 2026-11-04
 previous: 00_intro.html
 next: 02_installing-git.html
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## The problem Git solves
 

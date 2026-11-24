@@ -3,6 +3,11 @@ title: Create a Sketch
 layout: lesson
 description: Creating the initial Sketch
 type: page
+cover: /learn/eye_mechanism/assets/banners/02_create_sketch.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Create a Sketch

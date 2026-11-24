@@ -3,7 +3,7 @@ layout: lesson
 title: Train, Evaluate, and Export
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/13_train_evaluate_export.jpg
 date: 2026-06-14
 previous: 12_meet_stable_baselines3.html
 next: 14_summary.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

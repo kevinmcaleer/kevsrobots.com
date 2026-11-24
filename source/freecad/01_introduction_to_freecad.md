@@ -3,10 +3,12 @@ title: Introduction to FreeCAD
 description: Learn what FreeCAD is and why it is a powerful tool for 3D modeling and design.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/freecad/assets/banners/01_introduction_to_freecad.jpg
 ---
 
-![FreeCAD cover image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Welcome to FreeCAD
 

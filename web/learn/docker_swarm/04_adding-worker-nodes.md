@@ -3,7 +3,7 @@ layout: lesson
 title: Adding Worker Nodes to the Swarm
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/04_adding-worker-nodes.jpg
 date: 2024-02-03
 previous: 03_initializing-docker-swarm.html
 next: 05_verifying-cluster-setup.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Expanding Your Docker Swarm Cluster
 

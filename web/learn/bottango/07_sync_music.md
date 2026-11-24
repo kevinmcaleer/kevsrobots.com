@@ -3,7 +3,7 @@ layout: lesson
 title: Syncing Animations to Music
 author: Kevin McAleer
 type: page
-cover: assets/bottango_sync_music.png
+cover: /learn/bottango/assets/banners/07_sync_music.jpg
 date: 2025-05-10
 previous: 06_triggers.html
 next: 08_arduino_mode.html
@@ -50,6 +50,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 One of Bottango’s most powerful features is the ability to **synchronize your animations with music or sound effects**. This is perfect for building animatronics that lip-sync, dance, or react to music in time.
 

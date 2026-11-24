@@ -3,7 +3,7 @@ layout: lesson
 title: Basic Movement
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/05_basic_movement.jpg
 date: 2023-04-27
 previous: 04_loading_the_code.html
 next: 06_measuring_distance.html
@@ -56,6 +56,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding Differential Drive
 

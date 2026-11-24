@@ -3,7 +3,7 @@ layout: lesson
 title: 'Project: Containerize a Simple Application'
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/09_dockerise.jpg
 date: 2024-01-21
 previous: 08_docker-compose.html
 next: 10_conclusion.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Project Overview
 

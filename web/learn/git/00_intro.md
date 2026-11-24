@@ -3,7 +3,7 @@ layout: lesson
 title: Course Overview
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/00_intro.jpg
 date: 2026-11-04
 next: 01_what-is-git.html
 description: What you'll learn in Git for Beginners
@@ -56,7 +56,9 @@ navigation:
 ---
 
 
-![banner]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

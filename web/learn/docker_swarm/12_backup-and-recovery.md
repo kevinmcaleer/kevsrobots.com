@@ -3,7 +3,7 @@ layout: lesson
 title: Backup and Recovery Strategies
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/12_backup-and-recovery.jpg
 date: 2024-02-03
 previous: 11_cluster-maintenance.html
 next: 13_project-ideas.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Essential Backup and Recovery for Docker Swarm
 

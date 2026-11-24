@@ -3,6 +3,10 @@ title: Introduction to Docker
 description: Learn what Docker is and why it's revolutionizing software development.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/01_what-is-docker.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Installing Git
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/02_installing-git.jpg
 date: 2026-11-04
 previous: 01_what-is-git.html
 next: 03_your-first-repository.html
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Is Git already installed?
 

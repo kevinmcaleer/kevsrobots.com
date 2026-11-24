@@ -2,7 +2,11 @@
 title: Wheel Stubs
 description: Create rotational features with Revolve and duplicate them with Polar Pattern
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/07_wheel_stubs.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What We're Building

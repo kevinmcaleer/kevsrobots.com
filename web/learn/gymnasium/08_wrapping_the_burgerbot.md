@@ -3,7 +3,7 @@ layout: lesson
 title: Wrapping the BurgerBot
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/08_wrapping_the_burgerbot.jpg
 date: 2026-06-14
 previous: 07_anatomy_of_custom_env.html
 next: 09_registering_and_rendering.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: What is BurgerBot?
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/01_what_is_burger_bot.jpg
 date: 2023-04-27
 previous: 01_why_video.html
 next: 02_assembly.html
@@ -57,6 +57,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 `BurgerBot`, as the name suggests, is a Burger-shaped robot. BurgerBot is quick and easy to print and assemble, with a low build cost and is designed for education and hobbyists. The Raspberry Pi Pico and Pico W board power the robot making it easy to program with MicroPython.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Conclusion and Next Steps
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/09_conclusion.jpg
 date: 2025-09-04
 previous: 08_performance_tuning.html
 next: 10_additional_resources.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Conclusion and Next Steps
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Using Bottango with a Gamepad
 author: Kevin McAleer
 type: page
-cover: assets/bottango_gamepad.png
+cover: /learn/bottango/assets/banners/09_use_with_gamepad.jpg
 date: 2025-05-10
 previous: 08_arduino_mode.html
 next: 10_summary.html
@@ -51,6 +51,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Want to control your servos live — like a puppet? Bottango supports USB **gamepads and joysticks**, letting you trigger animations or control servo positions in real time. Great for live performances, interactive demos, or fun robot battles!
 

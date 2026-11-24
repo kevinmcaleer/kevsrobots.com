@@ -3,6 +3,10 @@ title: Cluster Maintenance
 description: Master the key strategies and practices for maintaining a healthy and efficient Docker Swarm cluster, ensuring long-term stability and performance.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/11_cluster-maintenance.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

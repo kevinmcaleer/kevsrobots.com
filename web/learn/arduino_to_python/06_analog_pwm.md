@@ -3,7 +3,7 @@ layout: lesson
 title: Analog Reading and PWM - ADC and PWM Classes
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/06_analog_pwm.jpg
 date: 2025-11-20
 previous: 05_pin_control.html
 next: 07_timing.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Analog Input and Output: A Class-Based Approach
 

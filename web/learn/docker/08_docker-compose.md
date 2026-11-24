@@ -3,7 +3,7 @@ layout: lesson
 title: Creating a Docker-Compose File
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/08_docker-compose.jpg
 date: 2024-01-21
 previous: 07_volumes.html
 next: 09_dockerise.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction to Docker Compose
 

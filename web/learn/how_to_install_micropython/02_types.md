@@ -3,7 +3,7 @@ layout: lesson
 title: Types of Pico
 author: Kevin McAleer
 type: page
-cover: /learn/how_to_install_micropython/assets/cover.jpg
+cover: /learn/how_to_install_micropython/assets/banners/02_types.jpg
 date: 2024-08-10
 previous: 01_intro.html
 next: 03_install.html
@@ -29,6 +29,10 @@ navigation:
       link: 04_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Before we install MicroPython on the Pico, we first need to understand which version of the Pico we have. We need to understand which version we have because there is a specific version of MicroPython that we will need to download and install. There are several different versions of the Raspberry Pi Pico, we'll cover each below.
 

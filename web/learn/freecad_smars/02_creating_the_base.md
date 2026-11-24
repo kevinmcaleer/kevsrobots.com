@@ -3,7 +3,7 @@ layout: lesson
 title: Creating the Base
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/02_creating_the_base.jpg
 date: 2025-12-12
 previous: 01_navigation.html
 next: 03_shell_and_fillet.html
@@ -46,6 +46,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What We're Building
 

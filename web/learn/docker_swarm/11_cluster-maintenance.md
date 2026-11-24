@@ -3,7 +3,7 @@ layout: lesson
 title: Cluster Maintenance
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/11_cluster-maintenance.jpg
 date: 2024-02-03
 previous: 10_monitoring-tools.html
 next: 12_backup-and-recovery.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Best Practices for Docker Swarm Maintenance
 

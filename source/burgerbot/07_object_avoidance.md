@@ -3,6 +3,11 @@ title: Object Avoidance
 description: Learn how to avoid objects with BurgerBot.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/07_object_avoidance.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Avoiding an object

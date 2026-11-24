@@ -4,6 +4,11 @@ description: >-
     Use branches to work on new features without breaking the code that already works
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/08_branches.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Why branches?

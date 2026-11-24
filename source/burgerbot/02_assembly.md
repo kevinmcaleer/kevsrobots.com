@@ -3,6 +3,11 @@ title: Assembly
 description: Learn how to assemble the BurgerBot using a Raspberry Pi Pico and 3D printed parts.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/02_assembly.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Step | Detail

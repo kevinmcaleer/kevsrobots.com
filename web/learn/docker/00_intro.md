@@ -3,7 +3,7 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/00_intro.jpg
 date: 2024-01-21
 next: 01_what-is-docker.html
 description: An introductory overview of the Docker for Beginners course.
@@ -42,6 +42,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Docker cover artwork](/learn/docker/assets/docker.jpg){:class="cover"}
 

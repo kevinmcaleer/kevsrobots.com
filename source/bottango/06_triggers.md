@@ -3,8 +3,12 @@ title: Using Triggers and Interactivity
 description: Learn how to add interactivity to your animations using triggers in Bottango.
 layout: lesson
 type: page
-cover: assets/bottango_triggers.png
+cover: /learn/bottango/assets/banners/06_triggers.jpg
 date_updated: 2025-05-03
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 So far, you've created animations that play back on their own. But what if you want your servo to react to something — like a button press, sensor input, or keyboard event? That’s where **triggers** come in.

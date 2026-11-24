@@ -3,6 +3,10 @@ title: Backup and Recovery Strategies
 description: Learn essential backup and recovery strategies for Docker Swarm, ensuring your data and services can be restored quickly and reliably in case of failure.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/12_backup-and-recovery.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

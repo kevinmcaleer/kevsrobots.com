@@ -2,10 +2,12 @@
 title: Introduction to Building SMARS with FreeCAD
 description: Learn to design a real robot chassis from scratch using free, open-source CAD software
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/00_intro.jpg
 ---
 
-![Course Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Welcome, Robot Builders!
 

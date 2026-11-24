@@ -2,7 +2,11 @@
 title: Navigation in FreeCAD
 description: Master the 3D workspace - the foundation skill for efficient CAD work
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/01_navigation.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Why Navigation Matters

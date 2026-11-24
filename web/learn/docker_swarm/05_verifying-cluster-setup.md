@@ -3,7 +3,7 @@ layout: lesson
 title: Verifying Cluster Setup
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/05_verifying-cluster-setup.jpg
 date: 2024-02-03
 previous: 04_adding-worker-nodes.html
 next: 06_docker-compose-and-swarm-stacks.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Ensuring a Successful Docker Swarm Cluster Configuration
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Bottango
 author: Kevin McAleer
 type: page
-cover: assets/bottango_intro.png
+cover: /learn/bottango/assets/banners/00_intro.jpg
 date: 2025-05-10
 next: 01_install.html
 description: "Get started with Bottango \u2013 a visual tool for animating servos\
@@ -51,7 +51,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

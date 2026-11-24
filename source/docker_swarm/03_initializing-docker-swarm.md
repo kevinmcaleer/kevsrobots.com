@@ -3,6 +3,10 @@ title: Initializing Docker Swarm
 description: This lesson guides you through the process of initializing Docker Swarm on your Raspberry Pi cluster, transforming individual Pis into a powerful, unified computing resource.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/03_initializing-docker-swarm.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

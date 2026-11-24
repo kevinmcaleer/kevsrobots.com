@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: pages
-cover: /learn/how_to_install_micropython/assets/cover.jpg
+cover: /learn/how_to_install_micropython/assets/banners/01_intro.jpg
 date: 2024-08-10
 next: 02_types.html
 description: null
@@ -28,6 +28,10 @@ navigation:
       link: 04_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## About this course
 

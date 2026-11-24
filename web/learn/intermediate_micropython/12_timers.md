@@ -3,7 +3,7 @@ layout: lesson
 title: Timers
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/12_timers.jpg
 date: 2024-07-07
 previous: 11_interrupts.html
 next: 13_mp_remote.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Timers
 

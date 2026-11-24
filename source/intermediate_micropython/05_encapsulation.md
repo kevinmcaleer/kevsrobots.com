@@ -3,7 +3,11 @@ title: Encapsulation
 description: Learn about encapsulation in MicroPython and how it hides complexity by exposing only the necessary details.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/05_encapsulation.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Encapsulation

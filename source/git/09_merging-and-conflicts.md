@@ -4,6 +4,11 @@ description: >-
     Bring a branch back into main with git merge, and learn how to fix merge conflicts calmly
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/09_merging-and-conflicts.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Merging a branch

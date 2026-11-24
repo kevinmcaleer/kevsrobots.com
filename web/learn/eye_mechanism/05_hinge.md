@@ -3,7 +3,7 @@ layout: lesson
 title: Extrude The Hinge
 author: Kevin McAleer
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/05_hinge.jpg
 date: 2023-01-29
 previous: 04_create_hinges.html
 next: 06_lower_eyelid_sketch.html
@@ -46,6 +46,10 @@ navigation:
       link: 09_joint_and_export.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 * **Extrude Join** - Extrude the middle and inner circle out towards the outer edge of the eyelid by `2mm`.
 

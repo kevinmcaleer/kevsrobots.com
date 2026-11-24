@@ -3,7 +3,7 @@ layout: lesson
 title: Q-Learning on Gymnasium
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/05_qlearning_on_gymnasium.jpg
 date: 2026-06-14
 previous: 04_spaces.html
 next: 06_seeding_and_lifecycle.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

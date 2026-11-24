@@ -3,7 +3,7 @@ layout: lesson
 title: 'Parquet: fast columnar files'
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/07_parquet.jpg
 date: 2025-09-04
 previous: 06_datalakes.html
 next: 08_performance_tuning.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Working with Parquet
 

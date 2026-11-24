@@ -3,7 +3,7 @@ layout: lesson
 title: Setting Up Your Board
 author: Kevin McAleer
 type: page
-cover: assets/bottango_setup_board.png
+cover: /learn/bottango/assets/banners/02_setup_board.jpg
 date: 2025-05-10
 previous: 01_install.html
 next: 03_wiring.html
@@ -51,7 +51,7 @@ navigation:
 ---
 
 
-![Cover](assets/intro.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

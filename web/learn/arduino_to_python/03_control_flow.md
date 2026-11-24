@@ -3,7 +3,7 @@ layout: lesson
 title: Control Flow - If, Loops, and No Braces!
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/03_control_flow.jpg
 date: 2025-11-20
 previous: 02_syntax_basics.html
 next: 04_functions.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Control Flow: The Python Way
 

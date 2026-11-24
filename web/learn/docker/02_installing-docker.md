@@ -3,7 +3,7 @@ layout: lesson
 title: Installing Docker
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/02_installing-docker.jpg
 date: 2024-01-21
 previous: 01_what-is-docker.html
 next: 03_basics.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Installing Docker on Your Machine
 

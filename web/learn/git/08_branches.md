@@ -3,7 +3,7 @@ layout: lesson
 title: Branches
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/08_branches.jpg
 date: 2026-11-04
 previous: 07_ignoring-files.html
 next: 09_merging-and-conflicts.html
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Why branches?
 

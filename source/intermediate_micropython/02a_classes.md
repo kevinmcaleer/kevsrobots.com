@@ -4,7 +4,11 @@ title: Classes and Objects
 description: Learn how to create classes and objects in MicroPython
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/02a_classes.jpg
+
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

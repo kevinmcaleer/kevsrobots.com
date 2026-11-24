@@ -3,6 +3,11 @@ title: Managing Docker Containers
 description: Learn how to manage and interact with Docker containers.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/05_managing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Mastering Container Management in Docker

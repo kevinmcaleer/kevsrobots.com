@@ -3,7 +3,7 @@ layout: lesson
 title: Practical Data Analysis
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/05_data_analysis.jpg
 date: 2025-09-04
 previous: 04_python_integration.html
 next: 06_datalakes.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Practical Data Analysis
 

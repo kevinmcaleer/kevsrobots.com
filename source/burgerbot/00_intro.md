@@ -4,11 +4,13 @@ description: >-
     Learn how to build and program Burgerbot, a robot that can move around and avoid objects using a range finder.
 layout: lesson
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/00_intro.jpg
 date_updated: 2024-07-29
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

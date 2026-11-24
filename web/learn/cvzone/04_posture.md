@@ -3,7 +3,7 @@ layout: lesson
 title: Pose Detection
 author: Kevin McAleer
 type: page
-cover: /learn/cvzone/assets/computer_vision.jpg
+cover: /learn/cvzone/assets/banners/04_posture.jpg
 date: 2023-10-07
 previous: 03_hand.html
 next: 05_advanced.html
@@ -35,6 +35,10 @@ navigation:
       link: 05_advanced.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Pose detection
 

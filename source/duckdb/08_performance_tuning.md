@@ -3,6 +3,11 @@ title: Performance tuning (practical)
 description: "Quick wins to keep queries fast: schema, files, PRAGMAs, stats, EXPLAIN, profiling."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/08_performance_tuning.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 This lesson is a checklist of practical steps you can apply to most DuckDB analytics workloads.
