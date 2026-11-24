@@ -4,11 +4,14 @@ description: Learn how to wire SPI devices to your Raspberry Pi Pico with proper
 layout: lesson
 type: page
 cover: /learn/i2c_spi/assets/banners/08_spi-hardware-setup.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wire an SPI device to the Pico, read its pinout, and test the connection by reading data from it.
 
 ## Wiring Your First SPI Device
 
@@ -64,51 +67,39 @@ Here's the complete connection guide:
    - MAX31855 only sends data, doesn't receive
    - MOSI pin (GP3) remains unconnected
 
-### Pico SPI0 Pinout Reference
+### Wiring table
 
-```
-Raspberry Pi Pico (SPI0 pins):
-┌─────────────────────────┐
-│  USB PORT               │
-├─────────────────────────┤
-│ 1  GP0           VBUS 40│
-│ 2  GP1           VSYS 39│
-│ 3  GND            GND 38│ ← Connect GND
-│ 4  GP2 (SCK)   3V3_EN 37│
-│ 5  GP3 (MOSI)    3.3V 36│ ← Connect VCC
-│ 6  GP4 (MISO)     REF 35│
-│ 7  GP5 (CS)      GP28 34│
-│ 8  GND            GND 33│
-└─────────────────────────┘
+| MAX31855 pin | Pico GPIO | Pico physical pin | SPI role |
+|--------------|-----------|-------------------|----------|
+| VCC | 3V3(OUT) | 36 | Power |
+| GND | GND | 38 | Ground |
+| SCK | GP2 | 4 | SPI0 SCK |
+| DO | GP4 | 6 | SPI0 MISO (RX) |
+| CS | GP5 | 7 | Chip select (any GPIO) |
+{:class="table table-single table-narrow"}
 
-SCK:  GP2 (pin 4)   → Device SCK/SCLK
-MOSI: GP3 (pin 5)   → Device MOSI/SDI (if needed)
-MISO: GP4 (pin 6)   → Device MISO/SDO/DO
-CS:   GP5 (pin 7)   → Device CS/SS/CE
+```mermaid
+flowchart LR
+    subgraph Pico
+        A["GP2 (SPI0 SCK)"]
+        B["GP4 (SPI0 MISO)"]
+        C["GP5 (chip select)"]
+        D["3V3(OUT) and GND"]
+    end
+    subgraph MAX31855
+        SCK
+        DO
+        CS
+        PWR["VCC and GND"]
+    end
+    A --> SCK
+    DO --> B
+    C --> CS
+    D --- PWR
+    TC["K-type thermocouple"] --- MAX31855
 ```
 
-### Breadboard Layout
-
-```
-Breadboard:
-┌────────────────────────────────┐
-│ + + + + + + + + + + + + + + +  │ ← 3.3V rail
-│ - - - - - - - - - - - - - - -  │ ← GND rail
-│                                │
-│  [MAX31855 Module]             │
-│   VCC GND SCK DO CS            │
-│    │   │   │   │  │            │
-│    │   │   │   │  │            │
-│    │   │   │   │  └─ To GP5    │
-│    │   │   │   └──── To GP4    │
-│    │   │   └──────── To GP2    │
-│    │   └──────────── To GND    │
-│    └──────────────── To 3.3V   │
-│                                │
-│  [K-Type Thermocouple]         │
-│   Connected to screw terminals │
-└────────────────────────────────┘
-```
+The thermocouple goes into the screw terminals on the breakout board. The board marks one terminal + and the other -, and so does the thermocouple's datasheet or packaging. Connect them the right way round, because swapped leads make the reading fall when the tip is heated.
 
 ## Alternative SPI Device: SPI OLED Display
 
@@ -181,7 +172,7 @@ def read_temperature():
 
     # Check for errors (bit 16)
     if raw_value & 0x00010000:
-        print("⚠️  Thermocouple error detected")
+        print("[WARNING] Thermocouple error detected")
         return None
 
     # Extract temperature (bits 31:18, signed 14-bit value)
@@ -200,23 +191,23 @@ def read_temperature():
 temp = read_temperature()
 
 if temp is not None:
-    print(f"✅ Temperature: {temp:.2f}°C ({temp*9/5+32:.2f}°F)")
+    print(f"[OK] Temperature: {temp:.2f}°C ({temp*9/5+32:.2f}°F)")
     print("SPI connection working!")
 else:
-    print("❌ Check wiring and thermocouple connection")
+    print("[FAIL] Check wiring and thermocouple connection")
 ```
 
 **Expected output**:
 
 ```
 Testing MAX31855 connection...
-✅ Temperature: 22.50°C (72.50°F)
+[OK] Temperature: 22.50°C (72.50°F)
 SPI connection working!
 ```
 
 If you see this, your SPI wiring is correct!
 
-## Common SPI Wiring Mistakes
+## Wiring Mistakes to Look For
 
 ### MOSI and MISO Swapped
 
@@ -230,8 +221,9 @@ If you see this, your SPI wiring is correct!
 # Pico MOSI (GP3) → Device MOSI/SDI/DI (data IN to device)
 # Pico MISO (GP4) → Device MISO/SDO/DO (data OUT from device)
 
-# If confused, swap them in code:
-spi = SPI(0, sck=Pin(2), mosi=Pin(4), miso=Pin(3))  # Try swapped
+# If you swapped them, move the jumper wires, not the code.
+# Hardware SPI0 only accepts GP3 as MOSI and GP4 as MISO (in this setup),
+# so SPI(0, mosi=Pin(4), miso=Pin(3)) raises ValueError: bad MOSI pin.
 ```
 
 ### Chip Select Logic Inverted
@@ -240,17 +232,15 @@ spi = SPI(0, sck=Pin(2), mosi=Pin(4), miso=Pin(3))  # Try swapped
 
 **Symptom**: No data or timeout errors
 
-**Cause**: CS might be active-HIGH instead of active-LOW
+**Cause**: CS is active-LOW on almost every device: you pull it low to select and release it high when done. If the code forgets to do this (or the CS wire is on the wrong pin), the device never listens
 
 **Solution**:
 ```python
-# Try inverted logic
-cs.value(0)  # Most devices: LOW = selected
-
-# vs
-
-cs.value(1)  # Rare devices: HIGH = selected
+cs.value(0)   # select: LOW
+# ... transfer ...
+cs.value(1)   # deselect: HIGH, which ends the transaction
 ```
+{: .no-snakie }
 
 ### Clock Speed Too Fast
 
@@ -258,6 +248,7 @@ cs.value(1)  # Rare devices: HIGH = selected
 
 **Solution**: Reduce SPI speed
 
+<!-- code-check: skip -->
 ```python
 # Start slow
 spi = SPI(0, baudrate=100000, ...)  # 100 kHz
@@ -273,6 +264,7 @@ spi = SPI(0, baudrate=1000000, ...)  # 1 MHz
 
 **Solution**: Try different modes
 
+<!-- code-check: skip -->
 ```python
 # Mode 0 (most common)
 spi = SPI(0, baudrate=1000000, polarity=0, phase=0, ...)
@@ -361,8 +353,9 @@ Ensure compatibility:
 
 ```python
 # Check device datasheet
-# MAX31855: 3.0-3.6V ✓ (Safe with Pico's 3.3V)
-# SPI OLED: Often 3.3V or 5V tolerant
+# MAX31855: 3.0-3.6V (safe with Pico's 3.3V)
+# SPI OLED: check the module; many have a regulator and accept 3.3V or 5V,
+#           but the data pins must still be 3.3V logic
 # SD Cards: 3.3V only
 
 # If device is 5V only, use level shifter
@@ -375,7 +368,7 @@ Most SPI sensors use minimal current:
 - Small OLED: 20-30 mA
 - SD card: 100-200 mA
 
-Pico 3.3V pin can supply up to 300mA - sufficient for most SPI devices.
+The Pico's 3V3(OUT) pin is suitable for about 300 mA in total, which is enough for the sensor and a small OLED. An SD card can briefly draw more, so keep an eye on the total.
 
 ## Try It Yourself
 
@@ -412,23 +405,60 @@ def check_spi_wiring():
         spi = SPI(0, baudrate=1000000, sck=Pin(2), mosi=Pin(3), miso=Pin(4))
         cs = Pin(5, Pin.OUT)
 
-        print("✓ SPI initialized")
-        print("✓ CS pin configured")
+        print("[OK] SPI initialized")
+        print("[OK] CS pin configured")
 
         # Try simple read
         cs.value(0)
         data = spi.read(1)
         cs.value(1)
 
-        print(f"✓ Read test: 0x{data[0]:02X}")
+        print(f"[OK] Read test: 0x{data[0]:02X}")
         print("\nWiring appears correct!")
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[FAIL] Error: {e}")
         print("Check your connections")
 
 check_spi_wiring()
 ```
+
+## Common Issues
+
+- **Problem**: Every reading is 0 or 0xFFFFFFFF
+- **Solution**: Check that DO goes to GP4 (MISO), SCK to GP2, CS to GP5, and that VCC and GND are connected
+- **Why**: With the data line unplugged the MISO pin floats, which reads as all zeros or all ones
+
+- **Problem**: The error "Thermocouple fault" or an open-circuit reading
+- **Solution**: Push the thermocouple wires firmly into the screw terminals and check for a break in the wire
+- **Why**: The MAX31855 sets its fault bit when the thermocouple is open or shorted
+
+- **Problem**: Readings that jump around at higher speeds
+- **Solution**: Lower `baudrate` to 1 MHz or less and shorten the wires
+- **Why**: Long jumper wires pick up noise and smear fast clock edges
+
+## Check your understanding
+
+{% quiz %}
+? Why does the MAX31855 wiring not need a MOSI connection?
+- [ ] MOSI is only used by SD cards
+- [x] The chip only sends data to the Pico, so nothing needs to go the other way
+> The MAX31855 only has an output (DO), so only the clock, MISO and chip select are wired.
+
+? Which Pico pins are used for the SPI0 wiring in this lesson?
+- [ ] GP8 and GP9
+- [x] GP2 (SCK), GP4 (MISO) and GP5 (CS)
+- [ ] GP10 and GP11
+> GP8 and GP9 were the I2C pins; this lesson uses SPI0.
+
+? How many chip select wires do three SPI devices on one bus need?
+- [ ] One shared one
+- [x] Three, one per device
+- [ ] None, they use addresses
+> The clock, MOSI and MISO are shared, but each device needs its own CS.
+{% endquiz %}
+
+> **Teachers**: A thermocouple tip can be very hot, and even a lit candle or soldering iron is enough to give a reading, so agree safe heat sources (a mug of warm water, a hairdryer on low) before learners start. The MAX31855 board and probe are the costliest items in the course, so one set per group is realistic. With no hardware, learners can read the bit layout in the next lesson and decode a sample 32-bit value by hand.
 
 ## What You've Learned
 

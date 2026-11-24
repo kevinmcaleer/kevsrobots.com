@@ -4,11 +4,14 @@ description: Learn about the SPI protocol, how it differs from I2C, and when to 
 layout: lesson
 type: page
 cover: /learn/i2c_spi/assets/banners/07_what-is-spi.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to name the four SPI signals, wire them to the right Pico pins, and set the SPI mode (polarity and phase) in MicroPython.
 
 ## Understanding SPI
 
@@ -54,12 +57,27 @@ Here's how SPI communication works:
 
 ```python
 # Conceptual flow (MicroPython handles this automatically)
-cs.value(0)           # Select device
-spi.write(b'data')    # Send data
-response = spi.read() # Receive data
-cs.value(1)           # Deselect device
+cs.value(0)             # Select device
+spi.write(b'data')      # Send data
+response = spi.read(1)  # Receive 1 byte
+cs.value(1)             # Deselect device
 ```
 {: .no-snakie }
+
+Here is the bus with two devices. The clock and both data lines are shared, and each device has its own chip select:
+
+```mermaid
+flowchart LR
+    Pico["Pico (controller)"]
+    Pico -->|"SCK GP2 (shared)"| D1["Device 1"]
+    Pico -->|"SCK GP2 (shared)"| D2["Device 2"]
+    Pico -->|"MOSI GP3 (shared)"| D1
+    Pico -->|"MOSI GP3 (shared)"| D2
+    D1 -->|"MISO GP4 (shared)"| Pico
+    D2 -->|"MISO GP4 (shared)"| Pico
+    Pico -->|"CS GP5"| D1
+    Pico -->|"CS GP6"| D2
+```
 
 ## SPI on Raspberry Pi Pico
 
@@ -122,15 +140,16 @@ def spi_write_read(data):
     """Write data and read response"""
     cs.value(0)                    # Select device
     time.sleep_us(1)               # Small delay for device setup
-    result = spi.write_readinto(data, data)  # Send and receive
+    reply = bytearray(len(data))   # Somewhere to put the bytes that come back
+    spi.write_readinto(data, reply)  # Send and receive at the same time
     time.sleep_us(1)               # Small delay before deselect
     cs.value(1)                    # Deselect device
-    return result
+    return reply
 
 # Send a command byte
 command = bytearray([0x00])
-spi_write_read(command)
-print("Command sent via SPI")
+reply = spi_write_read(command)
+print("Command sent via SPI, reply:", reply)
 ```
 
 ## SPI Clock Polarity and Phase
@@ -175,6 +194,7 @@ SPI can run much faster than I2C:
 | SPI | 1-10 MHz | 60+ MHz |
 {:class="table table-single table-narrow"}
 
+<!-- code-check: skip -->
 ```python
 # Slow - for testing and compatibility
 spi = SPI(0, baudrate=100000, ...)   # 100 kHz
@@ -185,7 +205,8 @@ spi = SPI(0, baudrate=1000000, ...)  # 1 MHz
 # Fast - for displays and memory
 spi = SPI(0, baudrate=10000000, ...) # 10 MHz
 
-# Very fast - Pico can handle up to 62.5 MHz
+# Very fast - the Pico's hardware can reach 62.5 MHz, but jumper wires
+# on a breadboard are only reliable up to a few MHz
 spi = SPI(0, baudrate=62500000, ...) # 62.5 MHz
 ```
 {: .no-snakie }
@@ -240,7 +261,7 @@ cs_memory.value(1)
 | Max devices | 127 (theoretical) | Limited by available CS pins |
 | Full duplex | No | Yes (send and receive simultaneously) |
 | Complexity | Simpler wiring | More wires |
-| Power | Lower | Higher (faster clocking) |
+| Power | Depends on the chip's sleep modes | Faster clocking uses a little more |
 | Distance | ~1 meter | ~10 cm (very short) |
 {:class="table table-single table-narrow"}
 
@@ -271,13 +292,13 @@ Choose I2C when you need:
 - Multiple accessories on same bus
 - Limited GPIO pins
 
-**Longer distances**
-- Sensors spread across a robot
-- External connections
+**Sensors spread across a robot**
+- Two wires are easier to run to several places
+- Slow the bus to 100 kHz for longer runs
 
-**Lower power**
-- Battery-operated devices
-- Sleep modes
+**Low-speed battery projects**
+- Many I2C sensors have sleep modes
+- Fewer pins to drive
 
 **Simplicity in wiring**
 - Just two wires for everything
@@ -378,46 +399,48 @@ device.write(b'\x00')  # Automatically handles CS
 
 ## Common Issues
 
-### No Response from Device
+- **Problem**: The device does not respond, or you read all 0x00 or all 0xFF
+- **Solution**: Check the wiring (MOSI to the device's data-in, MISO to its data-out), then try mode 0 and mode 3, and drop the speed to 100 kHz while testing
+- **Why**: A device sampling on the wrong clock edge sees garbage, and a floating MISO line reads as all ones or all zeros
 
-**Problem**: Device doesn't respond to commands
+- **Problem**: The reply is shifted by one byte, or the data byte is missing
+- **Solution**: Send the command plus a dummy byte and keep the second byte received:
 
-**Possible causes**:
-- Wrong SPI mode (polarity/phase)
-- CS not connected or incorrect logic level
-- Clock speed too fast for device
-
-**Solution**:
 ```python
-# Try Mode 0 first
-spi = SPI(0, baudrate=1000000, polarity=0, phase=0, ...)
-
-# If that doesn't work, try Mode 3
-spi = SPI(0, baudrate=1000000, polarity=1, phase=1, ...)
-
-# Try slower speed
-spi = SPI(0, baudrate=100000, ...)
+tx_buf = bytearray([0x8F, 0x00, 0x00])  # command, then dummy bytes to clock data in
+rx_buf = bytearray(3)
+spi.write_readinto(tx_buf, rx_buf)
+data = rx_buf[1:]  # the first byte is whatever the device sent while receiving the command
 ```
 {: .no-snakie }
 
-### Reading Wrong Data
+- **Why**: SPI is full-duplex, so the device can only send while the controller is clocking, and it cannot reply to the byte it is still receiving
 
-**Problem**: Data received doesn't match expected values
+- **Problem**: `ValueError: bad SCK pin` (or MOSI or MISO)
+- **Solution**: Use pins from the SPI0 or SPI1 list in this lesson, with all three on the same bus
+- **Why**: Hardware SPI is built into fixed pins on the RP2040
 
-**Causes**:
-- MOSI and MISO swapped
-- Wrong bit order (MSB vs LSB first)
-- Not sending dummy bytes when reading
+## Check your understanding
 
-**Solution**:
-```python
-# Check wire connections - MOSI should go to MOSI (or SDI)
-# Some devices need dummy bytes for reading
-tx_buf = bytearray([read_cmd, 0x00, 0x00])  # Extra dummy bytes
-rx_buf = bytearray(3)
-spi.write_readinto(tx_buf, rx_buf)
-data = rx_buf[1:]  # Skip first byte (command echo)
-```
+{% quiz %}
+? How does the controller choose which SPI device to talk to?
+- [ ] By its address
+- [x] By pulling that device's chip select line low
+- [ ] By the order of the wires
+> I2C uses addresses; SPI uses a chip select wire for each device.
+
+? Which SPI mode has the clock idle low and samples on the rising edge?
+- [x] Mode 0 (polarity 0, phase 0)
+- [ ] Mode 1 (polarity 0, phase 1)
+- [ ] Mode 2 (polarity 1, phase 0)
+> Polarity 0 means the clock idles low, and phase 0 means data is sampled on the first (rising) edge.
+
+? Which Pico pins can be SPI0 SCK?
+- [ ] GP0, GP4 or GP16
+- [x] GP2, GP6 or GP18
+- [ ] Any GPIO
+> GP0, GP4 and GP16 are the SPI0 MISO choices. Only chip select can be any GPIO.
+{% endquiz %}
 
 ## What You've Learned
 

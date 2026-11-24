@@ -10,7 +10,9 @@ next: 10_i2c-vs-spi.html
 description: Build a complete temperature monitoring system using the MAX31855 thermocouple
   amplifier
 percent: 77
-duration: 9
+duration: 12
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -59,9 +61,11 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to write a MAX31855 driver class, read and decode its 32-bit SPI reply, and handle thermocouple faults in a monitoring program.
+
 ## Building a Temperature Monitor
 
-Let's build a complete, production-ready temperature monitoring system using the MAX31855 thermocouple amplifier. This lesson covers reading data, error handling, calibration, and creating a robust sensor class.
+Let's build a complete temperature monitoring system using the MAX31855 thermocouple amplifier. This lesson covers reading data, error handling, calibration, and creating a robust sensor class.
 
 ## Understanding the MAX31855
 
@@ -92,9 +96,10 @@ Bit 0:     OC (Open Circuit) fault
 
 ## Basic MAX31855 Class
 
-Let's create a robust sensor class:
+Let's create a robust sensor class. Save this block on the Pico as `max31855.py`; the later examples import it. Running it directly (with the sensor wired as in lesson 8) also prints a test reading.
 
 ```python
+# max31855.py
 from machine import Pin, SPI
 import time
 
@@ -121,11 +126,11 @@ class MAX31855:
         try:
             temp = self.read_temperature()
             if temp is None:
-                print("⚠️  Warning: MAX31855 might not be connected properly")
+                print("[WARNING] MAX31855 might not be connected properly")
             else:
-                print(f"✓ MAX31855 initialized ({temp:.2f}°C)")
+                print(f"[OK] MAX31855 initialized ({temp:.2f}°C)")
         except Exception as e:
-            print(f"❌ MAX31855 initialization failed: {e}")
+            print(f"[FAIL] MAX31855 initialization failed: {e}")
 
     def read_raw(self):
         """Read 32-bit raw data from MAX31855"""
@@ -183,7 +188,7 @@ class MAX31855:
         # Check for errors
         error_status = self.check_errors(raw)
         if error_status["has_error"]:
-            print(f"❌ Thermocouple error: {error_status['error_type']}")
+            print(f"[FAIL] Thermocouple error: {error_status['error_type']}")
             return None
 
         # Extract temperature (bits 31:18)
@@ -220,19 +225,19 @@ class MAX31855:
 
         return internal_temp
 
-# Initialize
-spi = SPI(0, baudrate=5000000, polarity=0, phase=0,
-          sck=Pin(2), mosi=Pin(3), miso=Pin(4))
+# Test reading (only runs when you run this file directly)
+if __name__ == "__main__":
+    spi = SPI(0, baudrate=5000000, polarity=0, phase=0,
+              sck=Pin(2), mosi=Pin(3), miso=Pin(4))
 
-sensor = MAX31855(spi, cs_pin=5)
+    sensor = MAX31855(spi, cs_pin=5)
 
-# Read temperature
-temp = sensor.read_temperature()
-if temp is not None:
-    print(f"Temperature: {temp:.2f}°C")
+    temp = sensor.read_temperature()
+    if temp is not None:
+        print(f"Temperature: {temp:.2f}°C")
 
-internal = sensor.read_internal_temperature()
-print(f"Internal temp: {internal:.2f}°C")
+    internal = sensor.read_internal_temperature()
+    print(f"Internal temp: {internal:.2f}°C")
 ```
 
 ## Continuous Monitoring
@@ -242,8 +247,7 @@ Create a real-time temperature monitor:
 ```python
 from machine import Pin, SPI
 import time
-
-# ... (MAX31855 class from above)
+from max31855 import MAX31855
 
 def monitor_temperature(sensor, duration_seconds=60, interval_seconds=2):
     """
@@ -317,6 +321,10 @@ Completed 15 readings in 15.2 seconds
 Add threshold alerts for safety monitoring:
 
 ```python
+from machine import Pin, SPI
+import time
+from max31855 import MAX31855
+
 class MAX31855_WithAlerts(MAX31855):
     """MAX31855 with temperature alerts"""
 
@@ -337,12 +345,12 @@ class MAX31855_WithAlerts(MAX31855):
         if temp < self.low_threshold:
             status = "LOW"
             if not self.alert_active:
-                print(f"\n⚠️  LOW TEMPERATURE ALERT: {temp:.2f}°C\n")
+                print(f"\n[WARNING] LOW TEMPERATURE ALERT: {temp:.2f}°C\n")
                 self.alert_active = True
         elif temp > self.high_threshold:
             status = "HIGH"
             if not self.alert_active:
-                print(f"\n🔥 HIGH TEMPERATURE ALERT: {temp:.2f}°C\n")
+                print(f"\nHIGH TEMPERATURE ALERT: {temp:.2f}°C\n")
                 self.alert_active = True
         else:
             status = "OK"
@@ -365,10 +373,10 @@ for i in range(20):
     temp, status = oven_sensor.read_with_alert()
 
     if temp is not None:
-        indicator = "✓" if status == "OK" else "⚠️"
+        indicator = "[OK]" if status == "OK" else "[WARNING]"
         print(f"{indicator} [{status:5s}] {temp:6.2f}°C")
     else:
-        print("❌ [ERROR] Thermocouple fault")
+        print("[ERROR] Thermocouple fault")
 
     time.sleep(2)
 ```
@@ -378,10 +386,9 @@ for i in range(20):
 Log temperature data to a file:
 
 ```python
-from machine import Pin, SPI, RTC
+from machine import Pin, SPI
 import time
-
-# ... (MAX31855 class from above)
+from max31855 import MAX31855
 
 def log_temperature(sensor, filename="temp_log.csv", duration_seconds=3600):
     """
@@ -411,7 +418,7 @@ def log_temperature(sensor, filename="temp_log.csv", duration_seconds=3600):
 
                 if temp_c is not None:
                     temp_f = temp_c * 9/5 + 32
-                    timestamp = time.time()
+                    timestamp = time.time()  # seconds, but see the note below
 
                     # Write to file
                     f.write(f"{timestamp},{temp_c:.2f},{temp_f:.2f},{internal_c:.2f}\n")
@@ -436,11 +443,17 @@ sensor = MAX31855(spi, cs_pin=5)
 log_temperature(sensor, filename="oven_temp.csv", duration_seconds=60)
 ```
 
+> **Note**: The Pico has no battery-backed clock, so `time.time()` only gives real dates if Thonny or `ntptime` set the clock when the program started. Otherwise it counts from a fixed start date each time the board powers up. For a log you can trust, either set the time first or record the reading number instead.
+
 ## Advanced: Moving Average Filter
 
 Smooth noisy readings:
 
 ```python
+from machine import Pin, SPI
+import time
+from max31855 import MAX31855
+
 class MAX31855_Filtered(MAX31855):
     """MAX31855 with moving average filter"""
 
@@ -499,9 +512,11 @@ Experiment with the MAX31855:
 ```python
 sensor = MAX31855(spi, cs_pin=5)
 
-print("24-hour temperature monitoring")
-log_temperature(sensor, duration_seconds=86400)  # 24 hours
+print("10-minute temperature log")
+log_temperature(sensor, duration_seconds=600)  # 10 minutes
 ```
+
+(This reuses `log_temperature` from the data logging section above.) Keep logs short: one row a second for 24 hours is over two megabytes of text, which is more than the Pico's flash can hold. For long runs, log once a minute.
 
 3. **Create a temperature controller**:
 
@@ -528,6 +543,8 @@ def simple_controller(sensor, target_temp, heater_pin):
 # Use with caution - add proper safety features!
 # simple_controller(sensor, target_temp=50, heater_pin=10)
 ```
+
+> **Warning**: Never connect a heater, kettle, oven element or any mains device directly to a GPIO pin. A GPIO pin can only drive a few milliamps at 3.3 V. For anything bigger use a proper relay or solid-state relay module, keep mains wiring away from the breadboard, and add an independent over-temperature cut-out. Test this exercise with a small LED as the "heater".
 
 4. **Challenge**: Calculate rate of temperature change:
 
@@ -591,6 +608,44 @@ else:
     print("Unable to read sensor - check connections")
 ```
 
+## Common Issues
+
+- **Problem**: `print` shows "Open circuit" or the reading is always `None`
+- **Solution**: Check the thermocouple is firmly in its terminals, and that the wire is not broken near the tip
+- **Why**: The MAX31855 sets its fault flag when the thermocouple is open, so the driver deliberately returns `None`
+
+- **Problem**: Readings are a steady few degrees off
+- **Solution**: Keep the breakout board out of draughts and away from heat, and compare with a second thermometer
+- **Why**: The chip adds the board's own temperature (the cold junction) to the thermocouple voltage, so a warm or unevenly heated board shifts every reading
+
+- **Problem**: `ImportError: no module named 'max31855'`
+- **Solution**: Save the class block as `max31855.py` on the Pico
+- **Why**: The later examples import the class from that file
+
+## Check your understanding
+
+{% quiz %}
+? How many bytes does the MAX31855 send in one read?
+- [ ] One
+- [ ] Two
+- [x] Four (32 bits)
+> The chip returns the thermocouple temperature, the fault flag and its own temperature in one 32-bit word.
+
+? Which bit tells you that something is wrong with the thermocouple?
+- [ ] Bit 31
+- [x] Bit 16
+- [ ] Bit 3
+> Bit 16 is the fault indicator; bits 0 to 2 say which fault it is.
+
+? What temperature step does one count of the thermocouple reading represent?
+- [ ] 1 degree
+- [x] 0.25 degrees
+- [ ] 0.0625 degrees
+> The 14-bit thermocouple value is in quarter-degree steps; 0.0625 is the internal temperature step.
+{% endquiz %}
+
+> **Teachers**: Temperature control and logging work is a good chance to talk about safety. Learners should test heater code with an LED, never mains equipment, and keep hot probes away from skin and cables. Short log files also stop the Pico's flash filling up if several pupils share one board.
+
 ## What You've Learned
 
 In this lesson, you mastered:
@@ -605,7 +660,7 @@ In this lesson, you mastered:
 - Error handling and retry logic
 - Building practical temperature control systems
 
-You now have production-ready code for working with SPI sensors. These patterns apply to many other SPI devices.
+You now have a solid pattern for working with SPI sensors. These patterns apply to many other SPI devices.
 
 ## What's Next
 

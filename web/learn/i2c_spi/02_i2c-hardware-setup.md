@@ -10,7 +10,9 @@ next: 03_scanning-i2c-devices.html
 description: Learn how to properly wire I2C devices with pull-up resistors and make
   reliable connections
 percent: 28
-duration: 8
+duration: 11
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -59,6 +61,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to wire a BME280 to the Pico, explain why the bus needs pull-up resistors, and check the wiring with a scan.
+
 ## Wiring Your First I2C Device
 
 Now that you understand what I2C is, let's connect a real BME280 sensor to your Raspberry Pi Pico. This lesson covers everything you need to know about physical connections, power requirements, and the mysterious pull-up resistors.
@@ -87,7 +91,7 @@ Most BME280 breakout boards have 4 pins:
 | SDA | Serial Data | Connect to Pico GP8 |
 {:class="table table-single table-narrow"}
 
-> **Important**: Some BME280 boards can handle 5V power, but the Pico outputs 3.3V. Always use 3.3V to be safe.
+> **Important**: The BME280 chip itself runs from 1.71 V to 3.6 V. Some breakout boards add a regulator so they can be powered from 5 V, but the Pico's GPIO pins are only 3.3 V tolerant, so power the board from the Pico's 3V3(OUT) pin (pin 36). Never connect VBUS (5 V) to a board whose pull-up resistors go to VCC: it would put 5 V on SDA and SCL.
 
 ## The Essential Pull-up Resistors
 
@@ -107,10 +111,12 @@ Without pull-up resistors, the lines would float randomly when released. The res
 
 Most BME280 breakout boards already have pull-up resistors built in! Look at your board carefully:
 
-- Small resistors labeled "103" (10kΩ) or "473" (47kΩ) near SDA/SCL
-- Sometimes labeled "R1" and "R2"
+- Small surface-mount resistors marked "103" (10 kilohms), "472" (4.7 kilohms) or "502" (5 kilohms) near SDA/SCL
+- Sometimes labelled "R1" and "R2"
 
-If your board has these, you don't need to add external resistors. If it doesn't, you'll need to add 4.7kΩ or 10kΩ resistors between SDA/SCL and 3.3V.
+If your board has these, you don't need to add external resistors. If it doesn't, add a 4.7 kilohm resistor from SDA to 3.3V and another from SCL to 3.3V (10 kilohms is fine at 100 kHz).
+
+The Pico's I2C driver also switches on the RP2040's own internal pull-ups, but those are weak (roughly 50 to 80 kilohms), so a bus that "half works" without proper pull-ups often fails once you raise the speed or add wires. Treat real pull-ups as required.
 
 ```python
 # You don't need to do anything in code for pull-ups
@@ -132,68 +138,58 @@ Here's the complete wiring guide:
    - BME280 SCL → Pico GP9 (pin 12)
    - BME280 SDA → Pico GP8 (pin 11)
 
-### Pico Pinout Reference
+### Wiring table
 
+| BME280 pin | Pico GPIO | Pico physical pin |
+|------------|-----------|-------------------|
+| VCC | 3V3(OUT) | 36 |
+| GND | GND | 38 (or any GND pin) |
+| SDA | GP8 | 11 |
+| SCL | GP9 | 12 |
+{:class="table table-single table-narrow"}
+
+```mermaid
+flowchart LR
+    subgraph Pico
+        P36["3V3(OUT) pin 36"]
+        P38["GND pin 38"]
+        P11["GP8 (SDA) pin 11"]
+        P12["GP9 (SCL) pin 12"]
+    end
+    subgraph BME280 module
+        VCC
+        GND
+        SDA
+        SCL
+    end
+    P36 --- VCC
+    P38 --- GND
+    P11 --- SDA
+    P12 --- SCL
 ```
-Raspberry Pi Pico Pinout (relevant pins):
-┌─────────────────────────┐
-│  USB PORT               │
-├─────────────────────────┤
-│ 1  GP0              VBUS│ 40
-│ 2  GP1              VSYS│ 39
-│ 3  GND               GND│ 38
-│ 4  GP2           3V3_EN │ 37
-│ 5  GP3              3.3V│ 36 ← Connect VCC here
-│ 6  GP4               REF│ 35
-│ 7  GP5              GP28│ 34
-│ 8  GND               GND│ 33 ← Connect GND here
-│ 9  GP6               GND│ 32
-│10  GP7              GP27│ 31
-│11  GP8 (SDA)        GP26│ 30 ← Connect SDA here
-│12  GP9 (SCL)        RUN │ 29 ← Connect SCL here
-└─────────────────────────┘
-```
 
-### Color Coding Tips
+### Colour coding tips
 
-If you're using jumper wires, consider this color scheme:
+If you're using jumper wires, consider this colour scheme:
 
 - **Red** - Power (VCC to 3.3V)
 - **Black** - Ground (GND to GND)
 - **Yellow** - SCL (clock)
 - **Blue** - SDA (data)
 
-This makes troubleshooting easier and keeps your projects organized.
+This makes troubleshooting easier and keeps your projects organised.
 
 ## Physical Connection Best Practices
 
 ### Use a Breadboard
 
-For prototyping, breadboards are perfect:
-
-```
-Breadboard Layout:
-┌────────────────────────────┐
-│ + + + + + + + + + + + + +  │ ← Power rail (connect to 3.3V)
-│ - - - - - - - - - - - - -  │ ← Ground rail (connect to GND)
-│                            │
-│  [BME280 Module]           │
-│   VCC GND SCL SDA          │
-│    │   │   │   │           │
-│    └───┼───┼───┼──────┐    │
-│        └───┼───┼──┐   │    │
-│            └───┼┐ │   │    │
-│                ││ │   │    │
-└────────────────┼┼─┼───┼────┘
-                 ││ │   │
-              To Pico Pins
-```
+For prototyping, breadboards are perfect. Run 3.3V and GND to the power rails first, then plug the BME280 header into the board and wire SDA and SCL straight across to the Pico.
 
 ### Wire Length Matters
 
 - Keep wires **short** - under 10cm if possible
 - Longer wires increase capacitance and can cause communication errors
-- If you need longer distances, consider I2C bus extenders
+- If you need longer distances, slow the bus to 100 kHz or use a dedicated I2C bus extender chip
 
 ### Secure Connections
 
@@ -217,9 +213,10 @@ The Raspberry Pi Pico uses 3.3V logic:
 
 The BME280 uses very little current:
 
-- **Typical**: 3.6μA (microamps) in sleep mode
-- **Measuring**: 714μA during readings
-- **Pico can supply**: Up to 300mA from 3.3V pin
+- **Sleep mode**: about 0.1 microamps
+- **One reading per second** at the lowest oversampling: about 3.6 microamps on average
+- **During a measurement**: roughly 350 microamps for a few milliseconds
+- **Pico 3V3(OUT) pin**: suitable for about 300 milliamps in total
 
 This means you can power the BME280 directly from the Pico with no issues.
 
@@ -235,9 +232,8 @@ import time
 i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=400000)
 
 print("Testing I2C connection...")
-print("If this runs without errors, wiring is likely correct")
 
-# Try to scan for devices (we'll learn more about this in the next lesson)
+# Scan for devices (we'll learn more about this in the next lesson)
 devices = i2c.scan()
 
 if devices:
@@ -283,7 +279,7 @@ devices = i2c.scan()
 print(f"Devices on alternate pins: {devices}")
 ```
 
-## Common Wiring Issues
+## Wiring Checklists
 
 ### No Devices Found
 
@@ -305,8 +301,6 @@ print(f"Devices on alternate pins: {devices}")
 
 ### OSError or Bus Error
 
-**Problem**: Error message like "OSError: [Errno 5] EIO" or "I2C bus error"
-
 **Possible causes**:
 1. Missing pull-up resistors
 2. Short circuit between SDA and SCL
@@ -318,8 +312,6 @@ print(f"Devices on alternate pins: {devices}")
 - Try a different sensor if available
 
 ### Wrong Address
-
-**Problem**: Device found but at unexpected address
 
 **This is usually fine!** BME280 sensors can appear at either 0x76 or 0x77. Make note of your sensor's address - you'll need it for the next lesson.
 
@@ -357,6 +349,44 @@ Pico GND ────────┬── Device 1 GND
 Each device gets its own power and ground, but they share the communication lines.
 
 > **Remember**: Each device needs a unique address. You can't have two BME280s at 0x76 on the same bus.
+
+## Common Issues
+
+- **Problem**: The scan prints "No devices found"
+- **Solution**: Check VCC, GND, SDA and SCL one wire at a time, and make sure SDA is on GP8 and SCL on GP9 to match the code
+- **Why**: A single loose or swapped wire looks exactly the same to the Pico as no sensor at all
+
+- **Problem**: The scan finds a device, but at 0x77 and not 0x76 (or the other way round)
+- **Solution**: Use the address the scan reports; do not change the sensor
+- **Why**: The BME280 has two valid addresses, chosen by the level on its SDO pin
+
+- **Problem**: `OSError: [Errno 5] EIO` or `[Errno 110] ETIMEDOUT`
+- **Solution**: Check for a short between SDA and SCL, and for missing pull-up resistors
+- **Why**: The Pico cannot get an acknowledgement from the device, so the bus transaction fails
+
+## Check your understanding
+
+{% quiz %}
+? Why do SDA and SCL need pull-up resistors?
+- [ ] To make the clock run faster
+- [x] Devices can only pull the lines low, so resistors pull them high when released
+- [ ] To protect the sensor from static
+> I2C uses open-drain outputs: devices pull a line down, and the resistor lifts it back up.
+
+? Which Pico pin should power a BME280 breakout?
+- [ ] VBUS (5 V)
+- [x] 3V3(OUT), pin 36
+- [ ] Any GPIO pin
+> The Pico's GPIO pins are 3.3 V, so power the sensor from 3.3 V as well.
+
+? Where do GP8 (SDA) and GP9 (SCL) sit on the Pico's header?
+- [ ] Pins 36 and 38
+- [x] Pins 11 and 12
+- [ ] Pins 1 and 2
+> The wiring table in this lesson lists the physical pin numbers.
+{% endquiz %}
+
+> **Teachers**: Breakout boards differ, so have learners check the silkscreen for the VCC voltage before connecting power. A module wired the wrong way round can fail in seconds, so a quick wiring check by a second pair of eyes before plugging in the USB cable saves modules. Keep a couple of spare BME280 boards in the class set.
 
 ## What You've Learned
 

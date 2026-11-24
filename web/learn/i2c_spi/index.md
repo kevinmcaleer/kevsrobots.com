@@ -8,9 +8,28 @@ description: Master I2C and SPI communication protocols on Raspberry Pi Pico. Le
   to connect sensors, scan for devices, read datasheets, and build real-world projects
   with practical hands-on examples using the BME280 sensor.
 level: intermediate
-course_duration: 1h 56m
+course_duration: 2h 29m
 lesson_count: 14
 first_lesson: 00_intro.html
+quiz_total: 36
+outcomes:
+- Wire an I2C sensor to a Raspberry Pi Pico, with the right pins, pull-up resistors
+  and 3.3 V power
+- Scan an I2C bus, read the hexadecimal addresses it returns and fix address problems
+- Save a driver on the Pico and read temperature, pressure and humidity from a BME280
+- Find the address, registers and data format you need in a datasheet and use them
+  from MicroPython
+- Wire and read an SPI device, and choose the right SPI mode, speed and chip select
+- Choose between I2C and SPI for a project, and troubleshoot a bus that is not working
+prerequisites:
+- Basic MicroPython on the Pico, such as the Introduction to MicroPython course (variables,
+  functions, loops)
+- Helpful but not required, Electronics Basics for voltage, current and resistors
+you_need:
+- A Raspberry Pi Pico or Pico W with MicroPython installed, a USB cable and Thonny
+- A BME280 sensor breakout (I2C), a breadboard and jumper wires
+- Optional for the SPI lessons, a MAX31855 thermocouple breakout and a K-type thermocouple
+- Optional for the final project, a 128x64 SSD1306 I2C OLED display
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
