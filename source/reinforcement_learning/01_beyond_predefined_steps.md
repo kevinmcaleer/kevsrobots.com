@@ -109,6 +109,7 @@ for episode in range(500):
 
     print(f"Episode {episode}: total reward = {total_reward:.1f}")
 ```
+{: .no-snakie }
 
 Each episode, the robot tries to navigate a grid, gets rewards for good moves and penalties for collisions, and updates a table of "how good is each action in each situation?" values. After enough episodes, that table holds a surprisingly competent policy — no rules written by hand.
 

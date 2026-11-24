@@ -32,6 +32,7 @@ Before diving into specific issues, adopt this approach:
 devices = i2c.scan()
 print(devices)  # Prints: []
 ```
+{: .no-snakie }
 
 **Possible causes**:
 
@@ -52,6 +53,7 @@ print(devices)  # Prints: []
 # Fix: Match code to actual wiring
 i2c = I2C(0, scl=Pin(9), sda=Pin(8))  # Check physical connections!
 ```
+{: .no-snakie }
 
 3. **Power not connected**
 
@@ -256,6 +258,7 @@ for mode in range(4):
 
     print(f"Mode {mode} (CPOL={polarity}, CPHA={phase}): {response}")
 ```
+{: .no-snakie }
 
 2. **Chip select not working**
 
@@ -280,6 +283,7 @@ cs.value(1)  # Start HIGH (deselected)
 # Solution: Swap in code or physically
 spi = SPI(0, sck=Pin(2), mosi=Pin(4), miso=Pin(3))  # Swapped
 ```
+{: .no-snakie }
 
 ### Issue 6: SPI Data Corrupted
 
@@ -296,6 +300,7 @@ spi = SPI(0, baudrate=100000, ...)   # 100 kHz
 spi = SPI(0, baudrate=1000000, ...)  # 1 MHz
 spi = SPI(0, baudrate=10000000, ...) # 10 MHz
 ```
+{: .no-snakie }
 
 2. **Wires too long**
 
@@ -449,6 +454,7 @@ except OSError as e:
     print(f"Sensor error: {e}")
     # Fallback behavior
 ```
+{: .no-snakie }
 
 **2. Add timeouts**
 

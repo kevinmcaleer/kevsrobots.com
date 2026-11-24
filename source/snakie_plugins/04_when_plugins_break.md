@@ -29,11 +29,13 @@ There are two kinds of failure, and Snakie shows them in different places.
 
 Open `__init__.py` and delete the colon from the end of the `def` line:
 
+<!-- code-check: skip -->
 ```python
 @plugin.command("clubkit.hi", "Say hi")
 def say_hi(ctx: Context)
     return message("info", f"Hi from ClubKit! You're editing {ctx.file.name}.")
 ```
+{: .no-snakie }
 
 Save and click **Reload**.
 
@@ -63,6 +65,7 @@ def say_hi(ctx: Context):
     laps = 10 / 0
     return message("info", f"Hi from ClubKit! You're editing {ctx.file.name}.")
 ```
+{: .no-snakie }
 
 Save and Reload. This time the plugin loads happily, because the file is valid Python. Now click **RUN**.
 
@@ -87,6 +90,7 @@ You don't get a line number for a crash, so here are three ways to track one dow
 ```python
 return message("info", f"content has {len(ctx.file.content)} characters")
 ```
+{: .no-snakie }
 
 **2. Test the idea outside Snakie.** Most plugin code is ordinary string handling. Try the tricky line in a Python prompt first, where you get a full traceback.
 
@@ -99,6 +103,7 @@ def say_hi(ctx: Context):
         return message("warning", "Open a file first.")
     return message("info", f"Hi from ClubKit! You're editing {ctx.file.name}.")
 ```
+{: .no-snakie }
 
 A friendly warning beats a `TypeError` every time, especially if other people will use your plugin.
 
