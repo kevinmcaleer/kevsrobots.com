@@ -6,18 +6,19 @@ type: page
 cover: /learn/python/assets/banners/18_tips_and_tricks.jpg
 date: 2023-07-20
 previous: 17_apps.html
-description: Discover various Python tips, tricks, and best practices, such as writing
-  Pythonic code, following PEP 8 style guide, and using the Black code formatter.
+description: Write more Pythonic code, format it with Black, and find out where to
+  go next after this course.
 percent: 100
-duration: 3
-quiz_total: 27
+duration: 5
+quiz_total: 58
+date_updated: 2026-11-24
 navigation:
 - name: Python for beginners
 - content:
   - section: Introduction
     content:
     - name: Introduction to Python Programming
-      link: 01_intro.html
+      link: 00_intro.html
     - name: Python Basics
       link: 02_basics.html
     - name: Python Data Structures
@@ -38,7 +39,7 @@ navigation:
     content:
     - name: Web Scraping with Python
       link: 10_webscraping.html
-    - name: Data Visualization
+    - name: Data Visualisation
       link: 11_data_visualisation.html
     - name: Machine Learning with Python
       link: 12_ml.html
@@ -61,37 +62,36 @@ navigation:
 
 ---
 
-## Introduction
-
-In addition to the basics, it's also important to familiarize yourself with Python best practices, tips, and tricks. These can help you write more efficient, readable, and Pythonic code. This lesson will introduce you to some of these techniques.
+By the end of this lesson you will be able to write list comprehensions and use `enumerate()` and built-in functions in place of clumsy loops, format your code with Black, and choose your next course.
 
 ---
 
-## Learning Objectives
+Working code is the first goal. Readable code is the second, because you will come back to it in a month and wonder what on earth you were thinking. These tips help you write code that other makers (and future you) can follow at a glance.
 
-- Understand what Pythonic code is.
-- Learn about the PEP 8 style guide and the Black code formatter.
-- Discover resources for further learning.
+## Writing Pythonic code
 
----
+"Pythonic" code uses Python's idioms and follows widely accepted conventions. Here are three habits that make code shorter and clearer.
 
-### Writing Pythonic Code
+**Use list comprehensions** instead of building a list with a loop:
 
-`Pythonic code` is a term used to describe code that effectively uses Python idioms and follows widely accepted Python coding conventions. Here are a few examples of Pythonic code:
-
-- Use list comprehensions instead of traditional for loops:
-
-```python
+{% capture snakie_code %}
 # Non-Pythonic
 squares = []
 for i in range(10):
     squares.append(i * i)
-    
+
 # Pythonic
 squares = [i * i for i in range(10)]
-```
+print(squares)
 
-- Loop over items directly, and use `enumerate()` when you need the position too:
+# With a filter: only the sensor readings that are too close
+distances = [80, 15, 42, 9, 63]
+too_close = [d for d in distances if d < 20]
+print(too_close)   # [15, 9]
+{% endcapture %}
+{% include snakie.html code=snakie_code name="tips_comprehension.py" engine="pyodide" %}
+
+**Loop over items directly**, and use `enumerate()` when you also need the position:
 
 {% capture snakie_code %}
 fruits = ["apple", "banana", "cherry"]
@@ -106,9 +106,9 @@ for i, fruit in enumerate(fruits):
 {% endcapture %}
 {% include snakie.html code=snakie_code name="tips_and_tricks.py" engine="pyodide" %}
 
-- Use built-in functions like `sum()`, `max()` and `sorted()` instead of writing your own loops:
+**Use built-in functions** like `sum()`, `max()`, `min()` and `sorted()` instead of writing your own loops:
 
-```python
+{% capture snakie_code %}
 scores = [7, 3, 9]
 
 # Non-Pythonic
@@ -118,42 +118,51 @@ for s in scores:
 
 # Pythonic
 total = sum(scores)
-```
+print(total, max(scores), sorted(scores))
+{% endcapture %}
+{% include snakie.html code=snakie_code name="tips_builtins.py" engine="pyodide" %}
 
----
+## PEP 8 and the Black code formatter
 
-### PEP 8 and the Black Code Formatter
+`PEP 8` is Python's official style guide. It recommends things like four spaces per indentation level, lowercase names with underscores for variables and functions (`battery_level`), and whitespace that makes code visually clear. Following it means your code looks familiar to every other Python programmer.
 
-`PEP 8` is Python's official style guide. It offers recommendations on how to format your code to make it more readable and consistent. Some recommendations include using 4 spaces per indentation level, limiting lines to a maximum of 79 characters, and using whitespace in a way that is visually clear.
+[`Black`](https://black.readthedocs.io/en/stable/) is a code formatter that applies a consistent style automatically, so you never have to argue about spaces. Its default maximum line length is 88 characters. Install it in your virtual environment and run it on a file:
 
-[`Black`](https://black.readthedocs.io/en/stable/) is an uncompromising code formatter for Python. It automatically formats your code to conform to the PEP 8 style guide. It's easy to use, and once you have it set up, you don't have to worry about manually formatting your code anymore.
-
-```shell
-# To install Black
+```bash
 pip install black
-
-# To use Black
 black your_file.py
 ```
+{: .no-snakie }
 
----
+Black rewrites the file in place, so commit or back up your work first if you want to compare before and after. It is also available as an editor plug-in, which formats your code each time you save.
 
-### Further Learning Resources
+## Further learning resources
 
-Here are some resources for further learning:
-
-- [Python Documentation](https://docs.python.org/3/): Official Python documentation and tutorials.
-- [Real Python](https://realpython.com/): Offers Python tutorials, articles, and other educational content.
+- [Python Documentation](https://docs.python.org/3/): the official documentation and tutorial.
+- [Real Python](https://realpython.com/): tutorials, articles and other educational content.
 - [PyBites](https://pybit.es/): Python code challenges and exercises.
-- [Project Euler](https://projecteuler.net/): A series of challenging mathematical/computer programming problems.
+- [Project Euler](https://projecteuler.net/): a series of challenging mathematical and programming problems.
 
 ---
 
-## Summary
+## Try it Yourself
 
-In this lesson, you've learned about Python best practices, such as writing Pythonic code, following the PEP 8 style guide, and using the Black code formatter. We've also shared some resources for further learning. Keep exploring and practicing Python to further enhance your skills.
+1. Rewrite this loop as a list comprehension: `doubled = []` then `for n in [1, 2, 3]: doubled.append(n * 2)`.
+1. Make a list of five distances and use a comprehension to build a list of only those over 30.
+1. Use `enumerate()` to print a numbered list of your robot's sensors, starting from 1 (hint: `enumerate(items, start=1)`).
+1. Challenge: install Black in a virtual environment, deliberately write some untidy code with odd spacing, and watch it get cleaned up.
 
----
+## Common Issues
+
+- **Problem**: `black: command not found`.
+- **Solution**: Activate the virtual environment you installed it in, or run `python -m black your_file.py`.
+- **Why**: Black is installed inside the environment, so the command only exists there.
+
+- **Problem**: A list comprehension has become long and unreadable.
+- **Solution**: Switch back to a normal `for` loop.
+- **Why**: Comprehensions are for short, simple jobs. Clear beats clever.
+
+## Check your understanding
 
 {% quiz %}
 ? Which is the most Pythonic way to add up a list called `scores`?
@@ -161,14 +170,30 @@ In this lesson, you've learned about Python best practices, such as writing Pyth
 - [ ] `for i in range(len(scores))`
 - [x] `sum(scores)`
 > Built-in functions are shorter, clearer and usually faster.
+
+? What does `[d for d in distances if d < 20]` build?
+- [x] A list of only the distances under 20
+- [ ] A single number
+- [ ] A dictionary
+> A list comprehension with an `if` keeps only the items that pass the test.
+
+? What does Black do?
+- [ ] Runs your program faster
+- [x] Automatically formats your code in a consistent style
+- [ ] Finds bugs
+> Black rewrites spacing and layout, but it does not change what your code does.
 {% endquiz %}
 
 ---
 
-## What's next?
+## Summary and what's next
 
-- [Data Manipulation with Pandas and Numpy](/learn/pandas_and_numpy/) - work with real data
-- [Create Databases with Python and SQLite3](/learn/sqlite3/) - store your data properly
-- [Learn MicroPython - The basics](/learn/micropython/) - use your Python skills to control electronics and robots
+Congratulations, you have gone from `print("Hello, World!")` to variables, data structures, loops, functions, files, errors, modules, classes, a tour of real-world Python and a complete application. That is a big step. Python is a skill you build by making things, so keep going.
 
----
+Here is where to head next:
+
+- [Data Manipulation with Pandas and Numpy](/learn/pandas_and_numpy/): work with real data
+- [Create Databases with Python and SQLite3](/learn/sqlite3/): store your data properly
+- [Mastering Pydantic for Robust Data Validation](/learn/pydantic/): make sure your data is the right shape
+- [Learn MicroPython - The basics](/learn/micropython/): use your Python skills to control electronics and robots
+- [Reinforcement Learning](/learn/reinforcement_learning/): teach an agent by reward
