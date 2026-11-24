@@ -2206,12 +2206,12 @@
   {
     "slug": "learning_platform",
     "name": "How to use the Learning Platform",
-    "description": "Learn how to use the new Learning Platform",
+    "description": "A short, friendly guide to the Learn section of KevsRobots.com: find a course, follow a learning pathway, run code in your browser, download files, track your progress with quizzes, and use it all in a classroom.",
     "cover": "assets/learn.jpg",
     "author": "Kevin McAleer",
     "date_published": "2022-12-04",
     "groups": [
-      "learning platform"
+      "productivity"
     ],
     "lessons": [
       {
@@ -2226,13 +2226,23 @@
       },
       {
         "file": "02_navigate_content.md",
-        "section": "Navigating Content",
+        "section": "Finding and using content",
         "url": "/learn/learning_platform/02_navigate_content.html"
       },
       {
         "file": "03_download_content.md",
-        "section": "Navigating Content",
+        "section": "Finding and using content",
         "url": "/learn/learning_platform/03_download_content.html"
+      },
+      {
+        "file": "04_track_progress.md",
+        "section": "Finding and using content",
+        "url": "/learn/learning_platform/04_track_progress.html"
+      },
+      {
+        "file": "05_for_teachers.md",
+        "section": "Wrapping up",
+        "url": "/learn/learning_platform/05_for_teachers.html"
       }
     ]
   },

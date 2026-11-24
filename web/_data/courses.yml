@@ -433,11 +433,13 @@
 - author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
   date_published: 2022-12-04
-  description: Learn how to use the new Learning Platform
-  duration: 0h 4m
+  description: 'A short, friendly guide to the Learn section of KevsRobots.com: find
+    a course, follow a learning pathway, run code in your browser, download files,
+    track your progress with quizzes, and use it all in a classroom.'
+  duration: 0h 29m
   groups:
-  - learning platform
-  lessons: 4
+  - productivity
+  lessons: 6
   level: beginner
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
