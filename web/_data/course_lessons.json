@@ -3463,6 +3463,102 @@
     ]
   },
   {
+    "slug": "open_duck_mini",
+    "name": "Build an Open Duck Mini Walking Robot",
+    "description": "Build an Open Duck Mini, the open-source walking robot inspired by Disney's BDX droid. Print and assemble it, wire up a Raspberry Pi Zero 2W, 14 serial bus servos and an IMU, get it walking with the pretrained policy, then learn how its reinforcement learning brain was trained and train your own.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "robots",
+      "ai",
+      "raspberrypi",
+      "3dprinting"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Meet the duck",
+        "url": "/learn/open_duck_mini/00_intro.html"
+      },
+      {
+        "file": "01_what_is_open_duck_mini.md",
+        "section": "Meet the duck",
+        "url": "/learn/open_duck_mini/01_what_is_open_duck_mini.html"
+      },
+      {
+        "file": "02_parts_list.md",
+        "section": "Parts and printing",
+        "url": "/learn/open_duck_mini/02_parts_list.html"
+      },
+      {
+        "file": "03_printing_the_parts.md",
+        "section": "Parts and printing",
+        "url": "/learn/open_duck_mini/03_printing_the_parts.html"
+      },
+      {
+        "file": "04_bus_servos_and_ids.md",
+        "section": "Parts and printing",
+        "url": "/learn/open_duck_mini/04_bus_servos_and_ids.html"
+      },
+      {
+        "file": "05_assembling_the_legs.md",
+        "section": "Assembly",
+        "url": "/learn/open_duck_mini/05_assembling_the_legs.html"
+      },
+      {
+        "file": "06_head_body_and_battery.md",
+        "section": "Assembly",
+        "url": "/learn/open_duck_mini/06_head_body_and_battery.html"
+      },
+      {
+        "file": "07_wiring_the_electronics.md",
+        "section": "Assembly",
+        "url": "/learn/open_duck_mini/07_wiring_the_electronics.html"
+      },
+      {
+        "file": "08_setting_up_the_pi.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/08_setting_up_the_pi.html"
+      },
+      {
+        "file": "09_testing_imu_motors_and_controller.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/09_testing_imu_motors_and_controller.html"
+      },
+      {
+        "file": "10_calibration_and_offsets.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/10_calibration_and_offsets.html"
+      },
+      {
+        "file": "11_first_steps.md",
+        "section": "Bring it to life",
+        "url": "/learn/open_duck_mini/11_first_steps.html"
+      },
+      {
+        "file": "12_how_the_duck_learned_to_walk.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/12_how_the_duck_learned_to_walk.html"
+      },
+      {
+        "file": "13_training_your_own_policy.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/13_training_your_own_policy.html"
+      },
+      {
+        "file": "14_troubleshooting.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/14_troubleshooting.html"
+      },
+      {
+        "file": "15_summary.md",
+        "section": "The walking brain",
+        "url": "/learn/open_duck_mini/15_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "openclaw_raspberry_pi",
     "name": "OpenClaw on Raspberry Pi",
     "description": "Run OpenClaw, the open-source personal AI agent, on a Raspberry Pi in Docker. Build Pi Butler, an always-on assistant you talk to from your phone, with its own persona, a custom skill that reports how the Pi is feeling, a morning brief, backups, safe upgrades and a security check.",

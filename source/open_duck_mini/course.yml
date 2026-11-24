@@ -1,0 +1,72 @@
+- name: Build an Open Duck Mini Walking Robot
+  author: Kevin McAleer
+  date_created: 2026-11-24
+  date_published: 2026-11-24
+  level: intermediate
+  layout: course
+  cover: assets/cover.jpg
+  video: _YHOQFOzjKg
+  code_target: cpython
+  groups:
+      - robots
+      - ai
+      - raspberrypi
+      - 3dprinting
+  description: >-
+    Build an Open Duck Mini, the open-source walking robot inspired by Disney's BDX droid. Print and
+    assemble it, wire up a Raspberry Pi Zero 2W, 14 serial bus servos and an IMU, get it walking with
+    the pretrained policy, then learn how its reinforcement learning brain was trained and train your own.
+  outcomes:
+    - Explain how the four Open Duck repos fit together, from CAD to simulation to a policy on the Pi
+    - Configure 14 Feetech STS3215 serial bus servos with the right IDs before assembly
+    - Assemble the legs, head and body, and wire the Pi, IMU, foot switches and servo bus
+    - Set up the runtime on the Pi, test every part, calibrate the IMU and find the joint offsets
+    - Make the duck walk with the pretrained ONNX policy and drive it with an Xbox controller
+    - Describe how imitation rewards, a motor model and domain randomisation close the sim-to-real gap, and train a policy of your own
+  prerequisites:
+    - Reinforcement Learning for Beginners
+    - Introduction to the Linux Command Line on Raspberry Pi OS
+    - Basic soldering
+  you_need:
+    - The parts on the Open Duck Mini bill of materials (a Google Sheet linked from the Open_Duck_Mini repo)
+    - 14 Feetech STS3215 serial bus servos and the USB-serial servo control board listed on the BOM
+    - A Raspberry Pi Zero 2W (a Raspberry Pi 5 also works) and a microSD card
+    - A BNO055 IMU, two foot micro switches and the battery pack from the BOM
+    - M3 heat-set inserts, M3x10 and M3x6 screws, and Loctite 243
+    - A 3D printer that can print PLA and TPU, and a soldering iron
+    - An Xbox controller with Bluetooth
+    - Optional, for lesson 13, a decent NVIDIA GPU or a cloud GPU
+  projects:
+    - /projects/kev/open-duck-mini
+  content:
+    - section:
+        name: Meet the duck
+        content:
+          - 00_intro.md
+          - 01_what_is_open_duck_mini.md
+    - section:
+        name: Parts and printing
+        content:
+          - 02_parts_list.md
+          - 03_printing_the_parts.md
+          - 04_bus_servos_and_ids.md
+    - section:
+        name: Assembly
+        content:
+          - 05_assembling_the_legs.md
+          - 06_head_body_and_battery.md
+          - 07_wiring_the_electronics.md
+    - section:
+        name: Bring it to life
+        content:
+          - 08_setting_up_the_pi.md
+          - 09_testing_imu_motors_and_controller.md
+          - 10_calibration_and_offsets.md
+          - 11_first_steps.md
+    - section:
+        name: The walking brain
+        content:
+          - 12_how_the_duck_learned_to_walk.md
+          - 13_training_your_own_policy.md
+          - 14_troubleshooting.md
+          - 15_summary.md
