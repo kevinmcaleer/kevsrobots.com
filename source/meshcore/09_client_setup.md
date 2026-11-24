@@ -1,62 +1,72 @@
 ---
 title: Setting Up the Client
-description: Pair node 2 with the MeshCore phone app over Bluetooth and match its radio settings
+description: Pair node 2 with the MeshCore phone app over Bluetooth and match its radio settings to the repeater
 type: page
 layout: lesson
 cover: /learn/meshcore/assets/banners/09_client_setup.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Node 2 has companion firmware on it. It has no keyboard and no way to type a message - that is your phone's job. Let's pair them up.
+By the end of this lesson you will be able to pair the companion board with the app, match its radio settings, and send an advert.
+
+Node 2 has companion firmware. It has no keyboard, so your phone does the typing. Let's pair them.
 
 ---
 
 ## Getting the app
 
-The MeshCore companion apps are built by Liam Cottle and are available for **iOS, Android, Windows and macOS**. Search your app store for **MeshCore**, or grab them from [files.liamcottle.net/MeshCore](https://files.liamcottle.net/MeshCore).
+The MeshCore README lists the official clients: the **MeshCore app for Android and iOS** (find it in your app store, or follow the links on [meshcore.io](https://meshcore.io)) and the **web client** at [app.meshcore.nz](https://app.meshcore.nz). The apps are made by Liam Cottle.
 
-The app is free. There is an optional in-app purchase that removes a wait timer on remote server management, which becomes relevant in lesson 13 - you do not need it yet.
+According to the MeshCore FAQ, the apps are free to use, with an optional purchase that removes the wait timer on remote repeater management. You do not need it yet.
 
-**No phone?** If you flashed **Companion (USB Serial)** instead of BLE, plug the board into a computer and open [app.meshcore.nz](https://app.meshcore.nz) in Chrome or Edge. It is free, open source, and does the same job over USB.
+**No phone?** If you flashed Companion (USB Serial), plug the board into a computer and open the web client in Chrome or Edge.
 
 ---
 
 ## Pairing over Bluetooth
 
-1. Power up node 2 with its antenna fitted. The OLED should show a pairing screen or the node's name
-2. Open the MeshCore app and choose to add or connect a device
-3. Pick your node from the Bluetooth list - it will have a generic name like `MeshCore-a1b2` to begin with
-4. If a pairing code is requested, the default is usually `123456`, and the OLED will show a code if one is generated
-5. The app connects and shows you the node's status
+```mermaid
+sequenceDiagram
+    participant P as Phone app
+    participant N as Node 2 (BLE companion)
+    P->>N: Scan and pick the node
+    N-->>P: Ask for pairing code
+    P->>N: Enter code (default 123456)
+    N-->>P: Connected, shows status
+```
 
-**A note on Bluetooth:** BLE range is a few metres. The board needs to be near your phone - it is a radio *modem* for your phone, not something you leave in the loft. The long range part happens on the LoRa side.
+1. Power up node 2 with its antenna fitted
+2. Open the app and choose to add or connect a device
+3. Pick your node from the Bluetooth list; it has a generic name to begin with
+4. Enter the pairing code if asked. The MeshCore FAQ gives the default as `123456`
+5. The app connects and shows the node's status
+
+**A note on Bluetooth range:** BLE only works over a few metres. The FAQ notes that the Heltec V3's built-in Bluetooth antenna is very small and short range, so keep the board near the phone. The long range part happens on the LoRa side.
 
 ---
 
 ## Naming your node
 
-In the app's settings, set your node's name. This is what other people in the mesh will see.
-
-Pick something you are happy being public. `Kev-Handheld` is good. Your full name and postcode is not.
+In the app's settings, set a node name. Other people in the mesh see it, so pick something you are happy being public, such as `Kev-Handheld`, never your full name and postcode.
 
 ---
 
 ## Matching the radio settings
 
-This is the step that decides whether the whole project works.
+This step decides whether the project works.
 
-1. Go into the app's **settings** for the connected node
-2. Find the **frequency** or **radio** section
-3. Look for a **preset** menu - usually a three-dot icon next to the frequency field
-4. Choose **EU/UK (Narrow)**
-5. Apply, and confirm
+1. Open the app's settings for the connected node
+2. Find the radio or frequency section
+3. Choose your region's preset (for the UK, EU/UK (Narrow)), or enter the values by hand
+4. Apply and confirm
 
-Verify the four numbers against what your repeater reported when you ran `get radio` in lesson 7:
+Verify against what the repeater reported from `get radio` in lesson 7. For the UK preset they are:
 
-| Setting | Expected |
+| Setting | Expected (UK preset) |
 |---|---|
 | Frequency | 869.618 MHz |
 | Bandwidth | 62.5 kHz |
@@ -64,61 +74,74 @@ Verify the four numbers against what your repeater reported when you ran `get ra
 | Coding Rate | 8 |
 {:class="table table-single"}
 
-**If these do not match your repeater exactly, nothing that follows will work.** It is worth double checking now rather than debugging later.
+If these do not match the repeater, nothing that follows will work. Menu names and layouts vary between app versions, so look for the preset option rather than a specific icon.
 
 ---
 
 ## Send an advert
 
-With the settings applied, tell the mesh you exist. In the app there will be an option to **advertise** or **send advert** - often on the node's status screen or in a menu.
+Tell the mesh you exist. In the app look for an option to **advertise** or **send advert**.
 
-You have two choices:
+- **Zero-hop advert:** heard by anything in direct range, including your repeater
+- **Flood advert:** passed on by repeaters across the mesh
 
-- **Zero-hop advert** - heard by anything in direct radio range, including your repeater
-- **Flood advert** - passed on across the whole mesh
-
-Start with a zero-hop advert. If your repeater is on the desk next to you, that is all you need.
-
-**Why this matters:** Unlike repeaters, client nodes do not advertise automatically on a timer. Nobody knows you exist until you tell them. If you have set everything up correctly and your contact list is empty, sending an advert is usually the missing step.
+Start with zero-hop. The MeshCore FAQ says clients only advertise when you tell them to. Nobody knows you are there until you do.
 
 ---
 
 ## Battery and power
 
-The companion node is the one you carry, so power matters:
+The companion is the node you carry:
 
-- USB-C from a power bank is the simplest option
-- A LiPo on the SH1.25 connector makes it properly portable
-- The OLED is a meaningful power draw - some builds let you dim or blank it
+- USB-C from a power bank is simplest
+- A LiPo battery makes it portable. Check polarity before connecting, do not charge unattended, and stop using a cell that is hot or swollen
+- The OLED uses power, so dimming it can help
 
 ---
 
 ## Try it Yourself
 
-1. Pair the app, rename the node, and confirm the new name appears on the OLED.
-2. Send a zero-hop advert, then walk 20 metres away and send another. Does the repeater still hear you?
-3. Challenge: unpair and re-pair the node. Getting comfortable with this saves panic later when the app forgets a device.
+1. Pair the app, rename the node, and confirm the new name appears in the app.
+2. Send a zero-hop advert, walk 20 metres away and send another. Does the repeater still hear you?
+3. Challenge: forget the device in your phone's Bluetooth settings, then pair again, so it is no surprise later.
 
 ---
 
 ## Common Issues
 
-**Problem**: The node does not appear in the Bluetooth list.
+- **Problem**: The node does not appear in the Bluetooth list.
+- **Solution**: Confirm you flashed the Bluetooth companion and not USB Serial or Repeater.
+- **Why**: Only the Bluetooth companion firmware advertises over Bluetooth, as the FAQ says.
 
-**Solution**: Confirm you flashed **Companion (BLE)** and not **Companion (USB Serial)** or **Repeater**.
+- **Problem**: The app connects then disconnects, or will not reconnect.
+- **Solution**: Remove the old pairing in your phone's Bluetooth settings, then pair again from the app.
+- **Why**: A stale pairing confuses the connection state, and the FAQ recommends removing it before pairing again.
 
-**Why**: Only the BLE build advertises over Bluetooth. Repeater firmware has no BLE interface at all.
+- **Problem**: Everything looks fine but my contact list is empty.
+- **Solution**: Send an advert, and get the repeater to send one too.
+- **Why**: Contacts are learned from adverts, and a silent mesh looks like a broken one.
 
-**Problem**: The app connects, then immediately disconnects.
+> **Teachers**: phones are not always allowed in lessons, and an app store account may be needed. If phones are a problem, flash the USB Serial companion and use the web client on a school laptop. Make sure each pair pairs only with its own board: with a whole class advertising at once, the Bluetooth list will be long, so name the boards clearly.
 
-**Solution**: Forget the device in your phone's Bluetooth settings, then pair again from inside the MeshCore app.
+## Check your understanding
 
-**Why**: Pairing at the OS level rather than in the app confuses the connection state on some phones.
+{% quiz %}
+? Which firmware lets the phone app connect over Bluetooth?
+- [ ] Repeater
+- [x] Companion (Bluetooth)
+- [ ] Room Server
+> Only the Bluetooth companion build advertises over Bluetooth.
 
-**Problem**: Everything looks fine but my contact list is empty.
+? Why must the client's radio settings match the repeater's?
+- [x] Nodes with different frequency, bandwidth or SF cannot hear each other
+- [ ] The phone will not allow it
+- [ ] The battery would drain
+> Mismatched settings mean the nodes never hear each other.
 
-**Solution**: Send an advert, and get someone else to send one too.
-
-**Why**: Contacts are learned from adverts. A silent mesh looks identical to a broken one.
+? Does a client advert automatically on a timer?
+- [ ] Yes, every minute
+- [x] No, you send an advert yourself
+> The FAQ says clients only advertise when the user does it.
+{% endquiz %}
 
 ---

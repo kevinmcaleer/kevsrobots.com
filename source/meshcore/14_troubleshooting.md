@@ -4,47 +4,59 @@ description: A systematic checklist for a mesh that will not talk, from dead boa
 type: page
 layout: lesson
 cover: /learn/meshcore/assets/banners/14_troubleshooting.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Something is not working. Do not start randomly changing settings - work down this list in order. Nine times out of ten it is one of the first four items.
+By the end of this lesson you will be able to work down a checklist to find why two nodes cannot talk, and read RSSI and SNR to judge a link.
+
+Something is not working. Do not change settings at random: work down the list in order. Most problems are in the first few items.
+
+```mermaid
+flowchart TD
+    S["Nodes cannot talk"] --> A{"Antennas fitted?"}
+    A -->|"No"| A1["Fit them, power off first"]
+    A -->|"Yes"| B{"get radio matches on both?"}
+    B -->|"No"| B1["Fix settings, reboot both"]
+    B -->|"Yes"| C{"Advert sent?"}
+    C -->|"No"| C1["Send advert from both"]
+    C -->|"Yes"| D{"Nodes a few metres apart?"}
+    D -->|"No"| D1["Separate them"]
+    D -->|"Yes"| E["Check variant, then physical causes"]
+```
 
 ---
 
 ## The five minute checklist
 
-Before anything else, confirm all of these:
-
 1. **Antennas fitted to both boards?**
-2. **Both boards on the same frequency, bandwidth and spreading factor?** Run `get radio` on the repeater and read the app's settings screen on the client. Compare digit by digit
-3. **Have you sent an advert?** Clients do not advertise automatically
-4. **Are the boards at least a few metres apart?** Touching on a desk overloads the receiver
-5. **Did you flash the right variants?** One repeater, one companion
+2. **Same frequency, bandwidth and spreading factor on both?** Run `get radio` on the repeater and read the app's settings on the client, digit by digit
+3. **Have you sent an advert?** Clients do not advertise by themselves
+4. **Are the boards a few metres apart?** Touching on a desk can overload the receiver
+5. **Did you flash the right variants?** One repeater and one companion
 
 ---
 
-## The board is not detected by the computer
+## The board is not detected
 
-**Symptoms:** No serial port appears; the flasher shows an empty device list.
-
-**Fixes, in order:**
+**Symptoms:** no serial port appears, or the flasher shows an empty list.
 
 1. **Try a different USB-C cable.** Charge-only cables are the number one cause
-2. Try a different USB port, ideally directly on the machine rather than through a hub
-3. Check for the CP2102 device - `ls /dev/cu.*` on macOS, Device Manager on Windows, `dmesg | tail` on Linux
-4. Hold the **BOOT** / **PRG** button while plugging in, to force the bootloader
-5. Use Chrome or Edge - WebUSB does not exist in Firefox or Safari
+2. Try a different USB port, directly on the machine rather than a hub
+3. Check your system's device list for a serial device
+4. Put the board into bootloader mode using its BOOT or PRG button, as the flasher page describes
+5. Use Chrome or Edge, as WebUSB does not exist in Firefox or Safari
 
 ---
 
 ## The OLED is blank
 
-1. Is the board getting power at all? Look for the power LED
-2. Reflash the firmware - a partial flash leaves a board that boots but does nothing
-3. Some builds blank the screen after a timeout. Press the user button
+1. Is the board getting power? Look for an LED
+2. Reflash the firmware, as a partial flash can leave a board that boots to nothing
+3. Some builds blank the screen after a timeout, so press the user button
 
 ---
 
@@ -52,23 +64,21 @@ Before anything else, confirm all of these:
 
 This is the big one, and it is almost always settings.
 
-**Check, in order:**
-
-1. **Frequency.** `get freq` on the repeater. Is it `869.618`? Not `869.525`, not `868.0`
-2. **Bandwidth and spreading factor.** `get radio`. These must match *exactly* - coding rate can differ, the other three cannot
+1. **Frequency.** Does `get radio` show the preset you intended?
+2. **Bandwidth and spreading factor.** They must match exactly, though a coding rate difference is tolerated
 3. **Reboot both** after any settings change
-4. **Distance.** Move them 5-10 metres apart and try again
-5. **Advert.** Press `advert` on the repeater console while watching the client's contact list
-6. **Frequency variant.** Is one board a 433MHz unit? Check the sticker
+4. **Distance.** Move them 5 to 10 metres apart
+5. **Advert.** Run `advert` on the repeater while watching the client's contacts
+6. **Frequency variant.** Is one board a different-band variant? Check the sticker
 
 ---
 
 ## Messages send but never arrive
 
-1. **Trace the contact** and look at the path and the SNR at each hop
-2. **Reset the path** for that contact and let it rediscover
-3. **Check the repeater is actually running** - `stats-core` for uptime
-4. **Check queue depth** in `stats-core`. A large queue means the mesh is congested
+1. **Trace the contact** and look at the path and SNR at each hop
+2. **Reset the path** and let it rediscover
+3. **Check the repeater is running** with `stats-core` over USB
+4. **Check queue length** in `stats-core`. A large queue means congestion
 
 ---
 
@@ -76,12 +86,12 @@ This is the big one, and it is almost always settings.
 
 | Cause | Fix |
 |---|---|
-| Antenna lying horizontal | Stand it vertically at both ends |
-| Wrong band antenna | Confirm it is an 868MHz antenna |
+| Antenna lying horizontal | Stand it vertical at both ends |
+| Wrong band antenna | Confirm it matches your band |
 | Long thin coax | Move the board to the antenna, run USB instead |
 | Foil-backed insulation | Get the antenna outside the roof space |
-| Node too low | Height beats everything - get it higher |
-| Damaged PA | Did you ever power up without an antenna? Compare against a known good board |
+| Node too low | Height beats everything |
+| Possible damage | Did you ever power it without an antenna? Compare with a known good board |
 | Local interference | Check the noise floor with `stats-radio` |
 {:class="table table-single"}
 
@@ -89,26 +99,28 @@ This is the big one, and it is almost always settings.
 
 ## The repeater keeps dropping off
 
-1. **Power bank auto-shutdown.** An idle repeater draws too little current for many banks to stay awake. Use a mains charger
-2. **Brownouts.** A weak USB supply causes reboots on transmit peaks - check uptime in `stats-core`
-3. **Overheating.** A black box in direct sun gets remarkably hot. Shade or vent it
-4. **Water ingress.** Check for condensation inside the enclosure
+1. **Power bank auto-shutdown.** Use a mains charger
+2. **Brownouts.** A weak supply can cause resets on transmit peaks
+3. **Overheating.** A closed dark box in the sun gets very hot, so shade or vent it
+4. **Water.** Check for condensation inside the enclosure
 
 ---
 
 ## I can see my nodes but nobody else's
 
-1. **Ask your local community which preset they use.** Some regions still run legacy settings
-2. **Check the map** at [map.meshcore.io](https://map.meshcore.io) - there may genuinely be nobody in range
-3. **Get higher.** Community repeaters are often several kilometres away
+1. **Ask your local community which preset they use.** Some areas still run older settings
+2. **Check the map** at [map.meshcore.io](https://map.meshcore.io). There may genuinely be nobody in range
+3. **Get higher**, as community repeaters are often kilometres away
 
 ---
 
-## Signal quality reference
+## Signal quality guide
+
+These are rough rules of thumb, not hard limits:
 
 | RSSI | Meaning |
 |---|---|
-| -30 to -60 dBm | Very strong - possibly too close |
+| -30 to -60 dBm | Very strong, possibly too close |
 | -60 to -90 dBm | Comfortable |
 | -90 to -110 dBm | Working, but marginal |
 | Below -115 dBm | At the edge, expect losses |
@@ -116,47 +128,70 @@ This is the big one, and it is almost always settings.
 
 | SNR | Meaning |
 |---|---|
-| Above 0 dB | Signal is stronger than the noise - excellent |
+| Above 0 dB | Signal stronger than the noise, excellent |
 | 0 to -7 dB | Normal for LoRa at range |
-| -7 to -10 dB | Marginal at SF8 - the UK preset |
-| Below -10 dB | Below the decoding threshold at SF8 (SF12 reaches about -20 dB) |
+| Below about -7 to -10 dB | Marginal for the SF8 preset, near the decoding limit |
 {:class="table table-single"}
 
 ---
 
 ## Starting over
 
-Sometimes the fastest fix is a clean slate. On the repeater console:
+Sometimes the fastest fix is a clean slate. Over USB on the repeater:
 
 ```text
 erase
 reboot
 ```
 
-Then reflash and reconfigure from lesson 5. It takes ten minutes and eliminates every accumulated mistake at once.
+Then reflash and reconfigure from lesson 5. It takes ten minutes and removes every accumulated mistake. `erase` is destructive and serial-only, so you lose the name, location and password you set.
 
 ---
 
 ## Try it Yourself
 
-1. Deliberately break your setup - change the client's spreading factor - then work down this checklist and find it.
-2. Record your normal RSSI and SNR to the repeater somewhere. Having a baseline makes future problems obvious.
-3. Challenge: write your own one-page troubleshooting card for your specific setup and tape it inside the repeater's enclosure lid.
+1. Deliberately break your setup by changing the client's spreading factor, then work down this checklist to find it.
+2. Record your normal RSSI and SNR to the repeater from one spot. A baseline makes later problems obvious.
+3. Challenge: write a one-page troubleshooting card for your own setup and tape it inside the repeater's enclosure lid.
 
 ---
 
 ## Common Issues
 
-**Problem**: I have tried everything on this list and it still does not work.
+- **Problem**: I have tried everything on this list and it still does not work.
+- **Solution**: Erase and reflash both boards, then configure them side by side on the same desk, about 5 metres apart.
+- **Why**: Debugging two variables at once is hard, and starting from a known good state removes one.
 
-**Solution**: Erase and reflash both boards, then configure them side by side on the same desk, 5 metres apart.
+- **Problem**: It works on the desk but not once the repeater is in place.
+- **Solution**: The problem is physical: height, obstruction, antenna direction or coax loss.
+- **Why**: Settings problems are all or nothing, while physical problems are gradual.
 
-**Why**: Debugging two variables at once is much harder than starting from a known good state.
+- **Problem**: A board is hot, or a battery is warm, swollen or smells.
+- **Solution**: Unplug it, move it somewhere non-flammable away from other things, and do not use that battery again.
+- **Why**: A damaged LiPo can overheat and catch fire, and this is a safety issue before it is a debugging one.
 
-**Problem**: It works on the desk but not once the repeater is in place.
+> **Teachers**: set up a "break it, then fix it" session in pairs. One partner changes one setting on the other's node while they look away, and the other finds it with this checklist. Keep a spare working pair of boards for comparison, and have a plan for what to do with a hot or swollen LiPo.
 
-**Solution**: The problem is physical - height, obstruction, antenna orientation, or coax loss.
+## Check your understanding
 
-**Why**: If the settings were wrong it would not have worked on the desk either. Settings problems are all-or-nothing; physical problems are gradual.
+{% quiz %}
+? What is the most common cause when two nodes cannot hear each other?
+- [ ] A damaged screen
+- [x] Mismatched radio settings
+- [ ] A bad phone case
+> The lesson says it is almost always settings: frequency, bandwidth or spreading factor.
+
+? Settings problems and physical problems differ how?
+- [x] Settings problems are all or nothing; physical problems are gradual
+- [ ] Settings problems only happen outdoors
+- [ ] There is no difference
+> If settings were wrong it would not work on the desk either.
+
+? What should you do first with a warm or swollen LiPo?
+- [ ] Keep charging
+- [x] Unplug it and move it somewhere safe
+- [ ] Put it in a sealed box outside
+> A damaged cell is a safety risk and must stop being used.
+{% endquiz %}
 
 ---
