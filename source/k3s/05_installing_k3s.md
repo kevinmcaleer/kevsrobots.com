@@ -3,11 +3,11 @@ title: Installing K3s
 description: Install K3s on your Raspberry Pi cluster, configure your master node, and prepare for adding workers.
 layout: lesson
 type: page
-cover: assets/k3s04.jpg
+cover: /learn/k3s/assets/banners/05_installing_k3s.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ K3s makes Kubernetes installation fast and easy — especially on resource-limit
 
 ---
 
-## 🚀 Step 1: SSH into the Master Node
+## Step 1: SSH into the Master Node
 
 From your main computer, SSH into the Pi that will act as the **control plane (master)**:
 
@@ -29,7 +29,7 @@ ssh pi@pi-master.local
 
 ---
 
-## 🧰 Step 2: Install K3s (Master Node)
+## Step 2: Install K3s (Master Node)
 
 Run this one-liner:
 
@@ -46,7 +46,7 @@ K3s will:
 
 ---
 
-## 📁 Step 3: Check Cluster Status
+## Step 3: Check Cluster Status
 
 After installation:
 
@@ -72,7 +72,7 @@ kubectl get nodes
 
 ---
 
-## 🔑 Step 4: Get the Join Token
+## Step 4: Get the Join Token
 
 You’ll need a token to join worker nodes to the cluster:
 
@@ -84,7 +84,7 @@ Copy the token — you’ll use it on the worker nodes in the next lesson.
 
 ---
 
-## 🧪 Troubleshooting
+## Troubleshooting
 
 | Problem                      | Solution                                    |
 | ---------------------------- | ------------------------------------------- |
@@ -96,7 +96,7 @@ Copy the token — you’ll use it on the worker nodes in the next lesson.
 
 ---
 
-## 📝 Notes
+## Notes
 
 * K3s uses a built-in SQLite database by default (great for small clusters).
 * For multi-master HA setups, use an external datastore (e.g. MySQL, Postgres, etcd).
@@ -104,7 +104,7 @@ Copy the token — you’ll use it on the worker nodes in the next lesson.
 
 ---
 
-🎉 Your Kubernetes control plane is now running!
+Your Kubernetes control plane is now running!
 
 Next up: [Adding Nodes](06_adding_nodes)
 

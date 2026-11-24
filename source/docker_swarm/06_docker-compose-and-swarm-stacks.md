@@ -3,6 +3,10 @@ title: Docker Compose and Swarm Stacks
 description: Learn the difference between Docker Compose and Swarm Stacks, and how to utilize them for deploying applications on your Docker Swarm cluster.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/06_docker-compose-and-swarm-stacks.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

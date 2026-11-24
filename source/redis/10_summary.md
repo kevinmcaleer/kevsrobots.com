@@ -3,9 +3,12 @@ layout: lesson
 title: Conclusion and Additional Resources
 type: page
 description: Review what we have learned and find additional resources for further study.
+cover: /learn/redis/assets/banners/10_summary.jpg
 ---
 
-<!-- ![Cover photo of Redis and Python](assets/redis-python.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

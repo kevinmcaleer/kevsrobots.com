@@ -2,6 +2,11 @@
 title: DisPy
 description: learn how to use DisPy to parallelize your Python code across multiple machines
 layout: lesson
+cover: /learn/octapi/assets/banners/05_dispy.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What is DisPy?

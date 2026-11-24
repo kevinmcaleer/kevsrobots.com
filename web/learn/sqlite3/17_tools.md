@@ -3,7 +3,7 @@ layout: lesson
 title: Tools
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: /learn/sqlite3/assets/banners/17_tools.jpg
 date: 2023-07-15
 previous: 16_demo_program.html
 description: Desktop Apps for managing SQlite3 databases
@@ -61,6 +61,10 @@ navigation:
       link: 17_tools.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## SQLite3 Tools for macOS, Windows and Linux
 

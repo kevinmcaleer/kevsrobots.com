@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Redis
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/01_introduction.jpg
 date: 2023-04-12
 next: 02_redis_basics.html
 description: Get started with Redis, learn what it is, why you should use it, and
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-![Cover photo of Redis logo](assets/redis-cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

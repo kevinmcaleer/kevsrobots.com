@@ -5,6 +5,7 @@
   level: beginner
   layout: course
   cover: assets/cover.jpg
+  video: A7ZJ5TC-zUk
   description: >-
     Transition from Arduino C++ to MicroPython quickly and easily. Learn Python syntax
     with side-by-side comparisons, control hardware, and build IoT and robotics projects

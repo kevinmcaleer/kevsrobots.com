@@ -3,15 +3,19 @@ title: Using Bottango with a Gamepad
 description: Learn how to control your animations and servos in real time using a USB gamepad or joystick.
 layout: lesson
 type: page
-cover: assets/bottango_gamepad.png
+cover: /learn/bottango/assets/banners/09_use_with_gamepad.jpg
 date_updated: 2025-05-03
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Want to control your servos live — like a puppet? Bottango supports USB **gamepads and joysticks**, letting you trigger animations or control servo positions in real time. Great for live performances, interactive demos, or fun robot battles!
 
 ---
 
-## 🎮 Compatible Devices
+## Compatible Devices
 
 Bottango supports most USB gamepads and joysticks, including:
 
@@ -20,11 +24,11 @@ Bottango supports most USB gamepads and joysticks, including:
 - Generic USB gamepads
 - Flight sticks and arcade sticks
 
-> 🔌 Plug in your controller **before launching Bottango** to ensure it’s recognized.
+> Plug in your controller **before launching Bottango** to ensure it’s recognized.
 
 ---
 
-## 🛠️ Step 1: Enable Gamepad Input
+## Step 1: Enable Gamepad Input
 
 1. Open Bottango
 2. Go to **Devices > Gamepad Settings**
@@ -33,7 +37,7 @@ Bottango supports most USB gamepads and joysticks, including:
 
 ---
 
-## 🎚️ Step 2: Assign Gamepad Controls
+## Step 2: Assign Gamepad Controls
 
 You can assign gamepad inputs to either:
 
@@ -57,16 +61,16 @@ You can assign gamepad inputs to either:
 
 ---
 
-## 🧪 Test It Out
+## Test It Out
 
 - Press your assigned gamepad button — the servo should move or play an animation
 - Move a joystick — the servo should follow your movement in real time
 
-> 🎯 You can control multiple servos simultaneously with different axes!
+> You can control multiple servos simultaneously with different axes!
 
 ---
 
-## 🧠 Creative Uses
+## Creative Uses
 
 - Real-time puppet shows (control eyes, mouth, head)
 - Remote-controlled robots with expressive motion
@@ -75,7 +79,7 @@ You can assign gamepad inputs to either:
 
 ---
 
-## ⚠️ Tips for Smooth Gamepad Control
+## Tips for Smooth Gamepad Control
 
 - Use **easing curves** or filtering for smoother servo movement
 - Avoid using the same axis for multiple servos unless needed

@@ -3,6 +3,11 @@ title: Joining a Room
 description: Find the room from your phone, log in, post, and catch up on what you missed
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/06_joining_a_room.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The server is configured. Now let's use it - from the companion client you built in part one.

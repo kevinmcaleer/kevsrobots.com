@@ -3,6 +3,11 @@ title: Working with Tables and Data Types
 description: >-
     How to create tables and define data types, with an introduction to primary keys and constraints
 layout: lesson
+cover: /learn/sql/assets/banners/04_working_with_tables.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll explore how to structure data in tables and choose appropriate data types for each column. You’ll also learn about primary keys and constraints, essential concepts for organizing and securing data in a relational database.

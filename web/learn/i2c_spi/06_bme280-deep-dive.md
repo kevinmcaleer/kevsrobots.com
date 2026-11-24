@@ -3,7 +3,7 @@ layout: lesson
 title: BME280 Deep Dive
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/06_bme280-deep-dive.jpg
 date: 2026-01-15
 previous: 05_demystifying-datasheets.html
 next: 07_what-is-spi.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![BME280 Advanced Features](/learn/i2c_spi/assets/bme280-advanced.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Mastering the BME280
 

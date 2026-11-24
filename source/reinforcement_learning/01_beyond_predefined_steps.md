@@ -3,11 +3,11 @@ title: Beyond Predefined Steps
 description: Why hardcoded robot routines fail in dynamic environments, and how trial-and-error learning offers a better path.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/01_beyond_predefined_steps.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -109,6 +109,7 @@ for episode in range(500):
 
     print(f"Episode {episode}: total reward = {total_reward:.1f}")
 ```
+{: .no-snakie }
 
 Each episode, the robot tries to navigate a grid, gets rewards for good moves and penalties for collisions, and updates a table of "how good is each action in each situation?" values. After enough episodes, that table holds a surprisingly competent policy — no rules written by hand.
 

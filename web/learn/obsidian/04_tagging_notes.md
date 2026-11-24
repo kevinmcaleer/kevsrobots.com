@@ -3,7 +3,7 @@ layout: lesson
 title: Tagging Notes
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/04_tagging_notes.jpg
 date: 2025-08-24
 previous: 03_creating_notes.html
 next: 05_linking_notes.html
@@ -52,6 +52,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Tagging Notes
 

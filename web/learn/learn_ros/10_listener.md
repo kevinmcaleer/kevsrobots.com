@@ -3,7 +3,7 @@ layout: lesson
 title: Talker ROS2 Program
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/10_listener.jpg
 date: 2023-01-07
 previous: 09_first_ros_program.html
 next: 11_create_py_package.html
@@ -74,6 +74,10 @@ navigation:
       link: 19_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Talker Program
 

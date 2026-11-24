@@ -3,6 +3,10 @@ title: Further Resources
 description: A curated list of resources to deepen your knowledge and proficiency in Docker Swarm, containerization, and orchestration.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/14_further-resources.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

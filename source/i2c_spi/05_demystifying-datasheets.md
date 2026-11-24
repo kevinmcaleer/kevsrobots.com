@@ -3,9 +3,12 @@ title: Demystifying Datasheets
 description: Learn how to read and extract essential information from component datasheets
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/05_demystifying-datasheets.jpg
 ---
 
-<!-- ![Datasheet Example](/learn/i2c_spi/assets/datasheet.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding Datasheets
 
@@ -154,6 +157,7 @@ if 0x76 in devices:
 elif 0x77 in devices:
     BME280_ADDR = 0x77
 ```
+{: .no-snakie }
 
 ### Section 4: Register Map - The Most Important Section
 

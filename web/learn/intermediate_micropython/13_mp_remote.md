@@ -3,7 +3,7 @@ layout: lesson
 title: MP Remote
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/13_mp_remote.jpg
 date: 2024-07-07
 previous: 12_timers.html
 next: 14_summary.html
@@ -63,6 +63,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## MP Remote
 

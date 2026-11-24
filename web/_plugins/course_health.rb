@@ -81,12 +81,16 @@ module KevsRobots
           "in_pathway" => pathed.include?(course["name"])
         }
         PATTERNS.each { |key, pattern| checks[key] = pattern.match?(text) }
+        quality = (site.data["course_quality"] || {})[slug] || {}
 
         {
           "name" => course["name"], "link" => course["link"], "key" => "/learn/#{slug}/",
           "lessons" => pages.size, "updated" => updated&.strftime("%Y-%m-%d"),
           "checks" => CHECKS.map { |key, _label| checks[key] },
-          "score" => checks.values.count(true)
+          "score" => checks.values.count(true),
+          # The 100-point checklist score (#655), from scripts/course_quality.py --write.
+          "quality" => quality["score"], "band" => quality["band"],
+          "gaps" => (quality["gaps"] || []).join("\n")
         }
       end
 
@@ -100,7 +104,7 @@ module KevsRobots
         "noindex" => true,
         "hide_likes_and_comments" => true,
         "health_checks" => CHECKS.map { |key, label| { "key" => key, "label" => label } },
-        "health_rows" => rows.sort_by { |row| [row["score"], row["name"].to_s] }
+        "health_rows" => rows.sort_by { |row| [row["quality"] || 0, row["score"], row["name"].to_s] }
       )
       site.pages << page
     end

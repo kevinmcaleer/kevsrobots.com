@@ -3,10 +3,14 @@ title: Introduction to Rust
 description: >-
     This lesson introduces you to the Rust programming language, guiding you through installation and your first Rust program.
 layout: lesson
-cover: /learn/scrawly_wally/assets/cover.png
+cover: /learn/rust/assets/banners/01_intro.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+{% include youtubeplayer.html id="M9LekkoQyf0" %}
 
 ## Introduction
 

@@ -3,6 +3,11 @@ title: Grouping and Aggregating Data
 description: >-
     Aggregate data with GROUP BY, COUNT, SUM, AVG, and other functions
 layout: lesson
+cover: /learn/sql/assets/banners/09_grouping_and_aggregating_data.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll dive into grouping and aggregating data in SQL. These techniques allow us to summarize and analyze data across multiple rows, making it easier to extract valuable insights.

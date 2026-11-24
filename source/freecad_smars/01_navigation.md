@@ -2,7 +2,11 @@
 title: Navigation in FreeCAD
 description: Master the 3D workspace - the foundation skill for efficient CAD work
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/01_navigation.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Why Navigation Matters
@@ -49,8 +53,6 @@ Look in the **top right corner** of the 3D view. That little cube is incredibly 
 
 **When to use it**: When you need a precise orthographic view - like when sketching on the XY plane or checking alignment.
 
-![Navigation Cube](assets/nav02.png){:class="img-fluid w-100"}
-
 ---
 
 ## Keyboard Shortcuts - Speed Up Your Workflow
@@ -66,6 +68,7 @@ Memorize these - they'll save you hundreds of mouse movements:
 | `4` | Bottom | Rarely used, but helpful for base features |
 | `5` | Left | Sketching side holes and wheel stubs |
 | `6` | Right | Checking symmetric features |
+{:class="table table-single"}
 
 ### Other Essential Shortcuts
 
@@ -76,6 +79,7 @@ Memorize these - they'll save you hundreds of mouse movements:
 | `Shift + F` | Focus all | Show entire scene |
 | `+` / `-` | Zoom in/out | Fine zoom control |
 | `Arrow keys` | Pan | Precise panning in small steps |
+{:class="table table-single"}
 
 ---
 

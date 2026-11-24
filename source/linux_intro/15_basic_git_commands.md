@@ -2,10 +2,12 @@
 title: Basic Git Commands
 description: Learn essential Git commands like init, add, commit, and clone to manage your repositories.
 layout: lesson
-cover: /learn/linux_intro/assets/git.jpg
+cover: /learn/linux_intro/assets/banners/15_basic_git_commands.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

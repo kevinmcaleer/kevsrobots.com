@@ -4,10 +4,12 @@ description: >-
     What you'll learn in this beginner's course on drawing diagrams with Mermaid
 layout: lesson
 type: page
-cover: /learn/mermaid/assets/cover.jpg
+cover: /learn/mermaid/assets/banners/00_intro.jpg
 ---
 
-![banner]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

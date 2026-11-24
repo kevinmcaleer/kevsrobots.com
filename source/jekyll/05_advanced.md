@@ -3,6 +3,11 @@ title: Advanced Jekyll Features
 description: Explore advanced features in Jekyll including plugins, RSS feeds, and SEO best practices.
 layout: lesson
 type: page
+cover: /learn/jekyll/assets/banners/05_advanced.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

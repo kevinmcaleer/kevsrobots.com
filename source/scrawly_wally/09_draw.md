@@ -3,8 +3,12 @@ title: Creating Your First Drawing
 description: Guide to making the wall drawing robot create its first drawing.
 layout: lesson
 type: page
-cover: assets/draw.png
+cover: /learn/scrawly_wally/assets/banners/09_draw.jpg
 date_updated: 2024-08-02
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Creating Your First Drawing

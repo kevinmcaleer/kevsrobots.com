@@ -3,7 +3,7 @@ layout: lesson
 title: How does a Robot think?
 author: Kevin McAleer
 type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
+cover: /learn/robotics_101/assets/banners/lesson_05.jpg
 date: 2023-01-17
 previous: lesson_04.html
 description: The Robot Brain
@@ -31,6 +31,10 @@ navigation:
       link: lesson_05.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Video
 

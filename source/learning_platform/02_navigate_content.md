@@ -2,6 +2,11 @@
 title: Navigating Content
 description: How to navigate content
 layout: lesson
+cover: /learn/learning_platform/assets/banners/02_navigate_content.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The content is structured in a way that makes sense to the student taking the course.

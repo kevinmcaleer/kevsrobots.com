@@ -3,6 +3,11 @@ layout: lesson
 title: Introduction to Servos
 type: page
 description: Learn about servos and how to control them with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/14_servos.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

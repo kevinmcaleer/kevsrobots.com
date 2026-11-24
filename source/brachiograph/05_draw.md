@@ -3,7 +3,11 @@ title: Draw
 description: Learn how to draw with the BrachioGraph
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/05_draw.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Draw a simple box

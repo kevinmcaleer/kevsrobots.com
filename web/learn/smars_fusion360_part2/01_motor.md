@@ -3,7 +3,7 @@ layout: lesson
 title: Motor holder profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/01_motor.jpg
 date: 2023-07-20
 previous: 00_intro.html
 next: 02_extrude.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The profile for the motor holders within the body is created next.
 There are several dimensions on this sketch:

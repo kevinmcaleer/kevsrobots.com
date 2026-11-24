@@ -3,7 +3,7 @@ layout: lesson
 title: Encapsulation
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/05_encapsulation.jpg
 date: 2024-07-07
 previous: 04_inheritance.html
 next: 06_polymorphism.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Encapsulation
 

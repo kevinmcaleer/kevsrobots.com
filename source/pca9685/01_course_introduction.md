@@ -3,10 +3,14 @@ title: Introduction
 description: Kickstart your journey into robotics by learning about the components, tools, and skills you will acquire in this course.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/pca9685/assets/banners/01_course_introduction.jpg
 ---
 
-![Robot Arm Course Cover Image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+{% include youtubeplayer.html id="_JJAV97Mm98" %}
 
 ## Welcome to the Course
 

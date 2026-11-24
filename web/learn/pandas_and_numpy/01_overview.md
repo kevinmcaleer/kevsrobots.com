@@ -3,7 +3,7 @@ layout: lesson
 title: About this course
 author: Kevin McAleer
 type: page
-cover: /learn/pandas_and_numpy/assets/pandas.png
+cover: /learn/pandas_and_numpy/assets/banners/01_overview.jpg
 date: 2023-11-14
 next: 02_intro.html
 description: Learn the basics of data manipulation in Python using Pandas and NumPy,
@@ -51,7 +51,9 @@ navigation:
 ---
 
 
-![Cover photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

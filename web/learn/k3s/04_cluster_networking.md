@@ -3,7 +3,7 @@ layout: lesson
 title: Cluster Networking
 author: Kevin McAleer
 type: page
-cover: assets/k3s03.jpg
+cover: /learn/k3s/assets/banners/04_cluster_networking.jpg
 date: 2025-06-01
 previous: 03_os_installation.html
 next: 05_installing_k3s.html
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -80,7 +80,7 @@ In this lesson, you’ll configure **static IP addresses**, **hostnames**, and o
 
 ---
 
-## 🌐 Why Networking Matters in Kubernetes
+## Why Networking Matters in Kubernetes
 
 K3s (and Kubernetes) rely heavily on:
 
@@ -92,9 +92,9 @@ Without stable networking, your cluster will be unreliable or fail to form prope
 
 ---
 
-## ✅ Step 1: Assign Static IPs
+## Step 1: Assign Static IPs
 
-### 🛠 Option A: DHCP Reservation (Recommended)
+### Option A: DHCP Reservation (Recommended)
 
 - Login to your home router or DHCP server
 - Reserve a static IP for each Pi based on its **MAC address**
@@ -108,11 +108,11 @@ Without stable networking, your cluster will be unreliable or fail to form prope
 
 ---
 
-> 🧠 This is the easiest and most router-friendly method.
+> This is the easiest and most router-friendly method.
 
 ---
 
-### 🛠 Option B: Static IP on the Device
+### Option B: Static IP on the Device
 
 If your router doesn’t support reservations, configure static IPs directly:
 
@@ -144,7 +144,7 @@ sudo netplan apply
 
 ---
 
-## 🧩 Step 2: Set Consistent Hostnames
+## Step 2: Set Consistent Hostnames
 
 Each Pi should have a unique, meaningful hostname:
 
@@ -163,7 +163,7 @@ Repeat on all nodes (e.g., `pi-node1`, `pi-node2`).
 
 ---
 
-## 🧰 Step 3: Test Network Connectivity
+## Step 3: Test Network Connectivity
 
 On each Pi, ping the others:
 
@@ -182,7 +182,7 @@ If `.local` doesn’t work, use IPs or set up a shared `/etc/hosts` file on all 
 
 ---
 
-## 🔧 Optional: Set Up Local DNS with Pi-hole or dnsmasq
+## Optional: Set Up Local DNS with Pi-hole or dnsmasq
 
 If you're managing a home lab or multiple clusters, consider setting up **Pi-hole** or **dnsmasq** to provide:
 
@@ -192,13 +192,13 @@ If you're managing a home lab or multiple clusters, consider setting up **Pi-hol
 
 ---
 
-## 🧪 Test Summary
+## Test Summary
 
 You’re ready to move forward when:
 
-- ✅ All nodes have **static IPs**
-- ✅ Each node has a unique **hostname**
-- ✅ You can **SSH and ping** all nodes from each other
+- All nodes have **static IPs**
+- Each node has a unique **hostname**
+- You can **SSH and ping** all nodes from each other
 
 ---
 

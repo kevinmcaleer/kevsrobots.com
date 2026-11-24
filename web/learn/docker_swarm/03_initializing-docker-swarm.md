@@ -3,7 +3,7 @@ layout: lesson
 title: Initializing Docker Swarm
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/03_initializing-docker-swarm.jpg
 date: 2024-02-03
 previous: 02_cloning-raspberry-pi-os.html
 next: 04_adding-worker-nodes.html
@@ -59,6 +59,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Setting Up Docker Swarm on Raspberry Pi
 

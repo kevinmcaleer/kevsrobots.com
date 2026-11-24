@@ -3,7 +3,7 @@ layout: lesson
 title: Paths and Routing
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/12_paths_and_routing.jpg
 date: 2026-08-05
 previous: 11_channels.html
 next: 13_remote_admin.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 This is the lesson that explains why MeshCore behaves the way it does. Once routing clicks, everything else - why clients do not repeat, why adverts matter, why the network stays usable - falls into place.
 

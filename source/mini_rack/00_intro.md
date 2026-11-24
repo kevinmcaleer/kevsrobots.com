@@ -3,9 +3,14 @@ title: Introduction
 description: Overview of this course
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/00_intro.jpg
 ---
 
-![Mini-Rack](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+{% include youtubeplayer.html id="fJC68N9nphA" %}
 
 Learn how to design and build your own 10" mini-rack for your Raspberry Pi cluster or home lab. This project is perfect for upgrading your home lab and keeping your equipment organized and easily accessible.
 

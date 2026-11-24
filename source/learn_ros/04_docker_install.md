@@ -3,9 +3,12 @@ layout: lesson
 title: Docker Install
 type: page
 description: Install and configure Docker
+cover: /learn/learn_ros/assets/banners/04_docker_install.jpg
 ---
 
-![Screenshot of the imager tool](assets/rpi_desktop.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Get Docker
 

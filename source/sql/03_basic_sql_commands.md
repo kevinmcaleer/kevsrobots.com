@@ -3,6 +3,11 @@ title: Basic SQL Commands and Syntax
 description: >-
     Introduction to essential SQL commands such as SELECT, INSERT, UPDATE, DELETE
 layout: lesson
+cover: /learn/sql/assets/banners/03_basic_sql_commands.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll cover the essential SQL commands used for managing data in databases. These commands—SELECT, INSERT, UPDATE, and DELETE—form the basis of SQL’s ability to interact with and manipulate data.

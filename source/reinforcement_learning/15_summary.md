@@ -3,11 +3,11 @@ title: Summary and What's Next
 description: Recap the key concepts, review what you've built, and find out where to take your robotics and AI journey next.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/15_summary.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -91,6 +91,7 @@ q_table[state][action] += alpha * (
 # gamma (discount):       how much I trust the future — typically 0.9–0.99
 # TD error:               positive = I was too pessimistic, negative = too optimistic
 ```
+{: .no-snakie }
 
 ---
 

@@ -3,6 +3,10 @@ title: Installing Docker
 description: Step-by-step guide to installing Docker on various operating systems.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/02_installing-docker.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

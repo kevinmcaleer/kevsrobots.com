@@ -3,7 +3,7 @@ layout: lesson
 title: Anatomy of a Custom Environment
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/07_anatomy_of_custom_env.jpg
 date: 2026-06-14
 previous: 06_seeding_and_lifecycle.html
 next: 08_wrapping_the_burgerbot.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

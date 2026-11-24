@@ -26,6 +26,7 @@ We also need to do something different in our code, we need to indent the code u
 if name == 'Kevin':
     print('Hi Boss')
 ```
+{: .no-snakie }
 
 Notice that there are two equals signs `==`. This is because we use one equal sign `=` to assign values, but two equal signs `==` for comparing two value.
 

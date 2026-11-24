@@ -2,7 +2,11 @@
 title: Shell and Fillet the Base
 description: Transform a solid block into a hollow enclosure with smooth, strong edges
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/03_shell_and_fillet.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What We're Building
@@ -128,6 +132,7 @@ Press `0` on your keyboard to return to the isometric view.
 | 2mm front/back walls | Will have large cutouts - don't need extra material |
 | 4mm fillet radius | Visible rounding, better print quality |
 | Shell before fillet | Easier to select edges after hollowing |
+{:class="table table-single"}
 
 ---
 

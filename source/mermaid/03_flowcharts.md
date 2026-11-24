@@ -4,6 +4,11 @@ description: >-
     Draw flowcharts with Mermaid - set the direction, choose node shapes, and connect them with different arrows and labels
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/03_flowcharts.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Why flowcharts?

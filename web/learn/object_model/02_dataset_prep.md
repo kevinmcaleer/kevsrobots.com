@@ -3,7 +3,7 @@ layout: lesson
 title: Preparing Custom Object Detection Datasets
 author: Kevin McAleer
 type: page
-cover: /learn/object_model/assets/cover.jpg
+cover: /learn/object_model/assets/banners/02_dataset_prep.jpg
 date: 2025-12-04
 previous: 01_setup.html
 next: 03_training.html
@@ -44,6 +44,10 @@ navigation:
       link: 08_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

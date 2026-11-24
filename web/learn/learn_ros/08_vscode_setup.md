@@ -3,7 +3,7 @@ layout: lesson
 title: VSCode setup
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/08_vscode_setup.jpg
 date: 2023-01-07
 previous: 07_build_container.html
 next: 09_first_ros_program.html
@@ -75,6 +75,10 @@ navigation:
       link: 19_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## VSCode Remote connection
 
@@ -150,7 +154,7 @@ docker compose exec ros2 bash
 
 > To list all the running containers, type `docker ps` from the terminal
 
-> 🎉 Congratulations, you've now setup ROS2 in a container on the Raspberry Pi and connected to it from another computer running VSCode.
+> Congratulations, you've now setup ROS2 in a container on the Raspberry Pi and connected to it from another computer running VSCode.
 {:class="bg-blue"}
 
 ---

@@ -3,11 +3,11 @@ title: Deploying Apps
 description: Learn how to deploy real-world applications on your K3s cluster using Deployments, Services, and Ingress.
 layout: lesson
 type: page
-cover: assets/k3s05.jpg
+cover: /learn/k3s/assets/banners/12_deploying_apps.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ In this lesson, you'll deploy a simple web app with a backing Redis database usi
 
 ---
 
-## 🧩 Example App: Python + Redis
+## Example App: Python + Redis
 
 We’ll deploy:
 
@@ -28,7 +28,7 @@ These will be connected using environment variables and services.
 
 ---
 
-## 📁 Step 1: Create Deployment YAML
+## Step 1: Create Deployment YAML
 
 Create a file called `webapp.yaml`:
 
@@ -73,7 +73,7 @@ This assumes you have a Docker image like `kevdev/web-redis-demo` on Docker Hub 
 
 ---
 
-## 🧱 Step 2: Add Redis Deployment
+## Step 2: Add Redis Deployment
 
 Append this to the same file or create a separate `redis.yaml`:
 
@@ -110,7 +110,7 @@ spec:
 
 ---
 
-## 🚀 Step 3: Apply to the Cluster
+## Step 3: Apply to the Cluster
 
 ```bash
 kubectl apply -f webapp.yaml
@@ -126,7 +126,7 @@ kubectl get svc
 
 ---
 
-## 🌐 Step 4: Add Ingress
+## Step 4: Add Ingress
 
 Create a file called `webapp-ingress.yaml`:
 
@@ -167,7 +167,7 @@ Visit `http://web.local` in your browser!
 
 ---
 
-## 🧪 Optional: Scale Your App
+## Optional: Scale Your App
 
 ```bash
 kubectl scale deployment web --replicas=3
@@ -177,7 +177,7 @@ See the load balancing in action (especially with Ingress).
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 

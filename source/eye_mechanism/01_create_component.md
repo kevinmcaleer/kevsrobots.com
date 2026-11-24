@@ -3,6 +3,11 @@ title: Create a Component
 layout: lesson
 description: Creating the initial Component
 type: page
+cover: /learn/eye_mechanism/assets/banners/01_create_component.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Open Fusion 360

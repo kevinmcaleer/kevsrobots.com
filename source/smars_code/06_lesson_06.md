@@ -2,6 +2,11 @@
 title: Lesson 06 - How to control servos
 description: Learn how to control SG90 Servos with Arduino
 layout: lesson
+cover: /learn/smars_code/assets/banners/06_lesson_06.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the livestream

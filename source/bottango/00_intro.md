@@ -3,11 +3,11 @@ title: Introduction to Bottango
 description: Get started with Bottango – a visual tool for animating servos and bringing your robotic creations to life without writing code.
 layout: lesson
 type: page
-cover: assets/bottango_intro.png
+cover: /learn/bottango/assets/banners/00_intro.jpg
 date_updated: 2025-05-03
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -62,7 +62,7 @@ Here's a list of recommended components to follow along with the course:
 
 You'll also need to download Bottango from the official site:
 
-🔗 [Download Bottango](https://bottango.com)
+[Download Bottango](https://bottango.com)
 
 ---
 

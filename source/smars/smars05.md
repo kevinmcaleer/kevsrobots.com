@@ -2,6 +2,11 @@
 title: Fit Motors Holders
 description: Fit Motors Holders to the chassis
 layout: lesson
+cover: /learn/smars/assets/banners/smars05.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Fit Motors Holders

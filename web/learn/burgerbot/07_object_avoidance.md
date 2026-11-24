@@ -3,7 +3,7 @@ layout: lesson
 title: Object Avoidance
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/07_object_avoidance.jpg
 date: 2023-04-27
 previous: 06_measuring_distance.html
 next: 08_video.html
@@ -56,6 +56,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Avoiding an object
 

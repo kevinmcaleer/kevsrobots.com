@@ -3,6 +3,11 @@ title: Final view
 description: The completed design
 layout: lesson
 redirect_from: /learn/smars_fusion360/33_final.html
+cover: /learn/smars_fusion360_part2/assets/banners/17_final.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 You should now have a finished Chassis design, ready for saving out to an STL file and printing.

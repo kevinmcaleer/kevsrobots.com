@@ -3,8 +3,12 @@ title: Vectorizing Images for Drawing
 description: Learn how to convert images to vectors for the wall drawing robot.
 layout: lesson
 type: page
-cover: assets/vectorize.png
+cover: /learn/scrawly_wally/assets/banners/10_vectorize.jpg
 date_updated: 2024-08-02
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Vectorizing Images

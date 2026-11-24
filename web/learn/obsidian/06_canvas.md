@@ -3,7 +3,7 @@ layout: lesson
 title: Canvas in Obsidian
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/06_canvas.jpg
 date: 2025-08-24
 previous: 05_linking_notes.html
 next: 07_tasks.html
@@ -52,6 +52,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Canvas in Obsidian
 

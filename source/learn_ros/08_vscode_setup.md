@@ -3,6 +3,11 @@ layout: lesson
 title: VSCode setup
 type: page
 description: Install the VSCode extensions so we can remotely connect to the Raspberry Pi and Docker container instances
+cover: /learn/learn_ros/assets/banners/08_vscode_setup.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## VSCode Remote connection
@@ -79,7 +84,7 @@ docker compose exec ros2 bash
 
 > To list all the running containers, type `docker ps` from the terminal
 
-> 🎉 Congratulations, you've now setup ROS2 in a container on the Raspberry Pi and connected to it from another computer running VSCode.
+> Congratulations, you've now setup ROS2 in a container on the Raspberry Pi and connected to it from another computer running VSCode.
 {:class="bg-blue"}
 
 ---

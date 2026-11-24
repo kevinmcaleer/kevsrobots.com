@@ -11,7 +11,7 @@ date_updated: 2025-06-15
 
 ---
 
-🎉 Congratulations — you’ve completed your first C programming course on the Raspberry Pi Pico!
+Congratulations — you’ve completed your first C programming course on the Raspberry Pi Pico!
 
 You’ve gone from absolute beginner to writing real C programs that interact with **hardware**. That’s a huge leap — well done!
 
@@ -72,7 +72,7 @@ You’ve got a strong foundation — now it’s time to go further:
 
 You’ve started your journey into the world of **embedded systems**, **low-level programming**, and **physical computing**. The C language and the Raspberry Pi Pico are powerful tools — and now you know how to use them.
 
-Keep building, keep learning, and share what you create. 🚀
+Keep building, keep learning, and share what you create.
 
 ---
 
@@ -80,9 +80,9 @@ Keep building, keep learning, and share what you create. 🚀
 
 If you enjoyed this course:
 
-- ⭐ Star and follow my GitHub page (<https://www.github.com/kevinmcaleer>)
-- 📣 Share it with friends or students
-- 💬 Let us know what you build next
+- Star and follow my GitHub page (<https://www.github.com/kevinmcaleer>)
+- Share it with friends or students
+- Let us know what you build next
 
 Good luck, and happy hacking!
 

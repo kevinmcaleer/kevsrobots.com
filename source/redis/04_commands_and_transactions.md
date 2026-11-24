@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Commands and Transactions
 type: page
 description: Learn about Redis commands and transactions, and how to use them in Python.
+cover: /learn/redis/assets/banners/04_commands_and_transactions.jpg
 ---
 
-<!-- ![Cover photo of Redis commands and transactions](assets/redis-commands.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

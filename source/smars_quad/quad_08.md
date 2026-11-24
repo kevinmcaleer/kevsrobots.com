@@ -2,6 +2,11 @@
 title: Servo Horns
 description: Attach the other servo holders to the frame
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_08.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 8 Attach the other servo holders to the frame

@@ -14,6 +14,7 @@ level: beginner
 course_duration: 0h 34m
 lesson_count: 12
 first_lesson: 01_course_introduction.html
+video: _JJAV97Mm98
 navigation:
 - name: Building a Robot Arm with Raspberry Pi and PCA9685
 - content:

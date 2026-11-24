@@ -3,7 +3,7 @@ layout: lesson
 title: Arduino Slots
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/06_arduino_slots.jpg
 date: 2025-12-12
 previous: 05_front_rear_profiles.html
 next: 07_wheel_stubs.html
@@ -45,6 +45,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What We're Building
 
@@ -285,6 +289,7 @@ The Mirror workflow is essential for professional CAD:
 | Single feature + Mirror | Symmetric parts (like SMARS) |
 | Datum planes | Reference surfaces for operations |
 | Construction geometry | Guides that don't become features |
+{:class="table table-single"}
 
 These skills transfer to any parametric CAD software!
 

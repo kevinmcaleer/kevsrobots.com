@@ -3,8 +3,12 @@ title: Dataview and Bases
 description: Use the Dataview plugin to create dashboards and databases from your notes.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/08_dataview_and_bases.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Dataview and Bases
 

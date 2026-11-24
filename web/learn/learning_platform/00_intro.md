@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: /learn/learning_platform/assets/learn.jpg
+cover: /learn/learning_platform/assets/banners/00_intro.jpg
 date: 2022-12-04
 next: 01_how_to_use.html
 description: How to use the Learning Platform
@@ -26,6 +26,10 @@ navigation:
       link: 03_download_content.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Learning Platform Logo](assets/learning_platform.jpg){:class="img-fluid w-100"}
 

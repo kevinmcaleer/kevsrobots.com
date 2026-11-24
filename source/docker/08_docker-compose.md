@@ -3,6 +3,11 @@ title: Creating a Docker-Compose File
 description: Learn how to use Docker Compose to manage multi-container Docker applications.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/08_docker-compose.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction to Docker Compose

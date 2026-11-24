@@ -3,11 +3,11 @@ title: Advanced Networking & Custom CNI
 description: Explore Kubernetes Container Network Interfaces (CNI) in K3s and learn how to replace the default Flannel with more advanced CNIs like Calico or Cilium.
 layout: lesson
 type: page
-cover: assets/k3s02.jpg
+cover: /learn/k3s/assets/banners/15_custom_cni.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ In this lesson, you’ll learn how CNI works in K3s and how to install alternati
 
 ---
 
-## 🌐 What Is CNI?
+## What Is CNI?
 
 CNI stands for **Container Network Interface**, a standard that defines how containers connect to the network.
 
@@ -30,7 +30,7 @@ Kubernetes uses CNI plugins to:
 
 ---
 
-## ⚙️ Default in K3s: Flannel
+## Default in K3s: Flannel
 
 - Lightweight and simple
 - Uses VXLAN overlay by default
@@ -39,7 +39,7 @@ Kubernetes uses CNI plugins to:
 
 ---
 
-## 🚀 Why Replace the Default CNI?
+## Why Replace the Default CNI?
 
 | Need                            | Recommended CNI |
 |----------------------------------|------------------|
@@ -52,7 +52,7 @@ Kubernetes uses CNI plugins to:
 
 ---
 
-## 🧼 Step 1: Disable Flannel in K3s
+## Step 1: Disable Flannel in K3s
 
 To disable Flannel, uninstall and reinstall K3s with:
 
@@ -68,7 +68,7 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none --disabl
 
 ---
 
-## 🧱 Step 2: Install Calico (Example)
+## Step 2: Install Calico (Example)
 
 Apply the official Calico manifests:
 
@@ -90,7 +90,7 @@ kubectl get pods -n calico-system
 
 ---
 
-## 🧪 Test Network Policies (Optional)
+## Test Network Policies (Optional)
 
 Calico allows you to enforce pod-to-pod communication rules. For example:
 
@@ -109,7 +109,7 @@ This would block all incoming traffic unless explicitly allowed.
 
 ---
 
-## ⚠️ Notes on ARM Compatibility
+## Notes on ARM Compatibility
 
 - Always check the **ARM64 support** for the CNI plugin you want to use.
 - Both Calico and Cilium support ARM (Raspberry Pi 4/5) as of recent versions.
@@ -117,7 +117,7 @@ This would block all incoming traffic unless explicitly allowed.
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 

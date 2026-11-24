@@ -3,6 +3,11 @@ title: Create the Cluster Panel
 description: Learn how to create the cluster panel for the mini-rack
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/06_panel.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Cluster Panel Design](assets/cluster_panel_design.png){:class="img-fluid w-100"}

@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to SQL and Relational Databases
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/01_introduction_to_sql.jpg
 date: 2024-11-01
 previous: 00_course_overview.html
 next: 02_setting_up_environment.html
@@ -55,6 +55,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore the fundamentals of `SQL` (Structured Query Language) and relational databases. SQL is the standard language for interacting with databases, and relational databases are widely used to store, organize, and manage data in a structured way.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Back cutout profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/11_back.jpg
 date: 2023-07-20
 previous: 10_fillet.html
 next: 12_back.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 A profile is created for the back cutout section. This has 2 dimensions:
 

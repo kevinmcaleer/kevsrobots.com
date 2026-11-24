@@ -3,7 +3,7 @@ layout: lesson
 title: Front Cutout Profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/06_front.jpg
 date: 2023-07-20
 previous: 05_thin.html
 next: 07_cut.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The Front and Back sides need to have a section cut out of them, first we need to create a profile for the cutout.
 

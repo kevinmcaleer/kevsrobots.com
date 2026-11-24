@@ -3,6 +3,11 @@ title: Formatting Temperature Readings
 description: Enhance your temperature monitoring script by formatting the output for better readability and user experience.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/07_displaying_temperature_in_thonny_console.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

@@ -3,11 +3,11 @@ title: Coding the Learning Loop
 description: Implement the Q-learning update rule and the full episode loop — the algorithm that turns experience into a policy.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/09_coding_the_learning_loop.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

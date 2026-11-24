@@ -3,7 +3,7 @@ layout: lesson
 title: Create a ROS2 Python Package
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/11_create_py_package.jpg
 date: 2023-01-07
 previous: 10_listener.html
 next: 12_create_publisher.html
@@ -74,6 +74,10 @@ navigation:
       link: 19_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Create a ROS2 Package
 

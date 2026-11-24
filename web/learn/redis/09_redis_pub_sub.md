@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Pub/Sub
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/09_redis_pub_sub.jpg
 date: 2023-04-12
 previous: 08_redis_sorted_sets.html
 next: 10_summary.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis pub/sub](assets/redis-pubsub.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

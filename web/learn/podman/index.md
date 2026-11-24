@@ -10,7 +10,7 @@ description: Learn how to transition from Docker to Podman and unlock better con
   features like systemd integration  and Kubernetes support. Perfect for developers
   and DevOps professionals looking to modernize  their container workflows.
 level: intermediate
-course_duration: 0h 31m
+course_duration: 0h 32m
 lesson_count: 14
 first_lesson: 01_intro_to_podman.html
 navigation:

@@ -3,7 +3,7 @@ layout: lesson
 title: Writing a Docker Compose File
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/07_writing-a-docker-compose-file.jpg
 date: 2024-02-03
 previous: 06_docker-compose-and-swarm-stacks.html
 next: 08_deploying-a-stack.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Crafting Your Docker Compose Configuration
 

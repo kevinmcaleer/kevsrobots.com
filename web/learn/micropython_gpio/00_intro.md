@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/00_intro.jpg
 date: 2023-04-14
 next: 01_gpio_pin_types.html
 description: Learn how to control the GPIO pins on the Raspberry Pi Pico with MicroPython,
@@ -69,7 +69,9 @@ navigation:
 ---
 
 
-![Cover photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the videos
 

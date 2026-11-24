@@ -3,7 +3,7 @@ layout: lesson
 title: Fillet applied to side cutouts
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/10_fillet.jpg
 date: 2023-07-20
 previous: 09_sidecut.html
 next: 11_back.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 A small fillet of 1.5mm is applied to round the inner edges of the [cutout](09_sidecut.html) that has just been applied.
 

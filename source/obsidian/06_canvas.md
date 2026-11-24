@@ -3,8 +3,12 @@ title: Canvas in Obsidian
 description: Learn how to use the Canvas feature for visual note-taking and planning.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/06_canvas.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Canvas in Obsidian
 

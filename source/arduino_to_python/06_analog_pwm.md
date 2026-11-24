@@ -3,7 +3,11 @@ title: Analog Reading and PWM - ADC and PWM Classes
 description: Learn how to read analog sensors with the ADC class and control PWM outputs for LED brightness and motor speed control
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/06_analog_pwm.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Analog Input and Output: A Class-Based Approach

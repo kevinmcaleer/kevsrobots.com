@@ -3,7 +3,7 @@ layout: lesson
 title: Demo program
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: /learn/sqlite3/assets/banners/16_demo_program.jpg
 date: 2023-07-15
 previous: 12_boyce_codd_normal_form.html
 next: 17_tools.html
@@ -63,6 +63,10 @@ navigation:
       link: 17_tools.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 {% capture snakie_code %}
 import sqlite3

@@ -3,6 +3,11 @@ title: Boyce-Codd Normal Form (BCNF)
 description: >-
     BCNF helps reduce data duplication and ensures accurate data storage in relational databases
 layout: lesson
+cover: /learn/sqlite3/assets/banners/12_boyce_codd_normal_form.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 > **Aside: "The key, the whole key, and nothing but the key, so help me Codd"**

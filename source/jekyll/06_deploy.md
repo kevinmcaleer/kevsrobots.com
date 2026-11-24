@@ -3,6 +3,11 @@ title: Deploying and Managing Your Jekyll Site
 description: Learn about various deployment options for your Jekyll site and best practices for site maintenance.
 layout: lesson
 type: page
+cover: /learn/jekyll/assets/banners/06_deploy.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

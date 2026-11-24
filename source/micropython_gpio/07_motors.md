@@ -3,6 +3,11 @@ layout: lesson
 title: Controlling Motors with PWM
 type: page
 description: Learn how to control motors using Pulse Width Modulation (PWM) with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/07_motors.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

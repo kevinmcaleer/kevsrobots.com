@@ -3,6 +3,11 @@ title: Markdown in Obsidian
 description: How to use Markdown syntax and features within Obsidian.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/10_markdown_in_obsidian.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Markdown in Obsidian

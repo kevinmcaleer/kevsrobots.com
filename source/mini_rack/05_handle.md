@@ -3,6 +3,11 @@ title: Create the Handle
 description: Learn how to create the handle for the mini-rack
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/05_handle.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Handle Design](assets/handle_design.png){:class="img-fluid w-100"}

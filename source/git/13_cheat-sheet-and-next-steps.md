@@ -4,6 +4,11 @@ description: >-
     Every Git command from the course on one page, plus where to go next
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/13_cheat-sheet-and-next-steps.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Well done!

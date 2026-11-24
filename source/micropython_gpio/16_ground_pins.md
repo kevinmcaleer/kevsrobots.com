@@ -3,6 +3,11 @@ layout: lesson
 title: Ground Pins
 type: page
 description: Learn about ground pins on the Raspberry Pi Pico and how to use them in your projects.
+cover: /learn/micropython_gpio/assets/banners/16_ground_pins.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

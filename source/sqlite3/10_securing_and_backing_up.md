@@ -3,6 +3,11 @@ title: Securing and Backing Up SQLite Databases
 description: >-
     Module 10 focuses on securing SQLite databases and implementing backup strategies to protect data integrity and ensure business continuity
 layout: lesson
+cover: /learn/sqlite3/assets/banners/10_securing_and_backing_up.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Module 10 focuses on securing SQLite databases and implementing backup strategies to protect data integrity and ensure business continuity.

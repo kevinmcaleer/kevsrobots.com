@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Features
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/03_advanced_features.jpg
 date: 2025-09-04
 previous: 02_basic_queries.html
 next: 04_python_integration.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Advanced Features
 

@@ -3,8 +3,12 @@ title: Creating Notes
 description: Learn how to create and manage notes in Obsidian.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/03_creating_notes.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Creating Notes in Obsidian
 

@@ -3,6 +3,11 @@ title: Components
 description: Learn about the components that make up the 10" mini-rack for Raspberry Pi
 type: page
 layout: lesson
+cover: /learn/mini_rack/assets/banners/01_components.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Components](/learn/mini_rack/assets/components.jpg){:class="img-fluid w-100"}

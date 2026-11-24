@@ -3,7 +3,7 @@ layout: lesson
 title: Lesson 01 - Movement
 author: Kevin McAleer
 type: page
-cover: /learn/smars_code/assets/program_smars.png
+cover: /learn/smars_code/assets/banners/01_lesson_01.jpg
 date: 2023-09-10
 previous: 00_intro.html
 next: 02_lesson_02.html
@@ -40,6 +40,10 @@ navigation:
       link: 07_lesson_07.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the livestream
 

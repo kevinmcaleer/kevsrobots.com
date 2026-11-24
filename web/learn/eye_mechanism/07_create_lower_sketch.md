@@ -3,7 +3,7 @@ layout: lesson
 title: Creating the Lower Eyelid
 author: Kevin McAleer
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/07_create_lower_sketch.jpg
 date: 2023-01-29
 previous: 06_lower_eyelid_sketch.html
 next: 08_hinge.html
@@ -46,6 +46,10 @@ navigation:
       link: 09_joint_and_export.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Picking up the pace
 

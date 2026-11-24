@@ -3,7 +3,7 @@ layout: lesson
 title: Managing Docker Containers
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/05_managing.jpg
 date: 2024-01-21
 previous: 04_building.html
 next: 06_networking.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Mastering Container Management in Docker
 

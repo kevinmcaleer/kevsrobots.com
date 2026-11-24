@@ -3,7 +3,7 @@ layout: lesson
 title: Database Transactions and Error Handling
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: /learn/sqlite3/assets/banners/08_transations_and_error_handling.jpg
 date: 2023-07-15
 previous: 07_advanced_queries.html
 next: 09_indexes_and_performance.html
@@ -63,6 +63,10 @@ navigation:
       link: 17_tools.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Module 8 covers the important topics of database transactions and error handling in SQLite. You will learn how to work with transactions to ensure data integrity and handle errors effectively in your Python code.
 

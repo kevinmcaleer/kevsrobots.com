@@ -3,7 +3,7 @@ layout: lesson
 title: Assembly
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/02_assembly.jpg
 date: 2023-04-27
 previous: 01_what_is_burger_bot.html
 next: 02_video.html
@@ -57,6 +57,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Step | Detail
 ---|---

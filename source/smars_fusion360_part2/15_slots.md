@@ -3,6 +3,11 @@ title: Motor holder slots profile
 description: Define the motor holder slots
 layout: lesson
 redirect_from: /learn/smars_fusion360/31_slots.html
+cover: /learn/smars_fusion360_part2/assets/banners/15_slots.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Two slot profiles need to be sketched above each of the areas where the motors live. This will enable a motor holder part to be snapped into place later once the motors are installed. The parts are pressure fit, so this part will only need to be a few mm deep.

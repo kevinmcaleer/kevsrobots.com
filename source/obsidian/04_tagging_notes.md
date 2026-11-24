@@ -3,8 +3,12 @@ title: Tagging Notes
 description: How to use tags to organize your notes in Obsidian.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/04_tagging_notes.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Tagging Notes
 

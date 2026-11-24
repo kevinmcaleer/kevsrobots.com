@@ -12,6 +12,7 @@ level: beginner
 course_duration: 1h 6m
 lesson_count: 11
 first_lesson: 00_intro.html
+video: S7EoZHd03FY
 navigation:
 - name: Building SMARS with FreeCAD
 - content:

@@ -3,7 +3,7 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/00_intro.jpg
 date: 2023-01-29
 next: 01_create_component.html
 description: Design a robot eye mechanism with moving eyelids in Fusion 360
@@ -46,13 +46,19 @@ navigation:
 ---
 
 
-![Page cover photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 
 This course goes with the video below, which shows every step in action.
 
 {% include youtubeplayer.html id="JbWKsdy5iOk" %}
+
+There is also a newer build of the mechanism in this video:
+
+{% include youtubeplayer.html id="XpKnyTx_1mQ" %}
 
 ---
 

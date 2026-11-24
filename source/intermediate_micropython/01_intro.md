@@ -3,10 +3,12 @@ title: Introduction to Intermediate MicroPython
 description: Dive deeper into MicroPython with this intermediate-level course.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/01_intro.jpg
 ---
 
-![Cover](assets/cover.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Welcome to the **Intermediate MicroPython** course! Building on the foundations laid in the [Learn MicroPython - the basics](/learn/micropython/) course, this course delves into more advanced topics, equipping you with the knowledge and skills to tackle complex projects with confidence.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Project Ideas
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/13_project-ideas.jpg
 date: 2024-02-03
 previous: 12_backup-and-recovery.html
 next: 14_further-resources.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Expanding Your Docker Swarm Portfolio
 

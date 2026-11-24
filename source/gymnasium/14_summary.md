@@ -3,11 +3,11 @@ title: What You Have Built — and Where to Go Next
 description: Recap the journey from hand-built loop to Gymnasium environment to neural-network policy, check your understanding, and explore the Farama ecosystem.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/14_summary.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

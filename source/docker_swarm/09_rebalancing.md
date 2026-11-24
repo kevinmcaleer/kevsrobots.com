@@ -3,6 +3,10 @@ title: Rebalancing Services in Docker Swarm
 description: Learn how to manually rebalance services across nodes in your Docker Swarm cluster using the docker service update --force command, and understand the rationale behind manual rebalancing.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/09_rebalancing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

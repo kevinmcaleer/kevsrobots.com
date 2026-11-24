@@ -3,7 +3,7 @@ layout: lesson
 title: Course Overview
 author: Kevin McAleer
 type: page
-cover: /learn/mermaid/assets/cover.jpg
+cover: /learn/mermaid/assets/banners/00_intro.jpg
 date: 2026-11-04
 next: 01_what-is-mermaid.html
 description: What you'll learn in this beginner's course on drawing diagrams with
@@ -61,7 +61,9 @@ navigation:
 ---
 
 
-![banner]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

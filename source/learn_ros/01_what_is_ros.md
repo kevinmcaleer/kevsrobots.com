@@ -3,6 +3,10 @@ layout: lesson
 title: What is ROS
 type: page
 description: Learn about ROS, the different versions and what it does
+cover: /learn/learn_ros/assets/banners/01_what_is_ros.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

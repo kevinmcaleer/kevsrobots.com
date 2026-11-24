@@ -3,6 +3,11 @@ title: Customizing Your Jekyll Site
 description: Learn how to personalize your Jekyll site with themes, custom CSS/HTML, and JavaScript.
 layout: lesson
 type: page
+cover: /learn/jekyll/assets/banners/04_customizing.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

@@ -3,7 +3,7 @@ layout: lesson
 title: Basic Queries
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/02_basic_queries.jpg
 date: 2025-09-04
 previous: 01_installing.html
 next: 03_advanced_features.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Basic Queries
 

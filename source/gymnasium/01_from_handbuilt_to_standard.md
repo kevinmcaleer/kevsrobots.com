@@ -3,11 +3,11 @@ title: From Hand-Built to Standard
 description: Understand what a standard environment API buys you, and learn the history of OpenAI Gym and its maintained successor Gymnasium.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/01_from_handbuilt_to_standard.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

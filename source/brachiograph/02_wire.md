@@ -3,7 +3,11 @@ title: Wiring up the BrachioGraph
 description: Learn how to wire up the BrachioGraph plotter using a Raspberry Pi and SG90 servos.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/02_wire.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Wiring up the BrachioGraph

@@ -3,6 +3,11 @@ title: Motor holder profile
 description: Create the motor holder profile
 layout: lesson
 redirect_from: /learn/smars_fusion360/17_motor.html
+cover: /learn/smars_fusion360_part2/assets/banners/01_motor.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The profile for the motor holders within the body is created next.

@@ -3,6 +3,11 @@ title: Views and Indexes
 description: >-
     Creating and using views to simplify complex queries, and using indexes to optimize database performance
 layout: lesson
+cover: /learn/sql/assets/banners/13_views_and_indexes.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll explore **views** and **indexes**, two powerful tools that improve database usability and performance. Views allow you to simplify complex queries by saving them as virtual tables, while indexes optimize query speed by improving data retrieval efficiency.

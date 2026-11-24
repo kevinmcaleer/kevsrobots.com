@@ -3,6 +3,11 @@ title: Motor holder and nub chamfer
 description: Refine the tops
 layout: lesson
 redirect_from: /learn/smars_fusion360/21_chamfer.html
+cover: /learn/smars_fusion360_part2/assets/banners/05_chamfer.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 A small chamfer is applied to the tops of the extruded [motor holder profiles](01_motor.html) and [motor nubs](04_extrude.html).

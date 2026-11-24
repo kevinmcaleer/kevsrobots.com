@@ -3,6 +3,11 @@ title: "Parquet: fast columnar files"
 description: "Why Parquet is great for analytics, and how to read/write it efficiently in DuckDB."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/07_parquet.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Working with Parquet

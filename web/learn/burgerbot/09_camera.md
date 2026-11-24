@@ -3,7 +3,7 @@ layout: lesson
 title: Camera
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/09_camera.jpg
 date: 2023-04-27
 previous: 08_line_following_code.html
 description: Learn how to upgrade your BurgerBot with a camera.
@@ -55,6 +55,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Vision
 

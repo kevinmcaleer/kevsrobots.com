@@ -3,7 +3,7 @@ layout: lesson
 title: Gymnasium Wrappers
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/10_wrappers.jpg
 date: 2026-06-14
 previous: 09_registering_and_rendering.html
 next: 11_vectorized_envs.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

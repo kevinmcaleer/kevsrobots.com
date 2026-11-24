@@ -4,6 +4,11 @@ description: >-
     Plan a robot build with a Mermaid Gantt chart, and tell the story of a project with a timeline
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/09_gantt-and-timeline.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Planning a build

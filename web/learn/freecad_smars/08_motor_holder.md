@@ -3,7 +3,7 @@ layout: lesson
 title: Motor Holder
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/08_motor_holder.jpg
 date: 2025-12-12
 previous: 07_wheel_stubs.html
 next: 09_save_as_stl.html
@@ -46,6 +46,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What We're Building
 
@@ -218,6 +222,7 @@ The motor mounting works as a system:
 | Wheel stubs | Connect to wheels on outside |
 | Floor pads | Elevate and position motor |
 | Retention cutouts | Lock motor tabs in place |
+{:class="table table-single"}
 
 When assembled:
 1. Motor slides into position on floor pads

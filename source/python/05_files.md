@@ -2,10 +2,12 @@
 title: Working with Files in Python
 description: Learn how to read from and write to files in Python, handling both text and binary files.
 layout: lesson
-cover: /learn/python/assets/5.png
+cover: /learn/python/assets/banners/05_files.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

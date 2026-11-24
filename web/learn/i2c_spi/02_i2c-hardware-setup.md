@@ -3,7 +3,7 @@ layout: lesson
 title: I2C Hardware Setup
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/02_i2c-hardware-setup.jpg
 date: 2026-01-15
 previous: 01_what-is-i2c.html
 next: 03_scanning-i2c-devices.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![I2C Wiring Example](/learn/i2c_spi/assets/i2c-wiring.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Wiring Your First I2C Device
 

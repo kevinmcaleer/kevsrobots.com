@@ -3,7 +3,7 @@ layout: lesson
 title: Using H-Bridge Motor Drivers
 author: Kevin McAleer
 type: page
-cover: assets/hbridge.jpg
+cover: /learn/micropython_robotics/assets/banners/03_hbridge_control.jpg
 date: 2025-05-20
 previous: 02_dc_motors.html
 next: 04_line_following.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -66,7 +66,7 @@ An **H-bridge** is a circuit that lets you control the direction of a DC motor b
 
 ---
 
-## ⚙️ How the H-Bridge Works
+## How the H-Bridge Works
 
 The H-bridge gets its name from the circuit diagram, which looks like an “H” made of transistors or switches.
 
@@ -84,7 +84,7 @@ When paired with **PWM on the enable pin**, you can also control the **speed** o
 
 ---
 
-## 🔌 Wiring Two Motors with L298N
+## Wiring Two Motors with L298N
 
 {% include gallery.html titles="L298N Motor Driver" images="assets/l298n.png" descriptions="Works with up to 12v for powerful motors." cols=2 %}
 
@@ -112,7 +112,7 @@ The L298N has two H-bridges inside — perfect for controlling two motors indepe
 
 ---
 
-## 🧪 Writing the Code
+## Writing the Code
 
 Here’s a MicroPython script for controlling both motors:
 
@@ -174,7 +174,7 @@ stop_motors()
 
 ---
 
-## 🤖 Why This Matters
+## Why This Matters
 
 With two motors under your control, you can:
 
@@ -188,7 +188,7 @@ This forms the basic movement logic for most two-wheeled robots.
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 Try setting different speeds for left and right motors.
 

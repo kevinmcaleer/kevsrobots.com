@@ -13,6 +13,7 @@ level: intermediate
 course_duration: 0h 27m
 lesson_count: 12
 first_lesson: 01_intro.html
+video: ZuX45_rid68
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico
 - content:

@@ -3,7 +3,7 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/01_intro.jpg
 date: 2024-01-24
 next: 02_install.html
 description: Introduction to Jekyll and Static Sites
@@ -37,7 +37,9 @@ navigation:
 ---
 
 
-![Jekyll cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is Jekyll?
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Getting More Accurate Temperature Readings
 author: Kevin McAleer
 type: page
-cover: /learn/pico_temp_sensor/assets/cover.jpg
+cover: /learn/pico_temp_sensor/assets/banners/09_converting_adc_to_temperature.jpg
 date: 2024-11-22
 previous: 08_formatting_temperature_readings.html
 next: 10_creating_a_temperature_alert_system.html
@@ -50,6 +50,10 @@ navigation:
       link: 12_troubleshooting_temperature_readings.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

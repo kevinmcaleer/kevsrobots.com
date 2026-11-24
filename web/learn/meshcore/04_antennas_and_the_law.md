@@ -3,7 +3,7 @@ layout: lesson
 title: Antennas and the Law
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/04_antennas_and_the_law.jpg
 date: 2026-08-05
 previous: 03_the_hardware.html
 next: 05_flashing.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Your antenna matters more than your transmit power. A £5 antenna change can do more for your range than any setting in the firmware. This lesson covers what to buy, what not to do, and what the rules are in the UK.
 

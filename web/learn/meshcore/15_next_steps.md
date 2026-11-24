@@ -3,7 +3,7 @@ layout: lesson
 title: Where to Go Next
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/15_next_steps.jpg
 date: 2026-08-05
 previous: 14_troubleshooting.html
 description: Room servers, sensors, solar repeaters, T-Decks and joining the wider
@@ -61,6 +61,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 You have a working mesh. A repeater extending your range, a client in your pocket, and a network that owes nothing to anybody's infrastructure. Here is where to take it.
 

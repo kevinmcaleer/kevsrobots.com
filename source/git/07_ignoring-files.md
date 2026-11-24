@@ -4,6 +4,11 @@ description: >-
     Keep junk files, build output and secrets out of your repository with .gitignore
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/07_ignoring-files.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Not everything belongs in Git

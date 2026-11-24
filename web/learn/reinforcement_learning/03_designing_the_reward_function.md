@@ -3,7 +3,7 @@ layout: lesson
 title: Designing the Reward Function
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/03_designing_the_reward_function.jpg
 date: 2026-06-13
 previous: 02_anatomy_of_robotic_rl.html
 next: 04_mapping_the_robots_world.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

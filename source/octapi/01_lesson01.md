@@ -2,6 +2,11 @@
 title: Encrypt
 description: Learn how to encrypt a simple message with Py-Engima
 layout: lesson
+cover: /learn/octapi/assets/banners/01_lesson01.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What is `Py-Engima`?

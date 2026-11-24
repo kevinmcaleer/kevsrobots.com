@@ -3,7 +3,7 @@ layout: lesson
 title: Tasks in Obsidian
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/07_tasks.jpg
 date: 2025-08-24
 previous: 06_canvas.html
 next: 08_dataview_and_bases.html
@@ -52,6 +52,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Tasks in Obsidian
 

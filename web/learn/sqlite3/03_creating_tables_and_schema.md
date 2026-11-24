@@ -3,7 +3,7 @@ layout: lesson
 title: Creating Tables and Schema Design
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: /learn/sqlite3/assets/banners/03_creating_tables_and_schema.jpg
 date: 2023-07-15
 previous: 02_getting_started_with_sqlite3.html
 next: 04.inserting_and_retrieving_data.html
@@ -64,6 +64,10 @@ navigation:
       link: 17_tools.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Module 3 focuses on creating tables in SQLite databases and understanding the principles of schema design. We will explore how to define table structure, data types, constraints, and primary keys.
 

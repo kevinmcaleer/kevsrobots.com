@@ -2,9 +2,12 @@
 title: Overview
 description: Learn to program your SMARS robot in Arduino C++, from first moves to line following
 layout: lesson
+cover: /learn/smars_code/assets/banners/00_intro.jpg
 ---
 
-![Program SMARS with Arduino](assets/program_smars.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

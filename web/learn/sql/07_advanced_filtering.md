@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Filtering and Conditional Logic
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/07_advanced_filtering.jpg
 date: 2024-11-01
 previous: 06_querying_data_with_select.html
 next: 08_working_with_joins.html
@@ -55,6 +55,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore advanced filtering techniques and conditional logic with SQL. You’ll learn how to refine your queries using multiple conditions and implement conditional expressions with the `CASE` statement.
 

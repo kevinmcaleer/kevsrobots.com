@@ -3,8 +3,12 @@ title: Creating Your First Vault
 description: How to create and set up your first Obsidian vault.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/02_first_vault.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Creating Your First Vault
 

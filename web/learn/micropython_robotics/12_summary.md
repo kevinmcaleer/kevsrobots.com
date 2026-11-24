@@ -3,7 +3,7 @@ layout: lesson
 title: "Course Summary and What\u2019s Next"
 author: Kevin McAleer
 type: page
-cover: assets/summary.jpg
+cover: /learn/micropython_robotics/assets/banners/12_summary.jpg
 date: 2025-05-20
 previous: 11_final_project.html
 description: "Reflect on what you\u2019ve accomplished and explore ideas for taking\
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover](assets/01.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -67,7 +67,7 @@ You’ve gone from individual components to a functioning robot that can sense, 
 
 ---
 
-## ✅ What You’ve Learned
+## What You’ve Learned
 
 By completing this course, you’ve gained experience with:
 
@@ -81,39 +81,39 @@ By completing this course, you’ve gained experience with:
 
 ---
 
-## 🚀 What’s Next?
+## What’s Next?
 
 Here are some ways you can take your skills further:
 
-### 🔧 Build Smarter Robots
+### Build Smarter Robots
 - Add encoders to track distance and speed
 - Explore PID control for smoother motion
 - Experiment with multiple sensor types (light, temperature, compass, etc.)
 
-### 🧠 Add Logic and AI
+### Add Logic and AI
 - Use conditionals to make more complex decisions
 - Try micropython libraries for machine learning at the edge
 - Implement basic mapping or obstacle memory
 
-### 🕸️ Connect to the Cloud
+### Connect to the Cloud
 - Send sensor data to a web dashboard
 - Control your robot over the internet
 - Log your robot’s movements for analysis
 
-### 🤖 Explore Other Microcontrollers
+### Explore Other Microcontrollers
 - Try MicroPython on ESP32 or other boards
 - Compare features and performance
 - Use additional hardware like cameras or GPS modules
 
 ---
 
-## 🧩 Share What You’ve Built
+## Share What You’ve Built
 
 We’d love to see your final robot! Share your photos, code, and write-ups on your favorite maker forums or tag us on social media.
 
 ---
 
-## 🙌 Keep Learning
+## Keep Learning
 
 This is just the beginning. Robotics is a huge field that touches programming, electronics, mechanics, and AI. Keep building, keep testing, and most importantly — **keep having fun**.
 

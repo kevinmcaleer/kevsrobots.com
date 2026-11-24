@@ -3,7 +3,7 @@ layout: lesson
 title: Create Hinge Sketch
 author: Kevin McAleer
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/04_create_hinges.jpg
 date: 2023-01-29
 previous: 03_revolve.html
 next: 05_hinge.html
@@ -46,6 +46,10 @@ navigation:
       link: 09_joint_and_export.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 * **Create new Sketch** - Create a new sketch on the edge of the eyelid by clicking the `CONSTRUCT` Menu and selecting the `offset plane` option.
 

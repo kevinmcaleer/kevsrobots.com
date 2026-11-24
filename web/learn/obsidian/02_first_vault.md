@@ -3,13 +3,13 @@ layout: lesson
 title: Creating Your First Vault
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/02_first_vault.jpg
 date: 2025-08-24
 previous: 01_installing.html
 next: 03_creating_notes.html
 description: How to create and set up your first Obsidian vault.
 percent: 21
-duration: 2
+duration: 3
 navigation:
 - name: Obsidian
 - content:
@@ -52,6 +52,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Creating Your First Vault
 

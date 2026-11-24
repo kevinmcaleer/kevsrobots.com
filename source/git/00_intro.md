@@ -4,10 +4,12 @@ description: >-
     What you'll learn in Git for Beginners
 layout: lesson
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/00_intro.jpg
 ---
 
-![banner]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

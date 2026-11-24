@@ -3,7 +3,7 @@ layout: lesson
 title: BurgerBot Upgrades video
 author: Kevin McAleer
 type: video
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/08_video.jpg
 date: 2023-04-27
 previous: 07_object_avoidance.html
 next: 08_pen.html
@@ -57,6 +57,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this livestream, BurgerBot gets an upgrade. The next lessons cover the add-ons you can build: a pen, a line sensor and a camera.
 

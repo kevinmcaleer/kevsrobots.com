@@ -3,9 +3,12 @@ title: I2C Hardware Setup
 description: Learn how to properly wire I2C devices with pull-up resistors and make reliable connections
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/02_i2c-hardware-setup.jpg
 ---
 
-<!-- ![I2C Wiring Example](/learn/i2c_spi/assets/i2c-wiring.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Wiring Your First I2C Device
 

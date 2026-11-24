@@ -3,7 +3,7 @@ layout: lesson
 title: Planning the Cluster
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/01_planning-the-cluster.jpg
 date: 2024-02-03
 previous: 00_intro.html
 next: 02_cloning-raspberry-pi-os.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction to Cluster Building
 

@@ -3,7 +3,11 @@ title: Polymorphism
 description: Learn about polymorphism in MicroPython and how it allows objects to take on many forms.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/06_polymorphism.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Polymorphism

@@ -3,7 +3,11 @@ title: PyPi & MIP
 description: Learn about PyPi and MIP in MicroPython and how they can enhance your projects.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/09_pypi.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## PyPi

@@ -3,10 +3,12 @@ title: Overview
 description: Introduction to Jekyll and Static Sites
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/01_intro.jpg
 ---
 
-![Jekyll cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is Jekyll?
 

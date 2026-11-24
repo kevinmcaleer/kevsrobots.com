@@ -4,6 +4,11 @@ description: >-
     Version control explained: snapshots, repositories, commits, and the difference between Git and GitHub
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/01_what-is-git.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## The problem Git solves

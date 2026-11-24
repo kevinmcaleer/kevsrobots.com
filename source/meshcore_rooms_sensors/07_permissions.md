@@ -3,6 +3,11 @@ title: Permissions and Moderation
 description: The three permission tiers, access control lists, and running a room other people use
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/07_permissions.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The moment more than two people use your room, you are running shared infrastructure. This lesson is about the controls MeshCore gives you, and the fact that some of the problem is social rather than technical.

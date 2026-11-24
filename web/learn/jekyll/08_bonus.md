@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Tips and Productivity Hacks for Jekyll
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/08_bonus.jpg
 date: 2024-01-24
 previous: 07_realworld.html
 description: Enhance your Jekyll skills with advanced tips, productivity hacks, and
@@ -37,6 +37,10 @@ navigation:
       link: 08_bonus.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

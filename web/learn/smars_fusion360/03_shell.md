@@ -3,7 +3,7 @@ layout: lesson
 title: Shell the Extruded Base
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/03_shell.jpg
 date: 2023-07-20
 previous: 02_extrude_base.html
 next: 04_fillet.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Next a shell is applied to the extruded base cube, making it more into the familiar shape, if not a little blocky.
 

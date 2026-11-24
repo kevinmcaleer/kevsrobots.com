@@ -3,7 +3,7 @@ layout: lesson
 title: Summary and next steps
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/19_summary.jpg
 date: 2023-01-07
 previous: 18_laserscan.html
 description: What you've learned about ROS 2 and where to go next
@@ -73,6 +73,10 @@ navigation:
       link: 19_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What you've learned
 

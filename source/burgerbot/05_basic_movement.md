@@ -3,6 +3,11 @@ title: Basic Movement
 description: Learn how to move the robot forward, backward, left and right.
 layout: lesson
 type: page
+cover: /learn/burgerbot/assets/banners/05_basic_movement.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Understanding Differential Drive

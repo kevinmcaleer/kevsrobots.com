@@ -3,7 +3,7 @@ layout: lesson
 title: Front profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/06_front.jpg
 date: 2023-07-20
 previous: 05_chamfer.html
 next: 07_cut.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 A profile sketch is needed to make a final cut to the front side.
 

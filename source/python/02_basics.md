@@ -2,10 +2,12 @@
 title: Python Basics
 description: Dive into the basics of Python, including variables, data types, syntax, comments, and operators.
 layout: lesson
-cover: /learn/python/assets/2.png
+cover: /learn/python/assets/banners/02_basics.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

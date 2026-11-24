@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Data Types
 type: page
 description: Learn about Redis data types and how to use them in Python.
+cover: /learn/redis/assets/banners/03_data_types.jpg
 ---
 
-<!-- ![Cover photo of Redis data types](assets/redis-data-types.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

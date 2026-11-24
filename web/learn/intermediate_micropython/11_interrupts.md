@@ -3,7 +3,7 @@ layout: lesson
 title: Interrupts
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/11_interrupts.jpg
 date: 2024-07-07
 previous: 10_docstrings.html
 next: 12_timers.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Interrupts
 

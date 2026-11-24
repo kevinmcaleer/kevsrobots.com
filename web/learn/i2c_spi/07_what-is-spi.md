@@ -3,7 +3,7 @@ layout: lesson
 title: What is SPI?
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/07_what-is-spi.jpg
 date: 2026-01-15
 previous: 06_bme280-deep-dive.html
 next: 08_spi-hardware-setup.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![SPI Communication](/learn/i2c_spi/assets/spi-diagram.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding SPI
 
@@ -106,6 +108,7 @@ spi.write(b'data')    # Send data
 response = spi.read() # Receive data
 cs.value(1)           # Deselect device
 ```
+{: .no-snakie }
 
 ## SPI on Raspberry Pi Pico
 
@@ -234,6 +237,7 @@ spi = SPI(0, baudrate=10000000, ...) # 10 MHz
 # Very fast - Pico can handle up to 62.5 MHz
 spi = SPI(0, baudrate=62500000, ...) # 62.5 MHz
 ```
+{: .no-snakie }
 
 > **Tip**: Start with 1 MHz and increase speed once everything works. Some sensors have maximum speed limits.
 
@@ -443,6 +447,7 @@ spi = SPI(0, baudrate=1000000, polarity=1, phase=1, ...)
 # Try slower speed
 spi = SPI(0, baudrate=100000, ...)
 ```
+{: .no-snakie }
 
 ### Reading Wrong Data
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Navigating Content
 author: Kevin McAleer
 type: page
-cover: /learn/learning_platform/assets/learn.jpg
+cover: /learn/learning_platform/assets/banners/02_navigate_content.jpg
 date: 2022-12-04
 previous: 01_how_to_use.html
 next: 03_download_content.html
@@ -27,6 +27,10 @@ navigation:
       link: 03_download_content.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The content is structured in a way that makes sense to the student taking the course.
 

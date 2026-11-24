@@ -25,6 +25,7 @@ With a driver the whole job becomes two lines:
 sensor = HCSR04(trigger=14, echo=15)
 print(sensor.distance_mm())
 ```
+{: .no-snakie }
 
 The driver has to be **on the board** before your program can import it.
 

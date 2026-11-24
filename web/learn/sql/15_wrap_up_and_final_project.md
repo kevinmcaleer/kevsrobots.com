@@ -3,7 +3,7 @@ layout: lesson
 title: Wrap-up and Final Project
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/15_wrap_up_and_final_project.jpg
 date: 2024-11-01
 previous: 14_sql_functions_and_expressions.html
 description: Apply everything you've learned in this SQL course to a final project
@@ -54,6 +54,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll review the key topics covered in this course and introduce a final project that lets you apply everything you’ve learned to a real-world scenario.
 

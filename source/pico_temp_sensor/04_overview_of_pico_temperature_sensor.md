@@ -3,7 +3,11 @@ title: Understanding the Pico’s Temperature Sensor
 description: Dive into how the Raspberry Pi Pico’s built-in temperature sensor works and how to interact with it programmatically.
 layout: lesson
 type: page
-cover: assets/temperature_sensor_intro.png
+cover: /learn/pico_temp_sensor/assets/banners/04_overview_of_pico_temperature_sensor.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

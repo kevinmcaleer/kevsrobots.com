@@ -3,7 +3,7 @@ layout: lesson
 title: Deploying the Brain
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/13_deploying_the_brain.jpg
 date: 2026-06-13
 previous: 12_discretizing_real_sensors.html
 next: 14_scaling_up_to_deep_rl.html
@@ -61,9 +61,11 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+{% include youtubeplayer.html id="HJYdGICcw0k" %}
 
 This is the payoff lesson. We've trained a policy, understood its limitations, and built the sensor infrastructure. Now we put it all together: the Q-table travels from the laptop to the Pico as a JSON file, and a MicroPython script runs the greedy policy in a continuous loop, reading sensors and driving motors in real time.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Recap and Review
 author: Kevin McAleer
 type: page
-cover: /learn/pandas_and_numpy/assets/pandas.png
+cover: /learn/pandas_and_numpy/assets/banners/12_recap.jpg
 date: 2023-11-14
 previous: 11_case_studies.html
 description: Consolidate your learning journey in data manipulation with Pandas and
@@ -52,7 +52,9 @@ navigation:
 ---
 
 
-![Cover photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

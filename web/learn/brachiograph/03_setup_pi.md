@@ -3,7 +3,7 @@ layout: lesson
 title: Setup Raspberry Pi
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/03_setup_pi.jpg
 date: 2024-07-26
 previous: 02_wire.html
 next: 04_code.html
@@ -39,6 +39,10 @@ navigation:
       link: 07_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson you will learn how to setup a Raspberry Pi to run the BrachioGraph Python code. The Raspberry Pi is a small single-board computer that can be used to control the BrachioGraph plotter. By installing the Raspberry Pi OS and the required Python libraries, you can run the BrachioGraph code to create drawings and designs.
 

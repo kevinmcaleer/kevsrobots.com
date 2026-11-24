@@ -3,6 +3,11 @@ title: Stub extrude profile
 description: Cut the profile
 layout: lesson
 redirect_from: /learn/smars_fusion360/25_cut.html
+cover: /learn/smars_fusion360_part2/assets/banners/09_cut.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 A small extrusion is needed to join the stub wheel to the fillet at the bottom of the chassis.

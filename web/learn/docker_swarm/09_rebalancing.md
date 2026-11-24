@@ -3,7 +3,7 @@ layout: lesson
 title: Rebalancing Services in Docker Swarm
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/09_rebalancing.jpg
 date: 2024-02-03
 previous: 09_managing-and-scaling-services.html
 next: 10_monitoring-tools.html
@@ -59,6 +59,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Optimizing Service Distribution in Docker Swarm
 

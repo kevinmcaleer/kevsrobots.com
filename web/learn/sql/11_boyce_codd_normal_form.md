@@ -3,7 +3,7 @@ layout: lesson
 title: Boyce-Codd Normal Form (BCNF)
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/11_boyce_codd_normal_form.jpg
 date: 2024-11-01
 previous: 10_introduction_to_normalization.html
 next: 12_subqueries_and_nested_queries.html
@@ -56,6 +56,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore **Boyce-Codd Normal Form (BCNF)**, an advanced normalization form that extends Third Normal Form (3NF). BCNF is used to ensure that all dependencies in a table are based strictly on keys, enhancing data integrity and minimizing redundancy.
 

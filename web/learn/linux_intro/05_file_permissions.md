@@ -225,6 +225,7 @@ Command | Description
 --------|--------------------------------
 `chmod` | ***change file permissions*** - **ch**ange **mod**e
 `chown` | ***change file ownership*** - **ch**ange **own**er
+{:class="table table-single"}
 
 ---
 

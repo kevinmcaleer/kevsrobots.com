@@ -3,7 +3,7 @@ layout: lesson
 title: Data Insertion, Modification, and Deletion
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/05_data_insertion_and_modification.jpg
 date: 2024-11-01
 previous: 04_working_with_tables.html
 next: 06_querying_data_with_select.html
@@ -55,6 +55,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore how to insert, modify, and delete data in SQL tables. These operations are commonly referred to as **CRUD** operations: **Create**, **Read**, **Update**, and **Delete**.
 

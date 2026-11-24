@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/00_intro.jpg
 date: 2026-08-05
 next: 01_beyond_repeaters.html
 description: Build the other two MeshCore node types - a room server and a sensor
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![MeshCore room servers and sensors](assets/cover.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Ahoy there makers! In [part one](/learn/meshcore/) we built a repeater and a client, and got a message across town for about £30. That course covered conversation. This one covers the other two things a mesh can do: **remember**, and **measure**.
 

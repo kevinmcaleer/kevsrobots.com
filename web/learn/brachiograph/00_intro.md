@@ -3,7 +3,7 @@ layout: lesson
 title: BrachioGraph Pen Plotter
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/00_intro.jpg
 date: 2024-07-26
 next: 01_build.html
 description: Build and program a BrachioGraph; a simple and fun drawing robot that
@@ -41,9 +41,11 @@ navigation:
 ---
 
 
-![Cover](assets/cover.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+{% include youtubeplayer.html id="tkAv3HIw3CY" %}
 
 ## Overview
 

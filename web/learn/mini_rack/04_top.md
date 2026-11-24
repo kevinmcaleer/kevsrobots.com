@@ -3,7 +3,7 @@ layout: lesson
 title: Create the Top Corner
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/04_top.jpg
 date: 2025-02-16
 previous: 03_bottom.html
 next: 05_handle.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Top Design](assets/top_design.png){:class="img-fluid w-100"}
 

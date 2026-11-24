@@ -3,6 +3,11 @@ title: Beyond Repeaters and Clients
 description: What room servers and sensor nodes add to a mesh, and when each is worth building
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/01_beyond_repeaters.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 A repeater and a client give you a working network. So why add anything else? Because a plain mesh has two blind spots, and each of these roles fixes one of them.

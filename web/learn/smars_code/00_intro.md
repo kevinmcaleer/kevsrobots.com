@@ -3,7 +3,7 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
-cover: /learn/smars_code/assets/program_smars.png
+cover: /learn/smars_code/assets/banners/00_intro.jpg
 date: 2023-09-10
 next: 01_lesson_01.html
 description: Learn to program your SMARS robot in Arduino C++, from first moves to
@@ -41,7 +41,9 @@ navigation:
 ---
 
 
-![Program SMARS with Arduino](assets/program_smars.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

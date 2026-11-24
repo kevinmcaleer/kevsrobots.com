@@ -4,6 +4,10 @@ description: >-
     Understand the foundational concepts and planning required to build a Raspberry Pi 5 cluster with Docker Swarm.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/01_planning-the-cluster.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Course Introduction
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/pico_temp_sensor/assets/banners/01_course_introduction.jpg
 date: 2024-11-22
 next: 02_setting_up_thonny.html
 description: Learn about the exciting journey ahead as we explore the Raspberry Pi
@@ -50,7 +50,9 @@ navigation:
 ---
 
 
-![cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Welcome to the Course
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Wiring up the BrachioGraph
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/02_wire.jpg
 date: 2024-07-26
 previous: 01_build.html
 next: 03_setup_pi.html
@@ -40,6 +40,10 @@ navigation:
       link: 07_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Wiring up the BrachioGraph
 

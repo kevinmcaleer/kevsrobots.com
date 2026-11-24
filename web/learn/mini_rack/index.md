@@ -9,6 +9,7 @@ level: beginner
 course_duration: 0h 13m
 lesson_count: 10
 first_lesson: 00_intro.html
+video: fJC68N9nphA
 navigation:
 - name: Mini-Rack 3D Design Tutorial
 - content:

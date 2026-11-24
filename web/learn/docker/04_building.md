@@ -3,7 +3,7 @@ layout: lesson
 title: Building Your First Docker Image
 author: Kevin McAleer
 type: page
-cover: /learn/docker/assets/docker.jpg
+cover: /learn/docker/assets/banners/04_building.jpg
 date: 2024-01-21
 previous: 03_basics.html
 next: 05_managing.html
@@ -43,6 +43,10 @@ navigation:
       link: 10_conclusion.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Creating a Custom Docker Image
 

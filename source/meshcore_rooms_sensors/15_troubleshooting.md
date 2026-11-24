@@ -3,6 +3,11 @@ title: Troubleshooting
 description: A systematic checklist for room servers and sensor nodes that will not behave
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/15_troubleshooting.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Work down this list in order. As in part one, most problems are in the first few items, and most of those are radio settings or wiring.

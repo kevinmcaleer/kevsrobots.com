@@ -3,6 +3,11 @@ title: Practical Data Analysis
 description: "Do an end-to-end mini analysis with DuckDB over CSV/Parquet, producing tidy outputs for reuse."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/05_data_analysis.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Practical Data Analysis
