@@ -19,7 +19,7 @@ Everything so far has run from a battery. Now we bring in the brain. The Pico ca
 
 ## 3.3 V logic
 
-The Pico's pins work at 3.3 V. A pin outputting a 1 sits at 3.3 V, and 0 sits at 0 V. As an input, anything above about 2 V reads as 1, and anything below roughly 0.7 V reads as 0. In between the pin is undefined, so avoid it.
+The Pico's pins work at 3.3 V. A pin outputting a 1 sits at 3.3 V, and 0 sits at 0 V. As an input, anything above about 2 V reads as 1, and anything below about 0.8 V reads as 0. In between the pin is undefined, so avoid it.
 
 **Never apply more than 3.3 V to a GPIO pin.** The pins are not 5 V tolerant. If you have a 5 V sensor output, use a voltage divider (lesson 8!) or a level shifter to bring it down. For example, a 1k resistor on top and a 2k at the bottom turn a 5 V signal into about 3.3 V (5 x 2 / 3 = 3.33 V). This only works for a signal going into the Pico, not for powering things.
 
