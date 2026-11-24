@@ -10,6 +10,8 @@ cover: /learn/micropython_gpio/assets/banners/10_temperature_sensors.jpg
 
 ---
 
+By the end of this lesson you will be able to read temperature from the built-in sensor, a DS18B20 and a DHT11.
+
 ## Overview
 
 In this lesson you'll read temperatures three ways: with the sensor built into the Pico, a DS18B20 digital probe and a DHT11 temperature and humidity sensor.
@@ -99,17 +101,41 @@ while True:
 
 ---
 
-## Common issues
+---
 
-**Problem:** The DS18B20 `scan()` returns an empty list.
-**Solution:** Check the 4.7kΩ pull-up resistor between data and 3V3.
-**Why:** The 1-Wire bus relies on the pull-up to hold the line high between messages.
+## Wiring table for the DS18B20
 
-**Problem:** The DHT11 raises `OSError: [Errno 110] ETIMEDOUT`.
-**Solution:** Check the data wire and wait at least a second between readings.
-**Why:** The sensor didn't reply in time, usually because of wiring or reading too often.
+| DS18B20 pin | Connects to |
+| --- | --- |
+| VDD | 3V3(OUT) |
+| GND | GND |
+| DQ (data) | GP4, plus a 4.7kΩ resistor from DQ to 3V3 |
+{:class="table table-single"}
 
 ---
+
+## Try it Yourself
+
+1. Run the built-in sensor program. Put a finger on the chip and watch the reading rise.
+2. Convert the Celsius value to Fahrenheit and print both.
+3. If you have a DS18B20, add a second one on the same pin. How many addresses does `scan()` find?
+4. Challenge: turn an LED on when the temperature rises above a limit you choose.
+
+## Common Issues
+
+- **Problem**: The DS18B20 `scan()` returns an empty list.
+- **Solution**: Check the 4.7kΩ pull-up resistor between data and 3V3.
+- **Why**: The 1-Wire bus relies on the pull-up to hold the line high between messages.
+
+- **Problem**: The DHT11 raises `OSError: [Errno 110] ETIMEDOUT`.
+- **Solution**: Check the data wire and wait at least a second between readings.
+- **Why**: The sensor did not reply in time, usually because of wiring or reading too often.
+
+- **Problem**: The built-in sensor reads several degrees warmer than the room.
+- **Solution**: Treat it as a rough value, or use an external sensor.
+- **Why**: It measures the chip itself, which warms as the processor works.
+
+## Check your understanding
 
 {% quiz %}
 ? How long should you wait after `convert_temp()` before reading a DS18B20?
@@ -123,6 +149,12 @@ while True:
 - [ ] ADC2
 - [x] ADC4
 > ADC0 to ADC2 are GP26 to GP28. ADC4 is wired to the on-chip temperature sensor.
+
+? Which sensor in this lesson needs no wiring?
+- [x] The built-in sensor on ADC4
+- [ ] The DS18B20
+- [ ] The DHT11
+> The RP2040 has a temperature sensor on ADC channel 4.
 {% endquiz %}
 
 ---
