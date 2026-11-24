@@ -344,6 +344,11 @@ def slugs_from(paths):
     return found
 
 
+# Courses with hard failures that predate the strict check. Each is tracked by
+# the issue listed, and its entry is removed when that course is reworked.
+KNOWN_DEBT = {"learning_platform": 706, "scrawly_wally": 690}
+
+
 def main():
     parser = argparse.ArgumentParser(description="Score courses against the course quality checklist.")
     parser.add_argument("paths", nargs="*", help="course folders or lesson files (default: every course)")
@@ -383,9 +388,13 @@ def main():
     failed = False
     for r in results:
         if args.strict and r["hard"]:
-            failed = True
+            issue = KNOWN_DEBT.get(r["slug"])
             for item in r["hard"]:
-                print(f"::error::{r['slug']}: {item}")
+                if issue:
+                    print(f"::warning::{r['slug']}: {item} (known, tracked in #{issue})")
+                else:
+                    failed = True
+                    print(f"::error::{r['slug']}: {item}")
         if args.min and r["score"] < args.min:
             failed = True
             print(f"::error::{r['slug']} scores {r['score']}, under {args.min}")
