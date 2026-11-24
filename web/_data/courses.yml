@@ -224,12 +224,12 @@
   cover: /learn/duckdb/assets/cover.jpg
   date_published: 2025-09-04
   description: Learn how to use DuckDB, the fast, free, and embeddable database designed
-    for analytics.
-  duration: 0h 48m
+    for analytics. Query robot sensor logs, parts lists and print histories with SQL,
+    from the shell and from Python, then save them as Parquet and tune the speed.
+  duration: 1h 32m
   groups:
-  - databases
   - python
-  - raspberry pi
+  - raspberrypi
   lessons: 14
   level: beginner
   link: /learn/duckdb/00_intro.html

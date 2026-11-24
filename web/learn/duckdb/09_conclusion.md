@@ -5,12 +5,13 @@ author: Kevin McAleer
 type: page
 cover: /learn/duckdb/assets/banners/09_conclusion.jpg
 date: 2025-09-04
-previous: 08_performance_tuning.html
-next: 10_additional_resources.html
-description: Wrap up the course with key takeaways and patterns for using DuckDB in
-  real projects.
-percent: 84
-duration: 5
+previous: 11_mini_capstone.html
+description: Recap what you built with DuckDB, keep a glossary and a checklist of
+  patterns, and find where to go next.
+percent: 100
+duration: 6
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: DuckDB - Fast, free analytics
 - content:
@@ -38,7 +39,7 @@ navigation:
       link: 05_data_analysis.html
   - section: Datalakes, Parquet, and Performance
     content:
-    - name: Querying data lakes (HTTP/S3)
+    - name: Data lakes - many files, one query
       link: 06_datalakes.html
     - name: 'Parquet: fast columnar files'
       link: 07_parquet.html
@@ -46,12 +47,12 @@ navigation:
       link: 08_performance_tuning.html
   - section: Conclusion and Next Steps
     content:
-    - name: Conclusion and Next Steps
-      link: 09_conclusion.html
     - name: Additional Resources
       link: 10_additional_resources.html
-    - name: 'Mini capstone: local analytics project'
+    - name: 'Mini capstone: the workshop report'
       link: 11_mini_capstone.html
+    - name: Conclusion and Next Steps
+      link: 09_conclusion.html
 ---
 
 
@@ -59,140 +60,101 @@ navigation:
 
 ---
 
-## Conclusion and Next Steps
+By the end of this lesson you will be able to describe the workflow you learned, pick the right object (view, table or file) for a job, and choose what to study next.
 
-You’ve seen how DuckDB makes local analytics simple, fast, and portable—no servers required.
+Well done, makers! You started with three CSV files and ended with a workspace that can answer questions about robots, parts and printers in milliseconds, with no server in sight. Let's pull the threads together.
 
----
+## The workflow in one picture
+
+```mermaid
+flowchart LR
+    A[Raw CSV or Parquet in data/] --> B[Query in place or load a table]
+    B --> C[Check the data]
+    C --> D[Views for logic]
+    D --> E[Summary tables]
+    E --> F[Parquet in exports/ and charts]
+    G[(robots.duckdb)] --- B
+    G --- E
+```
 
 ## Key takeaways
 
-- DuckDB queries CSV/Parquet directly and integrates deeply with Python.
-- A single `.duckdb` file is a great local analytics store.
-- Views for readability; tables and Parquet for durable artifacts.
-- Extensions like `httpfs` unlock remote data.
+- DuckDB queries CSV and Parquet files directly, and works hand in hand with Python and Pandas.
+- A single `.duckdb` file is a portable local database. Parquet files are the best way to share results.
+- Views keep logic readable and fresh. Tables and Parquet files store answers you want fast and frozen.
+- A folder of partitioned files is a data lake you can query as one table, skipping what the filter rules out.
+- Measure before you tune: `EXPLAIN ANALYZE`, timings and profiles beat guessing.
 
----
+## Turn it into a real project
 
-## Why this matters (beginner’s view)
-
-- Do “big database” analytics on your laptop—no servers to run or pay for.
-- Keep data portable: Parquet files and a `.duckdb` database travel easily.
-- Simple deployments: a notebook + a couple of SQL files are often enough.
-- Start small here; move to a warehouse later only if/when you outgrow it.
-
----
-
-## Step-by-step: turn this course into a real workflow
-
-1) Create a tiny project skeleton
-- Folders: `data/` (raw), `exports/` (outputs), `sql/` (queries), `notebooks/` (optional)
-- File: `analytics.duckdb` (local database file)
-
-2) Bring in data
-- Prefer Parquet for speed; if you start with CSV, convert to Parquet once
-- Keep `data/` immutable; do transforms in SQL so they’re reproducible
-
-3) Build trusted tables or views
-- Views for readable logic you can re-run; tables for stable artifacts you reuse
-- Run `ANALYZE` after loading to improve the planner’s choices
-
-4) Analyze and iterate
-- Keep small, focused, commented SQL files in `sql/`
-- In Python, register DataFrames, bind parameters, and return DataFrames
-
-5) Persist and share
-- COPY important results to `exports/` (ensure the folder exists)
-- Save final tables to partitioned Parquet for interoperability
-
-6) Document
-- Add a short `README.md` with how to run, data sources, and assumptions
-- Capture pitfalls/decisions as notes in SQL comments
-
----
-
-## Practical notes and tips
-
-- Partition Parquet by a column you frequently filter on (e.g., date)
-- Reproducibility beats ad‑hoc: prefer SQL + Parquet over spreadsheets
-- Performance: filter early, select only needed columns, materialize hot results
-- Portability: DuckDB files and Parquet work across machines and tools
-
----
+1. **Skeleton**: folders `data/` (raw, never edited), `exports/` (outputs), `sql/` (saved queries) and a `robots.duckdb` file.
+2. **Bring data in**: load once, convert CSV to Parquet if you will query it again.
+3. **Build trusted views and tables**: views for logic you will tweak, tables for results you reuse.
+4. **Analyse in SQL files**: short, commented scripts you can rerun with `.read sql/report.sql` in the shell, or from Python.
+5. **Share**: `COPY` summaries to `exports/` as Parquet or CSV, and charts as PNG.
+6. **Document**: a short `README.md` saying where the data came from and how to rerun everything.
 
 ## Beginner glossary: the language of data
 
-- **Materialize**: Save the result of a query as a real table or file instead of re‑computing it every time. Use when a step is slow but reused often.
-- **Parquet**: A fast, compressed, column‑oriented file format for analytics. Great for large, read‑heavy workloads.
-- **CTE (Common Table Expression)**: A named subquery using WITH that makes complex SQL easier to read and reuse within one query.
-- **View**: A saved SQL query that behaves like a table when you read from it. It doesn’t store data by itself.
-- **Table**: Data stored physically inside the database (or as files when exported). Good for durable artifacts.
-- **Persistence**: Keeping results around (in a table or file) so you can use them later without recomputing.
-- **Predicate pushdown**: Letting the engine skip files/rows/columns early by applying your WHERE filters as close to the data as possible (especially with Parquet).
-- **Partitioning**: Organizing files into folders by a key (e.g., year=2025/month=09) so queries can skip entire folders.
-- **Column pruning**: Reading only the columns you SELECT to reduce I/O and speed up queries.
-- **PRAGMA**: A command to adjust engine settings (e.g., threads, memory_limit) or enable profiling.
-- **ANALYZE**: Command to compute statistics about your tables so the query planner makes better decisions.
-- **Manifest table**: A small table that lists all files in a dataset so you have a stable reference to a changing lake.
-- **Schema evolution**: Carefully changing table/file columns over time (add columns, rename, change types) without breaking queries.
-
----
-
-## Common pitfalls and quick fixes
-
-- COPY error “No such file or directory”
-  - Create the `exports/` folder first or adjust the path
-- SSL errors when reading remote data
-  - On macOS, run Python’s “Install Certificates.command” or use DuckDB `httpfs`
-- Mixed types in CSV columns
-  - CAST explicitly or convert to Parquet once, then query the Parquet
-- Timezones/timestamps look off
-  - Normalize to UTC on ingest; store as TIMESTAMP; format on output
-- Large queries feel slow or memory heavy
-  - Add selective WHERE filters; push computation down to Parquet; tune `threads`/`memory_limit`
-
----
-
-## Quick reference (keep handy)
-
-- After ingest: run `ANALYZE`
-- Speed trio: Parquet + partitioning + predicate pushdown
-- Stability: materialize intermediate heavy steps as tables/Parquet
-- Python patterns: quick query, persistent connection, register DataFrames
-- Extensions to know: `httpfs`, `json`
-
----
+- **Analytics (OLAP)**: asking questions about lots of rows at once, such as averages and totals. DuckDB is built for this.
+- **Column pruning**: reading only the columns you select, so the rest of a Parquet file is never touched.
+- **CTE (Common Table Expression)**: a named step in a query, written with `WITH`.
+- **Hive partitioning**: folders named `column=value`, such as `robot=rover-3`, that DuckDB turns back into columns.
+- **Manifest**: a table listing the files in a dataset and their row counts, so you can see what changed.
+- **Materialise**: save the result of a query as a table or file instead of recomputing it.
+- **Parquet**: a compressed, column-oriented file format that stores types and statistics.
+- **Partition pruning**: skipping whole folders or files because their partition values cannot match your filter.
+- **Persistence**: keeping data in a file so it survives after your program ends.
+- **Predicate pushdown**: applying your `WHERE` filter inside the file reader so fewer rows are read.
+- **PRAGMA and SET**: commands that change DuckDB settings or switch features such as profiling on.
+- **Row group**: a chunk of rows inside a Parquet file, with minimum and maximum values stored for each column.
+- **Schema evolution**: columns being added or changed over time, and how you cope when reading old and new files.
+- **View**: a saved query that behaves like a table but stores no data of its own.
+- **Window function**: a calculation such as `LAG` that looks at neighbouring rows without collapsing them.
 
 ## Where to go next
 
-- Try DuckDB on your own datasets—start with Parquet for speed.
-- Build a tiny “data mart” per project with reproducible SQL.
-- Combine with notebooks or lightweight dashboards.
+- **Learn more SQL**: the [SQL course](/learn/sql/) and the [SQLite course](/learn/sqlite3/) cover transactions and the kind of database you update row by row, which is the opposite job to DuckDB.
+- **Dig into DataFrames**: [Pandas and NumPy](/learn/pandas_and_numpy/) pairs perfectly with the Python lessons here.
+- **Try other data stores**: the [MongoDB](/learn/mongodb/) and [Redis](/learn/redis/) courses show document and in-memory databases.
+- **Sharpen your Python**: the [Python course](/learn/python/) is a good companion if the scripts felt tricky.
+- **Collect real data**: log your own Pico or Raspberry Pi sensors to a CSV (lesson 10 shows how), then point these queries at it.
 
----
+## Try it Yourself
 
-## Suggested patterns
+1. Write a three-line README for your project folder: what the data is, how to regenerate it (`python make_data.py`), and how to open the database.
+2. Make a file `sql/report.sql` containing two queries from earlier lessons, then run it in the shell with `.read sql/report.sql`.
+3. List the five terms from the glossary that you would still struggle to explain, and find them in earlier lessons.
+4. Challenge: pick one lesson and rebuild its main example using your own data instead of the sample robots.
 
-- Keep a `/data` folder for raw files and `/exports` for outputs.
-- Store environment and connection tips in a `README.md`.
-- Commit SQL scripts alongside analysis notebooks.
+## Common Issues
 
----
+- **Problem**: `.read sql/report.sql` says the file cannot be found.
+- **Solution**: Start the shell from the project folder, or give the full path.
+- **Why**: `.read` uses the folder the shell was started in, like every relative path.
 
-## What to practice next (mini capstones)
+- **Problem**: Old exports still appear after you changed a query.
+- **Solution**: Delete or overwrite the old files, then rerun the `COPY`.
+- **Why**: `COPY` overwrites a single file, but a partitioned folder may keep files from earlier runs.
 
-- Personal dataset: load a CSV you know, clean it, export to Parquet, then re-query fast
-- Open data lake: query a public partitioned Parquet dataset over HTTP/S3 with `httpfs`
-- Mini data mart: build 2–3 views, 1–2 materialized tables, and a final exported report
+## Check your understanding
 
----
+{% quiz %}
+? You have a slow summary that you read every day. What should you do with it?
+- [ ] Keep it as a CTE
+- [x] Save it as a table or a Parquet file
+- [ ] Rerun the whole analysis each time
+> Materialising stores the answer, so reads are quick and the result stays stable.
 
-## Share and learn
+? Which of these is a good rule for sharing results with other tools?
+- [ ] Always send the `.duckdb` file
+- [x] Export Parquet or CSV files with `COPY`
+- [ ] Paste results into a chat
+> Parquet and CSV are understood by many programs, so they travel well.
 
-- Contribute back improvements to queries and structure.
-- Explore extensions (JSON, spatial) for new use cases.
-- Swap tips with the community; compare patterns and performance.
-
-On to the resources for more learning and tools.
-
----
+? What is a partition column in a lake like `robot=rover-3/day=2025-03-04`?
+- [ ] A column stored only in the first file
+- [x] A column whose values come from the folder names
+- [ ] A column that holds file sizes
+> DuckDB reads the names `robot` and `day` and their values from the path.
+{% endquiz %}
