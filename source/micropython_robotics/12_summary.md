@@ -1,72 +1,91 @@
 ---
-title: Course Summary and What’s Next
-description: Reflect on what you’ve accomplished and explore ideas for taking your MicroPython robotics skills even further.
+title: Course Summary and What's Next
+description: Reflect on what you've accomplished and explore ideas for taking your MicroPython robotics skills even further.
 layout: lesson
 type: page
 cover: /learn/micropython_robotics/assets/banners/12_summary.jpg
-date_updated: 2025-05-10
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Congratulations — you’ve completed the **MicroPython Robotics Projects with the Raspberry Pi Pico** course!
+By the end of this lesson you will be able to recap every part of the robot, say which lesson to revisit when something breaks, and choose your next project.
 
-You’ve gone from individual components to a functioning robot that can sense, move, react, and even be controlled wirelessly. That’s a huge achievement in the world of physical computing!
+Congratulations on completing **MicroPython Robotics Projects with the Raspberry Pi Pico**! You've gone from single components to a robot that can sense, move, react, and even take orders from your phone. That's a real achievement in physical computing.
 
----
+## What you've learned
 
-## What You’ve Learned
+```mermaid
+flowchart TD
+    M["Motors: PWM and H-bridge (lessons 2 and 3)"] --> R["robot.py"]
+    S1["IR line sensor (lesson 4)"] --> B["Behaviours"]
+    S2["Ultrasonic sonar.py (lesson 5)"] --> B
+    SV["Servo scanning (lesson 7)"] --> B
+    R --> B
+    C["Bluetooth and Wi-Fi (lessons 8 and 9)"] --> B
+    B --> P["Your own robot (lessons 10 and 11)"]
+```
 
-By completing this course, you’ve gained experience with:
+| If this goes wrong | Revisit |
+|--------------------|---------|
+| Motor will not turn, or always runs flat out | Lesson 2 |
+| Wheels turn the wrong way | Lesson 3 |
+| Robot loses the line | Lesson 4 |
+| Distance readings are wrong or the Pico is damaged by ECHO | Lesson 5 |
+| Resets, heat or power trouble | Lesson 6 |
+| Servo angle is off or buzzing | Lesson 7 |
+| Remote control not responding | Lessons 8 and 9 |
+{:class="table table-single"}
 
-- Controlling DC motors using H-bridge drivers
-- Reading input from IR and ultrasonic sensors
-- Programming autonomous and reactive behaviors
-- Mounting and wiring a two-wheeled robot chassis
-- Using a servo to scan the environment
-- Adding remote control via Bluetooth and Wi-Fi
-- Building and testing a complete robotics project
+The big ideas to keep:
 
----
+- A Pico cannot run motors directly, so a **driver** switches the power
+- **PWM** sets speed: duty of 65535 means fully on, and a servo angle is a pulse width
+- **Sensors** give numbers, and you must calibrate and check their voltage levels
+- Robots run a **sense, decide, act** loop
+- Build in **safety stops** and test each part on its own
 
-## What’s Next?
+## What's next
 
-Here are some ways you can take your skills further:
+Here are some ways to take your skills further:
 
-### Build Smarter Robots
-- Add encoders to track distance and speed
-- Explore PID control for smoother motion
-- Experiment with multiple sensor types (light, temperature, compass, etc.)
+- **Understand drivers deeply** with [Motors and motor drivers](/learn/motors_and_drivers/): motor classes, braking, servos, steppers and encoders
+- **Go back to the foundations** with [Robotics 101](/learn/robotics_101/)
+- **Build more MicroPython skills** with [GPIO Mastery](/learn/micropython_gpio/) and [Intermediate level MicroPython](/learn/intermediate_micropython/)
+- **Try a complete robot kit** with [Build your own BurgerBot](/learn/burgerbot/) or the SMARS robot courses, such as [Learn how to program SMARS with Arduino](/learn/smars_code/)
+- **Wire and test in a simulator** with [Wire It Up - Electronics in Snakie](/learn/snakie_electronics/)
+- **Smarter robots**: add wheel encoders, try PID control, or add more sensors
 
-### Add Logic and AI
-- Use conditionals to make more complex decisions
-- Try micropython libraries for machine learning at the edge
-- Implement basic mapping or obstacle memory
+## Share what you've built
 
-### Connect to the Cloud
-- Send sensor data to a web dashboard
-- Control your robot over the internet
-- Log your robot’s movements for analysis
+Share your photos, code and write-ups on your favourite maker forums. Show what went wrong as well as what worked, since that's what other makers learn the most from.
 
-### Explore Other Microcontrollers
-- Try MicroPython on ESP32 or other boards
-- Compare features and performance
-- Use additional hardware like cameras or GPS modules
+## Try it Yourself
 
----
+1. Write down the three biggest problems you fixed during the course and what caused each.
+2. Draw your robot's wiring as a table, from memory, then compare it to the intro.
+3. Pick one idea from What's next and write a plan for it using the checklist in lesson 11.
 
-## Share What You’ve Built
+## Check your understanding
 
-We’d love to see your final robot! Share your photos, code, and write-ups on your favorite maker forums or tag us on social media.
+{% quiz %}
+? What sets the speed of a DC motor driven through an L298N enable pin?
+- [ ] The direction pins
+- [x] The PWM duty cycle on the enable pin
+- [ ] The motor wire colour
+> PWM on ENA or ENB sets the average power the motor gets.
 
----
+? Which loop describes how an autonomous robot works?
+- [x] Sense, decide, act
+- [ ] Wire, solder, test
+- [ ] Pair, connect, drive
+> The robot reads its sensors, decides, and then moves.
 
-## Keep Learning
-
-This is just the beginning. Robotics is a huge field that touches programming, electronics, mechanics, and AI. Keep building, keep testing, and most importantly — **keep having fun**.
-
-Thanks for learning with us, and happy making!
-
----
+? Why should you build in a safety stop in remote-controlled robots?
+- [ ] It makes the code shorter
+- [ ] It saves memory
+- [x] So the robot stops if the connection is lost
+> The Bluetooth lesson stops the robot when commands stop arriving, and the Wi-Fi lesson uses short nudges.
+{% endquiz %}

@@ -5,10 +5,27 @@
   level: intermediate
   layout: course
   cover: assets/cover.jpg
+  video: 6YqzOQ7OZkQ
+  outcomes:
+    - Drive two DC motors forwards, backwards and at different speeds with an L298N driver and PWM
+    - Read an infrared line sensor and an HC-SR04 ultrasonic sensor, and turn the readings into decisions
+    - Aim an SG90 servo by working out the pulse width for any angle
+    - Control the robot from a phone over Bluetooth (HC-05) or Wi-Fi (Pico W)
+    - Combine motors and sensors into an autonomous robot that avoids obstacles and follows a line
+  prerequisites:
+    - Learn MicroPython - The basics
+    - Raspberry Pi Pico with MicroPython - GPIO Mastery
+  you_need:
+    - A Raspberry Pi Pico or Pico W (a Pico W for the Wi-Fi lesson) running MicroPython
+    - An L298N motor driver module and two small DC gear motors with wheels
+    - An HC-SR04 ultrasonic sensor, one or two TCRT5000 style IR line sensors and an SG90 servo
+    - A battery pack for the motors, jumper wires and resistors (1k and 2k ohm)
+    - Optional, an HC-05 Bluetooth module
   groups:
-      - robotics
+      - robots
       - micropython
-      - raspberry pi
+      - raspberrypi
+      - pico
   description: >-
     Learn how to build simple yet powerful robots using the Raspberry Pi Pico and MicroPython. 
     This hands-on course guides you through controlling motors, reading sensors, and combining hardware to create autonomous and remotely controlled robots. 
@@ -17,7 +34,7 @@
     - section:
         name: Introduction
         content:
-          - 01_intro.md
+          - 00_intro.md
     - section:
         name: Motors and Movement
         content:
