@@ -15,6 +15,25 @@
   {%- endfor -%}
 {%- endfor -%}
 {%- assign related_posts = related_posts | uniq -%}
+{%- comment -%}
+  Top up to three so the section always shows, even when no other published
+  post shares a tag yet (a new series whose later posts are still future
+  dated): first posts in the same group, then the latest posts.
+{%- endcomment -%}
+{%- if related_posts.size < 3 -%}
+  {%- for group in page.groups -%}
+    {%- for post in site.posts -%}
+      {%- if post.groups contains group and post.url != page.url -%}{%- assign related_posts = related_posts | push: post -%}{%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+  {%- assign related_posts = related_posts | uniq -%}
+{%- endif -%}
+{%- if related_posts.size < 3 -%}
+  {%- for post in site.posts limit: 6 -%}
+    {%- unless post.url == page.url -%}{%- assign related_posts = related_posts | push: post -%}{%- endunless -%}
+  {%- endfor -%}
+  {%- assign related_posts = related_posts | uniq -%}
+{%- endif -%}
 <link rel="stylesheet" href="/assets/css/blog-cards.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/read-next.css?v={{ site.time | date: '%s' }}">
 <section class="read-next" data-read-next data-page="{{ page.url | escape }}" aria-labelledby="read-next-title"{% if related_posts.size == 0 %} hidden{% endif %}>
