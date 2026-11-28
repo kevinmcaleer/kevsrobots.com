@@ -1005,6 +1005,96 @@
     ]
   },
   {
+    "slug": "design_thinking",
+    "name": "Design Thinking for Vibe Coders",
+    "description": "AI can write the code in minutes, so the hard part now is building the right thing. Learn the five design thinking modes (empathise, define, ideate, prototype, test) and how to use each one with AI-assisted, vibe coded software and robots, while you build a Classroom Plant Helper with a Raspberry Pi Pico.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-28",
+    "groups": [
+      "ai",
+      "robots",
+      "micropython"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/design_thinking/00_intro.html"
+      },
+      {
+        "file": "01_why_vibe_coding_needs_design.md",
+        "section": "Why design thinking now",
+        "url": "/learn/design_thinking/01_why_vibe_coding_needs_design.html"
+      },
+      {
+        "file": "02_the_design_thinking_process.md",
+        "section": "Why design thinking now",
+        "url": "/learn/design_thinking/02_the_design_thinking_process.html"
+      },
+      {
+        "file": "03_empathise.md",
+        "section": "Understand the problem",
+        "url": "/learn/design_thinking/03_empathise.html"
+      },
+      {
+        "file": "04_define.md",
+        "section": "Understand the problem",
+        "url": "/learn/design_thinking/04_define.html"
+      },
+      {
+        "file": "05_a_brief_your_ai_can_use.md",
+        "section": "Understand the problem",
+        "url": "/learn/design_thinking/05_a_brief_your_ai_can_use.html"
+      },
+      {
+        "file": "06_ideate.md",
+        "section": "Explore ideas",
+        "url": "/learn/design_thinking/06_ideate.html"
+      },
+      {
+        "file": "07_prototype_to_learn.md",
+        "section": "Explore ideas",
+        "url": "/learn/design_thinking/07_prototype_to_learn.html"
+      },
+      {
+        "file": "08_vibe_coding_a_prototype.md",
+        "section": "Build with AI",
+        "url": "/learn/design_thinking/08_vibe_coding_a_prototype.html"
+      },
+      {
+        "file": "09_prototyping_robots_with_ai.md",
+        "section": "Build with AI",
+        "url": "/learn/design_thinking/09_prototyping_robots_with_ai.html"
+      },
+      {
+        "file": "10_test_with_real_people.md",
+        "section": "Test and iterate",
+        "url": "/learn/design_thinking/10_test_with_real_people.html"
+      },
+      {
+        "file": "11_test_the_code.md",
+        "section": "Test and iterate",
+        "url": "/learn/design_thinking/11_test_the_code.html"
+      },
+      {
+        "file": "12_iterate.md",
+        "section": "Test and iterate",
+        "url": "/learn/design_thinking/12_iterate.html"
+      },
+      {
+        "file": "13_project_plant_helper.md",
+        "section": "Project and summary",
+        "url": "/learn/design_thinking/13_project_plant_helper.html"
+      },
+      {
+        "file": "14_summary.md",
+        "section": "Project and summary",
+        "url": "/learn/design_thinking/14_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "docker",
     "name": "Docker",
     "description": "Learn how to use Docker on a Raspberry Pi or Linux PC. Build a robot status web app, package it in an image, then run it with Redis, a network and a volume using Docker Compose.",

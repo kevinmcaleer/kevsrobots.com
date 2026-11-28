@@ -207,6 +207,25 @@
   name: Computer Vision on Raspberry Pi with CVZone
   video: FrLHFZZIozk
 - author: Kevin McAleer
+  cover: /learn/design_thinking/assets/cover.jpg
+  date_published: 2026-11-28
+  description: AI can write the code in minutes, so the hard part now is building
+    the right thing. Learn the five design thinking modes (empathise, define, ideate,
+    prototype, test) and how to use each one with AI-assisted, vibe coded software
+    and robots, while you build a Classroom Plant Helper with a Raspberry Pi Pico.
+  duration: 1h 38m
+  groups:
+  - ai
+  - robots
+  - micropython
+  lessons: 15
+  level: beginner
+  link: /learn/design_thinking/00_intro.html
+  name: Design Thinking for Vibe Coders
+  projects:
+  - /projects/picodrone/index.html
+  video: 90pPahgU9JM
+- author: Kevin McAleer
   cover: /learn/docker/assets/docker.jpg
   date_published: 2024-01-21
   description: Learn how to use Docker on a Raspberry Pi or Linux PC. Build a robot

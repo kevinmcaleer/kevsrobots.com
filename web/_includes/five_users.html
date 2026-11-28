@@ -1,0 +1,10 @@
+{%- comment -%}
+  How many usability problems a test with n people finds, from Jakob Nielsen's
+  model N(1 - (1 - L)^n). See docs/course_widgets.md.
+
+    {% include five_users.html %}
+{%- endcomment -%}
+<div data-kr-widget="five-users" data-users="{{ include.users | default: '5' | escape }}" data-rate="{{ include.rate | default: '31' | escape }}">
+<p><em>This calculator needs JavaScript. By hand: with L = 0.31 (each tester finds about 31% of the problems), n testers find 1 - (1 - 0.31) to the power n of them. Five testers find about 84%.</em></p>
+</div>
+{% include course_widget_assets.html %}

@@ -1140,8 +1140,127 @@
     reset();
   }
 
+  // ------------------------------------------------------------ POV builder
+  // Design thinking course, lesson 4: user + need + insight -> a point of view,
+  // three How Might We questions, and a short brief to paste into an AI.
+  function povBuilder(root) {
+    function field(label, key, hint) {
+      var input = el('textarea', { rows: '2', class: 'kr-pv-input', placeholder: hint });
+      input.value = root.getAttribute('data-' + key) || '';
+      return { input: input, box: el('label', { class: 'kr-pv-field' }, [el('span', { class: 'kr-mx-caption', text: label }), input]) };
+    }
+    var user = field('User: who, specifically?', 'user', 'e.g. Leo and Priya, the pupils on plant duty');
+    var need = field('Need: a verb, not a gadget', 'need', 'e.g. a way to tell which plant needs water');
+    var insight = field('Insight: what you learned that surprised you', 'insight', 'e.g. they are afraid of getting it wrong');
+    var pov = el('p', { class: 'kr-pv-pov', role: 'status' });
+    var hmw = el('ul', { class: 'kr-pv-hmw' });
+    var warn = el('p', { class: 'kr-w-hint kr-pv-warn' });
+    var brief = el('pre', { class: 'kr-pv-brief' });
+    var copy = el('button', { type: 'button', class: 'kr-w-btn', text: 'Copy brief' });
+    copy.addEventListener('click', function () { copyText(brief.textContent, copy); });
+    var GADGETS = /\b(app|robot|website|web page|screen|sensor|button|pump|camera|ai|chatbot|dashboard|device|machine|alexa)\b/i;
+    function clean(t) { return t.trim().replace(/[.\s]+$/, ''); }
+    function lowerFirst(t) { return t ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+    function show() {
+      var u = clean(user.input.value), n = clean(need.input.value), i = clean(insight.input.value);
+      hmw.textContent = '';
+      if (!u || !n || !i) {
+        pov.textContent = 'Fill in all three boxes to see your point of view.';
+        brief.textContent = ''; warn.textContent = '';
+        return;
+      }
+      var needCore = lowerFirst(n.replace(/^(a way|some way|a means)\s+(to|of)\s+/i, ''));
+      var uc = u + (u.indexOf(',') >= 0 ? ',' : '');
+      pov.textContent = uc + ' need' + (/\band\b|,/.test(u) ? '' : 's') + ' ' + lowerFirst(n) + ', because ' + lowerFirst(i) + '.';
+      [
+        'How might we help ' + uc + ' ' + needCore.replace(/^to\s+/i, '') + '?',
+        'How might we make it impossible to ' + (/afraid|worr|scared|nervous/i.test(i) ? 'get it wrong' : 'miss') + '?',
+        'How might we make it easy even when ' + lowerFirst(i) + '?'
+      ].forEach(function (q) { hmw.appendChild(el('li', { text: q })); });
+      warn.textContent = GADGETS.test(n)
+        ? 'Your need names a thing (' + n.match(GADGETS)[0] + '). That is a solution sneaking in. Try describing what they need to do instead.'
+        : '';
+      brief.textContent = [
+        'Before writing any code, help me design this.',
+        '',
+        'Who it is for: ' + u + '.',
+        'Point of view: ' + pov.textContent,
+        'What we found out: ' + i + '.',
+        '',
+        'Please do three things, and wait for me after each:',
+        '1. Ask me up to five questions about anything in this brief that is unclear.',
+        '2. Suggest at least eight quite different ideas, including some with no electronics at all.',
+        '3. For the idea I pick, list what we would need to test with real people before building it.',
+        '',
+        'Do not write code yet.'
+      ].join('\n');
+    }
+    [user, need, insight].forEach(function (f) { f.input.addEventListener('input', show); });
+    root.textContent = '';
+    root.appendChild(el('div', { class: 'kr-w-head' }, [
+      el('span', { class: 'kr-w-label', text: 'Point of view builder' }),
+      el('span', { class: 'kr-w-hint', text: 'Edit the boxes with your own project.' })
+    ]));
+    root.appendChild(el('div', { class: 'kr-pv-fields' }, [user.box, need.box, insight.box]));
+    root.appendChild(el('span', { class: 'kr-mx-caption', text: 'Your point of view' }));
+    root.appendChild(pov);
+    root.appendChild(warn);
+    root.appendChild(el('span', { class: 'kr-mx-caption', text: 'How might we...' }));
+    root.appendChild(hmw);
+    root.appendChild(el('div', { class: 'kr-pv-briefhead' }, [el('span', { class: 'kr-mx-caption', text: 'A brief to paste into your AI assistant' }), copy]));
+    root.appendChild(brief);
+    show();
+  }
+
+  // ------------------------------------------------------------- five users
+  // Jakob Nielsen (2000), after Nielsen and Landauer (1993): share of usability
+  // problems found by n testers = 1 - (1 - L)^n, with L about 0.31.
+  function fiveUsers(root) {
+    var users = el('input', { type: 'range', min: '1', max: '15', step: '1', class: 'kr-cf-slider', 'aria-label': 'Number of testers' });
+    users.value = root.getAttribute('data-users') || '5';
+    var rate = el('input', { type: 'range', min: '10', max: '60', step: '1', class: 'kr-cf-slider', 'aria-label': 'Share of problems one tester finds' });
+    rate.value = root.getAttribute('data-rate') || '31';
+    var usersOut = el('strong'), rateOut = el('strong');
+    var bars = el('div', { class: 'kr-fu-bars', 'aria-hidden': 'true' });
+    var result = el('p', { class: 'kr-cf-result', role: 'status' });
+    var cols = [];
+    for (var k = 1; k <= 15; k++) {
+      var bar = el('span', { class: 'kr-fu-bar' });
+      var col = el('span', { class: 'kr-fu-col' }, [bar, el('span', { class: 'kr-fu-n', text: String(k) })]);
+      cols.push({ col: col, bar: bar });
+      bars.appendChild(col);
+    }
+    function found(n, L) { return 1 - Math.pow(1 - L, n); }
+    function show() {
+      var n = Number(users.value), L = Number(rate.value) / 100;
+      usersOut.textContent = String(n);
+      rateOut.textContent = rate.value + '%';
+      cols.forEach(function (c, i) {
+        c.bar.style.height = (found(i + 1, L) * 100).toFixed(1) + '%';
+        c.col.classList.toggle('is-on', i + 1 <= n);
+      });
+      var share = found(n, L), extra = found(n + 1, L) - share;
+      result.textContent = n + (n === 1 ? ' tester finds' : ' testers find') + ' about ' + Math.round(share * 100) +
+        '% of the problems. One more tester would add ' + (extra * 100).toFixed(1) + ' percentage points.';
+    }
+    users.addEventListener('input', show);
+    rate.addEventListener('input', show);
+    root.textContent = '';
+    root.appendChild(el('div', { class: 'kr-w-head' }, [
+      el('span', { class: 'kr-w-label', text: 'How many testers?' }),
+      el('span', { class: 'kr-w-hint', text: 'Nielsen’s model. Bars show 1 to 15 testers.' })
+    ]));
+    root.appendChild(el('label', { class: 'kr-cf-control' }, [el('span', { text: 'Testers: ' }), usersOut, users]));
+    root.appendChild(el('label', { class: 'kr-cf-control' }, [el('span', { text: 'One tester finds: ' }), rateOut, rate]));
+    root.appendChild(bars);
+    root.appendChild(result);
+    root.appendChild(el('p', { class: 'kr-w-hint', text: 'A model, not a law: it assumes your testers are like your real users and all try the same tasks.' }));
+    show();
+  }
+
   var WIDGETS = { 'matrix-painter': matrixPainter, 'bridge-steps': bridgeSteps, sorter: sorter, 'uno-q-sim': unoQSim,
-    'confidence-demo': confidenceDemo, 'cost-breakeven': costBreakeven, 'move-detector': moveDetector };
+    'confidence-demo': confidenceDemo, 'cost-breakeven': costBreakeven, 'move-detector': moveDetector,
+    'pov-builder': povBuilder, 'five-users': fiveUsers };
 
   function start() {
     document.querySelectorAll('[data-kr-widget]').forEach(function (root) {

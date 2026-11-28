@@ -1,0 +1,11 @@
+{%- comment -%}
+  Point-of-view and How Might We builder, with a brief to paste into an AI
+  assistant. See docs/course_widgets.md.
+
+    {% include pov_builder.html %}
+    {% include pov_builder.html user="Leo and Priya, the pupils on plant duty" need="..." insight="..." %}
+{%- endcomment -%}
+<div data-kr-widget="pov-builder" data-user="{{ include.user | default: 'Leo and Priya, the pupils on plant duty' | escape }}" data-need="{{ include.need | default: 'a way to tell at a glance which plant needs water' | escape }}" data-insight="{{ include.insight | default: 'they cannot judge it by looking and they are afraid of getting it wrong' | escape }}">
+<p><em>This builder needs JavaScript. Without it, write your point of view by hand: "[user] needs [need] because [insight]." Then turn it into questions that start "How might we..."</em></p>
+</div>
+{% include course_widget_assets.html %}
