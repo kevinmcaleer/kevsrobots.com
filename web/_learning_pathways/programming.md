@@ -14,6 +14,7 @@ stages:
   build:
   - Create Diagrams with Mermaid
   - Obsidian
+  - Design Thinking for Vibe Coders
   further:
   - Building Websites with Jekyll
   - Build a RAG for Your Obsidian Vault

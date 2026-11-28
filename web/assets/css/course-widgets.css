@@ -145,3 +145,23 @@ button.kr-md-sq:focus-visible { outline: 3px solid #0d6efd; outline-offset: -3px
 .kr-sim-phone-reading { font-size: 2.6rem; font-weight: 700; line-height: 1.2; }
 .kr-sim-phone input { width: 100%; }
 .kr-sim-phone-state { color: #555; font-size: 0.8rem; }
+
+/* POV builder (design thinking course) */
+.kr-pv-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem 1rem; margin-bottom: 0.75rem; }
+.kr-pv-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.kr-pv-input { box-sizing: border-box; width: 100%; padding: 0.35rem 0.5rem; border: 1px solid #ccc; border-radius: 6px; font: inherit; font-size: 0.95rem; resize: vertical; }
+.kr-pv-pov { margin: 0.25rem 0 0.5rem; font-weight: 600; font-size: 1.05rem; }
+.kr-pv-warn { color: #a33a00; margin: 0 0 0.5rem; }
+.kr-pv-warn:empty { display: none; }
+.kr-pv-hmw { margin: 0.25rem 0 0.75rem; padding-left: 1.25rem; }
+.kr-pv-briefhead { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.5rem; }
+.kr-pv-brief { margin: 0.4rem 0 0; background: #10151c; color: #e6edf3; border-radius: 6px; padding: 0.6rem 0.75rem; font-size: 0.8rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.kr-pv-brief:empty { display: none; }
+
+/* Five users (design thinking course) */
+.kr-fu-bars { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; height: 8rem; align-items: end; margin: 0.5rem 0; }
+.kr-fu-col { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 0; }
+.kr-fu-bar { display: block; background: #ddd; border-radius: 3px 3px 0 0; transition: height 0.2s; }
+.kr-fu-col.is-on .kr-fu-bar { background: #198754; }
+.kr-fu-n { font-size: 0.65rem; text-align: center; color: #555; }
+@media (prefers-reduced-motion: reduce) { .kr-fu-bar { transition: none; } }

@@ -93,6 +93,26 @@ A chess board in the opening position. The reader makes a move, sees how much ea
 {% include move_detector.html %}
 ```
 
+## Point of view builder
+
+For design thinking lessons. Three boxes (user, need, insight) build a point-of-view statement, three "How might we" questions and a short brief the reader can copy into an AI assistant. The brief asks the AI for questions and ideas, not code. If the need names a gadget (app, robot, sensor...), it warns that a solution has sneaked into the problem.
+
+```liquid
+{% include pov_builder.html %}
+{% include pov_builder.html user="..." need="..." insight="..." %}
+```
+
+With no options it starts with the Classroom Plant Helper example from the design thinking course.
+
+## How many testers?
+
+Two sliders (number of testers, 1 to 15, and the share of problems one tester finds, default 31%) over Jakob Nielsen's model, 1 - (1 - L)^n, from "Why You Only Need to Test with 5 Users" (NN/g, 2000). Bars show 1 to 15 testers, with the chosen number lit.
+
+```liquid
+{% include five_users.html %}
+{% include five_users.html users="3" rate="31" %}
+```
+
 ## Tips
 
 - Put a widget straight after the paragraph that explains the idea, and follow it with one sentence saying what to try.

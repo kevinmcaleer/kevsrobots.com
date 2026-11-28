@@ -1,0 +1,71 @@
+- name: Design Thinking for Vibe Coders
+  author: Kevin McAleer
+  date_created: 2026-11-28
+  date_published: 2026-11-28
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  video: 90pPahgU9JM
+  groups:
+    - ai
+    - robots
+    - micropython
+  description: >-
+    AI can write the code in minutes, so the hard part now is building the right thing. Learn the five
+    design thinking modes (empathise, define, ideate, prototype, test) and how to use each one with
+    AI-assisted, vibe coded software and robots, while you build a Classroom Plant Helper with a
+    Raspberry Pi Pico.
+  outcomes:
+    - Find out what real people need by watching and interviewing them, instead of asking an AI to guess
+    - Turn what you learn into a point of view, How Might We questions and a brief an AI assistant can work from
+    - Generate lots of ideas, then choose one with impact and effort in mind
+    - Build quick prototypes, from cardboard and Wizard of Oz fakes to vibe coded MicroPython
+    - Check AI-written code for made-up libraries, wrong pins and missing tests, and test it with real users
+    - Run the whole loop again, and know when to iterate, pivot or stop
+  prerequisites:
+    - None for the design lessons. For the build lessons, Learn MicroPython - The basics helps
+    - Helpful, Getting Started with Snakie and Git for Beginners
+  you_need:
+    - Paper, sticky notes, pens and some cardboard
+    - An AI coding assistant, such as the chat pane in Snakie, Claude, ChatGPT or GitHub Copilot
+    - For the build, a Raspberry Pi Pico or Pico W, a capacitive soil moisture sensor, red, amber and green LEDs with 220 ohm resistors, a piezo buzzer, a push button, a breadboard and jumper wires
+    - A plant in a pot, and a real person to design for
+  projects:
+    - /projects/picodrone/index.html
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 00_intro.md
+    - section:
+        name: Why design thinking now
+        content:
+          - 01_why_vibe_coding_needs_design.md
+          - 02_the_design_thinking_process.md
+    - section:
+        name: Understand the problem
+        content:
+          - 03_empathise.md
+          - 04_define.md
+          - 05_a_brief_your_ai_can_use.md
+    - section:
+        name: Explore ideas
+        content:
+          - 06_ideate.md
+          - 07_prototype_to_learn.md
+    - section:
+        name: Build with AI
+        content:
+          - 08_vibe_coding_a_prototype.md
+          - 09_prototyping_robots_with_ai.md
+    - section:
+        name: Test and iterate
+        content:
+          - 10_test_with_real_people.md
+          - 11_test_the_code.md
+          - 12_iterate.md
+    - section:
+        name: Project and summary
+        content:
+          - 13_project_plant_helper.md
+          - 14_summary.md
